@@ -1,14 +1,17 @@
 cmake_minimum_required(VERSION 3.8)
 project(gs_matterhorn)
 
-set(CMAKE_CXX_STANDARD 14)
+find_package(Qt5 COMPONENTS Quick Core REQUIRED)
 
-set(SOURCE_FILES main.cpp)
-add_executable(gs_run ${SOURCE_FILES})
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
 
-include_directories(ground_station)
 
 add_subdirectory(ground_station)
+include_directories(ground_station/)
+
 add_subdirectory(gs_tests)
 
-target_link_libraries(gs_run ground_station)
+add_executable(gs_run main.cpp qml.qrc)
+target_link_libraries(gs_run ground_station_lib)
