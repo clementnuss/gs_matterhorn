@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 project(gs_matterhorn)
+set(CMAKE_CXX_STANDARD 11)
 
 find_package(Qt5 COMPONENTS Core Gui REQUIRED)
 
