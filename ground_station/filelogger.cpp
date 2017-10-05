@@ -1,6 +1,3 @@
 #include "filelogger.h"
 
-FileLogger::FileLogger()
-{
-
-}
+FileLogger::FileLogger() = default;

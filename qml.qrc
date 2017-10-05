@@ -1,7 +1,0 @@
-<!DOCTYPE RCC>
-<RCC version="1.0">
-    <qresource prefix="/">
-        <file>ground_station/main.qml</file>
-        <file>ground_station/MainForm.ui.qml</file>
-    </qresource>
-</RCC>
