@@ -1,0 +1,10 @@
+#ifndef GS_MATTERHORN_TELEMETRYHANDLER_H
+#define GS_MATTERHORN_TELEMETRYHANDLER_H
+
+
+class TelemetryHandler : public IDataHandler {
+
+};
+
+
+#endif //GS_MATTERHORN_TELEMETRYHANDLER_H

@@ -1,0 +1,10 @@
+#ifndef GS_MATTERHORN_RADIORECEIVER_H
+#define GS_MATTERHORN_RADIORECEIVER_H
+
+
+class RadioReceiver {
+
+};
+
+
+#endif //GS_MATTERHORN_RADIORECEIVER_H

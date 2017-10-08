@@ -1,0 +1,10 @@
+#ifndef GS_MATTERHORN_ISENSOR_H
+#define GS_MATTERHORN_ISENSOR_H
+
+
+class ISensor {
+
+};
+
+
+#endif //GS_MATTERHORN_ISENSOR_H

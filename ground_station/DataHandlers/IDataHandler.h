@@ -1,0 +1,10 @@
+#ifndef GS_MATTERHORN_IDATAHANDLER_H
+#define GS_MATTERHORN_IDATAHANDLER_H
+
+
+class IDataHandler {
+
+};
+
+
+#endif //GS_MATTERHORN_IDATAHANDLER_H

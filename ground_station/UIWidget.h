@@ -6,7 +6,7 @@
 #include <QTime>
 #include <QThread>
 #include "datastructs.h"
-#include "worker.h"
+#include "MainWorker.h"
 
 namespace Ui {
 class GSWidget;

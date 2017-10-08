@@ -1,6 +1,6 @@
 #include <QThread>
 #include <iostream>
-#include "worker.h"
+#include "MainWorker.h"
 
 Worker::Worker() : enabled{true} {
 
@@ -13,7 +13,7 @@ Worker::~Worker(){
 void Worker::run(){
 
     while(!QThread::currentThread()->isInterruptionRequested()){
-        QThread::msleep(1000);
+        QThread::msleep(100);
         emit dummySignal();
     }
 

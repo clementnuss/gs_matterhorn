@@ -1,4 +1,4 @@
-#include "gswidget.h"
+#include "UIWidget.h"
 #include <QApplication>
 
 int runGUI(int argc, char *argv[])

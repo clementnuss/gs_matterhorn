@@ -1,9 +1,7 @@
-#include "gswidget.h"
-#include "worker.h"
-#include <QString>
-#include <QTime>
+#include "UIWidget.h"
 #include "ui_gswidget.h"
 #include <iostream>
+#include <iomanip>
 
 GSWidget::GSWidget(QWidget *parent) :
     QWidget(parent),
@@ -31,7 +29,10 @@ GSWidget::~GSWidget()
 }
 
 void GSWidget::dummySlot(){
-    std::cout << "The dummy slot was called. Time was: " << QTime::currentTime().toString().toStdString() << std::endl;
+    std::cout << "The dummy slot was called. Time was: "
+              << QTime::currentTime().toString().toStdString()
+              << "." << std::setw(3) << std::setfill('0')
+              << QTime::currentTime().msec() << std::endl;
 }
 
 void GSWidget::updateTime(){
