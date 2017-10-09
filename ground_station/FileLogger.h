@@ -14,14 +14,17 @@ class FileLogger
 public:
     FileLogger(std::string, int);
 
+    ~FileLogger();
     void writeData(vector<reference_wrapper<ILoggable>>);
 
-private:
-    void writeFile();
+    void close();
 
+    static const size_t bufferSize = 1000;
+private:
+
+    void writeFile();
     const int entrySize;
     const std::string path;
-    static const size_t bufferSize = 1000;
 
     size_t id;
     size_t bufferIndex;

@@ -7,6 +7,17 @@ using namespace std;
 
 FileLogger::FileLogger(std::string path, int entrySize) : path{path}, entrySize{entrySize}, id{0}, bufferIndex{0} {}
 
+FileLogger::~FileLogger() {
+    close();
+}
+
+void FileLogger::close() {
+    if (bufferIndex != 0) {
+        writeFile();
+        bufferIndex = 0;
+    }
+}
+
 void FileLogger::writeData(vector<reference_wrapper<ILoggable>> data) {
 
 
@@ -38,8 +49,12 @@ void FileLogger::writeFile() {
         return;
     }
 
-    for (int i = 0; i < bufferSize; i++) {
-        outf << buffer[i] << endl;
+    for (int i = 0; i < bufferIndex; i++) {
+        outf << buffer[i];
+
+        if (i != bufferIndex - 1) {
+            outf << endl;
+        }
     }
 
     outf.close();

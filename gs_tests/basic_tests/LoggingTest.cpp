@@ -30,11 +30,14 @@ TEST(LoggingTests, fileLoggerIsCorrect) {
     vector<reference_wrapper<ILoggable>> v;
 
     v.push_back(reference_wrapper<ILoggable>{t1});
-    for (int i = 0; i < 3001; i++) {
+
+    // Put 2999 rows more for a total of 3000
+    for (int i = 0; i < 3 * FileLogger::bufferSize - 1; i++) {
         v.push_back(reference_wrapper<ILoggable>{t2});
     }
 
     fl.writeData(v);
+    fl.close();
 
     ifstream input1("0testfile.csv");
     ifstream input2("1testfile.csv");
@@ -52,5 +55,6 @@ TEST(LoggingTests, fileLoggerIsCorrect) {
     EXPECT_EQ(strInput, "-1\t1.12456\t2.12456\t3.12456\t4.12456\t5.12456\t6.12456\t7.12456\t8.12456");
     getline(input3, strInput);
     EXPECT_EQ(strInput, "-1\t1.12456\t2.12456\t3.12456\t4.12456\t5.12456\t6.12456\t7.12456\t8.12456");
-    input3.
+
+    //TODO: check last line
 }
