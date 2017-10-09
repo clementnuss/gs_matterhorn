@@ -2,7 +2,7 @@
 #define WORKER_H
 
 #include <QThread>
-#include "datastructs.h"
+#include "DataStructures/datastructs.h"
 
 class Worker : public QObject
 {
@@ -16,7 +16,8 @@ public slots:
     void run();
 
 signals:
-    void telemetryReady(telemetry_t);
+
+    void telemetryReady(TelemetryReading);
     void linkStatusReady(bool, bool);
     void groundStatusReady(float, float);
     void dummySignal();

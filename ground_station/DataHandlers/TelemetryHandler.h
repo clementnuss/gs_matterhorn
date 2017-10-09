@@ -2,6 +2,8 @@
 #define GS_MATTERHORN_TELEMETRYHANDLER_H
 
 
+#include "IDataHandler.h"
+
 class TelemetryHandler : public IDataHandler {
 
 };

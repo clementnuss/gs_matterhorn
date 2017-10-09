@@ -39,7 +39,7 @@ void GSWidget::updateTime(){
     ui->ground_time->setText(QTime::currentTime().toString());
 }
 
-void GSWidget::updateTelemetry(telemetry_t t){
+void GSWidget::updateTelemetry(TelemetryReading t) {
     ui->telemetry_altitude_value->setText(QString::number(t.altitude.value));
     ui->telemetry_speed_value->setText(QString::number(t.speed.value));
     ui->telemetry_acceleration_value->setText(QString::number(t.acceleration.value));

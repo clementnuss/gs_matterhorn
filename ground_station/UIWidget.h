@@ -5,7 +5,7 @@
 #include <QTimer>
 #include <QTime>
 #include <QThread>
-#include "datastructs.h"
+#include "DataStructures/datastructs.h"
 #include "MainWorker.h"
 
 namespace Ui {
@@ -23,7 +23,8 @@ public:
 public slots:
     void dummySlot();
     void updateTime();
-    void updateTelemetry(telemetry_t);
+
+    void updateTelemetry(TelemetryReading);
     void updateLinkStatus(bool, bool);
     void updateGroundStatus(float, float);
 

@@ -5,7 +5,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 
-file(GLOB SOURCES "*.cpp")
+file(GLOB_RECURSE SOURCES "*.cpp")
 add_library(ground_station_lib ${SOURCES})
 
 # This will link_libraries for the specified Qt modules
