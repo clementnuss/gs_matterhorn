@@ -24,7 +24,7 @@ TEST(DataStructuresTests, timedTelemetryDataIsCorrect) {
             {6, 7, 8, true}
     };
 
-    EXPECT_EQ(std::string("-1,0,0,0,0,0,0,0,0"), t1.toString());
-    EXPECT_EQ(std::string("-1,1,2,3,4,5,6,7,8"), t2.toString());
+    EXPECT_EQ(std::string("-1\t0\t0\t0\t0\t0\t0\t0\t0"), t1.toString());
+    EXPECT_EQ(std::string("-1\t1\t2\t3\t4\t5\t6\t7\t8"), t2.toString());
 }
 
