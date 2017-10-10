@@ -5,6 +5,7 @@
 #include <array>
 #include <string>
 #include <functional>
+#include <atomic>
 #include "DataStructures/datastructs.h"
 
 using namespace std;
@@ -15,19 +16,29 @@ public:
     FileLogger(std::string, int);
 
     ~FileLogger();
-    void writeData(vector<reference_wrapper<ILoggable>>);
 
+    void registerData(vector<reference_wrapper<ILoggable>>);
     void close();
 
-    static const size_t bufferSize = 1000;
-private:
+    bool isReady();
 
+    static const size_t bufferSize = 1000;
+
+private:
     void writeFile();
+
+    void writeRoutine(array<string, bufferSize>, size_t);
+
+    void resetFlag();
+
+    void raiseFlag();
     const int entrySize;
     const std::string path;
 
     size_t id;
     size_t bufferIndex;
+
+    std::atomic_bool busyFlag;
 
     array<string, bufferSize> buffer;
 };
