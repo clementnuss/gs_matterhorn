@@ -27,10 +27,10 @@ struct YawPitchRollReading : ILoggable {
     float roll;
     bool validity;
 
-    virtual std::string toString() override {
+    virtual std::string toString() const override {
         std::stringstream ss;
 
-        ss << yaw << ILoggable::DELIMITER << pitch << ILoggable::DELIMITER << roll;
+        ss << yaw << DELIMITER << pitch << DELIMITER << roll;
         return ss.str();
     }
 };
@@ -48,14 +48,14 @@ struct TelemetryReading : TimedData, ILoggable {
     DataReading temperature;
     YawPitchRollReading ypr;
 
-    virtual std::string toString() override {
+    virtual std::string toString() const override {
         std::stringstream ss;
-        ss << this->timestamp << ILoggable::DELIMITER
-           << altitude.value << ILoggable::DELIMITER
-           << speed.value << ILoggable::DELIMITER
-           << acceleration.value << ILoggable::DELIMITER
-           << pressure.value << ILoggable::DELIMITER
-           << temperature.value << ILoggable::DELIMITER
+        ss << this->timestamp << DELIMITER
+           << altitude.value << DELIMITER
+           << speed.value << DELIMITER
+           << acceleration.value << DELIMITER
+           << pressure.value << DELIMITER
+           << temperature.value << DELIMITER
            << ypr.toString();
 
         return ss.str();

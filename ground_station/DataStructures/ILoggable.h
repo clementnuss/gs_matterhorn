@@ -7,11 +7,12 @@
 class ILoggable {
 
 public:
-    virtual std::string toString() = 0;
+    virtual std::string toString() const = 0;
 
 protected:
-    static const std::string DELIMITER;
+
 };
 
+static const std::string DELIMITER = "\t";
 
 #endif //GS_MATTERHORN_LOGGABLE_H

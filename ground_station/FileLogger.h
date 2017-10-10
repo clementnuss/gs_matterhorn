@@ -17,10 +17,10 @@ public:
 
     ~FileLogger();
 
-    void registerData(vector<reference_wrapper<ILoggable>>);
+    void registerData(const vector<reference_wrapper<ILoggable>> &);
     void close();
 
-    bool isReady();
+    bool isReady() const;
 
     static const size_t bufferSize = 1000;
 
@@ -28,10 +28,9 @@ private:
     void writeFile();
 
     void writeRoutine(array<string, bufferSize>, size_t);
-
     void resetFlag();
-
     void raiseFlag();
+
     const int entrySize;
     const std::string path;
 

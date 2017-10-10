@@ -7,7 +7,7 @@
 using namespace std;
 
 FileLogger::FileLogger(std::string path, int entrySize) :
-        path{path}, entrySize{entrySize}, id{0}, bufferIndex{0}, busyFlag{false} {}
+        path{std::move(path)}, entrySize{entrySize}, id{0}, bufferIndex{0}, busyFlag{false} {}
 
 FileLogger::~FileLogger() {
     close();
@@ -20,7 +20,7 @@ void FileLogger::close() {
     }
 }
 
-void FileLogger::registerData(vector<reference_wrapper<ILoggable>> data) {
+void FileLogger::registerData(const vector<reference_wrapper<ILoggable>> &data) {
 
     for (const auto loggable : data) {
 
@@ -50,11 +50,12 @@ void FileLogger::writeFile() {
 
 void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
 
+    //TODO add unit tests for exceptions
     if (isReady()) {
         throw logic_error("A call to write routine was made without raising the write flag");
     }
 
-    if (a.size() < 1 || tailIndex < 1) {
+    if (tailIndex < 1) {
         throw invalid_argument("Call to write routine was made either with an empty array or an invalid tail index");
     }
 
@@ -80,7 +81,7 @@ void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
     resetFlag();
 }
 
-bool FileLogger::isReady() {
+bool FileLogger::isReady() const {
     return !(this->busyFlag);
 }
 

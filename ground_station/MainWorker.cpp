@@ -18,5 +18,4 @@ void Worker::run(){
     }
 
     std::cout << "The worker has finished" << std::endl;
-    return;
 }

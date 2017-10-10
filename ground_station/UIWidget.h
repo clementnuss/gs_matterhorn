@@ -17,8 +17,9 @@ class GSWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit GSWidget(QWidget *parent = 0);
-    ~GSWidget();
+    explicit GSWidget(QWidget *parent = nullptr);
+
+    ~GSWidget() override;
 
 public slots:
     void dummySlot();
@@ -27,9 +28,6 @@ public slots:
     void updateTelemetry(TelemetryReading);
     void updateLinkStatus(bool, bool);
     void updateGroundStatus(float, float);
-
-signals:
-    void operate();
 
 private:
     Ui::GSWidget *ui;

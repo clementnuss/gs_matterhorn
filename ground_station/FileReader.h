@@ -7,7 +7,7 @@
 class FileReader {
 
 public:
-    FileReader(std::string path);
+    explicit FileReader(std::string path);
 
     ~FileReader();
 

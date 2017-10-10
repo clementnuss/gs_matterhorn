@@ -11,7 +11,7 @@ GSWidget::GSWidget(QWidget *parent) :
     ui->setupUi(this);
 
     connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
-    clockTimer.start((1.0/60.0) * 1000);
+    clockTimer.start(std::lround((1.0 / 60.0) * 1000));
 
     worker = new Worker;
     worker->moveToThread(&workerThread);

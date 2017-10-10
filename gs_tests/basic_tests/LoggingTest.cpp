@@ -29,11 +29,11 @@ TEST(LoggingTests, fileLoggerIsCorrect) {
     FileLogger fl{"testfile.csv", 2};
     vector<reference_wrapper<ILoggable>> v;
 
-    v.push_back(reference_wrapper<ILoggable>{t1});
+    v.emplace_back(reference_wrapper<ILoggable>{t1});
 
     // Put 2999 rows more for a total of 3000
     for (int i = 0; i < 3 * FileLogger::bufferSize - 1; i++) {
-        v.push_back(reference_wrapper<ILoggable>{t2});
+        v.emplace_back(reference_wrapper<ILoggable>{t2});
     }
 
     fl.registerData(v);

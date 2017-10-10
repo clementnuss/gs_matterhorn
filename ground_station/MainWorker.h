@@ -10,7 +10,8 @@ class Worker : public QObject
 
 public:
     Worker();
-    ~Worker();
+
+    ~Worker() override;
 
 public slots:
     void run();
