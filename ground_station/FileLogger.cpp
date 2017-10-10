@@ -63,7 +63,8 @@ void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
     ofstream fileOutput(ss.str());
 
     if (!fileOutput) {
-        cerr << "Could not open file for writing." << endl;
+        //TODO: find an alternative way to save data ?
+        cerr << "Could not open file for writing, data will be lost." << endl;
         return;
     }
 
