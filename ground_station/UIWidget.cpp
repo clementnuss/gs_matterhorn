@@ -2,6 +2,7 @@
 #include "ui_gswidget.h"
 #include <iostream>
 #include <iomanip>
+#include <qcustomplot.h>
 
 GSWidget::GSWidget(QWidget *parent) :
     QWidget(parent),
@@ -9,6 +10,8 @@ GSWidget::GSWidget(QWidget *parent) :
     clockTimer(this)
 {
     ui->setupUi(this);
+
+    displayGraph();
 
     connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
     clockTimer.start(std::lround((1.0 / 60.0) * 1000));
@@ -37,6 +40,27 @@ void GSWidget::dummySlot(){
 
 void GSWidget::updateTime(){
     ui->ground_time->setText(QTime::currentTime().toString());
+}
+
+void GSWidget::displayGraph() {
+    QCustomPlot* plot_frame = ui->plot_frame;
+
+    QVector<double> x(101), y(101); // initialize with entries 0..100
+    for (int i=0; i<101; ++i)
+    {
+        x[i] = i/50.0 - 1; // x goes from -1 to 1
+        y[i] = x[i]*x[i];  // let's plot a quadratic function
+    }
+    // create graph and assign data to it:
+    plot_frame->addGraph();
+    plot_frame->graph(0)->setData(x, y);
+    // give the axes some labels:
+    plot_frame->xAxis->setLabel("x");
+    plot_frame->yAxis->setLabel("y");
+    // set axes ranges, so we see all data:
+    plot_frame->xAxis->setRange(-1, 1);
+    plot_frame->yAxis->setRange(0, 1);
+
 }
 
 void GSWidget::updateTelemetry(TelemetryReading t) {

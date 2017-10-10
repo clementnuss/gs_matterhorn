@@ -1,8 +1,7 @@
 #include "UIWidget.h"
 #include <QApplication>
 
-int runGUI(int argc, char *argv[])
-{
+int runGUI(int argc, char *argv[]) {
     QApplication a(argc, argv);
     GSWidget w;
     w.show();

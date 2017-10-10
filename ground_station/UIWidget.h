@@ -38,6 +38,8 @@ private:
 
     QThread workerThread;
     Worker* worker;
+
+    void displayGraph();
 };
 
 #endif // GSWIDGET_H

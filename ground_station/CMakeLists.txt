@@ -8,5 +8,9 @@ set(CMAKE_AUTOMOC ON)
 file(GLOB_RECURSE SOURCES "*.cpp")
 add_library(ground_station_lib ${SOURCES})
 
+# Include QCustomPlot libtrary and include file
+include_directories(${CMAKE_BINARY_DIR}/qcustomplot-src/)
+target_link_libraries(ground_station_lib qcustomplot_lib)
+
 # This will link_libraries for the specified Qt modules
 qt5_use_modules(ground_station_lib Core Gui Widgets)

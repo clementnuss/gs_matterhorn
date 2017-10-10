@@ -673,25 +673,8 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,1,1">
        <item>
-        <widget class="QFrame" name="frame">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>200</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
+        <widget class="QCustomPlot" name="plot_frame">
+         
         </widget>
        </item>
        <item>
@@ -731,7 +714,7 @@
           </layout>
          </widget>
         </widget>
-       </item>
+		</item>
       </layout>
      </item>
     </layout>
@@ -739,6 +722,14 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+  <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

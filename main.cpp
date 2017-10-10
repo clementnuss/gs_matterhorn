@@ -1,7 +1,4 @@
-#include <QGuiApplication>
 #include <iostream>
-#include <ground_station/UIWidget.h>
-#include <QtWidgets/QApplication>
 #include <c++/thread>
 #include "General.h"
 

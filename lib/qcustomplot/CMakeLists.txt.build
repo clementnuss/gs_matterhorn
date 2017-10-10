@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.8)
+project(qcustomplot_lib LANGUAGES CXX)
+
+find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport REQUIRED)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+
+file(GLOB SOURCES "*.cpp")
+message("sources: ${SOURCES}")
+#${CMAKE_BINARY_DIR}/qcustomplot-src/qcustomplot.cpp
+add_library(qcustomplot_lib SHARED ${CMAKE_BINARY_DIR}/qcustomplot-src/qcustomplot.cpp)
+
+find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport REQUIRED)
+qt5_use_modules(qcustomplot_lib Widgets PrintSupport)
+
+install(TARGETS qcustomplot_lib
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
