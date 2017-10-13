@@ -31,8 +31,8 @@ private:
     void resetFlag();
     void raiseFlag();
 
-    const int entrySize;
     const std::string path;
+    const int entrySize;
 
     size_t id;
     size_t bufferIndex;

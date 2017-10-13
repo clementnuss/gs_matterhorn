@@ -34,7 +34,19 @@ void FileLogger::registerData(const vector<reference_wrapper<ILoggable>> &data) 
     }
 }
 
+void FileLogger::writeFile() {
 
+    while (!isReady()) {
+        //cout << "Waiting for file to be written " << endl;
+    }
+
+    raiseFlag();
+
+    array<string, bufferSize> a = buffer;
+    thread t(&FileLogger::writeRoutine, this, a, bufferIndex);
+
+    t.detach();
+}
 
 void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
 
@@ -57,7 +69,7 @@ void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
         return;
     }
 
-    for (int i = 0; i < tailIndex; i++) {
+    for (size_t i = 0; i < tailIndex; i++) {
         fileOutput << a[i];
 
         if (i != tailIndex - 1) {
@@ -67,20 +79,6 @@ void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
 
     fileOutput.close();
     resetFlag();
-}
-
-void FileLogger::writeFile() {
-
-    while (!isReady()) {
-        //cout << "Waiting for file to be written " << endl;
-    }
-
-    raiseFlag();
-
-    array<string, bufferSize> a = buffer;
-    thread t(&FileLogger::writeRoutine, this, a, bufferIndex);
-
-    t.detach();
 }
 
 bool FileLogger::isReady() const {
