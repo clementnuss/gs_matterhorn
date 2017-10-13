@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.7)
 project(qcustomplot_cmake_lib LANGUAGES CXX)
 
 configure_file(CMakeLists.txt.ddl ${CMAKE_BINARY_DIR}/qcustomplot-download/CMakeLists.txt)

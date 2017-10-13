@@ -1,5 +1,5 @@
 #include <fstream>
-#include <c++/iostream>
+#include <iostream>
 #include <sstream>
 #include <thread>
 #include "FileLogger.h"
@@ -34,19 +34,7 @@ void FileLogger::registerData(const vector<reference_wrapper<ILoggable>> &data) 
     }
 }
 
-void FileLogger::writeFile() {
 
-    while (!isReady()) {
-        //cout << "Waiting for file to be written " << endl;
-    }
-
-    raiseFlag();
-
-    array<string, bufferSize> a = buffer;
-    thread t(FileLogger::writeRoutine, this, a, bufferIndex);
-
-    t.detach();
-}
 
 void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
 
@@ -79,6 +67,20 @@ void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
 
     fileOutput.close();
     resetFlag();
+}
+
+void FileLogger::writeFile() {
+
+    while (!isReady()) {
+        //cout << "Waiting for file to be written " << endl;
+    }
+
+    raiseFlag();
+
+    array<string, bufferSize> a = buffer;
+    thread t(&FileLogger::writeRoutine, this, a, bufferIndex);
+
+    t.detach();
 }
 
 bool FileLogger::isReady() const {

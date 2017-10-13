@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.7)
 project(ground_station LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
