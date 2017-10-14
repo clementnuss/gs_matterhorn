@@ -2,6 +2,8 @@
 #include <iostream>
 #include "MainWorker.h"
 
+using namespace std;
+
 Worker::Worker() : enabled{true} {
 
 }
@@ -13,9 +15,18 @@ Worker::~Worker(){
 void Worker::run(){
 
     while(!QThread::currentThread()->isInterruptionRequested()){
-        QThread::msleep(100);
-        emit dummySignal();
+        QThread::msleep(1000);
+
+
+        vector<TelemetryReading> telemetryData = telemetryHandler.getData();
+        emit graphDataReady(graphSpeedData(telemetryData), GraphFeature::FEATURE1);
+
     }
 
     std::cout << "The worker has finished" << std::endl;
 }
+
+QVector<QCPGraphData> Worker::graphSpeedData(vector<TelemetryReading> &data) {
+    return QVector<QCPGraphData>();
+}
+

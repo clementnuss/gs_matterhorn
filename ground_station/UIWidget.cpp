@@ -2,7 +2,7 @@
 #include "ui_gswidget.h"
 #include <iostream>
 #include <iomanip>
-#include <qcustomplot.h>
+#include <c++/cassert>
 
 GSWidget::GSWidget(QWidget *parent) :
     QWidget(parent),
@@ -11,15 +11,30 @@ GSWidget::GSWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    displayGraph();
+    graphSetup();
 
     connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
     clockTimer.start(std::lround((1.0 / 60.0) * 1000));
 
     worker = new Worker;
     worker->moveToThread(&workerThread);
-    connect(worker, SIGNAL(dummySignal()), this, SLOT(dummySlot()));
-    connect(&workerThread, SIGNAL(started()), worker, SLOT(run()));
+
+    qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>");
+    qRegisterMetaType<GraphFeature>("GraphFeature");
+
+    connect(worker,
+            SIGNAL(dummySignal()),
+            this,
+            SLOT(dummySlot()));
+    connect(worker,
+            SIGNAL(graphDataReady(QVector<QCPGraphData>, GraphFeature)),
+            this,
+            SLOT(updateGraphData(QVector<QCPGraphData>, GraphFeature)));
+    connect(&workerThread,
+            SIGNAL(started()),
+            worker,
+            SLOT(run()));
+
     workerThread.start();
 }
 
@@ -42,25 +57,35 @@ void GSWidget::updateTime(){
     ui->ground_time->setText(QTime::currentTime().toString());
 }
 
-void GSWidget::displayGraph() {
-    QCustomPlot* plot_frame = ui->plot_frame;
+void GSWidget::graphSetup() {
+    QCustomPlot* customPlot = ui->graph_widget;
 
-    QVector<double> x(101), y(101); // initialize with entries 0..100
-    for (int i=0; i<101; ++i)
+    customPlot->plotLayout()->clear();
+
+
+    QCPAxisRect *topAxisRect = new QCPAxisRect(customPlot);
+    customPlot->plotLayout()->addElement(0, 0, topAxisRect);
+    QCPAxisRect *bottomAxisRect = new QCPAxisRect(customPlot);
+    customPlot->plotLayout()->addElement(1, 0, bottomAxisRect);
+
+
+    QList<QCPAxis*> allAxes;
+    allAxes << bottomAxisRect->axes() << topAxisRect->axes();
+    foreach (QCPAxis *axis, allAxes)
     {
-        x[i] = i/50.0 - 1; // x goes from -1 to 1
-        y[i] = x[i]*x[i];  // let's plot a quadratic function
+        axis->setLayer("axes");
+        axis->grid()->setLayer("grid");
     }
-    // create graph and assign data to it:
-    plot_frame->addGraph();
-    plot_frame->graph(0)->setData(x, y);
-    // give the axes some labels:
-    plot_frame->xAxis->setLabel("x");
-    plot_frame->yAxis->setLabel("y");
-    // set axes ranges, so we see all data:
-    plot_frame->xAxis->setRange(-1, 1);
-    plot_frame->yAxis->setRange(0, 1);
 
+    customPlot->addGraph(topAxisRect->axis(QCPAxis::atBottom), topAxisRect->axis(QCPAxis::atLeft));
+    customPlot->addGraph(bottomAxisRect->axis(QCPAxis::atBottom), bottomAxisRect->axis(QCPAxis::atLeft));
+
+    // Check if the number of graphs corresponds to the number of available features
+    assert(ui->graph_widget->graphCount() == static_cast<int>(GraphFeature::Count));
+}
+
+void GSWidget::updateGraphData(QVector<QCPGraphData> d, GraphFeature feature) {
+    ui->graph_widget->graph(static_cast<int>(feature))->data()->set(d);
 }
 
 void GSWidget::updateTelemetry(TelemetryReading t) {

@@ -13,18 +13,18 @@ protected:
 };
 
 struct DataReading {
-    DataReading(float v, bool b) : value{v}, validity{b} {}
+    DataReading(double v, bool b) : value{v}, validity{b} {}
 
-    float value;
+    double value;
     bool validity;
 };
 
 struct YawPitchRollReading : ILoggable {
-    YawPitchRollReading(float y, float p, float r, bool b) : yaw{y}, pitch{p}, roll{r}, validity{b} {}
+    YawPitchRollReading(double y, double p, double r, bool b) : yaw{y}, pitch{p}, roll{r}, validity{b} {}
 
-    float yaw;
-    float pitch;
-    float roll;
+    double yaw;
+    double pitch;
+    double roll;
     bool validity;
 
     virtual std::string toString() const override {

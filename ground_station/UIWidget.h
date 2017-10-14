@@ -1,16 +1,17 @@
 #ifndef GSWIDGET_H
 #define GSWIDGET_H
 
-#include <QWidget>
-#include <QTimer>
-#include <QTime>
-#include <QThread>
-#include "DataStructures/datastructs.h"
+#include <QtWidgets/QWidget>
+#include <DataStructures/datastructs.h>
+#include <QtCore/QTimer>
+#include <QtCore/QThread>
+#include <qcustomplot.h>
 #include "MainWorker.h"
 
 namespace Ui {
 class GSWidget;
 }
+
 
 class GSWidget : public QWidget
 {
@@ -25,6 +26,7 @@ public slots:
     void dummySlot();
     void updateTime();
 
+    void updateGraphData(QVector<QCPGraphData>, GraphFeature);
     void updateTelemetry(TelemetryReading);
     void updateLinkStatus(bool, bool);
     void updateGroundStatus(float, float);
@@ -37,9 +39,9 @@ private:
     const QString DOWN = "DOWN";
 
     QThread workerThread;
-    Worker* worker;
+    Worker *worker;
 
-    void displayGraph();
+    void graphSetup();
 };
 
 #endif // GSWIDGET_H

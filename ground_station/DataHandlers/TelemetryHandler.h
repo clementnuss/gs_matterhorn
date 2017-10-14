@@ -2,9 +2,16 @@
 #define GS_MATTERHORN_TELEMETRYHANDLER_H
 
 
+#include <c++/memory>
 #include "IDataHandler.h"
+#include "DataStructures/datastructs.h"
 
-class TelemetryHandler : public IDataHandler {
+
+class TelemetryHandler : public IDataHandler<TelemetryReading> {
+
+public:
+    virtual const std::vector<TelemetryReading> getData() override;
+
 
 };
 

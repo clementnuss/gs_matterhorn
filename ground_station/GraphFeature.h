@@ -1,0 +1,9 @@
+
+#ifndef GS_MATTERHORN_GRAPHFEATURE_H
+#define GS_MATTERHORN_GRAPHFEATURE_H
+
+enum class GraphFeature {
+    FEATURE1, FEATURE2, Count
+};
+
+#endif //GS_MATTERHORN_GRAPHFEATURE_H
