@@ -1,5 +1,5 @@
 #include <fstream>
-#include <c++/iostream>
+#include <iostream>
 #include <sstream>
 #include <thread>
 #include "FileLogger.h"
@@ -43,7 +43,7 @@ void FileLogger::writeFile() {
     raiseFlag();
 
     array<string, bufferSize> a = buffer;
-    thread t(FileLogger::writeRoutine, this, a, bufferIndex);
+    thread t(&FileLogger::writeRoutine, this, a, bufferIndex);
 
     t.detach();
 }
@@ -69,7 +69,7 @@ void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
         return;
     }
 
-    for (int i = 0; i < tailIndex; i++) {
+    for (size_t i = 0; i < tailIndex; i++) {
         fileOutput << a[i];
 
         if (i != tailIndex - 1) {

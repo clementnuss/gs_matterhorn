@@ -1,5 +1,5 @@
 #include <iostream>
-#include <c++/thread>
+#include <thread>
 #include "General.h"
 
 int runGUI(int argc, char *argv[]);
