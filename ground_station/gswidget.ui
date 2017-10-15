@@ -22,8 +22,72 @@
     <height>600</height>
    </size>
   </property>
+     <property name="palette">
+         <palette>
+             <active>
+                 <colorrole role="Base">
+                     <brush brushstyle="SolidPattern">
+                         <color alpha="255">
+                             <red>255</red>
+                             <green>255</green>
+                             <blue>255</blue>
+                         </color>
+                     </brush>
+                 </colorrole>
+                 <colorrole role="Window">
+                     <brush brushstyle="SolidPattern">
+                         <color alpha="255">
+                             <red>255</red>
+                             <green>255</green>
+                             <blue>255</blue>
+                         </color>
+                     </brush>
+                 </colorrole>
+             </active>
+             <inactive>
+                 <colorrole role="Base">
+                     <brush brushstyle="SolidPattern">
+                         <color alpha="255">
+                             <red>255</red>
+                             <green>255</green>
+                             <blue>255</blue>
+                         </color>
+                     </brush>
+                 </colorrole>
+                 <colorrole role="Window">
+                     <brush brushstyle="SolidPattern">
+                         <color alpha="255">
+                             <red>255</red>
+                             <green>255</green>
+                             <blue>255</blue>
+                         </color>
+                     </brush>
+                 </colorrole>
+             </inactive>
+             <disabled>
+                 <colorrole role="Base">
+                     <brush brushstyle="SolidPattern">
+                         <color alpha="255">
+                             <red>255</red>
+                             <green>255</green>
+                             <blue>255</blue>
+                         </color>
+                     </brush>
+                 </colorrole>
+                 <colorrole role="Window">
+                     <brush brushstyle="SolidPattern">
+                         <color alpha="255">
+                             <red>255</red>
+                             <green>255</green>
+                             <blue>255</blue>
+                         </color>
+                     </brush>
+                 </colorrole>
+             </disabled>
+         </palette>
+     </property>
   <property name="windowTitle">
-   <string>GSWidget</string>
+      <string>Ground Station</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_10">
    <item>
@@ -58,7 +122,9 @@
          </property>
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
+              <pointsize>12</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
           </font>
          </property>
          <property name="title">
@@ -455,8 +521,10 @@
          </property>
          <property name="font">
           <font>
-           <family>Source Code Pro</family>
-           <pointsize>10</pointsize>
+              <family>MS Shell Dlg 2</family>
+              <pointsize>12</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
           </font>
          </property>
          <property name="title">
@@ -569,7 +637,10 @@
          </property>
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
+              <family>MS Shell Dlg 2</family>
+              <pointsize>12</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
           </font>
          </property>
          <property name="title">
@@ -676,15 +747,36 @@
                    </size>
                </property>
                <property name="frameShape">
-                   <enum>QFrame::StyledPanel</enum>
+                   <enum>QFrame::NoFrame</enum>
                </property>
                <property name="frameShadow">
-                   <enum>QFrame::Raised</enum>
+                   <enum>QFrame::Plain</enum>
                </property>
                <property name="lineWidth">
                    <number>1</number>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_7">
+                   <item>
+                       <widget class="QLabel" name="label_2">
+                           <property name="sizePolicy">
+                               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                                   <horstretch>0</horstretch>
+                                   <verstretch>0</verstretch>
+                               </sizepolicy>
+                           </property>
+                           <property name="font">
+                               <font>
+                                   <pointsize>12</pointsize>
+                                   <weight>75</weight>
+                                   <italic>false</italic>
+                                   <bold>true</bold>
+                               </font>
+                           </property>
+                           <property name="text">
+                               <string>REALTIME GRAPHS</string>
+                           </property>
+                       </widget>
+                   </item>
                    <item>
                        <widget class="QStackedWidget" name="stackedWidget">
                            <property name="frameShape">
@@ -731,6 +823,9 @@
        </item>
        <item>
         <widget class="QScrollArea" name="scrollArea">
+            <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+            </property>
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
@@ -739,11 +834,25 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>385</width>
-            <height>555</height>
+               <width>387</width>
+               <height>557</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">
+              <item>
+                  <widget class="QLabel" name="label">
+                      <property name="font">
+                          <font>
+                              <pointsize>12</pointsize>
+                              <weight>75</weight>
+                              <bold>true</bold>
+                          </font>
+                      </property>
+                      <property name="text">
+                          <string>EVENT LOG</string>
+                      </property>
+                  </widget>
+              </item>
            <item>
             <widget class="QPlainTextEdit" name="plainTextEdit"/>
            </item>
