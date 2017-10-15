@@ -1,5 +1,5 @@
-#ifndef WORKER_H
-#define WORKER_H
+#ifndef MAINWORKER_H
+#define MAINWORKER_H
 
 #include <QtWidgets/QWidget>
 #include <DataStructures/datastructs.h>
@@ -8,32 +8,35 @@
 #include "GraphFeature.h"
 
 using namespace std;
-
 class Worker : public QObject
 {
     Q_OBJECT
 
 public:
     Worker();
-
     ~Worker() override;
 
 public slots:
     void run();
 
 signals:
+
     void telemetryReady(TelemetryReading);
 
-    void graphDataReady(QVector<QCPGraphData>, GraphFeature);
+    void graphDataReady(QVector<QCPGraphData> &, GraphFeature);
     void linkStatusReady(bool, bool);
     void groundStatusReady(float, float);
-    void dummySignal();
 
+    void dummySignal();
 private:
     bool enabled;
-    TelemetryHandler telemetryHandler;
+    QVector<QCPGraphData> speedDataBuffer;
+    QVector<QCPGraphData> accelDataBuffer;
+    unique_ptr<TelemetryHandler> telemetryHandler;
 
-    QVector<QCPGraphData> graphSpeedData(vector<TelemetryReading> &);
+    void appendSpeedData(vector<TelemetryReading> &);
+
+    void appendAccelData(vector<TelemetryReading> &);
 };
 
 #endif // WORKER_H

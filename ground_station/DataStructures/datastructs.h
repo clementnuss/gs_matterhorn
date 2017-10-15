@@ -8,7 +8,6 @@
 struct TimedData {
     TimedData(long t) : timestamp{t} {}
 
-protected:
     long timestamp;
 };
 

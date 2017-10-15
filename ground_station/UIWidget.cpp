@@ -19,7 +19,7 @@ GSWidget::GSWidget(QWidget *parent) :
     worker = new Worker;
     worker->moveToThread(&workerThread);
 
-    qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>");
+    qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>&");
     qRegisterMetaType<GraphFeature>("GraphFeature");
 
     connect(worker,
@@ -27,9 +27,9 @@ GSWidget::GSWidget(QWidget *parent) :
             this,
             SLOT(dummySlot()));
     connect(worker,
-            SIGNAL(graphDataReady(QVector<QCPGraphData>, GraphFeature)),
+            SIGNAL(graphDataReady(QVector<QCPGraphData> & , GraphFeature)),
             this,
-            SLOT(updateGraphData(QVector<QCPGraphData>, GraphFeature)));
+            SLOT(updateGraphData(QVector<QCPGraphData> & , GraphFeature)));
     connect(&workerThread,
             SIGNAL(started()),
             worker,
@@ -46,17 +46,6 @@ GSWidget::~GSWidget()
     workerThread.wait();
 }
 
-void GSWidget::dummySlot(){
-    std::cout << "The dummy slot was called. Time was: "
-              << QTime::currentTime().toString().toStdString()
-              << "." << std::setw(3) << std::setfill('0')
-              << QTime::currentTime().msec() << std::endl;
-}
-
-void GSWidget::updateTime(){
-    ui->ground_time->setText(QTime::currentTime().toString());
-}
-
 void GSWidget::graphSetup() {
     QCustomPlot* customPlot = ui->graph_widget;
 
@@ -68,24 +57,49 @@ void GSWidget::graphSetup() {
     QCPAxisRect *bottomAxisRect = new QCPAxisRect(customPlot);
     customPlot->plotLayout()->addElement(1, 0, bottomAxisRect);
 
+    QPen penFeature1;
+    QPen penFeature2;
+    penFeature1.setWidth(2);
+    penFeature1.setColor(QColor(180, 0, 0));
+    penFeature2.setColor(QColor(0, 180, 0));
 
     QList<QCPAxis*> allAxes;
     allAxes << bottomAxisRect->axes() << topAxisRect->axes();
-    foreach (QCPAxis *axis, allAxes)
-    {
-        axis->setLayer("axes");
-        axis->grid()->setLayer("grid");
-    }
+            foreach (QCPAxis *axis, allAxes) {
+            axis->setLayer("axes");
+            axis->grid()->setLayer("grid");
+        }
 
-    customPlot->addGraph(topAxisRect->axis(QCPAxis::atBottom), topAxisRect->axis(QCPAxis::atLeft));
-    customPlot->addGraph(bottomAxisRect->axis(QCPAxis::atBottom), bottomAxisRect->axis(QCPAxis::atLeft));
+    QCPGraph *g1 = customPlot->addGraph(topAxisRect->axis(QCPAxis::atBottom), topAxisRect->axis(QCPAxis::atLeft));
+    QCPGraph *g2 = customPlot->addGraph(bottomAxisRect->axis(QCPAxis::atBottom), bottomAxisRect->axis(QCPAxis::atLeft));
+
+    g1->setPen(penFeature1);
+    g2->setPen(penFeature2);
 
     // Check if the number of graphs corresponds to the number of available features
     assert(ui->graph_widget->graphCount() == static_cast<int>(GraphFeature::Count));
+
 }
 
-void GSWidget::updateGraphData(QVector<QCPGraphData> d, GraphFeature feature) {
-    ui->graph_widget->graph(static_cast<int>(feature))->data()->set(d);
+void GSWidget::dummySlot() {
+    std::cout << "The dummy slot was called. Time was: "
+              << QTime::currentTime().toString().toStdString()
+              << "." << std::setw(3) << std::setfill('0')
+              << QTime::currentTime().msec() << std::endl;
+}
+
+void GSWidget::updateTime() {
+    ui->ground_time->setText(QTime::currentTime().toString());
+}
+
+void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
+    QCPGraph *g = ui->graph_widget->graph(static_cast<int>(feature));
+
+    g->data()->set(d);
+    g->keyAxis()->setRange(d.last().key, UIConstants::MSECS_GRAPH_XRANGE, Qt::AlignRight);
+    g->valueAxis()->rescale(true);
+
+    ui->graph_widget->replot();
 }
 
 void GSWidget::updateTelemetry(TelemetryReading t) {

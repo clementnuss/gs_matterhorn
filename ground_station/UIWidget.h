@@ -7,6 +7,7 @@
 #include <QtCore/QThread>
 #include <qcustomplot.h>
 #include "MainWorker.h"
+#include "ProgramConstants.h"
 
 namespace Ui {
 class GSWidget;
@@ -26,7 +27,7 @@ public slots:
     void dummySlot();
     void updateTime();
 
-    void updateGraphData(QVector<QCPGraphData>, GraphFeature);
+    void updateGraphData(QVector<QCPGraphData> &, GraphFeature);
     void updateTelemetry(TelemetryReading);
     void updateLinkStatus(bool, bool);
     void updateGroundStatus(float, float);

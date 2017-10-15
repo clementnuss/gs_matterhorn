@@ -7,7 +7,7 @@ TEST(SimulatorsTests, simulatedTelemetryIsCorrect) {
     TelemetrySimulator ts;
     TelemetryHandler &telemetryHandler = ts;
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 100; i++) {
         vector<TelemetryReading> data = ts.getData();
 
         EXPECT_TRUE(data.size() > 0);
