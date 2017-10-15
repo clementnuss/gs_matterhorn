@@ -10,8 +10,7 @@
 class TelemetryHandler : public IDataHandler<TelemetryReading> {
 
 public:
-    virtual const std::vector<TelemetryReading> getData() override;
-
+    virtual std::vector<TelemetryReading> getData() override;
 
 };
 

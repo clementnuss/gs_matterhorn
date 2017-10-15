@@ -2,6 +2,6 @@
 
 using namespace std;
 
-const vector<TelemetryReading> TelemetryHandler::getData() {
+vector<TelemetryReading> TelemetryHandler::getData() {
     return vector<TelemetryReading>();
 }
