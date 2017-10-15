@@ -33,10 +33,6 @@ private:
     unique_ptr<TelemetryHandler> telemetryHandler;
 
     QVector<QCPGraphData> extractGraphData(vector<TelemetryReading> &, QCPGraphData (*)(TelemetryReading));
-
-    QVector<QCPGraphData> toSpeedGraphData(vector<TelemetryReading> &);
-
-    QVector<QCPGraphData> toAccelerationGraphData(vector<TelemetryReading> &);
 };
 
 #endif // WORKER_H

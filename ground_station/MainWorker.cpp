@@ -11,13 +11,13 @@ Worker::Worker() : enabled{true}, telemetryHandler{new TelemetrySimulator()} {
 
 }
 
-Worker::~Worker(){
+Worker::~Worker() {
     std::cout << "Destroying worker thread" << std::endl;
 }
 
-void Worker::run(){
+void Worker::run() {
 
-    while(!QThread::currentThread()->isInterruptionRequested()){
+    while (!QThread::currentThread()->isInterruptionRequested()) {
         //TODO: adapt sleep time so as to have proper 30 fps
         QThread::msleep(UIConstants::REFRESH_RATE);
 
