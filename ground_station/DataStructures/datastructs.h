@@ -3,7 +3,12 @@
 
 #include <string>
 #include <sstream>
+#include <iomanip>
 #include "ILoggable.h"
+#include "ProgramConstants.h"
+
+using namespace std;
+using namespace PrintConstants;
 
 struct TimedData {
     TimedData(long t) : timestamp{t} {}
@@ -26,10 +31,13 @@ struct YawPitchRollReading : ILoggable {
     double roll;
     bool validity;
 
-    virtual std::string toString() const override {
-        std::stringstream ss;
+    virtual string toString() const override {
+        stringstream ss;
 
-        ss << yaw << DELIMITER << pitch << DELIMITER << roll;
+        ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << yaw
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << pitch
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << roll;
+        
         return ss.str();
     }
 };
@@ -47,14 +55,17 @@ struct TelemetryReading : TimedData, ILoggable {
     DataReading temperature;
     YawPitchRollReading ypr;
 
-    virtual std::string toString() const override {
-        std::stringstream ss;
-        ss << this->timestamp << DELIMITER
-           << altitude.value << DELIMITER
-           << speed.value << DELIMITER
-           << acceleration.value << DELIMITER
-           << pressure.value << DELIMITER
-           << temperature.value << DELIMITER
+    virtual string toString() const override {
+        stringstream format;
+        format << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed;
+
+        stringstream ss;
+        ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << this->timestamp
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << altitude.value
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << speed.value
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << acceleration.value
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << pressure.value
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << temperature.value
            << ypr.toString();
 
         return ss.str();

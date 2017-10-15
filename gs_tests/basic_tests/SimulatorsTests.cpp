@@ -11,7 +11,7 @@ TEST(SimulatorsTests, simulatedTelemetryIsCorrect) {
         vector<TelemetryReading> data = ts.getData();
 
         EXPECT_TRUE(data.size() > 0);
-        EXPECT_TRUE(data.size() <= TelemetrySimulator::MAX_RANDOM_VECTOR_LENGTH);
+        EXPECT_TRUE(data.size() <= SimulatorConstants::MAX_RANDOM_VECTOR_LENGTH);
 
         for (TelemetryReading tr : data) {
             std::cout << tr.toString() << std::endl;

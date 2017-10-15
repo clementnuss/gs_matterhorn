@@ -13,6 +13,4 @@ protected:
 
 };
 
-static const std::string DELIMITER = "\t";
-
 #endif //GS_MATTERHORN_LOGGABLE_H

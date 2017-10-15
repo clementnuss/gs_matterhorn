@@ -2,6 +2,12 @@
 #ifndef GS_MATTERHORN_PROGRAMCONSTANTS_H
 #define GS_MATTERHORN_PROGRAMCONSTANTS_H
 
+namespace PrintConstants {
+    static constexpr int PRECISION = 4;
+    static constexpr int FIELD_WIDTH = 12;
+    static constexpr char DELIMITER = ' ';
+}
+
 namespace TimeConstants {
     static constexpr int MSECS_IN_SEC = 1000;
 }

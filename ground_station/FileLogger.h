@@ -13,7 +13,7 @@ using namespace std;
 class FileLogger
 {
 public:
-    FileLogger(std::string, int);
+    FileLogger(std::string);
 
     ~FileLogger();
 
@@ -32,7 +32,6 @@ private:
     void raiseFlag();
 
     const std::string path;
-    const int entrySize;
 
     size_t id;
     size_t bufferIndex;

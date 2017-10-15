@@ -26,7 +26,7 @@ TEST(LoggingTests, fileLoggerIsCorrect) {
             {6.12456, 7.12456, 8.12456, true}
     };
 
-    FileLogger fl{"testfile.csv", 2};
+    FileLogger fl{"testfile.csv"};
     vector<reference_wrapper<ILoggable>> v;
 
     v.emplace_back(reference_wrapper<ILoggable>{t1});
@@ -51,6 +51,7 @@ TEST(LoggingTests, fileLoggerIsCorrect) {
     std::string strInput;
 
     getline(input1, strInput);
+    cout << strInput << endl << flush;
     EXPECT_EQ(strInput, "-1\t0\t0\t0\t0\t0\t0\t0\t0");
     getline(input2, strInput);
     EXPECT_EQ(strInput, "-1\t1.12456\t2.12456\t3.12456\t4.12456\t5.12456\t6.12456\t7.12456\t8.12456");

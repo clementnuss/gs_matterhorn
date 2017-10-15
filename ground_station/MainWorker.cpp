@@ -2,12 +2,14 @@
 #include <iostream>
 #include <DataHandlers/TelemetrySimulator.h>
 #include "MainWorker.h"
-#include "ProgramConstants.h"
 #include "Utilities/GraphUtils.h"
 
 using namespace std;
 
-Worker::Worker() : enabled{true}, telemetryHandler{new TelemetrySimulator()} {
+Worker::Worker() :
+        enabled{true},
+        telemetryHandler{new TelemetrySimulator()},
+        telemetryLogger{"telemetry_data"} {
 
 }
 
@@ -23,15 +25,24 @@ void Worker::run() {
 
         vector<TelemetryReading> data = telemetryHandler->getData();
 
+        logData(data);
+
         QVector<QCPGraphData> speedDataBuffer = extractGraphData(data, speedFromReading);
         QVector<QCPGraphData> accelDataBuffer = extractGraphData(data, accelerationFromReading);
 
         emit graphDataReady(speedDataBuffer, GraphFeature::FEATURE1);
         emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
-
     }
 
     std::cout << "The worker has finished" << std::endl;
+    telemetryLogger.close();
+}
+
+void Worker::logData(vector<TelemetryReading> &data) {
+
+    vector<reference_wrapper<ILoggable>> wrappedData(begin(data), end(data));
+    telemetryLogger.registerData(wrappedData);
+
 }
 
 QVector<QCPGraphData>

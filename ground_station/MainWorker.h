@@ -6,6 +6,7 @@
 #include <DataHandlers/TelemetryHandler.h>
 #include <qcustomplot.h>
 #include "GraphFeature.h"
+#include "FileLogger.h"
 
 using namespace std;
 class Worker : public QObject
@@ -30,7 +31,10 @@ signals:
     void dummySignal();
 private:
     bool enabled;
+
+    void logData(vector<TelemetryReading> &);
     unique_ptr<TelemetryHandler> telemetryHandler;
+    FileLogger telemetryLogger;
 
     QVector<QCPGraphData> extractGraphData(vector<TelemetryReading> &, QCPGraphData (*)(TelemetryReading));
 };

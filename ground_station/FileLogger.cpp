@@ -2,18 +2,20 @@
 #include <iostream>
 #include <sstream>
 #include <thread>
+#include <c++/cassert>
 #include "FileLogger.h"
 
 using namespace std;
 
-FileLogger::FileLogger(std::string path, int entrySize) :
-        path{std::move(path)}, entrySize{entrySize}, id{0}, bufferIndex{0}, busyFlag{false} {}
+FileLogger::FileLogger(std::string path) :
+        path{std::move(path)}, id{0}, bufferIndex{0}, busyFlag{false} {}
 
 FileLogger::~FileLogger() {
     close();
 }
 
 void FileLogger::close() {
+    cout << "Flushing file logger @ " << path << endl;
     if (bufferIndex != 0) {
         writeFile();
         bufferIndex = 0;
@@ -25,6 +27,7 @@ void FileLogger::registerData(const vector<reference_wrapper<ILoggable>> &data) 
     for (const auto loggable : data) {
 
         if (bufferIndex >= bufferSize) {
+            cout << "Writing log file.." << endl;
             writeFile();
             bufferIndex = 0;
         }
@@ -50,14 +53,9 @@ void FileLogger::writeFile() {
 
 void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
 
-    //TODO add unit tests for exceptions
-    if (isReady()) {
-        throw logic_error("A call to write routine was made without raising the write flag");
-    }
-
-    if (tailIndex < 1) {
-        throw invalid_argument("Call to write routine was made either with an empty array or an invalid tail index");
-    }
+    // The busy write flag should have been raised at this point
+    assert(!isReady());
+    assert(tailIndex >= 1);
 
     stringstream ss;
     ss << id++ << path;
