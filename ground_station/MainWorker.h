@@ -30,13 +30,13 @@ signals:
     void dummySignal();
 private:
     bool enabled;
-    QVector<QCPGraphData> speedDataBuffer;
-    QVector<QCPGraphData> accelDataBuffer;
     unique_ptr<TelemetryHandler> telemetryHandler;
 
-    void appendSpeedData(vector<TelemetryReading> &);
+    QVector<QCPGraphData> extractGraphData(vector<TelemetryReading> &, QCPGraphData (*)(TelemetryReading));
 
-    void appendAccelData(vector<TelemetryReading> &);
+    QVector<QCPGraphData> toSpeedGraphData(vector<TelemetryReading> &);
+
+    QVector<QCPGraphData> toAccelerationGraphData(vector<TelemetryReading> &);
 };
 
 #endif // WORKER_H

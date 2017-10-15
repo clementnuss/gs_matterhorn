@@ -49,17 +49,29 @@ GSWidget::~GSWidget()
 void GSWidget::graphSetup() {
     QCustomPlot* customPlot = ui->graph_widget;
 
+    // TODO: check if needed on RaspberryPi3
+    //customPlot->setOpenGl(true);
+
     customPlot->plotLayout()->clear();
 
-
     QCPAxisRect *topAxisRect = new QCPAxisRect(customPlot);
+    topAxisRect->setupFullAxesBox(true);
     customPlot->plotLayout()->addElement(0, 0, topAxisRect);
     QCPAxisRect *bottomAxisRect = new QCPAxisRect(customPlot);
+    bottomAxisRect->setupFullAxesBox(true);
     customPlot->plotLayout()->addElement(1, 0, bottomAxisRect);
+
+    QFont font;
+    font.setPointSize(12);
+    topAxisRect->axis(QCPAxis::atLeft, 0)->setTickLabelFont(font);
+    topAxisRect->axis(QCPAxis::atBottom, 0)->setTickLabelFont(font);
+    bottomAxisRect->axis(QCPAxis::atLeft, 0)->setTickLabelFont(font);
+    bottomAxisRect->axis(QCPAxis::atBottom, 0)->setTickLabelFont(font);
 
     QPen penFeature1;
     QPen penFeature2;
-    penFeature1.setWidth(2);
+    penFeature1.setWidth(1);
+    penFeature2.setWidth(1);
     penFeature1.setColor(QColor(180, 0, 0));
     penFeature2.setColor(QColor(0, 180, 0));
 
@@ -95,7 +107,15 @@ void GSWidget::updateTime() {
 void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
     QCPGraph *g = ui->graph_widget->graph(static_cast<int>(feature));
 
-    g->data()->set(d);
+    g->data()->add(d);
+
+    int sizeDiff = g->data()->size() - DataConstants::MAX_DATA_VECTOR_SIZE;
+    if (sizeDiff > 0) {
+        g->data()->removeBefore(
+                (g->data()->at(sizeDiff)->key) + 1
+        );
+    }
+
     g->keyAxis()->setRange(d.last().key, UIConstants::MSECS_GRAPH_XRANGE, Qt::AlignRight);
     g->valueAxis()->rescale(true);
 

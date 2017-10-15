@@ -3,6 +3,7 @@
 #include <DataHandlers/TelemetrySimulator.h>
 #include "MainWorker.h"
 #include "ProgramConstants.h"
+#include "Utilities/GraphUtils.h"
 
 using namespace std;
 
@@ -21,8 +22,10 @@ void Worker::run(){
         QThread::msleep(UIConstants::REFRESH_RATE);
 
         vector<TelemetryReading> data = telemetryHandler->getData();
-        appendAccelData(data);
-        appendSpeedData(data);
+
+        QVector<QCPGraphData> speedDataBuffer = extractGraphData(data, speedFromReading);
+        QVector<QCPGraphData> accelDataBuffer = extractGraphData(data, accelerationFromReading);
+
         emit graphDataReady(speedDataBuffer, GraphFeature::FEATURE1);
         emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
 
@@ -31,28 +34,14 @@ void Worker::run(){
     std::cout << "The worker has finished" << std::endl;
 }
 
-void Worker::appendSpeedData(vector<TelemetryReading> &data) {
-
+QVector<QCPGraphData>
+Worker::extractGraphData(vector<TelemetryReading> &data, QCPGraphData (*extractionFct)(TelemetryReading)) {
+    QVector<QCPGraphData> v;
     //TODO: plot only one value per msec ?
     for (TelemetryReading reading : data) {
-        speedDataBuffer.append(QCPGraphData(reading.timestamp, reading.speed.value));
+        v.append(extractionFct(reading));
     }
 
-    // Remove older elements so the graph does not have to store them
-    if (speedDataBuffer.size() > DataConstants::MAX_DATA_VECTOR_SIZE) {
-        speedDataBuffer.remove(0, speedDataBuffer.size() - DataConstants::MAX_DATA_VECTOR_SIZE);
-    }
-}
-
-void Worker::appendAccelData(vector<TelemetryReading> &data) {
-
-    for (TelemetryReading reading : data) {
-        accelDataBuffer.append(QCPGraphData(reading.timestamp, reading.acceleration.value));
-    }
-
-    // Remove older elements so the graph does not have to store them
-    if (accelDataBuffer.size() > DataConstants::MAX_DATA_VECTOR_SIZE) {
-        accelDataBuffer.remove(0, accelDataBuffer.size() - DataConstants::MAX_DATA_VECTOR_SIZE);
-    }
+    return v;
 }
 

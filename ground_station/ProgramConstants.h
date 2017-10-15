@@ -7,7 +7,7 @@ namespace TimeConstants {
 }
 
 namespace UIConstants {
-    static constexpr int REFRESH_RATE = 32;
+    static constexpr int REFRESH_RATE = 50;
     static constexpr int MSECS_GRAPH_XRANGE = 10000;
 }
 
