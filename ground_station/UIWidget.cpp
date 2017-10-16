@@ -1,7 +1,6 @@
 #include "UIWidget.h"
 #include "ui_gswidget.h"
 #include <iostream>
-#include <iomanip>
 #include <c++/cassert>
 
 GSWidget::GSWidget(QWidget *parent) :
@@ -19,6 +18,7 @@ GSWidget::GSWidget(QWidget *parent) :
     worker = new Worker;
     worker->moveToThread(&workerThread);
 
+    qRegisterMetaType<TelemetryReading>("TelemetryReading");
     qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>&");
     qRegisterMetaType<GraphFeature>("GraphFeature");
 
@@ -26,6 +26,10 @@ GSWidget::GSWidget(QWidget *parent) :
             SIGNAL(dummySignal()),
             this,
             SLOT(dummySlot()));
+    connect(worker,
+            SIGNAL(telemetryReady(TelemetryReading)),
+            this,
+            SLOT(updateTelemetry(TelemetryReading)));
     connect(worker,
             SIGNAL(graphDataReady(QVector<QCPGraphData> & , GraphFeature)),
             this,

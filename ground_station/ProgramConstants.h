@@ -13,6 +13,9 @@ namespace TimeConstants {
 }
 
 namespace UIConstants {
+
+    // Refresh rates are in milliseconds
+    static constexpr int NUMERICAL_VALUES_REFRESH_RATE = 100;
     static constexpr int REFRESH_RATE = 50;
     static constexpr int MSECS_GRAPH_XRANGE = 10000;
 }

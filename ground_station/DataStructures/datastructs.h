@@ -11,12 +11,14 @@ using namespace std;
 using namespace PrintConstants;
 
 struct TimedData {
+    TimedData() = default;
     TimedData(long t) : timestamp{t} {}
 
     long timestamp;
 };
 
 struct DataReading {
+    DataReading() = default;
     DataReading(double v, bool b) : value{v}, validity{b} {}
 
     double value;
@@ -24,6 +26,7 @@ struct DataReading {
 };
 
 struct YawPitchRollReading : ILoggable {
+    YawPitchRollReading() = default;
     YawPitchRollReading(double y, double p, double r, bool b) : yaw{y}, pitch{p}, roll{r}, validity{b} {}
 
     double yaw;
@@ -43,10 +46,16 @@ struct YawPitchRollReading : ILoggable {
 };
 
 struct TelemetryReading : TimedData, ILoggable {
+    TelemetryReading() = default;
+
     TelemetryReading(long t, DataReading altitude, DataReading speed, DataReading acceleration,
                      DataReading pressure, DataReading temperature, YawPitchRollReading ypr) :
             TimedData(t), altitude{altitude}, speed{speed}, acceleration{acceleration}, pressure{pressure},
             temperature{temperature}, ypr{ypr} {}
+
+    TelemetryReading(const TelemetryReading &that) = default;
+
+    ~TelemetryReading() {}
 
     DataReading altitude;
     DataReading speed;

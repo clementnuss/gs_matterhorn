@@ -23,18 +23,21 @@ public slots:
 signals:
 
     void telemetryReady(TelemetryReading);
-
     void graphDataReady(QVector<QCPGraphData> &, GraphFeature);
     void linkStatusReady(bool, bool);
     void groundStatusReady(float, float);
-
     void dummySignal();
+
 private:
     bool enabled;
 
+    void displayMostRecentTelemetry(TelemetryReading);
     void logData(vector<TelemetryReading> &);
+
     unique_ptr<TelemetryHandler> telemetryHandler;
     FileLogger telemetryLogger;
+    TelemetryReading lastDisplayableReading;
+    chrono::system_clock::time_point lastUIupdate;
 
     QVector<QCPGraphData> extractGraphData(vector<TelemetryReading> &, QCPGraphData (*)(TelemetryReading));
 };
