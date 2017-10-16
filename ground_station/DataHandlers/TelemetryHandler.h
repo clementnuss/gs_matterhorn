@@ -12,6 +12,7 @@ class TelemetryHandler : public IDataHandler<TelemetryReading> {
 public:
     virtual std::vector<TelemetryReading> getData() override;
 
+    virtual std::vector<RocketEvent> getEvents();
 };
 
 

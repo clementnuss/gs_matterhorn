@@ -20,6 +20,7 @@ GSWidget::GSWidget(QWidget *parent) :
 
     qRegisterMetaType<TelemetryReading>("TelemetryReading");
     qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>&");
+    qRegisterMetaType<vector<RocketEvent>>("vector<RocketEvent>&");
     qRegisterMetaType<GraphFeature>("GraphFeature");
 
     connect(worker,
@@ -30,6 +31,10 @@ GSWidget::GSWidget(QWidget *parent) :
             SIGNAL(telemetryReady(TelemetryReading)),
             this,
             SLOT(updateTelemetry(TelemetryReading)));
+    connect(worker,
+            SIGNAL(newEventsReady(vector<RocketEvent> & )),
+            this,
+            SLOT(updateEvents(vector<RocketEvent> & )));
     connect(worker,
             SIGNAL(graphDataReady(QVector<QCPGraphData> & , GraphFeature)),
             this,
@@ -108,6 +113,27 @@ void GSWidget::updateTime() {
     ui->ground_time->setText(QTime::currentTime().toString());
 }
 
+void GSWidget::updateEvents(vector<RocketEvent> &events) {
+    if (events.size() >= 1) {
+        for (RocketEvent e : events) {
+            int seconds = e.timestamp / TimeConstants::MSECS_IN_SEC;
+            int minutes = seconds / TimeConstants::SECS_IN_MINUTE;
+
+            stringstream ss;
+            ss << "T+"
+               << setw(TimeConstants::SECS_AND_MINS_WIDTH) << setfill('0') << minutes % TimeConstants::MINUTES_IN_HOUR
+               << ":"
+               << setw(TimeConstants::SECS_AND_MINS_WIDTH) << setfill('0') << seconds % TimeConstants::SECS_IN_MINUTE
+               << ":"
+               << setw(TimeConstants::MSECS_WIDTH) << setfill('0') << e.timestamp % TimeConstants::MSECS_IN_SEC
+               << "    " << (e.description);
+
+            ui->event_log->appendPlainText(QString::fromStdString(ss.str()));
+        }
+    }
+}
+
+//TODO: only use qvectors or only use vectors
 void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 
     if (d.isEmpty()) {

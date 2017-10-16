@@ -27,10 +27,12 @@ public slots:
     void dummySlot();
     void updateTime();
 
+    void updateEvents(vector<RocketEvent> &);
     void updateGraphData(QVector<QCPGraphData> &, GraphFeature);
     void updateTelemetry(TelemetryReading);
     void updateLinkStatus(bool, bool);
     void updateGroundStatus(float, float);
+
 
 private:
     Ui::GSWidget *ui;

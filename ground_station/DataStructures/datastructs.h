@@ -25,6 +25,21 @@ struct DataReading {
     bool validity;
 };
 
+struct RocketEvent : TimedData {
+    //TODO: rule of three
+    RocketEvent() = default;
+
+    RocketEvent(const RocketEvent &that) = default;
+
+    RocketEvent(long timestamp, int code, std::string description) :
+            TimedData(timestamp), code{code}, description{description} {}
+
+    ~RocketEvent() = default;
+
+    int code;
+    std::string description;
+};
+
 struct YawPitchRollReading : ILoggable {
     YawPitchRollReading() = default;
     YawPitchRollReading(double y, double p, double r, bool b) : yaw{y}, pitch{p}, roll{r}, validity{b} {}
@@ -55,7 +70,7 @@ struct TelemetryReading : TimedData, ILoggable {
 
     TelemetryReading(const TelemetryReading &that) = default;
 
-    ~TelemetryReading() {}
+    ~TelemetryReading() = default;
 
     DataReading altitude;
     DataReading speed;

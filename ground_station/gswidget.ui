@@ -872,7 +872,13 @@
                   </widget>
               </item>
            <item>
-            <widget class="QPlainTextEdit" name="plainTextEdit"/>
+               <widget class="QPlainTextEdit" name="event_log">
+                   <property name="font">
+                       <font>
+                           <pointsize>10</pointsize>
+                       </font>
+                   </property>
+               </widget>
            </item>
           </layout>
          </widget>

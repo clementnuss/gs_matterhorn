@@ -29,11 +29,13 @@ Worker::~Worker() {
 void Worker::run() {
 
     while (!QThread::currentThread()->isInterruptionRequested()) {
-        //TODO: adapt sleep time so as to have proper 30 fps
+        //TODO: adapt sleep time so as to have proper framerate
         QThread::msleep(UIConstants::REFRESH_RATE);
 
+        vector<RocketEvent> rocketEvents = telemetryHandler->getEvents();
         vector<TelemetryReading> data = telemetryHandler->getData();
 
+        //TODO: Maybe change this and check if data is not empty
         assert(data.size() > 0);
 
         displayMostRecentTelemetry(data[data.size() - 1]);
@@ -42,6 +44,7 @@ void Worker::run() {
         QVector<QCPGraphData> speedDataBuffer = extractGraphData(data, speedFromReading);
         QVector<QCPGraphData> accelDataBuffer = extractGraphData(data, accelerationFromReading);
 
+        emit newEventsReady(rocketEvents);
         emit graphDataReady(speedDataBuffer, GraphFeature::FEATURE1);
         emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
     }
