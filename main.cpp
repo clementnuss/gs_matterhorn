@@ -14,5 +14,4 @@ int main(int argc, char **argv) {
     t.join();
 
     return runGUI(argc, argv);
-
 }

@@ -1,7 +1,7 @@
 #include "UIWidget.h"
 #include "ui_gswidget.h"
 #include <iostream>
-#include <c++/cassert>
+#include <cassert>
 
 GSWidget::GSWidget(QWidget *parent) :
     QWidget(parent),

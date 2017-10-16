@@ -1,8 +1,8 @@
 #include <DataStructures/datastructs.h>
-#include <c++/vector>
+#include <vector>
 #include <QtCore/QTime>
-#include <c++/cassert>
-#include <c++/iostream>
+#include <cassert>
+#include <iostream>
 #include "TelemetrySimulator.h"
 
 using namespace std;

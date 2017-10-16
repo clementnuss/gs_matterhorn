@@ -2,7 +2,7 @@
 #define GS_MATTERHORN_TELEMETRYHANDLER_H
 
 
-#include <c++/memory>
+#include <memory>
 #include "IDataHandler.h"
 #include "DataStructures/datastructs.h"
 

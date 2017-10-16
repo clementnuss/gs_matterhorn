@@ -2,7 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <thread>
-#include <c++/cassert>
+#include <cassert>
 #include "FileLogger.h"
 
 using namespace std;

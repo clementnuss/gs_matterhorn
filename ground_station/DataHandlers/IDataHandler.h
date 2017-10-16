@@ -1,8 +1,8 @@
 #ifndef GS_MATTERHORN_IDATAHANDLER_H
 #define GS_MATTERHORN_IDATAHANDLER_H
 
-#include <c++/vector>
-#include <c++/memory>
+#include <vector>
+#include <memory>
 
 template<class T>
 class IDataHandler {

@@ -5,6 +5,7 @@
 #include <DataStructures/datastructs.h>
 #include <DataHandlers/TelemetryHandler.h>
 #include <qcustomplot.h>
+#include <chrono>
 #include "GraphFeature.h"
 #include "FileLogger.h"
 
