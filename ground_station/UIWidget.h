@@ -19,14 +19,14 @@ class GSWidget : public QWidget
     Q_OBJECT
 
 public:
+    bool event(QEvent *) override;
     explicit GSWidget(QWidget *parent = nullptr);
-
     ~GSWidget() override;
 
 public slots:
     void dummySlot();
-    void updateTime();
 
+    void updateTime();
     void updateEvents(vector<RocketEvent> &);
     void updateGraphData(QVector<QCPGraphData> &, GraphFeature);
     void updateTelemetry(TelemetryReading);

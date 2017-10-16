@@ -177,3 +177,18 @@ void GSWidget::updateGroundStatus(float temperature, float pressure){
     ui->ground_temperature_value->setText(QString::number(temperature, 'f', UIConstants::PRECISION));
     ui->ground_temperature_value->setText(QString::number(pressure, 'f', UIConstants::PRECISION));
 }
+
+bool GSWidget::event(QEvent *event) {
+    if (event->type() == QEvent::KeyPress) {
+
+        QKeyEvent *ke = static_cast<QKeyEvent *>(event);
+
+        if (ke->key() == Qt::Key_Space) {
+            cout << "Detected key press on spacebar" << endl << flush;
+            return true;
+        }
+
+    }
+
+    return QWidget::event(event);
+}
