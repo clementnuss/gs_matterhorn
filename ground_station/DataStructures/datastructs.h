@@ -25,7 +25,7 @@ struct DataReading {
     bool validity;
 };
 
-struct RocketEvent : TimedData {
+struct RocketEvent : TimedData, ILoggable {
     //TODO: rule of three
     RocketEvent() = default;
 
@@ -38,6 +38,17 @@ struct RocketEvent : TimedData {
 
     int code;
     std::string description;
+
+    virtual string toString() const override {
+        stringstream ss;
+
+        ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << timestamp
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << code
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << " "
+           << description;
+
+        return ss.str();
+    }
 };
 
 struct YawPitchRollReading : ILoggable {

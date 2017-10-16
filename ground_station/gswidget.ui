@@ -18,8 +18,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>800</width>
-    <height>600</height>
+       <width>1200</width>
+       <height>800</height>
    </size>
   </property>
      <property name="palette">

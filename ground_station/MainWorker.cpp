@@ -1,7 +1,6 @@
 #include <QThread>
 #include <iostream>
 #include <DataHandlers/TelemetrySimulator.h>
-#include <c++/cassert>
 #include "MainWorker.h"
 #include "Utilities/GraphUtils.h"
 
@@ -10,7 +9,8 @@ using namespace std;
 Worker::Worker() :
         enabled{true},
         telemetryHandler{new TelemetrySimulator()},
-        telemetryLogger{"telemetry_data"},
+        telemetryLogger{LogConstants::TELEMETRY_PATH},
+        eventLogger{LogConstants::EVENTS_PATH},
         lastDisplayableReading{-1,
                                {0, false},
                                {0, false},
@@ -29,28 +29,32 @@ Worker::~Worker() {
 void Worker::run() {
 
     while (!QThread::currentThread()->isInterruptionRequested()) {
-        //TODO: adapt sleep time so as to have proper framerate
-        QThread::msleep(UIConstants::REFRESH_RATE);
-
-        vector<RocketEvent> rocketEvents = telemetryHandler->getEvents();
-        vector<TelemetryReading> data = telemetryHandler->getData();
-
-        //TODO: Maybe change this and check if data is not empty
-        assert(data.size() > 0);
-
-        displayMostRecentTelemetry(data[data.size() - 1]);
-        logData(data);
-
-        QVector<QCPGraphData> speedDataBuffer = extractGraphData(data, speedFromReading);
-        QVector<QCPGraphData> accelDataBuffer = extractGraphData(data, accelerationFromReading);
-
-        emit newEventsReady(rocketEvents);
-        emit graphDataReady(speedDataBuffer, GraphFeature::FEATURE1);
-        emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
+        mainRoutine();
     }
 
     std::cout << "The worker has finished" << std::endl;
     telemetryLogger.close();
+    eventLogger.close();
+}
+
+void Worker::mainRoutine() {
+    //TODO: adapt sleep time so as to have proper framerate
+    QThread::msleep(UIConstants::REFRESH_RATE);
+
+    vector<RocketEvent> rocketEvents = telemetryHandler->getEvents();
+    vector<TelemetryReading> data = telemetryHandler->getData();
+
+    telemetryLogger.registerData(vector<reference_wrapper<ILoggable>>(begin(data), end(data)));
+    eventLogger.registerData(vector<reference_wrapper<ILoggable>>(begin(rocketEvents), end(rocketEvents)));
+
+    displayMostRecentTelemetry(data[data.size() - 1]);
+
+    QVector<QCPGraphData> speedDataBuffer = extractGraphData(data, speedFromReading);
+    QVector<QCPGraphData> accelDataBuffer = extractGraphData(data, accelerationFromReading);
+
+    emit newEventsReady(rocketEvents);
+    emit graphDataReady(speedDataBuffer, GraphFeature::FEATURE1);
+    emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
 }
 
 void Worker::displayMostRecentTelemetry(TelemetryReading tr) {
@@ -64,12 +68,6 @@ void Worker::displayMostRecentTelemetry(TelemetryReading tr) {
     }
 }
 
-void Worker::logData(vector<TelemetryReading> &data) {
-
-    vector<reference_wrapper<ILoggable>> wrappedData(begin(data), end(data));
-    telemetryLogger.registerData(wrappedData);
-
-}
 
 QVector<QCPGraphData>
 Worker::extractGraphData(vector<TelemetryReading> &data, QCPGraphData (*extractionFct)(TelemetryReading)) {

@@ -20,6 +20,8 @@ public:
 public slots:
     void run();
 
+    void mainRoutine();
+
 signals:
 
     void telemetryReady(TelemetryReading);
@@ -34,10 +36,10 @@ private:
     bool enabled;
 
     void displayMostRecentTelemetry(TelemetryReading);
-    void logData(vector<TelemetryReading> &);
 
     unique_ptr<TelemetryHandler> telemetryHandler;
     FileLogger telemetryLogger;
+    FileLogger eventLogger;
     TelemetryReading lastDisplayableReading;
     chrono::system_clock::time_point lastUIupdate;
 

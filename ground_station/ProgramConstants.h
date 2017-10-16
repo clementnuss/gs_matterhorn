@@ -10,6 +10,11 @@ namespace PrintConstants {
     static constexpr char DELIMITER = ' ';
 }
 
+namespace LogConstants {
+    static const std::string TELEMETRY_PATH{"telemetry_data"};
+    static const std::string EVENTS_PATH{"events_data"};
+}
+
 namespace TimeConstants {
     static constexpr int MSECS_IN_SEC = 1000;
     static constexpr int SECS_IN_MINUTE = 60;
