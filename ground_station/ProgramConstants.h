@@ -13,10 +13,12 @@ namespace TimeConstants {
 }
 
 namespace UIConstants {
+    static constexpr int PRECISION = 2;
 
     // Refresh rates are in milliseconds
     static constexpr int NUMERICAL_VALUES_REFRESH_RATE = 100;
     static constexpr int REFRESH_RATE = 50;
+
     static constexpr int MSECS_GRAPH_XRANGE = 10000;
 }
 
@@ -25,9 +27,9 @@ namespace SimulatorConstants {
 }
 
 namespace DataConstants {
-    static constexpr int MAX_DATA_VECTOR_SIZE = UIConstants::MSECS_GRAPH_XRANGE
-                                                * SimulatorConstants::MAX_RANDOM_VECTOR_LENGTH
-                                                / UIConstants::REFRESH_RATE;
+    static constexpr double DELETION_FACTOR = 0.25;
+    static constexpr int MAX_DATA_VECTOR_SIZE =
+            (1.0 + DELETION_FACTOR) * (UIConstants::MSECS_GRAPH_XRANGE / UIConstants::REFRESH_RATE);
 }
 
 #endif //GS_MATTERHORN_PROGRAMCONSTANTS_H

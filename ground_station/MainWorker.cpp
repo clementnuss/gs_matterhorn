@@ -71,9 +71,13 @@ void Worker::logData(vector<TelemetryReading> &data) {
 QVector<QCPGraphData>
 Worker::extractGraphData(vector<TelemetryReading> &data, QCPGraphData (*extractionFct)(TelemetryReading)) {
     QVector<QCPGraphData> v;
-    //TODO: plot only one value per msec ?
+    long lastTimestampSeen = 0;
+
     for (TelemetryReading reading : data) {
-        v.append(extractionFct(reading));
+        if (lastTimestampSeen != reading.timestamp) {
+            v.append(extractionFct(reading));
+            lastTimestampSeen = reading.timestamp;
+        }
     }
 
     return v;

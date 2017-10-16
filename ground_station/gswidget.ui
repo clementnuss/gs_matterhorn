@@ -200,6 +200,9 @@
                  <property name="text">
                   <string>0.0</string>
                  </property>
+                    <property name="textFormat">
+                        <enum>Qt::AutoText</enum>
+                    </property>
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                  </property>
@@ -464,14 +467,29 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="telemetry_ypr_value">
-                 <property name="font">
-                  <font>
-                   <pointsize>12</pointsize>
-                  </font>
+                   <widget class="QLabel" name="telemetry_yaw_value">
+                       <property name="text">
+                           <string>0.0</string>
                  </property>
-                 <property name="text">
-                  <string>0.0/0.0/0.0</string>
+                       <property name="alignment">
+                           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                       </property>
+                   </widget>
+               </item>
+                  <item>
+                      <widget class="QLabel" name="telemetry_pitch_value">
+                          <property name="text">
+                              <string>0.0</string>
+                          </property>
+                          <property name="alignment">
+                              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                          </property>
+                      </widget>
+                  </item>
+                  <item>
+                      <widget class="QLabel" name="telemetry_roll_value">
+                          <property name="text">
+                              <string>0.0</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

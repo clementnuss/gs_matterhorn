@@ -1,8 +1,6 @@
 #include <DataStructures/datastructs.h>
 #include <c++/vector>
 #include <QtCore/QTime>
-#include <c++/chrono>
-#include <ProgramConstants.h>
 #include "TelemetrySimulator.h"
 
 using namespace std;
@@ -41,11 +39,11 @@ const TelemetryReading TelemetrySimulator::generateTelemetry() {
 
     return TelemetryReading{
             key,
-            DataReading{sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 0.2 * sin(keysec / 0.8), true},
-            DataReading{sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 0.2 * sin(keysec / 0.38), true},
-            DataReading{sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 0.3 * sin(keysec / 0.27), true},
-            DataReading{sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 0.2 * sin(keysec / 0.6), true},
-            DataReading{sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 0.2 * sin(keysec / 0.7), true},
+            DataReading{10000 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 0.2 * sin(keysec / 0.8), true},
+            DataReading{900 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 0.2 * sin(keysec / 0.38), true},
+            DataReading{200 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 0.3 * sin(keysec / 0.27), true},
+            DataReading{100 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 0.2 * sin(keysec / 0.6), true},
+            DataReading{50 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 0.2 * sin(keysec / 0.7), true},
             YawPitchRollReading{
                     sin(key) + rnd / static_cast<double>(RAND_MAX) * 1 * sin(keysec / 0.7),
                     sin(key) + rnd / static_cast<double>(RAND_MAX) * 1 * sin(keysec / 0.8),

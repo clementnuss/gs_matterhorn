@@ -109,6 +109,11 @@ void GSWidget::updateTime() {
 }
 
 void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
+
+    if (d.isEmpty()) {
+        return;
+    }
+
     QCPGraph *g = ui->graph_widget->graph(static_cast<int>(feature));
 
     g->data()->add(d);
@@ -116,7 +121,7 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
     int sizeDiff = g->data()->size() - DataConstants::MAX_DATA_VECTOR_SIZE;
     if (sizeDiff > 0) {
         g->data()->removeBefore(
-                (g->data()->at(sizeDiff)->key) + 1
+                (g->data()->at(DataConstants::DELETION_FACTOR * (sizeDiff + DataConstants::MAX_DATA_VECTOR_SIZE))->key)
         );
     }
 
@@ -127,18 +132,14 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 }
 
 void GSWidget::updateTelemetry(TelemetryReading t) {
-    ui->telemetry_altitude_value->setText(QString::number(t.altitude.value));
-    ui->telemetry_speed_value->setText(QString::number(t.speed.value));
-    ui->telemetry_acceleration_value->setText(QString::number(t.acceleration.value));
-    ui->telemetry_pressure_value->setText(QString::number(t.pressure.value));
-    ui->telemetry_temperature_value->setText(QString::number(t.temperature.value));
-
-    QString yprStr = "" +
-            QString::number(t.ypr.yaw) + "/" +
-            QString::number(t.ypr.pitch) + "/" +
-            QString::number(t.ypr.roll);
-
-    ui->telemetry_ypr_value->setText(yprStr);
+    ui->telemetry_altitude_value->setText(QString::number(t.altitude.value, 'f', UIConstants::PRECISION));
+    ui->telemetry_speed_value->setText(QString::number(t.speed.value, 'f', UIConstants::PRECISION));
+    ui->telemetry_acceleration_value->setText(QString::number(t.acceleration.value, 'f', UIConstants::PRECISION));
+    ui->telemetry_pressure_value->setText(QString::number(t.pressure.value, 'f', UIConstants::PRECISION));
+    ui->telemetry_temperature_value->setText(QString::number(t.temperature.value, 'f', UIConstants::PRECISION));
+    ui->telemetry_yaw_value->setText(QString::number(t.ypr.yaw, 'f', UIConstants::PRECISION));
+    ui->telemetry_pitch_value->setText(QString::number(t.ypr.pitch, 'f', UIConstants::PRECISION));
+    ui->telemetry_roll_value->setText(QString::number(t.ypr.roll, 'f', UIConstants::PRECISION));
 }
 
 void GSWidget::updateLinkStatus(bool radioStatus, bool videoStatus){
@@ -147,6 +148,6 @@ void GSWidget::updateLinkStatus(bool radioStatus, bool videoStatus){
 }
 
 void GSWidget::updateGroundStatus(float temperature, float pressure){
-    ui->ground_temperature_value->setText(QString::number(temperature));
-    ui->ground_temperature_value->setText(QString::number(pressure));
+    ui->ground_temperature_value->setText(QString::number(temperature, 'f', UIConstants::PRECISION));
+    ui->ground_temperature_value->setText(QString::number(pressure, 'f', UIConstants::PRECISION));
 }
