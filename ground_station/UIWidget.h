@@ -33,6 +33,9 @@ public slots:
     void updateLinkStatus(bool, bool);
     void updateGroundStatus(float, float);
 
+signals:
+
+    void toggleLogging();
 
 private:
     Ui::GSWidget *ui;
@@ -44,6 +47,7 @@ private:
     QThread workerThread;
     Worker *worker;
 
+    void connectSlotsAndSignals();
     void graphSetup();
 };
 

@@ -18,10 +18,12 @@ public:
     Worker();
     ~Worker() override;
 
+    void mainRoutine();
+
 public slots:
     void run();
 
-    void mainRoutine();
+    void updateLoggingStatus();
 
 signals:
 
@@ -34,7 +36,7 @@ signals:
     void dummySignal();
 
 private:
-    bool enabled;
+    bool loggingEnabled;
 
     void displayMostRecentTelemetry(TelemetryReading);
 

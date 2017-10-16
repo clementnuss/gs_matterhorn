@@ -18,31 +18,7 @@ GSWidget::GSWidget(QWidget *parent) :
     worker = new Worker;
     worker->moveToThread(&workerThread);
 
-    qRegisterMetaType<TelemetryReading>("TelemetryReading");
-    qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>&");
-    qRegisterMetaType<vector<RocketEvent>>("vector<RocketEvent>&");
-    qRegisterMetaType<GraphFeature>("GraphFeature");
-
-    connect(worker,
-            SIGNAL(dummySignal()),
-            this,
-            SLOT(dummySlot()));
-    connect(worker,
-            SIGNAL(telemetryReady(TelemetryReading)),
-            this,
-            SLOT(updateTelemetry(TelemetryReading)));
-    connect(worker,
-            SIGNAL(newEventsReady(vector<RocketEvent> & )),
-            this,
-            SLOT(updateEvents(vector<RocketEvent> & )));
-    connect(worker,
-            SIGNAL(graphDataReady(QVector<QCPGraphData> & , GraphFeature)),
-            this,
-            SLOT(updateGraphData(QVector<QCPGraphData> & , GraphFeature)));
-    connect(&workerThread,
-            SIGNAL(started()),
-            worker,
-            SLOT(run()));
+    connectSlotsAndSignals();
 
     workerThread.start();
 }
@@ -53,53 +29,6 @@ GSWidget::~GSWidget()
     workerThread.requestInterruption();
     workerThread.quit();
     workerThread.wait();
-}
-
-void GSWidget::graphSetup() {
-    QCustomPlot* customPlot = ui->graph_widget;
-
-    // TODO: check if needed on RaspberryPi3
-    //customPlot->setOpenGl(true);
-
-    customPlot->plotLayout()->clear();
-
-    QCPAxisRect *topAxisRect = new QCPAxisRect(customPlot);
-    topAxisRect->setupFullAxesBox(true);
-    customPlot->plotLayout()->addElement(0, 0, topAxisRect);
-    QCPAxisRect *bottomAxisRect = new QCPAxisRect(customPlot);
-    bottomAxisRect->setupFullAxesBox(true);
-    customPlot->plotLayout()->addElement(1, 0, bottomAxisRect);
-
-    QFont font;
-    font.setPointSize(12);
-    topAxisRect->axis(QCPAxis::atLeft, 0)->setTickLabelFont(font);
-    topAxisRect->axis(QCPAxis::atBottom, 0)->setTickLabelFont(font);
-    bottomAxisRect->axis(QCPAxis::atLeft, 0)->setTickLabelFont(font);
-    bottomAxisRect->axis(QCPAxis::atBottom, 0)->setTickLabelFont(font);
-
-    QPen penFeature1;
-    QPen penFeature2;
-    penFeature1.setWidth(1);
-    penFeature2.setWidth(1);
-    penFeature1.setColor(QColor(180, 0, 0));
-    penFeature2.setColor(QColor(0, 180, 0));
-
-    QList<QCPAxis*> allAxes;
-    allAxes << bottomAxisRect->axes() << topAxisRect->axes();
-            foreach (QCPAxis *axis, allAxes) {
-            axis->setLayer("axes");
-            axis->grid()->setLayer("grid");
-        }
-
-    QCPGraph *g1 = customPlot->addGraph(topAxisRect->axis(QCPAxis::atBottom), topAxisRect->axis(QCPAxis::atLeft));
-    QCPGraph *g2 = customPlot->addGraph(bottomAxisRect->axis(QCPAxis::atBottom), bottomAxisRect->axis(QCPAxis::atLeft));
-
-    g1->setPen(penFeature1);
-    g2->setPen(penFeature2);
-
-    // Check if the number of graphs corresponds to the number of available features
-    assert(ui->graph_widget->graphCount() == static_cast<int>(GraphFeature::Count));
-
 }
 
 void GSWidget::dummySlot() {
@@ -178,13 +107,96 @@ void GSWidget::updateGroundStatus(float temperature, float pressure){
     ui->ground_temperature_value->setText(QString::number(pressure, 'f', UIConstants::PRECISION));
 }
 
+void GSWidget::connectSlotsAndSignals() {
+
+    qRegisterMetaType<TelemetryReading>("TelemetryReading");
+    qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>&");
+    qRegisterMetaType<vector<RocketEvent>>("vector<RocketEvent>&");
+    qRegisterMetaType<GraphFeature>("GraphFeature");
+
+    connect(worker,
+            SIGNAL(dummySignal()),
+            this,
+            SLOT(dummySlot()));
+    connect(worker,
+            SIGNAL(telemetryReady(TelemetryReading)),
+            this,
+            SLOT(updateTelemetry(TelemetryReading)));
+    connect(worker,
+            SIGNAL(newEventsReady(vector<RocketEvent> & )),
+            this,
+            SLOT(updateEvents(vector<RocketEvent> & )));
+    connect(worker,
+            SIGNAL(graphDataReady(QVector<QCPGraphData> & , GraphFeature)),
+            this,
+            SLOT(updateGraphData(QVector<QCPGraphData> & , GraphFeature)));
+    connect(&workerThread,
+            SIGNAL(started()),
+            worker,
+            SLOT(run()));
+
+
+    connect(this,
+            SIGNAL(toggleLogging()),
+            worker,
+            SLOT(updateLoggingStatus()));
+}
+
+void GSWidget::graphSetup() {
+    QCustomPlot *customPlot = ui->graph_widget;
+
+    // TODO: check if needed on RaspberryPi3
+    //customPlot->setOpenGl(true);
+
+    customPlot->plotLayout()->clear();
+
+    QCPAxisRect *topAxisRect = new QCPAxisRect(customPlot);
+    topAxisRect->setupFullAxesBox(true);
+    customPlot->plotLayout()->addElement(0, 0, topAxisRect);
+    QCPAxisRect *bottomAxisRect = new QCPAxisRect(customPlot);
+    bottomAxisRect->setupFullAxesBox(true);
+    customPlot->plotLayout()->addElement(1, 0, bottomAxisRect);
+
+    QFont font;
+    font.setPointSize(12);
+    topAxisRect->axis(QCPAxis::atLeft, 0)->setTickLabelFont(font);
+    topAxisRect->axis(QCPAxis::atBottom, 0)->setTickLabelFont(font);
+    bottomAxisRect->axis(QCPAxis::atLeft, 0)->setTickLabelFont(font);
+    bottomAxisRect->axis(QCPAxis::atBottom, 0)->setTickLabelFont(font);
+
+    QPen penFeature1;
+    QPen penFeature2;
+    penFeature1.setWidth(1);
+    penFeature2.setWidth(1);
+    penFeature1.setColor(QColor(180, 0, 0));
+    penFeature2.setColor(QColor(0, 180, 0));
+
+    QList<QCPAxis *> allAxes;
+    allAxes << bottomAxisRect->axes() << topAxisRect->axes();
+            foreach (QCPAxis *axis, allAxes) {
+            axis->setLayer("axes");
+            axis->grid()->setLayer("grid");
+        }
+
+    QCPGraph *g1 = customPlot->addGraph(topAxisRect->axis(QCPAxis::atBottom), topAxisRect->axis(QCPAxis::atLeft));
+    QCPGraph *g2 = customPlot->addGraph(bottomAxisRect->axis(QCPAxis::atBottom), bottomAxisRect->axis(QCPAxis::atLeft));
+
+    g1->setPen(penFeature1);
+    g2->setPen(penFeature2);
+
+    // Check if the number of graphs corresponds to the number of available features
+    assert(ui->graph_widget->graphCount() == static_cast<int>(GraphFeature::Count));
+
+}
+
+
 bool GSWidget::event(QEvent *event) {
     if (event->type() == QEvent::KeyPress) {
 
         QKeyEvent *ke = static_cast<QKeyEvent *>(event);
 
         if (ke->key() == Qt::Key_Space) {
-            cout << "Detected key press on spacebar" << endl << flush;
+            emit toggleLogging();
             return true;
         }
 

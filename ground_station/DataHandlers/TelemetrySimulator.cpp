@@ -14,7 +14,6 @@ TelemetrySimulator::TelemetrySimulator() : time{QTime::currentTime()} {
 }
 
 vector<TelemetryReading> TelemetrySimulator::getData() {
-
     return generateTelemetryVector();
 }
 

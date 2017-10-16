@@ -7,7 +7,7 @@
 using namespace std;
 
 Worker::Worker() :
-        enabled{true},
+        loggingEnabled{false},
         telemetryHandler{new TelemetrySimulator()},
         telemetryLogger{LogConstants::TELEMETRY_PATH},
         eventLogger{LogConstants::EVENTS_PATH},
@@ -44,8 +44,10 @@ void Worker::mainRoutine() {
     vector<RocketEvent> rocketEvents = telemetryHandler->getEvents();
     vector<TelemetryReading> data = telemetryHandler->getData();
 
-    telemetryLogger.registerData(vector<reference_wrapper<ILoggable>>(begin(data), end(data)));
-    eventLogger.registerData(vector<reference_wrapper<ILoggable>>(begin(rocketEvents), end(rocketEvents)));
+    if (loggingEnabled) {
+        telemetryLogger.registerData(vector<reference_wrapper<ILoggable>>(begin(data), end(data)));
+        eventLogger.registerData(vector<reference_wrapper<ILoggable>>(begin(rocketEvents), end(rocketEvents)));
+    }
 
     displayMostRecentTelemetry(data[data.size() - 1]);
 
@@ -55,6 +57,13 @@ void Worker::mainRoutine() {
     emit newEventsReady(rocketEvents);
     emit graphDataReady(speedDataBuffer, GraphFeature::FEATURE1);
     emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
+
+    QCoreApplication::processEvents();
+}
+
+void Worker::updateLoggingStatus() {
+    loggingEnabled = !loggingEnabled;
+    cout << "Logging is now " << (loggingEnabled ? "enabled" : "disabled") << endl;
 }
 
 void Worker::displayMostRecentTelemetry(TelemetryReading tr) {
