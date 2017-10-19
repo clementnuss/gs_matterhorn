@@ -3,6 +3,7 @@
 #include <QtCore/QTime>
 #include <cassert>
 #include <iostream>
+#include <cmath>
 #include "TelemetrySimulator.h"
 
 using namespace std;
@@ -30,7 +31,7 @@ vector<RocketEvent> TelemetrySimulator::getEvents() {
 }
 
 const vector<TelemetryReading> TelemetrySimulator::generateTelemetryVector() {
-    size_t vlength = static_cast<size_t>(
+    auto vlength = static_cast<size_t>(
             qrand() / static_cast<double>(RAND_MAX) * MAX_RANDOM_VECTOR_LENGTH + 1);
     vector<TelemetryReading> v;
 
