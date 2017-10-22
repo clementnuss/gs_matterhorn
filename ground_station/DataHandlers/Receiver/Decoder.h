@@ -9,7 +9,7 @@
 class Decoder {
 
 public:
-    void processByte(std::uint16_t);
+    void processByte(std::uint8_t);
 
     bool datagramReady();
 
@@ -20,19 +20,19 @@ private:
 
     void asyncRead();
 
-    void processHeader(std::vector<uint16_t>);
+    void processHeader(std::vector<uint8_t>);
 
-    void processTelemetryPayload(std::vector<uint16_t>);
+    void processTelemetryPayload(std::vector<uint8_t>);
 
     void resetMachine();
 
-    void seekHeader(uint16_t);
+    void seekHeader(uint8_t);
 
-    void accumulateHeader(uint16_t);
+    void accumulateHeader(uint8_t);
 
-    void seekControlFlag(uint16_t);
+    void seekControlFlag(uint8_t);
 
-    void accumulatePayload(uint16_t);
+    void accumulatePayload(uint8_t);
 
     void validatePayload();
 
@@ -40,15 +40,15 @@ private:
 
     void assertBufferSmallerThan(size_t);
 
-    void (Decoder::*action_)(uint16_t);
+    void (Decoder::*action_)(uint8_t);
 
-    std::vector<uint16_t> byteBuffer_;
-    std::vector<uint16_t> checksumAccumulator_;
+    std::vector<uint8_t> byteBuffer_;
+    std::vector<uint8_t> checksumAccumulator_;
     DecodingState currentState_;
     Datagram currentDatagram_;
 
 
-    const std::map<DecodingState, std::pair<DecodingState, void (Decoder::*)(uint16_t)>> STATES_TABLE{
+    const std::map<DecodingState, std::pair<DecodingState, void (Decoder::*)(uint8_t)>> STATES_TABLE{
             {DecodingState::SEEKING_FRAMESTART,   {DecodingState::PARSING_HEADER,       &Decoder::accumulateHeader}},
             {DecodingState::PARSING_HEADER,       {DecodingState::SEEKING_CONTROL_FLAG, &Decoder::seekControlFlag}},
             {DecodingState::SEEKING_CONTROL_FLAG, {DecodingState::PARSING_PAYLOAD,      &Decoder::accumulatePayload}},

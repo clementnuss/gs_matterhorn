@@ -1,19 +1,30 @@
 #include <cassert>
 #include "Decoder.h"
 
-void Decoder::processByte(uint16_t byte) {
+void Decoder::processByte(uint8_t byte) {
     assert(currentState_ != DecodingState::DATAGRAM_READY);
 
     (this->*action_)(byte);
 }
 
-void Decoder::processHeader(std::vector<uint16_t> headerBuffer) {
+void Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
+    assert(headerBuffer.size() == HEADER_SIZE);
 
+    uint32_t seqNum = 0;
+    for (size_t i = 0; i < SEQUENCE_NUMBER_SIZE; i++) {
+        seqNum = seqNum & headerBuffer[i];
+        seqNum = seqNum << sizeof(uint8_t);
+    }
+
+    uint8_t payloadType = headerBuffer[SEQUENCE_NUMBER_SIZE];
+
+    currentDatagram_.sequenceNumber = seqNum;
+    currentDatagram_.payloadType = DatagramPayloadType(payloadType);
 }
 
 //TODO: find elegant way to abstract the way the payload is treated from the decoder implementation
 //TODO: maybe in a map in DatagramSpec.h
-void Decoder::processTelemetryPayload(std::vector<uint16_t> payloadBuffer) {
+void Decoder::processTelemetryPayload(std::vector<uint8_t> payloadBuffer) {
 
 }
 
@@ -44,7 +55,7 @@ void Decoder::resetMachine() {
     currentState_ = INITIAL_STATE;
 }
 
-void Decoder::seekHeader(uint16_t byte) {
+void Decoder::seekHeader(uint8_t byte) {
     assertBufferSmallerThan(PREAMBLE_SIZE);
 
     if (byte == HEADER_PREAMBLE_FLAG) {
@@ -59,7 +70,7 @@ void Decoder::seekHeader(uint16_t byte) {
     }
 }
 
-void Decoder::accumulateHeader(uint16_t byte) {
+void Decoder::accumulateHeader(uint8_t byte) {
     assertBufferSmallerThan(HEADER_SIZE);
 
     byteBuffer_.push_back(byte);
@@ -74,7 +85,7 @@ void Decoder::accumulateHeader(uint16_t byte) {
     }
 }
 
-void Decoder::seekControlFlag(uint16_t byte) {
+void Decoder::seekControlFlag(uint8_t byte) {
     assert(byteBuffer_.empty());
 
     if (byte == CONTROL_FLAG) {
@@ -85,7 +96,7 @@ void Decoder::seekControlFlag(uint16_t byte) {
     }
 }
 
-void Decoder::accumulatePayload(uint16_t byte) {
+void Decoder::accumulatePayload(uint8_t byte) {
     assertBufferSmallerThan(PAYLOAD_TYPES_LENGTH.at(currentDatagram_.payloadType));
 
     byteBuffer_.push_back(byte);
