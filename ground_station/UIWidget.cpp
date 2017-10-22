@@ -98,8 +98,7 @@ void GSWidget::updateTelemetry(TelemetryReading t) {
 }
 
 void GSWidget::updateLinkStatus(bool radioStatus, bool videoStatus){
-    ui->link_radio_status->setText((radioStatus) ? UP : DOWN);
-    ui->link_video_status->setText((videoStatus) ? UP : DOWN);
+
 }
 
 void GSWidget::updateGroundStatus(float temperature, float pressure){

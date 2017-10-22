@@ -11,7 +11,7 @@
  * @param io
  */
 RadioReceiver::RadioReceiver(boost::asio::io_service &io)
-        : serialPort_{io} {}
+        : byteDecoder_{}, serialPort_{io} {}
 
 void RadioReceiver::openSerialPort(const string device, const uint32_t baudRate) {
     std::cout << "Opening serial port " << device << " at " << baudRate << " bauds/s" << std::endl;
@@ -44,7 +44,9 @@ void RadioReceiver::handleReceive(const boost::system::error_code &error,
                                   std::size_t bytesTransferred) {
 
     for (int i = 0; i < bytesTransferred; ++i) {
+        //TODO: log every byte received
         cout << recvBuffer_[i];
+        byteDecoder_.processByte(recvBuffer_[i]);
     }
 
     asyncRead();
@@ -54,3 +56,4 @@ void RadioReceiver::handleReceive(const boost::system::error_code &error,
 RadioReceiver::~RadioReceiver() {
     serialPort_.close();
 }
+

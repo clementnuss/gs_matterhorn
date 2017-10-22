@@ -5,29 +5,31 @@
 #define SERIAL_BAUD_RATE 57600
 
 #include <DataHandlers/TelemetryHandler.h>
-#include <Boost/asio.hpp>
-#include <Boost/array.hpp>
+#include "Decoder.h"
+#include <../lib/boost-cmake/boost/boost_1_64_0/boost/asio.hpp>
+#include <../lib/boost-cmake/boost/boost_1_64_0/boost/array.hpp>
 
 class RadioReceiver : public TelemetryHandler {
 
 public:
+
     explicit RadioReceiver(boost::asio::io_service &);
+    ~RadioReceiver();
 
     void openSerialPort(string device, uint32_t baudRate);
 
-    ~RadioReceiver();
-
     vector<TelemetryReading> getData() override;
-
-    void asyncRead();
 
 private:
 
+    void asyncRead();
+
+    void handleReceive(const boost::system::error_code &error, std::size_t);
+
+    Decoder byteDecoder_;
     boost::asio::serial_port serialPort_;
     boost::array<uint8_t, 20> recvBuffer_;
     vector<TelemetryReading> telemetryBuffer;
-
-    void handleReceive(const boost::system::error_code &error, std::size_t);
 
 };
 

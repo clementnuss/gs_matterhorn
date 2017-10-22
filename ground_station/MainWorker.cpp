@@ -58,6 +58,7 @@ void Worker::mainRoutine() {
     emit graphDataReady(speedDataBuffer, GraphFeature::FEATURE1);
     emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
 
+    QCoreApplication::sendPostedEvents(this);
     QCoreApplication::processEvents();
 }
 

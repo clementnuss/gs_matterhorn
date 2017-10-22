@@ -1,5 +1,5 @@
 #include <iostream>
-#include <ground_station/RadioReceiver.h>
+#include <ground_station/DataHandlers/Receiver/RadioReceiver.h>
 #include <Boost/thread.hpp>
 #include <Boost/program_options.hpp>
 
