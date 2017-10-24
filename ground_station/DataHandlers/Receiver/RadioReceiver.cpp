@@ -45,8 +45,10 @@ void RadioReceiver::handleReceive(const boost::system::error_code &error,
 
     for (int i = 0; i < bytesTransferred; ++i) {
         //TODO: log every byte received
-        cout << recvBuffer_[i];
-        byteDecoder_.processByte(recvBuffer_[i]);
+        //cout << recvBuffer_[i];
+        if(byteDecoder_.processByte(recvBuffer_[i])){
+            Datagram d = byteDecoder_.retrieveDatagram();
+        }
     }
 
     asyncRead();

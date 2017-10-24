@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <cmath>
 #include "ILoggable.h"
 #include "ProgramConstants.h"
 
@@ -19,6 +20,7 @@ struct TimedData {
 
 struct DataReading {
     DataReading() = default;
+
     DataReading(double v, bool b) : value{v}, validity{b} {}
 
     double value;
@@ -51,57 +53,74 @@ struct RocketEvent : TimedData, ILoggable {
     }
 };
 
-struct YawPitchRollReading : ILoggable {
-    YawPitchRollReading() = default;
-    YawPitchRollReading(double y, double p, double r, bool b) : yaw{y}, pitch{p}, roll{r}, validity{b} {}
+struct XYZReading : ILoggable {
+    XYZReading() = default;
 
-    double yaw;
-    double pitch;
-    double roll;
+    XYZReading(double x, double y, double z, bool b) : x{x}, y{y}, z{z}, validity{b} {}
+
+    double x;
+    double y;
+    double z;
     bool validity;
 
-    virtual string toString() const override {
+    string toString() const override {
         stringstream ss;
 
-        ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << yaw
-           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << pitch
-           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << roll;
-        
+        ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << x
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << y
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << z;
+
         return ss.str();
+    }
+
+    double norm() {
+        return std::sqrt(x * x + y * y + z * z);
     }
 };
 
 struct TelemetryReading : TimedData, ILoggable {
     TelemetryReading() = default;
 
-    TelemetryReading(long t, DataReading altitude, DataReading speed, DataReading acceleration,
-                     DataReading pressure, DataReading temperature, YawPitchRollReading ypr) :
-            TimedData(t), altitude{altitude}, speed{speed}, acceleration{acceleration}, pressure{pressure},
-            temperature{temperature}, ypr{ypr} {}
+    /**
+     *
+     * @param t
+     * @param altitude
+     * @param acceleration
+     * @param magnetometer
+     * @param gyroscope
+     * @param pressure
+     * @param temperature
+     */
+    TelemetryReading(long t, DataReading altitude, /*DataReading speed,*/ XYZReading acceleration,
+                     XYZReading magnetometer, XYZReading gyroscope, DataReading pressure, DataReading temperature) :
+            TimedData(t), altitude{altitude}, /*speed{speed},*/ acceleration{acceleration}, magnetometer{magnetometer},
+            gyroscope{gyroscope}, pressure{pressure}, temperature{temperature} {}
 
     TelemetryReading(const TelemetryReading &that) = default;
 
     ~TelemetryReading() = default;
 
     DataReading altitude;
-    DataReading speed;
-    DataReading acceleration;
+//    DataReading speed;
+    XYZReading acceleration;
+    XYZReading magnetometer;
+    XYZReading gyroscope;
     DataReading pressure;
     DataReading temperature;
-    YawPitchRollReading ypr;
 
-    virtual string toString() const override {
+    string toString() const override {
         stringstream format;
         format << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed;
 
         stringstream ss;
         ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << this->timestamp
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << altitude.value
-           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << speed.value
-           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << acceleration.value
+           //           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << speed.value
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << pressure.value
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << temperature.value
-           << ypr.toString();
+           << acceleration.toString()
+           << gyroscope.toString()
+           << magnetometer.toString();
 
         return ss.str();
     }

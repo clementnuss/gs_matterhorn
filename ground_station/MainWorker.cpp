@@ -13,11 +13,11 @@ Worker::Worker() :
         eventLogger{LogConstants::EVENTS_PATH},
         lastDisplayableReading{-1,
                                {0, false},
+                               {0, 0, 0, false},
+                               {0, 0, 0, false},
+                               {0, 0, 0, false},
                                {0, false},
-                               {0, false},
-                               {0, false},
-                               {0, false},
-                               {0, 0, 0, false}},
+                               {0, false}},
         lastUIupdate{chrono::system_clock::now()} {
     
 }

@@ -6,19 +6,34 @@
 #include <vector>
 #include "DatagramSpec.h"
 
+typedef union {
+    float fl;
+    uint32_t uint32;
+} float_cast;
+
+uint16_t parseUint16(vector<uint8_t>::iterator &it);
+
+uint32_t parseUint32(vector<uint8_t>::iterator &it);
+
 class Decoder {
 
 public:
-    void processByte(std::uint8_t);
+
+    Decoder();
+
+    bool processByte(std::uint8_t);
 
     bool datagramReady();
 
     Datagram retrieveDatagram();
 
+    DecodingState getCurrentState_() const;
+
+
 private:
     static const DecodingState INITIAL_STATE = DecodingState::SEEKING_FRAMESTART;
 
-    void asyncRead();
+//    void asyncRead();
 
     void processHeader(std::vector<uint8_t>);
 
@@ -34,7 +49,7 @@ private:
 
     void accumulatePayload(uint8_t);
 
-    void validatePayload();
+    bool validatePayload();
 
     void jumpToNextState();
 

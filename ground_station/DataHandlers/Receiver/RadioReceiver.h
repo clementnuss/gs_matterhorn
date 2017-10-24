@@ -28,7 +28,7 @@ private:
 
     Decoder byteDecoder_;
     boost::asio::serial_port serialPort_;
-    boost::array<uint8_t, 20> recvBuffer_;
+    boost::array<uint8_t, 500> recvBuffer_;
     vector<TelemetryReading> telemetryBuffer;
 
 };
