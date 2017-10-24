@@ -31,9 +31,18 @@ void Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
     currentDatagram_.payloadType = DatagramPayloadType(payloadType);
 }
 
-//TODO: find elegant way to abstract the way the payload is treated from the decoder implementation
-//TODO: maybe in a map in DatagramSpec.h
+//TODO: remove hardcoded algorithm for generic one
+/**
+ * This function gathers the payload's binary data contained inside the
+ * datagram and split it such as to retrieve all the fields specified by
+ * the payload specification. Note that at this point the data is still
+ * in binary format. The casting should be done by the appropriate helper
+ * function
+ *
+ * @param payloadBuffer
+ */
 void Decoder::processTelemetryPayload(std::vector<uint8_t> payloadBuffer) {
+
     switch (currentDatagram_.payloadType) {
         case DatagramPayloadType::TELEMETRY: {
 

@@ -39,6 +39,8 @@ private:
 
     void processTelemetryPayload(std::vector<uint8_t>);
 
+    void processGenericTelemetryPayload(std::vector<uint8_t>);
+
     void resetMachine();
 
     void seekHeader(uint8_t);

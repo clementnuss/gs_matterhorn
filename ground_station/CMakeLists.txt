@@ -8,7 +8,8 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 
 file(GLOB_RECURSE SOURCES "*.cpp")
-add_library(ground_station_lib ${SOURCES})
+file(GLOB_RECURSE HEADERS "*.h")
+add_library(ground_station_lib ${SOURCES} ${HEADERS})
 
 # Include QCustomPlot libtrary and include file
 include_directories(${CMAKE_BINARY_DIR}/qcustomplot-src/)

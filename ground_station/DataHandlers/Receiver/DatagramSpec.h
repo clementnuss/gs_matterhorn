@@ -5,13 +5,14 @@
 
 #include <map>
 #include <vector>
+#include "DataStructures/datastructs.h"
 
 enum class DecodingState {
     SEEKING_FRAMESTART, PARSING_HEADER, SEEKING_CONTROL_FLAG, PARSING_PAYLOAD, DATAGRAM_READY
 };
 
 enum class DatagramPayloadType {
-    TELEMETRY = 0x00, ROCKET_PAYLOAD = 0x01
+    TELEMETRY = 0x00, EVENT = 0x01, ROCKET_PAYLOAD = 0x02
 };
 
 static const std::map<DatagramPayloadType, size_t> PAYLOAD_TYPES_LENGTH = {
@@ -38,6 +39,39 @@ static constexpr size_t PREAMBLE_SIZE = 4;
 static constexpr size_t HEADER_SIZE = SEQUENCE_NUMBER_SIZE + PAYLOAD_TYPE_SIZE;
 static constexpr size_t CONTROL_FLAG_SIZE = 1;
 static constexpr size_t CHECKSUM_SIZE = 2;
+
+static const TELEMETRY_PAYLOAD_LENGTH = 9;
+
+/**
+ * This map specifies each payload type as well as its internal field lengths in bytes
+ *
+ * Any custom payload specification should be added here.
+ */
+static const std::map<DatagramPayloadType, std::vector<size_t>> TELEMETRY_PAYLOAD_FIELD_SIZES{
+        {DatagramPayloadType::TELEMETRY,
+                {
+                        2, // Acceleration X
+                        2, // Acceleration Y
+                        2, // Acceleration Z
+                        2, // Gyroscope X
+                        2, // Gyroscope Y
+                        2, // Gyroscope Z
+                        2, // Magnetometer X
+                        2, // Magnetometer Y
+                        2  // Magnetometer Z
+                }},
+        {DatagramPayloadType::EVENT,
+                {
+                        1
+                }
+        },
+        {DatagramPayloadType::ROCKET_PAYLOAD,
+                {
+                        1
+                }
+        }
+};
+
 #endif //GS_MATTERHORN_PROTOCOL_H
 
 #pragma clang diagnostic pop
