@@ -2,63 +2,147 @@
 #include <gtest/gtest.h>
 #include <DataHandlers/Receiver/Decoder.h>
 
-TEST(DecoderTests, simulateNormalDecoding) {
+void push3D(std::vector<uint8_t> &v, size_t byteCount, uint32_t a, uint32_t b, uint32_t c) {
+    for (int i = byteCount - 1; i >= 0; --i)
+        v.push_back(static_cast<uint8_t>(a >> (8 * i)));
+    for (int i = byteCount - 1; i >= 0; --i)
+        v.push_back(static_cast<uint8_t>(b >> (8 * i)));
+    for (int i = byteCount - 1; i >= 0; --i)
+        v.push_back(static_cast<uint8_t>(c >> (8 * i)));
+}
+
+vector<uint8_t> createDatagram(uint32_t seqnum,
+                               uint32_t timestamp,
+                               uint32_t ax,
+                               uint32_t ay,
+                               uint32_t az,
+                               uint32_t mx,
+                               uint32_t my,
+                               uint32_t mz,
+                               uint32_t gx,
+                               uint32_t gy,
+                               uint32_t gz,
+                               float temp,
+                               uint32_t pres,
+                               float alt) {
+    // Create datagram header
+    vector<uint8_t> datagram{
+            HEADER_PREAMBLE_FLAG,
+            HEADER_PREAMBLE_FLAG,
+            HEADER_PREAMBLE_FLAG,
+            HEADER_PREAMBLE_FLAG};
+
+    float_cast sequenceNumber{.uint32 = seqnum};
+    for (int i = 3; i >= 0; --i)
+        datagram.push_back(static_cast<uint8_t>(sequenceNumber.uint32 >> (8 * i)));
+
+    datagram.push_back(static_cast<uint8_t>(DatagramPayloadType::TELEMETRY));
+    datagram.push_back(CONTROL_FLAG);
+
+    for (int i = 3; i >= 0; --i)
+        datagram.push_back(static_cast<uint8_t>(timestamp >> (8 * i)));
+
+    push3D(datagram, 2, ax, ay, az);
+    push3D(datagram, 2, mx, my, mz);
+    push3D(datagram, 2, gx, gy, gz);
+
+    float_cast temperature{.fl = temp};
+    for (int i = 3; i >= 0; --i)
+        datagram.push_back(static_cast<uint8_t>(temperature.uint32 >> (8 * i)));
+
+
+    float_cast pressure{.uint32 = pres};
+    for (int i = 3; i >= 0; --i)
+        datagram.push_back(static_cast<uint8_t>(pressure.uint32 >> (8 * i)));
+
+
+    float_cast altitude{.fl= alt};
+    for (int i = 3; i >= 0; --i)
+        datagram.push_back(static_cast<uint8_t>(altitude.uint32 >> (8 * i)));
+
+
+    return datagram;
+}
+
+TEST(DecoderTests, simulateTelemetryDecoding) {
 
     Decoder dec = Decoder{};
 
-    ASSERT_EQ(dec.getCurrentState_(), DecodingState::SEEKING_FRAMESTART);
+    ASSERT_EQ(dec.currentState(), DecodingState::SEEKING_FRAMESTART);
 
-    vector<uint8_t> correctTransmission(
-            {HEADER_PREAMBLE_FLAG, HEADER_PREAMBLE_FLAG, HEADER_PREAMBLE_FLAG, HEADER_PREAMBLE_FLAG, // header preamble
-             0x00, 0x00, 0x05, 0x82, // Sequence number
-             static_cast<uint8_t> (DatagramPayloadType::TELEMETRY)
-            });
+    // Test values
+    uint32_t seqnum = 1410;
+    uint32_t timestamp = 99999999;
+    uint32_t ax = 1;
+    uint32_t ay = 2;
+    uint32_t az = 3;
+    uint32_t mx = 4;
+    uint32_t my = 5;
+    uint32_t mz = 6;
+    uint32_t gx = 7;
+    uint32_t gy = 8;
+    uint32_t gz = 9;
+    float temp = 12345.6789;
+    uint32_t pres = 0141;
+    float alt = 98765.3210;
 
-    for (uint8_t byte : correctTransmission)
-        dec.processByte(byte);
 
-    ASSERT_EQ(dec.getCurrentState_(), DecodingState::SEEKING_CONTROL_FLAG);
+    vector<uint8_t> datagram = createDatagram(seqnum, timestamp, ax, ay, az, mx, my, mz, gx, gy, gz, temp, pres, alt);
 
-    dec.processByte(CONTROL_FLAG);
+    size_t k = 0;
 
-    ASSERT_EQ(dec.getCurrentState_(), DecodingState::PARSING_PAYLOAD);
-
-    // Timestamp
-    dec.processByte(0x80);
-    dec.processByte(0x00);
-    dec.processByte(0x00);
-    dec.processByte(0x00);
-
-    // Ax, ay, az, mx, my, mz, gx, gy, gz
-
-    for (uint8_t i = 0; i < 9; ++i) {
-        dec.processByte(0x01);
-        dec.processByte(i);
+    // Process preamble
+    for (size_t i = 0; i < PREAMBLE_SIZE; i++) {
+        ASSERT_EQ(dec.currentState(), DecodingState::SEEKING_FRAMESTART);
+        ASSERT_FALSE(dec.datagramReady());
+        dec.processByte(datagram[k++]);
     }
 
-    float temperature_f = -14.14f;
-    float_cast temp = {.fl = temperature_f};
-
-    for (int i = 3; i >= 0; --i) {
-        dec.processByte(static_cast<uint8_t>(temp.uint32 >> (8 * i)));
+    // Process header
+    for (size_t i = 0; i < HEADER_SIZE; i++) {
+        ASSERT_EQ(dec.currentState(), DecodingState::PARSING_HEADER);
+        ASSERT_FALSE(dec.datagramReady());
+        dec.processByte(datagram[k++]);
     }
 
-    float_cast pressure = {.uint32 = 0xff7fffff};
-    for (int i = 3; i >= 0; --i) {
-        dec.processByte(static_cast<uint8_t>(pressure.uint32 >> (8 * i)));
+    // Process control flag
+    ASSERT_EQ(dec.currentState(), DecodingState::SEEKING_CONTROL_FLAG);
+    ASSERT_FALSE(dec.datagramReady());
+    dec.processByte(datagram[k++]);
+
+    // Process payload
+    for (size_t i = 0; i < PAYLOAD_TYPES_LENGTH.at(DatagramPayloadType::TELEMETRY); i++) {
+        ASSERT_EQ(dec.currentState(), DecodingState::PARSING_PAYLOAD);
+        ASSERT_FALSE(dec.datagramReady());
+        dec.processByte(datagram[k++]);
     }
 
-    float_cast altitude = {.fl= 3.4028235E38f};
-    for (int i = 3; i >= 0; --i) {
-        dec.processByte(static_cast<uint8_t>(altitude.uint32 >> (8 * i)));
+    // Process checksum
+    for (size_t i = 0; i < CHECKSUM_SIZE; i++) {
+        ASSERT_EQ(dec.currentState(), DecodingState::PARSING_CHECKSUM);
+        ASSERT_FALSE(dec.datagramReady());
+        dec.processByte(datagram[k++]);
     }
 
+    // Datagram should be ready
     ASSERT_TRUE(dec.datagramReady());
+    ASSERT_EQ(dec.currentState(), DecodingState::SEEKING_FRAMESTART);
 
-    Datagram datagram = dec.retrieveDatagram();
-    ASSERT_EQ(datagram.sequenceNumber, 1410);
+    Datagram d = dec.retrieveDatagram();
 
-    ASSERT_EQ(datagram.payload.timestamp, 0x80000000);
-    ASSERT_EQ(datagram.payload.altitude.value, 3.4028235E38f);
+    // State machine should be reset
+    ASSERT_FALSE(dec.datagramReady());
+    ASSERT_EQ(dec.currentState(), DecodingState::SEEKING_FRAMESTART);
 
+    std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(d.payload_);
+    ASSERT_EQ(timestamp, (*data).timestamp);
+    ASSERT_EQ(ax, (*data).acceleration_.x_);
+    ASSERT_EQ(ay, (*data).acceleration_.y_);
+    ASSERT_EQ(az, (*data).acceleration_.z_);
+    ASSERT_EQ(mx, (*data).magnetometer_.x_);
+    ASSERT_EQ(my, (*data).magnetometer_.y_);
+    ASSERT_EQ(mz, (*data).magnetometer_.z_);
+    ASSERT_EQ(gx, (*data).gyroscope_.x_);
+    ASSERT_EQ(gy, (*data).gyroscope_.y_);
+    ASSERT_EQ(gz, (*data).gyroscope_.z_);
 }

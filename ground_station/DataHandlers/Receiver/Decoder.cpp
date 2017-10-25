@@ -9,7 +9,7 @@ Decoder::Decoder() {
 }
 
 bool Decoder::processByte(uint8_t byte) {
-    assert(currentState_ != DecodingState::DATAGRAM_READY);
+    assert(!datagramReady());
 
     (this->*action_)(byte);
 
@@ -27,60 +27,21 @@ void Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
 
     uint8_t payloadType = headerBuffer[SEQUENCE_NUMBER_SIZE];
 
-    currentDatagram_.sequenceNumber = seqNum;
-    currentDatagram_.payloadType = DatagramPayloadType(payloadType);
+    currentDatagram_.sequenceNumber_ = seqNum;
+    currentDatagram_.payloadType_ = DatagramPayloadType(payloadType);
 }
 
-//TODO: remove hardcoded algorithm for generic one
-/**
- * This function gathers the payload's binary data contained inside the
- * datagram and split it such as to retrieve all the fields specified by
- * the payload specification. Note that at this point the data is still
- * in binary format. The casting should be done by the appropriate helper
- * function
- *
- * @param payloadBuffer
- */
+
 void Decoder::processTelemetryPayload(std::vector<uint8_t> payloadBuffer) {
 
-    switch (currentDatagram_.payloadType) {
-        case DatagramPayloadType::TELEMETRY: {
+    std::shared_ptr<IDeserializable>
+    (*f)(std::vector<uint8_t>) = TELEMETRY_PAYLOAD_FACTORIES.at(currentDatagram_.payloadType_);
 
-            auto it = payloadBuffer.begin();
-
-            long measurement_time = static_cast<long>(parseUint32(it));
-
-            uint16_t ax = parseUint16(it);
-            uint16_t ay = parseUint16(it);
-            uint16_t az = parseUint16(it);
-
-            uint16_t mx = parseUint16(it);
-            uint16_t my = parseUint16(it);
-            uint16_t mz = parseUint16(it);
-
-            uint16_t gx = parseUint16(it);
-            uint16_t gy = parseUint16(it);
-            uint16_t gz = parseUint16(it);
-
-            float_cast temperature = {.uint32 = parseUint32(it)};
-            float_cast pressure = {.uint32 = parseUint32(it)};
-            float_cast altitude = {.uint32 = parseUint32(it)};
-
-            currentDatagram_.payload = TelemetryReading{
-                    measurement_time, {altitude.fl, true},
-                    {ax, ay, az, true}, {mx, my, mz, true}, {gx, gy, gz, true},
-                    {pressure.fl, true}, {temperature.fl, true}};
-
-        }
-            break;
-        case DatagramPayloadType::ROCKET_PAYLOAD:
-            //TODO: implement rocket_event
-            break;
-    }
+    currentDatagram_.payload_ = std::move(f(payloadBuffer));
 }
 
 bool Decoder::datagramReady() {
-    return currentState_ == DecodingState::DATAGRAM_READY;
+    return currentDatagram_.complete == true;
 }
 
 Datagram Decoder::retrieveDatagram() {
@@ -148,39 +109,40 @@ void Decoder::seekControlFlag(uint8_t byte) {
 }
 
 void Decoder::accumulatePayload(uint8_t byte) {
-    assertBufferSmallerThan(PAYLOAD_TYPES_LENGTH.at(currentDatagram_.payloadType));
+    assertBufferSmallerThan(PAYLOAD_TYPES_LENGTH.at(currentDatagram_.payloadType_));
 
     byteBuffer_.push_back(byte);
     checksumAccumulator_.push_back(byte);
 
-    if (byteBuffer_.size() == PAYLOAD_TYPES_LENGTH.at(currentDatagram_.payloadType)) {
-        if (validatePayload()) {
-            processTelemetryPayload(byteBuffer_);
-            jumpToNextState();
-        } else {
-            resetMachine();
-        }
+    if (byteBuffer_.size() == PAYLOAD_TYPES_LENGTH.at(currentDatagram_.payloadType_)) {
+        processTelemetryPayload(byteBuffer_);
+        byteBuffer_.clear();
+        jumpToNextState();
     }
 }
 
-bool Decoder::validatePayload() {
+void Decoder::accumulateChecksum(uint8_t byte) {
+    assertBufferSmallerThan(CHECKSUM_SIZE);
+
+    byteBuffer_.push_back(byte);
+
+    if (byteBuffer_.size() == CHECKSUM_SIZE) {
+        validatePayload();
+        jumpToNextState();
+    }
+}
+
+void Decoder::validatePayload() {
 
     //TODO: compute CRC checksum with checksumAccumulator.
-    return checksumAccumulator_.size() > 1;
+    currentDatagram_.complete = true;
+    jumpToNextState();
 }
 
 void Decoder::assertBufferSmallerThan(size_t bound) {
     assert(0 <= byteBuffer_.size() && byteBuffer_.size() < bound);
 }
 
-DecodingState Decoder::getCurrentState_() const {
+DecodingState Decoder::currentState() const {
     return currentState_;
-}
-
-uint16_t parseUint16(vector<uint8_t>::iterator &it) {
-    return (*(it++) << 8) | *(it++);
-}
-
-uint32_t parseUint32(vector<uint8_t>::iterator &it) {
-    return (*(it++) << 24) | (*(it++) << 16) | (*(it++) << 8) | *(it++);
 }

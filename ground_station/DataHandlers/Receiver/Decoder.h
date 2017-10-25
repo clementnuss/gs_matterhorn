@@ -6,14 +6,6 @@
 #include <vector>
 #include "DatagramSpec.h"
 
-typedef union {
-    float fl;
-    uint32_t uint32;
-} float_cast;
-
-uint16_t parseUint16(vector<uint8_t>::iterator &it);
-
-uint32_t parseUint32(vector<uint8_t>::iterator &it);
 
 class Decoder {
 
@@ -27,7 +19,7 @@ public:
 
     Datagram retrieveDatagram();
 
-    DecodingState getCurrentState_() const;
+    DecodingState currentState() const;
 
 
 private:
@@ -39,8 +31,6 @@ private:
 
     void processTelemetryPayload(std::vector<uint8_t>);
 
-    void processGenericTelemetryPayload(std::vector<uint8_t>);
-
     void resetMachine();
 
     void seekHeader(uint8_t);
@@ -51,7 +41,9 @@ private:
 
     void accumulatePayload(uint8_t);
 
-    bool validatePayload();
+    void accumulateChecksum(uint8_t);
+
+    void validatePayload();
 
     void jumpToNextState();
 
@@ -69,8 +61,9 @@ private:
             {DecodingState::SEEKING_FRAMESTART,   {DecodingState::PARSING_HEADER,       &Decoder::accumulateHeader}},
             {DecodingState::PARSING_HEADER,       {DecodingState::SEEKING_CONTROL_FLAG, &Decoder::seekControlFlag}},
             {DecodingState::SEEKING_CONTROL_FLAG, {DecodingState::PARSING_PAYLOAD,      &Decoder::accumulatePayload}},
-            {DecodingState::PARSING_PAYLOAD,      {DecodingState::DATAGRAM_READY,       nullptr}}, //TODO: find more elegant solution
-            {DecodingState::DATAGRAM_READY,       {DecodingState::SEEKING_FRAMESTART,   &Decoder::seekHeader}}
+            {DecodingState::PARSING_PAYLOAD,      {DecodingState::PARSING_CHECKSUM,     &Decoder::accumulateChecksum}},
+            {DecodingState::PARSING_CHECKSUM,     {DecodingState::VALIDATING_PAYLOAD,   nullptr}},
+            {DecodingState::VALIDATING_PAYLOAD,   {DecodingState::SEEKING_FRAMESTART,   &Decoder::seekHeader}}
     };
 
 };

@@ -11,6 +11,10 @@
 using namespace std;
 using namespace PrintConstants;
 
+struct IDeserializable {
+    virtual ~IDeserializable() = default;
+};
+
 struct TimedData {
     TimedData() = default;
     TimedData(long t) : timestamp{t} {}
@@ -56,57 +60,51 @@ struct RocketEvent : TimedData, ILoggable {
 struct XYZReading : ILoggable {
     XYZReading() = default;
 
-    XYZReading(double x, double y, double z, bool b) : x{x}, y{y}, z{z}, validity{b} {}
+    XYZReading(double x, double y, double z) : x_{x}, y_{y}, z_{z} {}
 
-    double x;
-    double y;
-    double z;
-    bool validity;
+    double x_;
+    double y_;
+    double z_;
 
     string toString() const override {
         stringstream ss;
 
-        ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << x
-           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << y
-           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << z;
+        ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << x_
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << y_
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << z_;
 
         return ss.str();
     }
 
     double norm() {
-        return std::sqrt(x * x + y * y + z * z);
+        return std::sqrt(x_ * x_ + y_ * y_ + z_ * z_);
     }
 };
 
-struct TelemetryReading : TimedData, ILoggable {
+struct TelemetryReading : TimedData, ILoggable, IDeserializable {
     TelemetryReading() = default;
 
-    /**
-     *
-     * @param t
-     * @param altitude
-     * @param acceleration
-     * @param magnetometer
-     * @param gyroscope
-     * @param pressure
-     * @param temperature
-     */
-    TelemetryReading(long t, DataReading altitude, /*DataReading speed,*/ XYZReading acceleration,
-                     XYZReading magnetometer, XYZReading gyroscope, DataReading pressure, DataReading temperature) :
-            TimedData(t), altitude{altitude}, /*speed{speed},*/ acceleration{acceleration}, magnetometer{magnetometer},
-            gyroscope{gyroscope}, pressure{pressure}, temperature{temperature} {}
+    TelemetryReading(long t, double altitude, XYZReading acceleration,
+                     XYZReading magnetometer, XYZReading gyroscope,
+                     double pressure, double temperature) :
+            TimedData(t),
+            altitude_{altitude},
+            acceleration_{acceleration},
+            magnetometer_{magnetometer},
+            gyroscope_{gyroscope},
+            pressure_{pressure},
+            temperature_{temperature} {}
 
     TelemetryReading(const TelemetryReading &that) = default;
 
     ~TelemetryReading() = default;
 
-    DataReading altitude;
-//    DataReading speed;
-    XYZReading acceleration;
-    XYZReading magnetometer;
-    XYZReading gyroscope;
-    DataReading pressure;
-    DataReading temperature;
+    XYZReading acceleration_;
+    XYZReading magnetometer_;
+    XYZReading gyroscope_;
+    double altitude_;
+    double pressure_;
+    double temperature_;
 
     string toString() const override {
         stringstream format;
@@ -114,13 +112,13 @@ struct TelemetryReading : TimedData, ILoggable {
 
         stringstream ss;
         ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << this->timestamp
-           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << altitude.value
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << altitude_
            //           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << speed.value
-           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << pressure.value
-           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << temperature.value
-           << acceleration.toString()
-           << gyroscope.toString()
-           << magnetometer.toString();
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << pressure_
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << temperature_
+           << acceleration_.toString()
+           << gyroscope_.toString()
+           << magnetometer_.toString();
 
         return ss.str();
     }

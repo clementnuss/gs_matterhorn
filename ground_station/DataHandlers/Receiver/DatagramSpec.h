@@ -5,10 +5,18 @@
 
 #include <map>
 #include <vector>
+#include <memory>
 #include "DataStructures/datastructs.h"
+#include "Factories.h"
 
 enum class DecodingState {
-    SEEKING_FRAMESTART, PARSING_HEADER, SEEKING_CONTROL_FLAG, PARSING_PAYLOAD, DATAGRAM_READY
+    SEEKING_FRAMESTART,
+    PARSING_HEADER,
+    SEEKING_CONTROL_FLAG,
+    PARSING_PAYLOAD,
+    PARSING_CHECKSUM,
+    VALIDATING_PAYLOAD,
+    DATAGRAM_READY
 };
 
 enum class DatagramPayloadType {
@@ -21,10 +29,10 @@ static const std::map<DatagramPayloadType, size_t> PAYLOAD_TYPES_LENGTH = {
 };
 
 struct Datagram {
-    uint32_t sequenceNumber;
-    DatagramPayloadType payloadType;
-//    std::vector<uint32_t> payload;
-    TelemetryReading payload;
+    uint32_t sequenceNumber_;
+    DatagramPayloadType payloadType_;
+    std::shared_ptr<IDeserializable> payload_;
+    bool complete;
 };
 
 static constexpr uint8_t HEADER_PREAMBLE_FLAG = 0x55;
@@ -40,37 +48,17 @@ static constexpr size_t HEADER_SIZE = SEQUENCE_NUMBER_SIZE + PAYLOAD_TYPE_SIZE;
 static constexpr size_t CONTROL_FLAG_SIZE = 1;
 static constexpr size_t CHECKSUM_SIZE = 2;
 
-static const TELEMETRY_PAYLOAD_LENGTH = 9;
 
 /**
  * This map specifies each payload type as well as its internal field lengths in bytes
  *
  * Any custom payload specification should be added here.
  */
-static const std::map<DatagramPayloadType, std::vector<size_t>> TELEMETRY_PAYLOAD_FIELD_SIZES{
-        {DatagramPayloadType::TELEMETRY,
-                {
-                        2, // Acceleration X
-                        2, // Acceleration Y
-                        2, // Acceleration Z
-                        2, // Gyroscope X
-                        2, // Gyroscope Y
-                        2, // Gyroscope Z
-                        2, // Magnetometer X
-                        2, // Magnetometer Y
-                        2  // Magnetometer Z
-                }},
-        {DatagramPayloadType::EVENT,
-                {
-                        1
-                }
-        },
-        {DatagramPayloadType::ROCKET_PAYLOAD,
-                {
-                        1
-                }
-        }
+static const std::map<DatagramPayloadType, std::shared_ptr<IDeserializable>(*)(
+        std::vector<uint8_t>)> TELEMETRY_PAYLOAD_FACTORIES{
+        {DatagramPayloadType::TELEMETRY, &Factories::telemetryReadingFactory}
 };
+
 
 #endif //GS_MATTERHORN_PROTOCOL_H
 

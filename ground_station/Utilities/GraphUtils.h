@@ -7,7 +7,7 @@ QCPGraphData speedFromReading(TelemetryReading reading) {
 }
 
 QCPGraphData accelerationFromReading(TelemetryReading reading) {
-    return {static_cast<double>(reading.timestamp), reading.acceleration.norm()};
+    return {static_cast<double>(reading.timestamp), reading.acceleration_.norm()};
 }
 
 #endif //GS_MATTERHORN_GRAPHUTILS_H

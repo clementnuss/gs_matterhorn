@@ -12,12 +12,12 @@ Worker::Worker() :
         telemetryLogger{LogConstants::TELEMETRY_PATH},
         eventLogger{LogConstants::EVENTS_PATH},
         lastDisplayableReading{-1,
-                               {0, false},
-                               {0, 0, 0, false},
-                               {0, 0, 0, false},
-                               {0, 0, 0, false},
-                               {0, false},
-                               {0, false}},
+                               0,
+                               {0, 0, 0},
+                               {0, 0, 0},
+                               {0, 0, 0},
+                               0,
+                               0},
         lastUIupdate{chrono::system_clock::now()} {
     
 }

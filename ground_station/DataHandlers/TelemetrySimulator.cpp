@@ -3,7 +3,6 @@
 #include <QtCore/QTime>
 #include <cassert>
 #include <iostream>
-#include <cmath>
 #include "TelemetrySimulator.h"
 
 using namespace std;
@@ -51,12 +50,12 @@ const TelemetryReading TelemetrySimulator::generateTelemetry() {
 
     return TelemetryReading{
             key,
-            DataReading{10000 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 1000.0 * sin(keysec / 0.8), true},
-            XYZReading{900 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 90.0 * sin(keysec / 0.38), 0, 0, true},
-            XYZReading{200 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 20.0 * sin(keysec / 0.27), 0, 0, true},
-            XYZReading{100 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 10.0 * sin(keysec / 0.6), 1, 2, true},
-            DataReading{50 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 5.0 * sin(keysec / 0.7), true},
-            DataReading{90.0 * sin(key) + rnd / static_cast<double>(RAND_MAX) * 1 * sin(keysec / 0.7), true}
+            10000 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 1000.0 * sin(keysec / 0.8),
+            XYZReading{900 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 90.0 * sin(keysec / 0.38), 0, 0},
+            XYZReading{200 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 20.0 * sin(keysec / 0.27), 0, 0},
+            XYZReading{100 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 10.0 * sin(keysec / 0.6), 1, 2},
+            50 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 5.0 * sin(keysec / 0.7),
+            90.0 * sin(key) + rnd / static_cast<double>(RAND_MAX) * 1 * sin(keysec / 0.7)
     };
 }
 

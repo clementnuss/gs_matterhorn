@@ -87,14 +87,14 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 }
 
 void GSWidget::updateTelemetry(TelemetryReading t) {
-    ui->telemetry_altitude_value->setText(QString::number(t.altitude.value, 'f', UIConstants::PRECISION));
-//    ui->telemetry_speed_value->setText(QString::number(t.speed.value, 'f', UIConstants::PRECISION));
-    ui->telemetry_acceleration_value->setText(QString::number(t.acceleration.norm(), 'f', UIConstants::PRECISION));
-    ui->telemetry_pressure_value->setText(QString::number(t.pressure.value, 'f', UIConstants::PRECISION));
-    ui->telemetry_temperature_value->setText(QString::number(t.temperature.value, 'f', UIConstants::PRECISION));
-    ui->telemetry_yaw_value->setText(QString::number(t.acceleration.x, 'f', UIConstants::PRECISION));
-    ui->telemetry_pitch_value->setText(QString::number(t.acceleration.y, 'f', UIConstants::PRECISION));
-    ui->telemetry_roll_value->setText(QString::number(t.acceleration.z, 'f', UIConstants::PRECISION));
+    ui->telemetry_altitude_value->setText(QString::number(t.altitude_, 'f', UIConstants::PRECISION));
+//    ui->telemetry_speed_value->setText(QString::number(t.speed, 'f', UIConstants::PRECISION));
+    ui->telemetry_acceleration_value->setText(QString::number(t.acceleration_.norm(), 'f', UIConstants::PRECISION));
+    ui->telemetry_pressure_value->setText(QString::number(t.pressure_, 'f', UIConstants::PRECISION));
+    ui->telemetry_temperature_value->setText(QString::number(t.temperature_, 'f', UIConstants::PRECISION));
+    ui->telemetry_yaw_value->setText(QString::number(t.acceleration_.x_, 'f', UIConstants::PRECISION));
+    ui->telemetry_pitch_value->setText(QString::number(t.acceleration_.y_, 'f', UIConstants::PRECISION));
+    ui->telemetry_roll_value->setText(QString::number(t.acceleration_.z_, 'f', UIConstants::PRECISION));
 }
 
 void GSWidget::updateLinkStatus(bool radioStatus, bool videoStatus){
