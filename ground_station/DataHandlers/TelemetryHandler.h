@@ -10,9 +10,10 @@
 class TelemetryHandler : public IDataHandler<TelemetryReading> {
 
 public:
-    std::vector<TelemetryReading> getData() override;
+    //TODO: move port and baud rate from derived class to here
+    virtual void startup() = 0;
 
-    virtual std::vector<RocketEvent> getEvents();
+    virtual std::vector<RocketEvent> pollEvents() = 0;
 };
 
 

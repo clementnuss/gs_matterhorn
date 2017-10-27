@@ -1,12 +1,13 @@
 #include <QThread>
 #include <iostream>
 #include <DataHandlers/TelemetrySimulator.h>
+#include <DataHandlers/Receiver/RadioReceiver.h>
 #include "MainWorker.h"
 #include "Utilities/GraphUtils.h"
 
 using namespace std;
 
-Worker::Worker() :
+Worker::Worker(std::string comPort) :
         loggingEnabled{false},
         telemetryHandler{new TelemetrySimulator()},
         telemetryLogger{LogConstants::TELEMETRY_PATH},
@@ -19,7 +20,7 @@ Worker::Worker() :
                                0,
                                0},
         lastUIupdate{chrono::system_clock::now()} {
-    
+    //telemetryHandler->startup();
 }
 
 Worker::~Worker() {
@@ -41,8 +42,8 @@ void Worker::mainRoutine() {
     //TODO: adapt sleep time so as to have proper framerate
     QThread::msleep(UIConstants::REFRESH_RATE);
 
-    vector<RocketEvent> rocketEvents = telemetryHandler->getEvents();
-    vector<TelemetryReading> data = telemetryHandler->getData();
+    vector<RocketEvent> rocketEvents = telemetryHandler->pollEvents();
+    vector<TelemetryReading> data = telemetryHandler->pollData();
 
     if (loggingEnabled) {
         telemetryLogger.registerData(vector<reference_wrapper<ILoggable>>(begin(data), end(data)));

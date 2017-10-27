@@ -13,11 +13,11 @@ using namespace SimulatorConstants;
 TelemetrySimulator::TelemetrySimulator() : time{QTime::currentTime()} {
 }
 
-vector<TelemetryReading> TelemetrySimulator::getData() {
+vector<TelemetryReading> TelemetrySimulator::pollData() {
     return generateTelemetryVector();
 }
 
-vector<RocketEvent> TelemetrySimulator::getEvents() {
+vector<RocketEvent> TelemetrySimulator::pollEvents() {
     vector<RocketEvent> v;
 
     if ((qrand() / static_cast<double>(RAND_MAX)) * EVENT_PROBABILITY_INTERVAL <= 1) {
@@ -27,6 +27,10 @@ vector<RocketEvent> TelemetrySimulator::getEvents() {
     }
 
     return v;
+}
+
+void TelemetrySimulator::startup() {
+
 }
 
 const vector<TelemetryReading> TelemetrySimulator::generateTelemetryVector() {

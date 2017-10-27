@@ -12,8 +12,11 @@ class TelemetrySimulator : public TelemetryHandler {
 public:
     TelemetrySimulator();
 
-    virtual vector<RocketEvent> getEvents() override;
-    virtual vector<TelemetryReading> getData() override;
+    void startup() override;
+
+    virtual vector<RocketEvent> pollEvents() override;
+
+    virtual vector<TelemetryReading> pollData() override;
 
 private:
     RocketEvent generateEvent();

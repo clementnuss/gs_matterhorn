@@ -134,7 +134,7 @@ TEST(DecoderTests, simulateTelemetryDecoding) {
     ASSERT_FALSE(dec.datagramReady());
     ASSERT_EQ(dec.currentState(), DecodingState::SEEKING_FRAMESTART);
 
-    std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(d.payload_);
+    std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(d.deserializedPayload_);
     ASSERT_EQ(timestamp, (*data).timestamp);
     ASSERT_EQ(ax, (*data).acceleration_.x_);
     ASSERT_EQ(ay, (*data).acceleration_.y_);

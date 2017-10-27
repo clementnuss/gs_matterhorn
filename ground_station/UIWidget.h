@@ -19,6 +19,7 @@ class GSWidget : public QWidget
     Q_OBJECT
 
 public:
+    GSWidget(QWidget *, std::string);
     bool event(QEvent *) override;
     explicit GSWidget(QWidget *parent = nullptr);
     ~GSWidget() override;

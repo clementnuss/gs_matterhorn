@@ -15,7 +15,7 @@ class Worker : public QObject
     Q_OBJECT
 
 public:
-    Worker();
+    Worker(std::string);
     ~Worker() override;
 
     void mainRoutine();
@@ -37,7 +37,6 @@ signals:
 
 private:
     bool loggingEnabled;
-
     void displayMostRecentTelemetry(TelemetryReading);
 
     unique_ptr<TelemetryHandler> telemetryHandler;

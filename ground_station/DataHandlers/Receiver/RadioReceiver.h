@@ -1,36 +1,44 @@
 #ifndef GS_MATTERHORN_RADIORECEIVER_H
 #define GS_MATTERHORN_RADIORECEIVER_H
 
-
-#define SERIAL_BAUD_RATE 57600
-
 #include <DataHandlers/TelemetryHandler.h>
 #include "Decoder.h"
-#include <../lib/boost-cmake/boost/boost_1_64_0/boost/asio.hpp>
-#include <../lib/boost-cmake/boost/boost_1_64_0/boost/array.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/serial_port.hpp>
+#include <boost/array.hpp>
 
 class RadioReceiver : public TelemetryHandler {
 
 public:
 
-    explicit RadioReceiver(boost::asio::io_service &);
+    explicit RadioReceiver(std::string);
     ~RadioReceiver();
 
-    void openSerialPort(string device, uint32_t baudRate);
+    void startup() override;
 
-    vector<TelemetryReading> getData() override;
+    vector<TelemetryReading> pollData() override;
+
+    vector<RocketEvent> pollEvents() override;
 
 private:
 
     void asyncRead();
 
+    void openSerialPort();
+
     void handleReceive(const boost::system::error_code &error, std::size_t);
 
+    static constexpr int THREAD_SLEEP_TIME_MILLIS = 100;
     Decoder byteDecoder_;
+    std::string device_;
+    boost::asio::io_service ioService_;
     boost::asio::serial_port serialPort_;
+    boost::thread thread_;
     boost::array<uint8_t, 500> recvBuffer_;
-    vector<TelemetryReading> telemetryBuffer;
 
+    vector<TelemetryReading> telemetryBuffer;
+    vector<RocketEvent> eventBuffer;
 };
 
 

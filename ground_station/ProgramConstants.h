@@ -44,6 +44,10 @@ namespace DataConstants {
             (1.0 + DELETION_FACTOR) * (UIConstants::MSECS_GRAPH_XRANGE / UIConstants::REFRESH_RATE);
 }
 
+namespace CommunicationsConstants {
+    static constexpr uint32_t TELEMETRY_BAUD_RATE = 115200;
+}
+
 static const std::map<int, std::string> EVENT_CODES = {
         {0, "Dummy event 1"},
         {1, "Dummy event 2"},

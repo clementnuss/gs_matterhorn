@@ -31,7 +31,7 @@ static const std::map<DatagramPayloadType, size_t> PAYLOAD_TYPES_LENGTH = {
 struct Datagram {
     uint32_t sequenceNumber_;
     DatagramPayloadType payloadType_;
-    std::shared_ptr<IDeserializable> payload_;
+    std::shared_ptr<IDeserializable> deserializedPayload_;
     bool complete;
 };
 

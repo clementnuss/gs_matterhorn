@@ -8,7 +8,7 @@ template<class T>
 class IDataHandler {
 
 public:
-    virtual std::vector<T> getData() = 0;
+    virtual std::vector<T> pollData() = 0;
 };
 
 

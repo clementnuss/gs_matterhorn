@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cassert>
 
-GSWidget::GSWidget(QWidget *parent) :
+GSWidget::GSWidget(QWidget *parent, std::string comPort) :
     QWidget(parent),
     ui(new Ui::GSWidget),
     clockTimer(this)
@@ -15,7 +15,7 @@ GSWidget::GSWidget(QWidget *parent) :
     connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
     clockTimer.start(std::lround((1.0 / 60.0) * 1000));
 
-    worker = new Worker;
+    worker = new Worker(comPort);
     worker->moveToThread(&workerThread);
 
     connectSlotsAndSignals();

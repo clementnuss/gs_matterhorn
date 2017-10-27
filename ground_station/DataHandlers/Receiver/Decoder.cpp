@@ -37,7 +37,7 @@ void Decoder::processTelemetryPayload(std::vector<uint8_t> payloadBuffer) {
     std::shared_ptr<IDeserializable>
     (*f)(std::vector<uint8_t>) = TELEMETRY_PAYLOAD_FACTORIES.at(currentDatagram_.payloadType_);
 
-    currentDatagram_.payload_ = std::move(f(payloadBuffer));
+    currentDatagram_.deserializedPayload_ = std::move(f(payloadBuffer));
 }
 
 bool Decoder::datagramReady() {
