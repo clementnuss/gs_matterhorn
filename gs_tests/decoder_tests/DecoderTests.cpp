@@ -74,13 +74,13 @@ TEST(DecoderTests, singlePacketDecoding) {
     uint32_t timestamp = 99999999;
     int16_t ax = -1;
     int16_t ay = 2;
-    int16_t az = 3;
+    int16_t az = -3;
     int16_t mx = 4;
-    int16_t my = 5;
+    int16_t my = -5;
     int16_t mz = 6;
-    int16_t gx = 7;
+    int16_t gx = -7;
     int16_t gy = 8;
-    int16_t gz = 9;
+    int16_t gz = -9;
     float temp = 12345.6789f;
     uint32_t pres = 0141;
     float alt = 98765.3210f;
@@ -159,11 +159,11 @@ TEST(DecoderTests, resistsToRandomByteSequence) {
     ASSERT_TRUE(true);
 }
 
-TEST(DecoderTests, resistsToRandomDatagram) {
+TEST(DecoderTests, resistsToRandomHeader) {
     srand(0);
     vector<uint8_t> byteSeq{};
-    const size_t datagramLength = 100;
-    const size_t datagramCounts = 10000;
+    const size_t datagramLength = 1000;
+    const size_t datagramCounts = 1000;
     Decoder decoder{};
 
     for (int i = 0; i < datagramCounts; i++) {

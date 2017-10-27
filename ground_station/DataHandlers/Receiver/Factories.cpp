@@ -6,10 +6,9 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
 
     long measurement_time = static_cast<long>(parseUint32(it));
 
-    static float accelerationFactor = 1 / 208.77f;
-    float ax = parseUint16(it) * accelerationFactor;
-    float ay = -parseUint16(it) * accelerationFactor;
-    float az = parseUint16(it) * accelerationFactor;
+    float ax = parseUint16(it);
+    float ay = parseUint16(it);
+    float az = parseUint16(it);
 
     float mx = parseUint16(it);
     float my = parseUint16(it);

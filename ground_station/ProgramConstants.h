@@ -38,6 +38,10 @@ namespace SimulatorConstants {
     static constexpr int EVENT_PROBABILITY_INTERVAL = 100;
 }
 
+namespace SensorConstants {
+    static constexpr float MPU_ACCEL_MULTIPLIER = 1.0f / 208.77f;
+}
+
 namespace DataConstants {
     static constexpr double DELETION_FACTOR = 0.25;
     static constexpr int MAX_DATA_VECTOR_SIZE =
