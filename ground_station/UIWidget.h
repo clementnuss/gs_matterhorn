@@ -42,13 +42,6 @@ private:
     Ui::GSWidget *ui;
     QTimer clockTimer;
 
-    const QString UP = "UP";
-    const QString DOWN = "DOWN";
-
-    QThread workerThread;
-    Worker *worker;
-
-    void connectSlotsAndSignals();
     void graphSetup();
 };
 
