@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cassert>
 
-GSWidget::GSWidget(QWidget *parent, std::string comPort) :
+GSWidget::GSWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::GSWidget),
     clockTimer(this)
@@ -15,20 +15,11 @@ GSWidget::GSWidget(QWidget *parent, std::string comPort) :
     connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
     clockTimer.start(std::lround((1.0 / 60.0) * 1000));
 
-    worker = new Worker(comPort);
-    worker->moveToThread(&workerThread);
-
-    connectSlotsAndSignals();
-
-    workerThread.start();
 }
 
 GSWidget::~GSWidget()
 {
     delete ui;
-    workerThread.requestInterruption();
-    workerThread.quit();
-    workerThread.wait();
 }
 
 void GSWidget::dummySlot() {
@@ -104,41 +95,6 @@ void GSWidget::updateLinkStatus(bool radioStatus, bool videoStatus){
 void GSWidget::updateGroundStatus(float temperature, float pressure){
     ui->ground_temperature_value->setText(QString::number(temperature, 'f', UIConstants::PRECISION));
     ui->ground_temperature_value->setText(QString::number(pressure, 'f', UIConstants::PRECISION));
-}
-
-void GSWidget::connectSlotsAndSignals() {
-
-    qRegisterMetaType<TelemetryReading>("TelemetryReading");
-    qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>&");
-    qRegisterMetaType<vector<RocketEvent>>("vector<RocketEvent>&");
-    qRegisterMetaType<GraphFeature>("GraphFeature");
-
-    connect(worker,
-            SIGNAL(dummySignal()),
-            this,
-            SLOT(dummySlot()));
-    connect(worker,
-            SIGNAL(telemetryReady(TelemetryReading)),
-            this,
-            SLOT(updateTelemetry(TelemetryReading)));
-    connect(worker,
-            SIGNAL(newEventsReady(vector<RocketEvent> & )),
-            this,
-            SLOT(updateEvents(vector<RocketEvent> & )));
-    connect(worker,
-            SIGNAL(graphDataReady(QVector<QCPGraphData> & , GraphFeature)),
-            this,
-            SLOT(updateGraphData(QVector<QCPGraphData> & , GraphFeature)));
-    connect(&workerThread,
-            SIGNAL(started()),
-            worker,
-            SLOT(run()));
-
-
-    connect(this,
-            SIGNAL(toggleLogging()),
-            worker,
-            SLOT(updateLoggingStatus()));
 }
 
 void GSWidget::graphSetup() {
