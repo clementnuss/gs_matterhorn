@@ -1,5 +1,6 @@
 #include <cassert>
 #include <iostream>
+#include <utility>
 #include <DataStructures/datastructs.h>
 #include "Decoder.h"
 
@@ -27,8 +28,13 @@ void Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
 
     uint8_t payloadType = headerBuffer[SEQUENCE_NUMBER_SIZE];
 
-    currentDatagram_.sequenceNumber_ = seqNum;
-    currentDatagram_.payloadType_ = DatagramPayloadType(payloadType);
+    if (0 <= payloadType && payloadType < static_cast<uint8_t >(DatagramPayloadType::Count)) {
+        currentDatagram_.sequenceNumber_ = seqNum;
+        currentDatagram_.payloadType_ = DatagramPayloadType(payloadType);
+    } else {
+        std::cout << "Wrong datagram payload type!\n";
+        resetMachine();
+    };
 }
 
 
@@ -41,7 +47,7 @@ void Decoder::processTelemetryPayload(std::vector<uint8_t> payloadBuffer) {
 }
 
 bool Decoder::datagramReady() {
-    return currentDatagram_.complete == true;
+    return currentDatagram_.complete;
 }
 
 Datagram Decoder::retrieveDatagram() {
@@ -65,6 +71,7 @@ void Decoder::resetMachine() {
     checksumAccumulator_.clear();
     currentDatagram_ = Datagram();
     currentState_ = INITIAL_STATE;
+    action_ = &Decoder::seekHeader;
 }
 
 void Decoder::seekHeader(uint8_t byte) {

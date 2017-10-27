@@ -9,7 +9,7 @@ using namespace std;
 
 Worker::Worker(std::string comPort) :
         loggingEnabled{false},
-        telemetryHandler{new TelemetrySimulator()},
+        telemetryHandler{new RadioReceiver{std::string("COM7")}},
         telemetryLogger{LogConstants::TELEMETRY_PATH},
         eventLogger{LogConstants::EVENTS_PATH},
         lastDisplayableReading{-1,
@@ -20,7 +20,8 @@ Worker::Worker(std::string comPort) :
                                0,
                                0},
         lastUIupdate{chrono::system_clock::now()} {
-    //telemetryHandler->startup();
+    //TODO: catch error
+    telemetryHandler->startup();
 }
 
 Worker::~Worker() {
@@ -50,14 +51,19 @@ void Worker::mainRoutine() {
         eventLogger.registerData(vector<reference_wrapper<ILoggable>>(begin(rocketEvents), end(rocketEvents)));
     }
 
-    displayMostRecentTelemetry(data[data.size() - 1]);
+    if (!data.empty()) {
+        displayMostRecentTelemetry(data[data.size() - 1]);
 
-    QVector<QCPGraphData> speedDataBuffer = extractGraphData(data, speedFromReading);
-    QVector<QCPGraphData> accelDataBuffer = extractGraphData(data, accelerationFromReading);
+        QVector<QCPGraphData> speedDataBuffer = extractGraphData(data, speedFromReading);
+        QVector<QCPGraphData> accelDataBuffer = extractGraphData(data, accelerationFromReading);
 
-    emit newEventsReady(rocketEvents);
-    emit graphDataReady(speedDataBuffer, GraphFeature::FEATURE1);
-    emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
+        emit graphDataReady(speedDataBuffer, GraphFeature::FEATURE1);
+        emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
+    }
+
+    if (!rocketEvents.empty()) {
+        emit newEventsReady(rocketEvents);
+    }
 
     QCoreApplication::sendPostedEvents(this);
     QCoreApplication::processEvents();

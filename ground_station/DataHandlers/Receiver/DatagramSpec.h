@@ -20,12 +20,13 @@ enum class DecodingState {
 };
 
 enum class DatagramPayloadType {
-    TELEMETRY = 0x00, EVENT = 0x01, ROCKET_PAYLOAD = 0x02
+    TELEMETRY, EVENT, ROCKET_PAYLOAD, Count
 };
 
 static const std::map<DatagramPayloadType, size_t> PAYLOAD_TYPES_LENGTH = {
         {DatagramPayloadType::TELEMETRY,      34},
-        {DatagramPayloadType::ROCKET_PAYLOAD, -1}   // TODO: handle ROCKET_PAYLOAD variable sizeCONTROL_FLAG
+        {DatagramPayloadType::ROCKET_PAYLOAD, 5},
+        {DatagramPayloadType::ROCKET_PAYLOAD, 5}// TODO: couple DatagramPayloadType and size
 };
 
 struct Datagram {

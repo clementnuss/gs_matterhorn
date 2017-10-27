@@ -32,9 +32,8 @@ vector<uint8_t> createDatagram(uint32_t seqnum,
             HEADER_PREAMBLE_FLAG,
             HEADER_PREAMBLE_FLAG};
 
-    float_cast sequenceNumber{.uint32 = seqnum};
     for (int i = 3; i >= 0; --i)
-        datagram.push_back(static_cast<uint8_t>(sequenceNumber.uint32 >> (8 * i)));
+        datagram.push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
 
     datagram.push_back(static_cast<uint8_t>(DatagramPayloadType::TELEMETRY));
     datagram.push_back(CONTROL_FLAG);
@@ -73,18 +72,18 @@ TEST(DecoderTests, simulateTelemetryDecoding) {
     // Test values
     uint32_t seqnum = 1410;
     uint32_t timestamp = 99999999;
-    uint32_t ax = 1;
-    uint32_t ay = 2;
-    uint32_t az = 3;
-    uint32_t mx = 4;
-    uint32_t my = 5;
-    uint32_t mz = 6;
-    uint32_t gx = 7;
-    uint32_t gy = 8;
-    uint32_t gz = 9;
-    float temp = 12345.6789;
+    int16_t ax = -1;
+    int16_t ay = 2;
+    int16_t az = 3;
+    int16_t mx = 4;
+    int16_t my = 5;
+    int16_t mz = 6;
+    int16_t gx = 7;
+    int16_t gy = 8;
+    int16_t gz = 9;
+    float temp = 12345.6789f;
     uint32_t pres = 0141;
-    float alt = 98765.3210;
+    float alt = 98765.3210f;
 
 
     vector<uint8_t> datagram = createDatagram(seqnum, timestamp, ax, ay, az, mx, my, mz, gx, gy, gz, temp, pres, alt);

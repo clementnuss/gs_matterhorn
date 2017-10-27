@@ -12,7 +12,8 @@
  * @param io
  */
 RadioReceiver::RadioReceiver(string device)
-        : byteDecoder_{}, device_{device}, ioService_{}, thread_{}, serialPort_{ioService_} {}
+        : byteDecoder_{}, device_{std::move(device)}, ioService_{}, thread_{},
+          serialPort_{ioService_}, telemQueue_{100} {}
 
 void RadioReceiver::startup() {
     openSerialPort();
@@ -34,11 +35,14 @@ void RadioReceiver::openSerialPort() {
 }
 
 vector<TelemetryReading> RadioReceiver::pollData() {
-
+    std::vector<TelemetryReading> telemetryBuffer{};
+    telemQueue_.consume_all([&telemetryBuffer](TelemetryReading tR) { telemetryBuffer.push_back(tR); });
+    return telemetryBuffer;
 }
 
 vector<RocketEvent> RadioReceiver::pollEvents() {
-
+    std::vector<RocketEvent> eventBuffer{};
+    return eventBuffer;
 }
 
 void RadioReceiver::asyncRead() {
@@ -57,14 +61,36 @@ void RadioReceiver::handleReceive(const boost::system::error_code &error,
 
     for (int i = 0; i < bytesTransferred; ++i) {
         //TODO: log every byte received
-        cout << recvBuffer_[i];
-        /*if(byteDecoder_.processByte(recvBuffer_[i])){
-            Datagram d = byteDecoder_.retrieveDatagram();
-            cout << d.sequenceNumber_ << endl;
-        }*/
+        //cout << recvBuffer_[i];
+
+        if (byteDecoder_.processByte(recvBuffer_[i])) {
+            unpackPayload();
+        }
     }
 
     asyncRead();
+}
+
+void RadioReceiver::unpackPayload() {
+    Datagram d = byteDecoder_.retrieveDatagram();
+    cout << d.sequenceNumber_ << endl;
+    switch (d.payloadType_) {
+        case DatagramPayloadType::TELEMETRY: {
+            std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(
+                    d.deserializedPayload_);
+            //TODO: make sure that the memory behaviour is correct
+            telemQueue_.push(*data);
+            break;
+        }
+
+        case DatagramPayloadType::EVENT:
+            break;
+        case DatagramPayloadType::ROCKET_PAYLOAD:
+            break;
+        case DatagramPayloadType::Count:
+            std::cout << "Wrong datagram payload type!";
+            break;
+    }
 }
 
 

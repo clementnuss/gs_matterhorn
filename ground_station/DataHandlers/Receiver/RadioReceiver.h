@@ -7,6 +7,7 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/serial_port.hpp>
 #include <boost/array.hpp>
+#include <boost/lockfree/spsc_queue.hpp>
 
 class RadioReceiver : public TelemetryHandler {
 
@@ -29,16 +30,16 @@ private:
 
     void handleReceive(const boost::system::error_code &error, std::size_t);
 
-    static constexpr int THREAD_SLEEP_TIME_MILLIS = 100;
+    void unpackPayload();
+
     Decoder byteDecoder_;
     std::string device_;
     boost::asio::io_service ioService_;
     boost::asio::serial_port serialPort_;
     boost::thread thread_;
     boost::array<uint8_t, 500> recvBuffer_;
+    boost::lockfree::spsc_queue<TelemetryReading> telemQueue_;
 
-    vector<TelemetryReading> telemetryBuffer;
-    vector<RocketEvent> eventBuffer;
 };
 
 
