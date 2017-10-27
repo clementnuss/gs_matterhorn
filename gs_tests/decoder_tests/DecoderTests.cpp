@@ -152,8 +152,11 @@ TEST(DecoderTests, resistsToRandomByteSequence) {
     Decoder decoder{};
 
     for (int i = 0; i < randomTestSequenceLength; i++) {
-        decoder.processByte(static_cast<uint8_t>(rand() % 256));
+        if (decoder.processByte(static_cast<uint8_t>(rand() % 256))) {
+            decoder.retrieveDatagram();
+        }
     }
+    ASSERT_TRUE(true);
 }
 
 TEST(DecoderTests, resistsToRandomDatagram) {
@@ -169,7 +172,9 @@ TEST(DecoderTests, resistsToRandomDatagram) {
         decoder.processByte(HEADER_PREAMBLE_FLAG);
         decoder.processByte(HEADER_PREAMBLE_FLAG);
         for (int j = 0; j < datagramLength; j++) {
-            decoder.processByte(static_cast<uint8_t>(rand() % 256));
+            if (decoder.processByte(static_cast<uint8_t>(rand() % 256))) {
+                decoder.retrieveDatagram();
+            }
         }
     }
 
