@@ -3,6 +3,7 @@
 #define GS_MATTERHORN_APPLICATION_H
 
 
+#include <QtWidgets/QApplication>
 #include "UIWidget.h"
 
 class Application {

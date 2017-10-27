@@ -19,5 +19,5 @@ add_subdirectory(gs_tests)
 
 add_executable(gs_run main.cpp)
 target_link_libraries(gs_run ground_station_lib)
-target_link_libraries(gs_run ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries(gs_run Boost::thread Boost::program_options)
+include_directories(${CMAKE_BINARY_DIR}/qcustomplot-src/)
+

@@ -34,7 +34,7 @@ Application::Application(int &argc, char **argv) : qApplication_{argc, argv}, ma
 
 void Application::run() {
 
-    worker_ = new Worker(std::string("COM4"));
+    worker_ = new Worker(std::string("COM7"));
     worker_->moveToThread(&workerThread_);
 
     connectSlotsAndSignals();
