@@ -63,7 +63,7 @@ vector<uint8_t> createDatagram(uint32_t seqnum,
     return datagram;
 }
 
-TEST(DecoderTests, simulateTelemetryDecoding) {
+TEST(DecoderTests, singlePacketDecoding) {
 
     Decoder dec = Decoder{};
 
@@ -144,4 +144,34 @@ TEST(DecoderTests, simulateTelemetryDecoding) {
     ASSERT_EQ(gx, (*data).gyroscope_.x_);
     ASSERT_EQ(gy, (*data).gyroscope_.y_);
     ASSERT_EQ(gz, (*data).gyroscope_.z_);
+}
+
+TEST(DecoderTests, resistsToRandomByteSequence) {
+    srand(0);
+    const size_t randomTestSequenceLength = 10000;
+    Decoder decoder{};
+
+    for (int i = 0; i < randomTestSequenceLength; i++) {
+        decoder.processByte(static_cast<uint8_t>(rand() % 256));
+    }
+}
+
+TEST(DecoderTests, resistsToRandomDatagram) {
+    srand(0);
+    vector<uint8_t> byteSeq{};
+    const size_t datagramLength = 100;
+    const size_t datagramCounts = 10000;
+    Decoder decoder{};
+
+    for (int i = 0; i < datagramCounts; i++) {
+        decoder.processByte(HEADER_PREAMBLE_FLAG);
+        decoder.processByte(HEADER_PREAMBLE_FLAG);
+        decoder.processByte(HEADER_PREAMBLE_FLAG);
+        decoder.processByte(HEADER_PREAMBLE_FLAG);
+        for (int j = 0; j < datagramLength; j++) {
+            decoder.processByte(static_cast<uint8_t>(rand() % 256));
+        }
+    }
+
+    ASSERT_TRUE(true);
 }

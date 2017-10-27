@@ -17,7 +17,7 @@ bool Decoder::processByte(uint8_t byte) {
     return this->datagramReady();
 }
 
-void Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
+bool Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
     assert(headerBuffer.size() == HEADER_SIZE);
 
     uint32_t seqNum = 0;
@@ -31,9 +31,10 @@ void Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
     if (0 <= payloadType && payloadType < static_cast<uint8_t >(DatagramPayloadType::Count)) {
         currentDatagram_.sequenceNumber_ = seqNum;
         currentDatagram_.payloadType_ = DatagramPayloadType(payloadType);
+        return true;
     } else {
         std::cout << "Wrong datagram payload type!\n";
-        resetMachine();
+        return false;
     };
 }
 
@@ -98,9 +99,13 @@ void Decoder::accumulateHeader(uint8_t byte) {
         for (auto b : byteBuffer_) {
             checksumAccumulator_.push_back(b);
         }
-        processHeader(byteBuffer_);
-        byteBuffer_.clear();
-        jumpToNextState();
+
+        if (processHeader(byteBuffer_)) {
+            byteBuffer_.clear();
+            jumpToNextState();
+        } else {
+            resetMachine();
+        }
     }
 }
 

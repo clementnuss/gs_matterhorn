@@ -27,7 +27,7 @@ private:
 
 //    void asyncRead();
 
-    void processHeader(std::vector<uint8_t>);
+    bool processHeader(std::vector<uint8_t>);
 
     void processTelemetryPayload(std::vector<uint8_t>);
 
