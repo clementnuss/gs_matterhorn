@@ -63,6 +63,42 @@ vector<uint8_t> createDatagram(uint32_t seqnum,
     return datagram;
 }
 
+
+void feedWithValidPreamble(Decoder &decoder) {
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+
+    for (int k = 0; k < PREAMBLE_SIZE; k++) {
+        decoder.processByte(HEADER_PREAMBLE_FLAG);
+    }
+
+    ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_HEADER);
+}
+
+void feedWithValidSequenceNumber(Decoder &decoder) {
+    decoder.processByte(0x00);
+    decoder.processByte(0x00);
+    decoder.processByte(0x00);
+    decoder.processByte(0x00);
+}
+
+void feedWithValidPayloadType(Decoder &decoder) {
+    // Select randomly one of the datagram payload types
+    decoder.processByte(rand() % static_cast<int>(DatagramPayloadType::Count));
+}
+
+void feedWithValidHeader(Decoder &decoder) {
+
+    feedWithValidPreamble(decoder);
+    feedWithValidSequenceNumber(decoder);
+    feedWithValidPayloadType(decoder);
+
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_CONTROL_FLAG);
+
+    decoder.processByte(CONTROL_FLAG);
+
+    ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_PAYLOAD);
+}
+
 TEST(DecoderTests, singlePacketDecoding) {
 
     Decoder dec = Decoder{};
@@ -167,10 +203,9 @@ TEST(DecoderTests, resistsToRandomHeader) {
     Decoder decoder{};
 
     for (int i = 0; i < datagramCounts; i++) {
-        decoder.processByte(HEADER_PREAMBLE_FLAG);
-        decoder.processByte(HEADER_PREAMBLE_FLAG);
-        decoder.processByte(HEADER_PREAMBLE_FLAG);
-        decoder.processByte(HEADER_PREAMBLE_FLAG);
+        for (int k = 0; k < PREAMBLE_SIZE; k++) {
+            decoder.processByte(HEADER_PREAMBLE_FLAG);
+        }
         for (int j = 0; j < datagramLength; j++) {
             if (decoder.processByte(static_cast<uint8_t>(rand() % 256))) {
                 decoder.retrieveDatagram();
@@ -179,4 +214,54 @@ TEST(DecoderTests, resistsToRandomHeader) {
     }
 
     ASSERT_TRUE(true);
+}
+
+TEST(DecoderTests, resistsToRandomPayloads) {
+    srand(0);
+    vector<uint8_t> byteSeq{};
+    const size_t datagramLength = 1000;
+    const size_t datagramCounts = 1000;
+    Decoder decoder{};
+
+    for (int i = 0; i < datagramCounts; i++) {
+
+        feedWithValidHeader(decoder);
+
+        for (int j = 0; j < datagramLength; j++) {
+
+            uint8_t randomByte = static_cast<uint8_t>(rand() % 256);
+
+            // Avoids frame starts
+            if (randomByte == HEADER_PREAMBLE_FLAG) {
+                randomByte -= 1;
+            }
+
+            if (decoder.processByte(randomByte)) {
+                decoder.retrieveDatagram();
+            }
+        }
+    }
+
+    ASSERT_TRUE(true);
+}
+
+TEST(DecoderTests, missingControlFlagResetsMachine) {
+    srand(0);
+    Decoder decoder{};
+
+    for (int b = 0; b <= UINT8_MAX; b++) {
+        if (b == CONTROL_FLAG) {
+            continue;
+        }
+        feedWithValidPreamble(decoder);
+        feedWithValidSequenceNumber(decoder);
+        feedWithValidPayloadType(decoder);
+
+        ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_CONTROL_FLAG);
+
+        decoder.processByte(b);
+
+        ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+    }
+
 }
