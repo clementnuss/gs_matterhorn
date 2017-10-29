@@ -182,6 +182,10 @@ TEST(DecoderTests, singlePacketDecoding) {
     ASSERT_EQ(gz, (*data).gyroscope_.z_);
 }
 
+TEST(DecoderTests, multipleConsecutivePacketsDecoding) {
+    ASSERT_TRUE(false);
+}
+
 TEST(DecoderTests, resistsToRandomByteSequence) {
     srand(0);
     const size_t randomTestSequenceLength = 10000;
@@ -264,4 +268,8 @@ TEST(DecoderTests, missingControlFlagResetsMachine) {
         ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
     }
 
+}
+
+TEST(DecoderTests, checksumValidationIsCorrect) {
+    ASSERT_TRUE(false);
 }
