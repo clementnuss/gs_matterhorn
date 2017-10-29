@@ -190,7 +190,10 @@ TEST(DecoderTests, singlePacketDecoding) {
 
     vector<uint8_t> datagram = createDatagram(seqnum, timestamp, ax, ay, az, mx, my, mz, gx, gy, gz, temp, pres, alt);
 
-    parseAndTestPacket(decoder, datagram, timestamp, {ax, ay, az}, {mx, my, mz}, {gx, gy, gz}, temp, pres, alt);
+    parseAndTestPacket(decoder, datagram, timestamp,
+                       {static_cast<double>(ax), static_cast<double>(ay), static_cast<double>(az)},
+                       {static_cast<double>(mx), static_cast<double>(my), static_cast<double>(mz)},
+                       {static_cast<double>(gx), static_cast<double>(gy), static_cast<double>(gz)}, temp, pres, alt);
 }
 
 TEST(DecoderTests, multipleConsecutivePacketsDecoding) {
@@ -234,9 +237,9 @@ TEST(DecoderTests, multipleConsecutivePacketsDecoding) {
                                                   temp[i], pressure[i], alt[i]);
 
         parseAndTestPacket(decoder, datagram, timestamp[i],
-                           {ax[i], ay[i], az[i]},
-                           {mx[i], my[i], mz[i]},
-                           {gx[i], gy[i], gz[i]},
+                           {static_cast<double>(ax[i]), static_cast<double>(ay[i]), static_cast<double>(az[i])},
+                           {static_cast<double>(mx[i]), static_cast<double>(my[i]), static_cast<double>(mz[i])},
+                           {static_cast<double>(gx[i]), static_cast<double>(gy[i]), static_cast<double>(gz[i])},
                            temp[i], pressure[i], alt[i]);
     }
 
