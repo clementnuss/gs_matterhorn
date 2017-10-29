@@ -1,6 +1,7 @@
 #include <DataHandlers/TelemetryHandler.h>
 #include <gtest/gtest.h>
 #include <DataHandlers/Receiver/Decoder.h>
+#include <Utilities/RandUtils.h>
 
 void push3D(std::vector<uint8_t> &v, size_t byteCount, uint32_t a, uint32_t b, uint32_t c) {
     for (int i = byteCount - 1; i >= 0; --i)
@@ -13,15 +14,15 @@ void push3D(std::vector<uint8_t> &v, size_t byteCount, uint32_t a, uint32_t b, u
 
 vector<uint8_t> createDatagram(uint32_t seqnum,
                                uint32_t timestamp,
-                               uint32_t ax,
-                               uint32_t ay,
-                               uint32_t az,
-                               uint32_t mx,
-                               uint32_t my,
-                               uint32_t mz,
-                               uint32_t gx,
-                               uint32_t gy,
-                               uint32_t gz,
+                               int16_t ax,
+                               int16_t ay,
+                               int16_t az,
+                               int16_t mx,
+                               int16_t my,
+                               int16_t mz,
+                               int16_t gx,
+                               int16_t gy,
+                               int16_t gz,
                                float temp,
                                uint32_t pres,
                                float alt) {
@@ -99,11 +100,76 @@ void feedWithValidHeader(Decoder &decoder) {
     ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_PAYLOAD);
 }
 
+void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint32_t timestamp,
+                        XYZReading accelReading, XYZReading magReading, XYZReading gyroReading,
+                        float temp, uint32_t pres, float alt
+) {
+    size_t k = 0;
+
+    // Process preamble
+    for (size_t i = 0; i < PREAMBLE_SIZE; i++) {
+        ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+        ASSERT_FALSE(decoder.datagramReady());
+        decoder.processByte(datagram[k++]);
+    }
+
+    // Process header
+    for (size_t i = 0; i < HEADER_SIZE; i++) {
+        ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_HEADER);
+        ASSERT_FALSE(decoder.datagramReady());
+        decoder.processByte(datagram[k++]);
+    }
+
+    // Process control flag
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_CONTROL_FLAG);
+    ASSERT_FALSE(decoder.datagramReady());
+    decoder.processByte(datagram[k++]);
+
+    // Process payload
+    for (size_t i = 0; i < PAYLOAD_TYPES_LENGTH.at(DatagramPayloadType::TELEMETRY); i++) {
+        ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_PAYLOAD);
+        ASSERT_FALSE(decoder.datagramReady());
+        decoder.processByte(datagram[k++]);
+    }
+
+    // Process checksum
+    for (size_t i = 0; i < CHECKSUM_SIZE; i++) {
+        ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_CHECKSUM);
+        ASSERT_FALSE(decoder.datagramReady());
+        decoder.processByte(datagram[k++]);
+    }
+
+    // Datagram should be ready
+    ASSERT_TRUE(decoder.datagramReady());
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+
+    Datagram d = decoder.retrieveDatagram();
+
+    // State machine should be reset
+    ASSERT_FALSE(decoder.datagramReady());
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+
+    std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(d.deserializedPayload_);
+    ASSERT_EQ(timestamp, (*data).timestamp);
+    ASSERT_EQ(accelReading.x_, (*data).acceleration_.x_);
+    ASSERT_EQ(accelReading.y_, (*data).acceleration_.y_);
+    ASSERT_EQ(accelReading.z_, (*data).acceleration_.z_);
+    ASSERT_EQ(magReading.x_, (*data).magnetometer_.x_);
+    ASSERT_EQ(magReading.y_, (*data).magnetometer_.y_);
+    ASSERT_EQ(magReading.z_, (*data).magnetometer_.z_);
+    ASSERT_EQ(gyroReading.x_, (*data).gyroscope_.x_);
+    ASSERT_EQ(gyroReading.y_, (*data).gyroscope_.y_);
+    ASSERT_EQ(gyroReading.z_, (*data).gyroscope_.z_);
+    ASSERT_EQ(temp, (*data).temperature_);
+    ASSERT_EQ(pres, (*data).pressure_);
+    ASSERT_EQ(alt, (*data).altitude_);
+}
+
 TEST(DecoderTests, singlePacketDecoding) {
 
-    Decoder dec = Decoder{};
+    Decoder decoder = Decoder{};
 
-    ASSERT_EQ(dec.currentState(), DecodingState::SEEKING_FRAMESTART);
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
     // Test values
     uint32_t seqnum = 1410;
@@ -124,66 +190,56 @@ TEST(DecoderTests, singlePacketDecoding) {
 
     vector<uint8_t> datagram = createDatagram(seqnum, timestamp, ax, ay, az, mx, my, mz, gx, gy, gz, temp, pres, alt);
 
-    size_t k = 0;
-
-    // Process preamble
-    for (size_t i = 0; i < PREAMBLE_SIZE; i++) {
-        ASSERT_EQ(dec.currentState(), DecodingState::SEEKING_FRAMESTART);
-        ASSERT_FALSE(dec.datagramReady());
-        dec.processByte(datagram[k++]);
-    }
-
-    // Process header
-    for (size_t i = 0; i < HEADER_SIZE; i++) {
-        ASSERT_EQ(dec.currentState(), DecodingState::PARSING_HEADER);
-        ASSERT_FALSE(dec.datagramReady());
-        dec.processByte(datagram[k++]);
-    }
-
-    // Process control flag
-    ASSERT_EQ(dec.currentState(), DecodingState::SEEKING_CONTROL_FLAG);
-    ASSERT_FALSE(dec.datagramReady());
-    dec.processByte(datagram[k++]);
-
-    // Process payload
-    for (size_t i = 0; i < PAYLOAD_TYPES_LENGTH.at(DatagramPayloadType::TELEMETRY); i++) {
-        ASSERT_EQ(dec.currentState(), DecodingState::PARSING_PAYLOAD);
-        ASSERT_FALSE(dec.datagramReady());
-        dec.processByte(datagram[k++]);
-    }
-
-    // Process checksum
-    for (size_t i = 0; i < CHECKSUM_SIZE; i++) {
-        ASSERT_EQ(dec.currentState(), DecodingState::PARSING_CHECKSUM);
-        ASSERT_FALSE(dec.datagramReady());
-        dec.processByte(datagram[k++]);
-    }
-
-    // Datagram should be ready
-    ASSERT_TRUE(dec.datagramReady());
-    ASSERT_EQ(dec.currentState(), DecodingState::SEEKING_FRAMESTART);
-
-    Datagram d = dec.retrieveDatagram();
-
-    // State machine should be reset
-    ASSERT_FALSE(dec.datagramReady());
-    ASSERT_EQ(dec.currentState(), DecodingState::SEEKING_FRAMESTART);
-
-    std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(d.deserializedPayload_);
-    ASSERT_EQ(timestamp, (*data).timestamp);
-    ASSERT_EQ(ax, (*data).acceleration_.x_);
-    ASSERT_EQ(ay, (*data).acceleration_.y_);
-    ASSERT_EQ(az, (*data).acceleration_.z_);
-    ASSERT_EQ(mx, (*data).magnetometer_.x_);
-    ASSERT_EQ(my, (*data).magnetometer_.y_);
-    ASSERT_EQ(mz, (*data).magnetometer_.z_);
-    ASSERT_EQ(gx, (*data).gyroscope_.x_);
-    ASSERT_EQ(gy, (*data).gyroscope_.y_);
-    ASSERT_EQ(gz, (*data).gyroscope_.z_);
+    parseAndTestPacket(decoder, datagram, timestamp, {ax, ay, az}, {mx, my, mz}, {gx, gy, gz}, temp, pres, alt);
 }
 
 TEST(DecoderTests, multipleConsecutivePacketsDecoding) {
-    ASSERT_TRUE(false);
+    Decoder decoder = Decoder{};
+    srand(0);
+    constexpr size_t measureCount = 10000;
+
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+
+    // Test values
+    std::array<uint32_t, measureCount> seqnum{}, timestamp{}, pressure{};
+    std::array<int16_t, measureCount> ax{}, ay{}, az{}, mx{}, my{}, mz{}, gx{}, gy{}, gz{};
+    std::array<float, measureCount> temp{}, alt{};
+
+    Rand<uint32_t> uint32Rand;
+    Rand<int16_t> int16Rand;
+    Rand<double> doubleRand(-FLT_MAX, FLT_MAX);
+
+    for (size_t i = 0; i < measureCount; i++) {
+        timestamp[i] = uint32Rand();
+        seqnum[i] = uint32Rand();
+        ax[i] = int16Rand();
+        ay[i] = int16Rand();
+        az[i] = int16Rand();
+        mx[i] = int16Rand();
+        my[i] = int16Rand();
+        mz[i] = int16Rand();
+        gx[i] = int16Rand();
+        gy[i] = int16Rand();
+        gz[i] = int16Rand();
+        temp[i] = static_cast<float>(doubleRand());
+        pressure[i] = uint32Rand();
+        alt[i] = static_cast<float>(doubleRand());
+    }
+
+    for (size_t i = 0; i < measureCount; i++) {
+        vector<uint8_t> datagram = createDatagram(seqnum[i], timestamp[i],
+                                                  ax[i], ay[i], az[i],
+                                                  mx[i], my[i], mz[i],
+                                                  gx[i], gy[i], gz[i],
+                                                  temp[i], pressure[i], alt[i]);
+
+        parseAndTestPacket(decoder, datagram, timestamp[i],
+                           {ax[i], ay[i], az[i]},
+                           {mx[i], my[i], mz[i]},
+                           {gx[i], gy[i], gz[i]},
+                           temp[i], pressure[i], alt[i]);
+    }
+
 }
 
 TEST(DecoderTests, resistsToRandomByteSequence) {
