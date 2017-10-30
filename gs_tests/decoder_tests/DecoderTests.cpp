@@ -150,10 +150,10 @@ void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint32_t ti
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
     std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(d.deserializedPayload_);
-    ASSERT_EQ(timestamp, (*data).timestamp_);
-    ASSERT_EQ(accelReading.x_, (*data).acceleration_.x_);
-    ASSERT_EQ(accelReading.y_, (*data).acceleration_.y_);
-    ASSERT_EQ(accelReading.z_, (*data).acceleration_.z_);
+    ASSERT_EQ(timestamp / 1000, (*data).timestamp_);
+    ASSERT_EQ(accelReading.x_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.x_);
+    ASSERT_EQ(accelReading.y_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.y_);
+    ASSERT_EQ(accelReading.z_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.z_);
     ASSERT_EQ(magReading.x_, (*data).magnetometer_.x_);
     ASSERT_EQ(magReading.y_, (*data).magnetometer_.y_);
     ASSERT_EQ(magReading.z_, (*data).magnetometer_.z_);

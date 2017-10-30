@@ -58,7 +58,7 @@ void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
     assert(tailIndex >= 1);
 
     stringstream ss;
-    ss << id++ << path;
+    ss << path << "_" << ++id;
     ofstream fileOutput(ss.str());
 
     if (!fileOutput) {
