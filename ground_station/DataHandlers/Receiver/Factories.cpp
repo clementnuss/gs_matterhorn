@@ -4,14 +4,11 @@
 shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8_t> payloadBuffer) {
     auto it = payloadBuffer.begin();
 
-    long measurement_time = static_cast<long>(parseUint32(it));
+    long measurement_time = static_cast<long>(parseUint32(it)) / 1000;
 
-    // Convert measurement time in milliseconds
-    measurement_time /= 1000;
-
-    float ax = parseInt16(it);
-    float ay = parseInt16(it);
-    float az = parseInt16(it);
+    float ax = parseInt16(it) * SensorConstants::MPU_ACCEL_MULTIPLIER;
+    float ay = parseInt16(it) * SensorConstants::MPU_ACCEL_MULTIPLIER;
+    float az = parseInt16(it) * SensorConstants::MPU_ACCEL_MULTIPLIER;
 
     float mx = parseInt16(it);
     float my = parseInt16(it);
