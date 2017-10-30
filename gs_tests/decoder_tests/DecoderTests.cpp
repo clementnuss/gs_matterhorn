@@ -3,6 +3,8 @@
 #include <DataHandlers/Receiver/Decoder.h>
 #include <Utilities/RandUtils.h>
 
+static constexpr double epsilon = 1e-4;
+
 void push3D(std::vector<uint8_t> &v, size_t byteCount, uint32_t a, uint32_t b, uint32_t c) {
     for (int i = byteCount - 1; i >= 0; --i)
         v.push_back(static_cast<uint8_t>(a >> (8 * i)));
@@ -151,18 +153,18 @@ void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint32_t ti
 
     std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(d.deserializedPayload_);
     ASSERT_EQ(timestamp / 1000, (*data).timestamp_);
-    ASSERT_EQ(accelReading.x_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.x_);
-    ASSERT_EQ(accelReading.y_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.y_);
-    ASSERT_EQ(accelReading.z_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.z_);
-    ASSERT_EQ(magReading.x_, (*data).magnetometer_.x_);
-    ASSERT_EQ(magReading.y_, (*data).magnetometer_.y_);
-    ASSERT_EQ(magReading.z_, (*data).magnetometer_.z_);
-    ASSERT_EQ(gyroReading.x_, (*data).gyroscope_.x_);
-    ASSERT_EQ(gyroReading.y_, (*data).gyroscope_.y_);
-    ASSERT_EQ(gyroReading.z_, (*data).gyroscope_.z_);
-    ASSERT_EQ(temp, (*data).temperature_);
-    ASSERT_EQ(pres, (*data).pressure_);
-    ASSERT_EQ(alt, (*data).altitude_);
+    ASSERT_NEAR(accelReading.x_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.x_, epsilon);
+    ASSERT_NEAR(accelReading.y_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.y_, epsilon);
+    ASSERT_NEAR(accelReading.z_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.z_, epsilon);
+    ASSERT_NEAR(magReading.x_, (*data).magnetometer_.x_, epsilon);
+    ASSERT_NEAR(magReading.y_, (*data).magnetometer_.y_, epsilon);
+    ASSERT_NEAR(magReading.z_, (*data).magnetometer_.z_, epsilon);
+    ASSERT_NEAR(gyroReading.x_, (*data).gyroscope_.x_, epsilon);
+    ASSERT_NEAR(gyroReading.y_, (*data).gyroscope_.y_, epsilon);
+    ASSERT_NEAR(gyroReading.z_, (*data).gyroscope_.z_, epsilon);
+    ASSERT_NEAR(temp, (*data).temperature_, epsilon);
+    ASSERT_NEAR(pres, (*data).pressure_, epsilon);
+    ASSERT_NEAR(alt, (*data).altitude_, epsilon);
 }
 
 TEST(DecoderTests, singlePacketDecoding) {
