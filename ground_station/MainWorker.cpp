@@ -92,9 +92,9 @@ Worker::extractGraphData(vector<TelemetryReading> &data, QCPGraphData (*extracti
     long lastTimestampSeen = 0;
 
     for (TelemetryReading reading : data) {
-        if (abs(lastTimestampSeen - reading.timestamp) > UIConstants::MSECS_GRAPH_DATA_INTERVAL) {
+        if (abs(lastTimestampSeen - reading.timestamp_) > UIConstants::GRAPH_DATA_INTERVAL_MSECS) {
             v.append(extractionFct(reading));
-            lastTimestampSeen = reading.timestamp;
+            lastTimestampSeen = reading.timestamp_;
         }
     }
 

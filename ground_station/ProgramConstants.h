@@ -31,10 +31,10 @@ namespace UIConstants {
     static constexpr int REFRESH_RATE = 50;
 
     // Time in milliseconds between each data point in the real-time graphs
-    static constexpr int MSECS_GRAPH_DATA_INTERVAL = 100;
+    static constexpr int GRAPH_DATA_INTERVAL_MSECS = 100;
 
-    static constexpr float GRAPH_MARGIN_RATIO = 1.05;
-    static constexpr int MSECS_GRAPH_XRANGE = 10000;
+    static constexpr float GRAPH_RANGE_MARGIN_RATIO = 1.05;
+    static constexpr int GRAPH_XRANGE_MSECS = 10000;
 }
 
 namespace SimulatorConstants {
@@ -49,7 +49,7 @@ namespace SensorConstants {
 namespace DataConstants {
     static constexpr double DELETION_FACTOR = 0.25;
     static constexpr int MAX_DATA_VECTOR_SIZE =
-            (1.0 + DELETION_FACTOR) * (UIConstants::MSECS_GRAPH_XRANGE / UIConstants::REFRESH_RATE);
+            (1.0 + DELETION_FACTOR) * (UIConstants::GRAPH_XRANGE_MSECS / UIConstants::REFRESH_RATE);
 }
 
 namespace CommunicationsConstants {

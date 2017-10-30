@@ -150,7 +150,7 @@ void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint32_t ti
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
     std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(d.deserializedPayload_);
-    ASSERT_EQ(timestamp, (*data).timestamp);
+    ASSERT_EQ(timestamp, (*data).timestamp_);
     ASSERT_EQ(accelReading.x_, (*data).acceleration_.x_);
     ASSERT_EQ(accelReading.y_, (*data).acceleration_.y_);
     ASSERT_EQ(accelReading.z_, (*data).acceleration_.z_);

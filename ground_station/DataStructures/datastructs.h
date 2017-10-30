@@ -17,9 +17,10 @@ struct IDeserializable {
 
 struct TimedData {
     TimedData() = default;
-    TimedData(long t) : timestamp{t} {}
 
-    long timestamp;
+    TimedData(long timestamp) : timestamp_{timestamp} {}
+
+    long timestamp_;
 };
 
 struct DataReading {
@@ -48,7 +49,7 @@ struct RocketEvent : TimedData, ILoggable {
     virtual string toString() const override {
         stringstream ss;
 
-        ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << timestamp
+        ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << timestamp_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << code
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << " "
            << description;
@@ -111,7 +112,7 @@ struct TelemetryReading : TimedData, ILoggable, IDeserializable {
         format << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed;
 
         stringstream ss;
-        ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << this->timestamp
+        ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << this->timestamp_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << altitude_
            //           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << speed.value
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << pressure_

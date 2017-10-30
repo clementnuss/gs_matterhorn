@@ -36,7 +36,7 @@ void GSWidget::updateTime() {
 void GSWidget::updateEvents(vector<RocketEvent> &events) {
     if (events.size() >= 1) {
         for (RocketEvent e : events) {
-            int seconds = e.timestamp / TimeConstants::MSECS_IN_SEC;
+            int seconds = e.timestamp_ / TimeConstants::MSECS_IN_SEC;
             int minutes = seconds / TimeConstants::SECS_IN_MINUTE;
 
             stringstream ss;
@@ -45,7 +45,7 @@ void GSWidget::updateEvents(vector<RocketEvent> &events) {
                << ":"
                << setw(TimeConstants::SECS_AND_MINS_WIDTH) << setfill('0') << seconds % TimeConstants::SECS_IN_MINUTE
                << ":"
-               << setw(TimeConstants::MSECS_WIDTH) << setfill('0') << e.timestamp % TimeConstants::MSECS_IN_SEC
+               << setw(TimeConstants::MSECS_WIDTH) << setfill('0') << e.timestamp_ % TimeConstants::MSECS_IN_SEC
                << "    " << (e.description);
 
             ui->event_log->appendPlainText(QString::fromStdString(ss.str()));
@@ -71,9 +71,9 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
         );
     }
 
-    g->keyAxis()->setRange(d.last().key, UIConstants::MSECS_GRAPH_XRANGE, Qt::AlignRight);
+    g->keyAxis()->setRange(d.last().key, UIConstants::GRAPH_XRANGE_MSECS, Qt::AlignRight);
     g->valueAxis()->rescale(true);
-    g->valueAxis()->scaleRange(UIConstants::GRAPH_MARGIN_RATIO);
+    g->valueAxis()->scaleRange(UIConstants::GRAPH_RANGE_MARGIN_RATIO);
 
     ui->graph_widget->replot();
 }
