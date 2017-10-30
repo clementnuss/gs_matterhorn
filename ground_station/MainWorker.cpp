@@ -54,10 +54,10 @@ void Worker::mainRoutine() {
     if (!data.empty()) {
         displayMostRecentTelemetry(data[data.size() - 1]);
 
-        QVector<QCPGraphData> speedDataBuffer = extractGraphData(data, speedFromReading);
+        QVector<QCPGraphData> altitudeDataBuffer = extractGraphData(data, altitudeFromReading);
         QVector<QCPGraphData> accelDataBuffer = extractGraphData(data, accelerationFromReading);
 
-        emit graphDataReady(speedDataBuffer, GraphFeature::FEATURE1);
+        emit graphDataReady(altitudeDataBuffer, GraphFeature::FEATURE1);
         emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
     }
 
