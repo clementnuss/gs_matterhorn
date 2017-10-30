@@ -152,19 +152,19 @@ void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint32_t ti
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
     std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(d.deserializedPayload_);
-    ASSERT_EQ(timestamp / 1000, (*data).timestamp_);
-    ASSERT_NEAR(accelReading.x_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.x_, epsilon);
-    ASSERT_NEAR(accelReading.y_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.y_, epsilon);
-    ASSERT_NEAR(accelReading.z_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.z_, epsilon);
-    ASSERT_NEAR(magReading.x_, (*data).magnetometer_.x_, epsilon);
-    ASSERT_NEAR(magReading.y_, (*data).magnetometer_.y_, epsilon);
-    ASSERT_NEAR(magReading.z_, (*data).magnetometer_.z_, epsilon);
-    ASSERT_NEAR(gyroReading.x_, (*data).gyroscope_.x_, epsilon);
-    ASSERT_NEAR(gyroReading.y_, (*data).gyroscope_.y_, epsilon);
-    ASSERT_NEAR(gyroReading.z_, (*data).gyroscope_.z_, epsilon);
-    ASSERT_NEAR(temp, (*data).temperature_, epsilon);
-    ASSERT_NEAR(pres, (*data).pressure_, epsilon);
-    ASSERT_NEAR(alt, (*data).altitude_, epsilon);
+    EXPECT_EQ(timestamp / 1000, (*data).timestamp_);
+    EXPECT_NEAR(accelReading.x_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.x_, epsilon);
+    EXPECT_NEAR(accelReading.y_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.y_, epsilon);
+    EXPECT_NEAR(accelReading.z_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.z_, epsilon);
+    EXPECT_NEAR(magReading.x_, (*data).magnetometer_.x_, epsilon);
+    EXPECT_NEAR(magReading.y_, (*data).magnetometer_.y_, epsilon);
+    EXPECT_NEAR(magReading.z_, (*data).magnetometer_.z_, epsilon);
+    EXPECT_NEAR(gyroReading.x_, (*data).gyroscope_.x_, epsilon);
+    EXPECT_NEAR(gyroReading.y_, (*data).gyroscope_.y_, epsilon);
+    EXPECT_NEAR(gyroReading.z_, (*data).gyroscope_.z_, epsilon);
+    EXPECT_NEAR(temp, (*data).temperature_, epsilon);
+    EXPECT_NEAR(pres, (*data).pressure_, epsilon);
+    EXPECT_NEAR(alt, (*data).altitude_, epsilon);
 }
 
 TEST(DecoderTests, singlePacketDecoding) {
