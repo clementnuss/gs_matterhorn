@@ -19,7 +19,7 @@ class Factories {
 public:
     static std::shared_ptr<IDeserializable> telemetryReadingFactory(std::vector<uint8_t>);
 
-    static uint16_t parseUint16(vector<uint8_t>::iterator &);
+    static int16_t parseInt16(vector<uint8_t>::iterator &);
 
     static uint32_t parseUint32(vector<uint8_t>::iterator &);
 };

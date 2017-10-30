@@ -6,17 +6,17 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
 
     long measurement_time = static_cast<long>(parseUint32(it));
 
-    float ax = parseUint16(it);
-    float ay = parseUint16(it);
-    float az = parseUint16(it);
+    float ax = parseInt16(it);
+    float ay = parseInt16(it);
+    float az = parseInt16(it);
 
-    float mx = parseUint16(it);
-    float my = parseUint16(it);
-    float mz = parseUint16(it);
+    float mx = parseInt16(it);
+    float my = parseInt16(it);
+    float mz = parseInt16(it);
 
-    float gx = parseUint16(it);
-    float gy = parseUint16(it);
-    float gz = parseUint16(it);
+    float gx = parseInt16(it);
+    float gy = parseInt16(it);
+    float gz = parseInt16(it);
 
     float_cast temperature = {.uint32 = parseUint32(it)};
     float_cast pressure = {.uint32 = parseUint32(it)};
@@ -33,7 +33,7 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
 }
 
 
-uint16_t Factories::parseUint16(vector<uint8_t>::iterator &it) {
+int16_t Factories::parseInt16(vector<uint8_t>::iterator &it) {
     return (*(it++) << 8) | *(it++);
 }
 

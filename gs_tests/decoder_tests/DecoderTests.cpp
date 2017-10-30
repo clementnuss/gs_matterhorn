@@ -24,7 +24,7 @@ vector<uint8_t> createDatagram(uint32_t seqnum,
                                int16_t gy,
                                int16_t gz,
                                float temp,
-                               uint32_t pres,
+                               float pres,
                                float alt) {
     // Create datagram header
     vector<uint8_t> datagram{
@@ -51,7 +51,7 @@ vector<uint8_t> createDatagram(uint32_t seqnum,
         datagram.push_back(static_cast<uint8_t>(temperature.uint32 >> (8 * i)));
 
 
-    float_cast pressure{.uint32 = pres};
+    float_cast pressure{.fl = pres};
     for (int i = 3; i >= 0; --i)
         datagram.push_back(static_cast<uint8_t>(pressure.uint32 >> (8 * i)));
 
@@ -102,7 +102,7 @@ void feedWithValidHeader(Decoder &decoder) {
 
 void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint32_t timestamp,
                         XYZReading accelReading, XYZReading magReading, XYZReading gyroReading,
-                        float temp, uint32_t pres, float alt
+                        float temp, float pres, float alt
 ) {
     size_t k = 0;
 
@@ -184,7 +184,7 @@ TEST(DecoderTests, singlePacketDecoding) {
     int16_t gy = 8;
     int16_t gz = -9;
     float temp = 12345.6789f;
-    uint32_t pres = 0141;
+    float pres = 1.41;
     float alt = 98765.3210f;
 
 
@@ -204,9 +204,9 @@ TEST(DecoderTests, multipleConsecutivePacketsDecoding) {
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
     // Test values
-    std::array<uint32_t, measureCount> seqnum{}, timestamp{}, pressure{};
+    std::array<uint32_t, measureCount> seqnum{}, timestamp{};
     std::array<int16_t, measureCount> ax{}, ay{}, az{}, mx{}, my{}, mz{}, gx{}, gy{}, gz{};
-    std::array<float, measureCount> temp{}, alt{};
+    std::array<float, measureCount> temp{}, pressure{}, alt{};
 
     Rand<uint32_t> uint32Rand;
     Rand<int16_t> int16Rand;
@@ -225,7 +225,7 @@ TEST(DecoderTests, multipleConsecutivePacketsDecoding) {
         gy[i] = int16Rand();
         gz[i] = int16Rand();
         temp[i] = static_cast<float>(doubleRand());
-        pressure[i] = uint32Rand();
+        pressure[i] = static_cast<float>(doubleRand());
         alt[i] = static_cast<float>(doubleRand());
     }
 
