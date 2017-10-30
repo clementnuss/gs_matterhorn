@@ -6,6 +6,9 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
 
     long measurement_time = static_cast<long>(parseUint32(it));
 
+    // Convert measurement time in milliseconds
+    measurement_time /= 1000;
+
     float ax = parseInt16(it);
     float ay = parseInt16(it);
     float az = parseInt16(it);

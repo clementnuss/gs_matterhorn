@@ -30,6 +30,9 @@ namespace UIConstants {
     static constexpr int NUMERICAL_VALUES_REFRESH_RATE = 100;
     static constexpr int REFRESH_RATE = 50;
 
+    // Time in milliseconds between each data point in the real-time graphs
+    static constexpr int MSECS_GRAPH_DATA_INTERVAL = 100;
+
     static constexpr int MSECS_GRAPH_XRANGE = 10000;
 }
 
