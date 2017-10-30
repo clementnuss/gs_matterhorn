@@ -34,7 +34,7 @@ namespace UIConstants {
     static constexpr int GRAPH_DATA_INTERVAL_MSECS = 100;
 
     static constexpr float GRAPH_RANGE_MARGIN_RATIO = 1.05;
-    static constexpr int GRAPH_XRANGE_MSECS = 10000;
+    static constexpr int GRAPH_XRANGE_MSECS = 20000;
 }
 
 namespace SimulatorConstants {
