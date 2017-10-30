@@ -33,6 +33,7 @@ namespace UIConstants {
     // Time in milliseconds between each data point in the real-time graphs
     static constexpr int MSECS_GRAPH_DATA_INTERVAL = 100;
 
+    static constexpr float GRAPH_MARGIN_RATIO = 1.05;
     static constexpr int MSECS_GRAPH_XRANGE = 10000;
 }
 

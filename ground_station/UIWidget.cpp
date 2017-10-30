@@ -73,6 +73,7 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 
     g->keyAxis()->setRange(d.last().key, UIConstants::MSECS_GRAPH_XRANGE, Qt::AlignRight);
     g->valueAxis()->rescale(true);
+    g->valueAxis()->scaleRange(UIConstants::GRAPH_MARGIN_RATIO);
 
     ui->graph_widget->replot();
 }
