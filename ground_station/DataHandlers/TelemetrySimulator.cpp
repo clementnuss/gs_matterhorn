@@ -30,7 +30,6 @@ vector<TelemetryReading> TelemetrySimulator::pollData() {
 
             case HandlerStatus::LOSSY: {
                 long long millisSinceLastPoll = msecsBetween(timeOfLastPolledData, now);
-                cout << "Simu: " << millisSinceLastPoll << endl << flush;
                 if (millisSinceLastPoll > CommunicationsConstants::MSECS_NOMINAL_RATE) {
                     timeOfLastPolledData = now;
                     return generatedVector;
@@ -94,9 +93,21 @@ const TelemetryReading TelemetrySimulator::generateTelemetry() {
     return TelemetryReading{
             key,
             10000 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 1000.0 * sin(keysec / 0.8),
-            XYZReading{900 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 90.0 * sin(keysec / 0.38), 0, 0},
-            XYZReading{200 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 20.0 * sin(keysec / 0.27), 0, 0},
-            XYZReading{100 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 10.0 * sin(keysec / 0.6), 1, 2},
+            XYZReading{
+                    900 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 90.0 * sin(keysec / 0.38),
+                    900 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 90.0 * sin(keysec / 0.37),
+                    900 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 90.0 * sin(keysec / 0.36)
+            },
+            XYZReading{
+                    200 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 20.0 * sin(keysec / 0.27),
+                    200 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 20.0 * sin(keysec / 0.26),
+                    200 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 20.0 * sin(keysec / 0.25)
+            },
+            XYZReading{
+                    100 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 10.0 * sin(keysec / 0.6),
+                    100 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 10.0 * sin(keysec / 0.5),
+                    100 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 10.0 * sin(keysec / 0.4)
+            },
             50 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 5.0 * sin(keysec / 0.7),
             90.0 * sin(key) + rnd / static_cast<double>(RAND_MAX) * 1 * sin(keysec / 0.7)
     };
