@@ -129,18 +129,26 @@ void GSWidget::updateGroundStatus(float temperature, float pressure){
 
 void GSWidget::graphSetup() {
     QCustomPlot *customPlot = ui->graph_widget;
+    customPlot->plotLayout()->clear();
 
     // TODO: check if needed on RaspberryPi3
     //customPlot->setOpenGl(true);
 
-    customPlot->plotLayout()->clear();
+    QFont titleFont = QFont("sans", 10, QFont::Bold);
+
+    QCPTextElement *topTitle = new QCPTextElement(customPlot, "Altitude", titleFont);
+    QCPTextElement *bottomTitle = new QCPTextElement(customPlot, "Acceleration", titleFont);
 
     QCPAxisRect *topAxisRect = new QCPAxisRect(customPlot);
-    topAxisRect->setupFullAxesBox(true);
-    customPlot->plotLayout()->addElement(0, 0, topAxisRect);
     QCPAxisRect *bottomAxisRect = new QCPAxisRect(customPlot);
+
+    topAxisRect->setupFullAxesBox(true);
     bottomAxisRect->setupFullAxesBox(true);
-    customPlot->plotLayout()->addElement(1, 0, bottomAxisRect);
+
+    customPlot->plotLayout()->addElement(0, 0, topTitle);
+    customPlot->plotLayout()->addElement(1, 0, topAxisRect);
+    customPlot->plotLayout()->addElement(2, 0, bottomTitle);
+    customPlot->plotLayout()->addElement(3, 0, bottomAxisRect);
 
     QFont font;
     font.setPointSize(12);
