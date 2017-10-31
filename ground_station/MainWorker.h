@@ -23,9 +23,12 @@ public:
 public slots:
     void run();
 
+    void emitAllStatuses();
     void updateLoggingStatus();
 
 signals:
+
+    void loggingStatusReady(bool);
 
     void telemetryReady(TelemetryReading);
     void graphDataReady(QVector<QCPGraphData> &, GraphFeature);

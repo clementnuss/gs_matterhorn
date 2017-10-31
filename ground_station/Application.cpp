@@ -38,6 +38,9 @@ void Application::run() {
     worker_->moveToThread(&workerThread_);
 
     connectSlotsAndSignals();
+
+    // Initialize UI status fields
+    worker_->emitAllStatuses();
 }
 
 int Application::exec() {
@@ -63,6 +66,11 @@ void Application::connectSlotsAndSignals() {
                      &Worker::telemetryReady,
                      &mainWidget_,
                      &GSWidget::updateTelemetry);
+
+    QObject::connect(worker_,
+                     &Worker::loggingStatusReady,
+                     &mainWidget_,
+                     &GSWidget::updateLoggingStatus);
 
     QObject::connect(worker_,
                      &Worker::newEventsReady,

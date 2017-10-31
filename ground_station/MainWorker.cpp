@@ -9,7 +9,7 @@ using namespace std;
 
 Worker::Worker(std::string comPort) :
         loggingEnabled{false},
-        telemetryHandler{new RadioReceiver{std::string("COM4")}},
+        telemetryHandler{new TelemetrySimulator()},
         telemetryLogger{LogConstants::TELEMETRY_PATH},
         eventLogger{LogConstants::EVENTS_PATH},
         lastDisplayableReading{-1,
@@ -22,10 +22,15 @@ Worker::Worker(std::string comPort) :
         lastUIupdate{chrono::system_clock::now()} {
     //TODO: catch error
     telemetryHandler->startup();
+
 }
 
 Worker::~Worker() {
     std::cout << "Destroying worker thread" << std::endl;
+}
+
+void Worker::emitAllStatuses() {
+    emit loggingStatusReady(loggingEnabled);
 }
 
 void Worker::run() {
@@ -71,6 +76,7 @@ void Worker::mainRoutine() {
 
 void Worker::updateLoggingStatus() {
     loggingEnabled = !loggingEnabled;
+    emit loggingStatusReady(loggingEnabled);
     cout << "Logging is now " << (loggingEnabled ? "enabled" : "disabled") << endl;
 }
 

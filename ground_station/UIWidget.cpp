@@ -89,6 +89,13 @@ void GSWidget::updateTelemetry(TelemetryReading t) {
     ui->telemetry_roll_value->setText(QString::number(t.acceleration_.z_, 'f', UIConstants::PRECISION));
 }
 
+void GSWidget::updateLoggingStatus(bool enabled) {
+    QLabel *label = ui->status_logging;
+    QPalette palette = label->palette();
+    palette.setColor(label->backgroundRole(), enabled ? Qt::green : Qt::red);
+    label->setPalette(palette);
+}
+
 void GSWidget::updateLinkStatus(bool radioStatus, bool videoStatus){
 
 }

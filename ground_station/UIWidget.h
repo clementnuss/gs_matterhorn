@@ -31,6 +31,8 @@ public slots:
     void updateEvents(vector<RocketEvent> &);
     void updateGraphData(QVector<QCPGraphData> &, GraphFeature);
     void updateTelemetry(TelemetryReading);
+
+    void updateLoggingStatus(bool);
     void updateLinkStatus(bool, bool);
     void updateGroundStatus(float, float);
 
