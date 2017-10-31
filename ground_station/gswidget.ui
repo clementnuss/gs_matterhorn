@@ -267,7 +267,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>kPa</string>
+                     <string>hPa</string>
                  </property>
                 </widget>
                </item>
@@ -598,7 +598,7 @@
                                        </font>
                                    </property>
                                    <property name="text">
-                                       <string>kPa</string>
+                                       <string>hPa</string>
                                    </property>
                                </widget>
                            </item>
