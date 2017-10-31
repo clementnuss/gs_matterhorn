@@ -53,7 +53,10 @@ namespace DataConstants {
 }
 
 namespace CommunicationsConstants {
+    static constexpr int MSECS_BETWEEN_LINK_CHECKS = 0;
     static constexpr uint32_t TELEMETRY_BAUD_RATE = 115200;
+    static constexpr int MSECS_NOMINAL_RATE = 200;
+    static constexpr float MSECS_LOSSY_RATE = 500;
 }
 
 static const std::map<int, std::string> EVENT_CODES = {

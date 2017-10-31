@@ -14,16 +14,25 @@ public:
 
     void startup() override;
 
-    virtual vector<RocketEvent> pollEvents() override;
+    vector<RocketEvent> pollEvents() override;
 
-    virtual vector<TelemetryReading> pollData() override;
+    vector<TelemetryReading> pollData() override;
 
+    void setVariableRate(bool);
 private:
+
     RocketEvent generateEvent();
 
-    QTime time;
+    void updateHandlerStatus();
+
+    static constexpr double VARIABLE_RATE_TIME_MULTIPLIER = 2.0 * M_PI * 0.05;
     const TelemetryReading generateTelemetry();
     const vector<TelemetryReading> generateTelemetryVector();
+
+    QTime time;
+    HandlerStatus simulatorStatus;
+    chrono::system_clock::time_point timeOfLastPolledData;
+    bool variableRate;
 };
 
 

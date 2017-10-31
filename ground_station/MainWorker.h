@@ -34,12 +34,15 @@ signals:
     void graphDataReady(QVector<QCPGraphData> &, GraphFeature);
 
     void newEventsReady(vector<RocketEvent> &);
-    void linkStatusReady(bool, bool);
+
+    void linkStatusReady(HandlerStatus);
     void groundStatusReady(float, float);
     void dummySignal();
 
 private:
     bool loggingEnabled;
+
+    void checkLinkStatuses();
     void displayMostRecentTelemetry(TelemetryReading);
 
     unique_ptr<TelemetryHandler> telemetryHandler;
@@ -47,6 +50,9 @@ private:
     FileLogger eventLogger;
     TelemetryReading lastDisplayableReading;
     chrono::system_clock::time_point lastUIupdate;
+    chrono::system_clock::time_point timeOfLastLinkCheck;
+    chrono::system_clock::time_point timeOfLastReceivedTelemetry;
+    long long int millisBetweenLastTwoPackets;
 
     QVector<QCPGraphData> extractGraphData(vector<TelemetryReading> &, QCPGraphData (*)(TelemetryReading));
 };

@@ -4,11 +4,21 @@
 #include <vector>
 #include <memory>
 
+enum class HandlerStatus {
+    NOMINAL, LOSSY, DOWN
+};
+
 template<class T>
 class IDataHandler {
 
 public:
+
+    IDataHandler() {}
+
+    virtual ~IDataHandler() {}
+
     virtual std::vector<T> pollData() = 0;
+
 };
 
 

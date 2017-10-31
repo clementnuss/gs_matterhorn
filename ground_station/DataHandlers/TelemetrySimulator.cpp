@@ -3,6 +3,8 @@
 #include <QtCore/QTime>
 #include <cassert>
 #include <iostream>
+#include <c++/chrono>
+#include <Utilities/TimeUtils.h>
 #include "TelemetrySimulator.h"
 
 using namespace std;
@@ -10,11 +12,44 @@ using namespace SimulatorConstants;
 
 //TODO: make telemetry handler factory to provide either simulator or real one
 
-TelemetrySimulator::TelemetrySimulator() : time{QTime::currentTime()} {
+TelemetrySimulator::TelemetrySimulator() : time{QTime::currentTime()},
+                                           timeOfLastPolledData{chrono::system_clock::now()}, variableRate{true} {
 }
 
 vector<TelemetryReading> TelemetrySimulator::pollData() {
-    return generateTelemetryVector();
+
+    vector<TelemetryReading> generatedVector = generateTelemetryVector();
+    chrono::system_clock::time_point now = chrono::system_clock::now();
+
+    if (variableRate) {
+        updateHandlerStatus();
+        switch (simulatorStatus) {
+            case HandlerStatus::NOMINAL:
+                timeOfLastPolledData = now;
+                return generatedVector;
+
+            case HandlerStatus::LOSSY: {
+                long long millisSinceLastPoll = msecsBetween(timeOfLastPolledData, now);
+                cout << "Simu: " << millisSinceLastPoll << endl << flush;
+                if (millisSinceLastPoll > CommunicationsConstants::MSECS_NOMINAL_RATE) {
+                    timeOfLastPolledData = now;
+                    return generatedVector;
+                }
+                break;
+            }
+
+            case HandlerStatus::DOWN:
+                break;
+
+            default:
+                break;
+        }
+
+    } else {
+        return generateTelemetryVector();
+    }
+
+    return vector<TelemetryReading>();
 }
 
 vector<RocketEvent> TelemetrySimulator::pollEvents() {
@@ -27,6 +62,10 @@ vector<RocketEvent> TelemetrySimulator::pollEvents() {
     }
 
     return v;
+}
+
+void TelemetrySimulator::setVariableRate(bool enable) {
+    variableRate = enable;
 }
 
 void TelemetrySimulator::startup() {
@@ -70,4 +109,20 @@ RocketEvent TelemetrySimulator::generateEvent() {
 
     assert(EVENT_CODES.find(code) != EVENT_CODES.end());
     return RocketEvent {time.elapsed(), code, EVENT_CODES.at(code)};
+}
+
+
+void TelemetrySimulator::updateHandlerStatus() {
+    chrono::system_clock::time_point now = chrono::system_clock::now();
+    long long seconds =
+            chrono::duration_cast<chrono::milliseconds>(now.time_since_epoch()).count() / TimeConstants::MSECS_IN_SEC;
+    double indicator = cos(seconds * VARIABLE_RATE_TIME_MULTIPLIER);
+
+    if (indicator <= 0) {
+        simulatorStatus = HandlerStatus::NOMINAL;
+    } else if (0 < indicator && indicator < 0.9) {
+        simulatorStatus = HandlerStatus::LOSSY;
+    } else {
+        simulatorStatus = HandlerStatus::DOWN;
+    }
 }

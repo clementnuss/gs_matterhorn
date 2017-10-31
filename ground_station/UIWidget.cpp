@@ -93,11 +93,32 @@ void GSWidget::updateTelemetry(TelemetryReading t) {
 void GSWidget::updateLoggingStatus(bool enabled) {
     QLabel *label = ui->status_logging;
     QPalette palette = label->palette();
-    palette.setColor(label->backgroundRole(), enabled ? GREEN : RED);
+    palette.setColor(label->backgroundRole(), enabled ? UIColors::GREEN : UIColors::RED);
     label->setPalette(palette);
 }
 
-void GSWidget::updateLinkStatus(bool radioStatus, bool videoStatus){
+void GSWidget::updateLinkStatus(HandlerStatus status) {
+    QColor statusColor;
+
+    switch (status) {
+        case HandlerStatus::NOMINAL:
+            statusColor = UIColors::GREEN;
+            break;
+        case HandlerStatus::LOSSY:
+            statusColor = UIColors::YELLOW;
+            break;
+        case HandlerStatus::DOWN:
+            statusColor = UIColors::RED;
+            break;
+        default:
+            statusColor = UIColors::RED;
+            break;
+    }
+
+    QLabel *label = ui->status_radio1;
+    QPalette palette = label->palette();
+    palette.setColor(label->backgroundRole(), statusColor);
+    label->setPalette(palette);
 
 }
 
