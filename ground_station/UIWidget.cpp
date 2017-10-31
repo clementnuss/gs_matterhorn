@@ -1,5 +1,6 @@
 #include "UIWidget.h"
 #include "ui_gswidget.h"
+#include "UI/Colors.h"
 #include <iostream>
 #include <cassert>
 
@@ -92,7 +93,7 @@ void GSWidget::updateTelemetry(TelemetryReading t) {
 void GSWidget::updateLoggingStatus(bool enabled) {
     QLabel *label = ui->status_logging;
     QPalette palette = label->palette();
-    palette.setColor(label->backgroundRole(), enabled ? Qt::green : Qt::red);
+    palette.setColor(label->backgroundRole(), enabled ? GREEN : RED);
     label->setPalette(palette);
 }
 
