@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include "CRC/CRC.h"
 
 namespace PrintConstants {
     static constexpr int PRECISION = 4;
@@ -53,6 +54,9 @@ namespace DataConstants {
 }
 
 namespace CommunicationsConstants {
+    // See https://users.ece.cmu.edu/~koopman/crc/index.html for good polynomials
+    static constexpr CRC::Parameters<crcpp_uint16, 16> CRC_16_GENERATOR_POLY = {0xA2EB, 0xFFFF, 0xFFFF, false, false};
+
     static constexpr int MSECS_BETWEEN_LINK_CHECKS = 0;
     static constexpr uint32_t TELEMETRY_BAUD_RATE = 115200;
     static constexpr int MSECS_NOMINAL_RATE = 200;
