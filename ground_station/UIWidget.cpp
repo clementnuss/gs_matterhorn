@@ -5,9 +5,10 @@
 #include <cassert>
 
 GSWidget::GSWidget(QWidget *parent) :
-        QWidget(parent),
-        ui(new Ui::GSWidget),
-        clockTimer(this) {
+    QWidget(parent),
+    ui(new Ui::GSWidget),
+    clockTimer(this)
+{
     ui->setupUi(this);
 
     graphSetup();
@@ -17,7 +18,8 @@ GSWidget::GSWidget(QWidget *parent) :
 
 }
 
-GSWidget::~GSWidget() {
+GSWidget::~GSWidget()
+{
     delete ui;
 }
 
@@ -85,19 +87,40 @@ void GSWidget::updateTelemetry(TelemetryReading t) {
     ui->telemetry_acceleration_value->setText(QString::number(t.acceleration_.norm(), 'f', UIConstants::PRECISION));
     ui->telemetry_pressure_value->setText(QString::number(t.pressure_, 'f', UIConstants::PRECISION));
     ui->telemetry_temperature_value->setText(QString::number(t.temperature_, 'f', UIConstants::PRECISION));
-    ui->telemetry_yaw_value->setText(QString::number(t.acceleration_.x_, 'f', UIConstants::PRECISION));
-    ui->telemetry_pitch_value->setText(QString::number(t.acceleration_.y_, 'f', UIConstants::PRECISION));
-    ui->telemetry_roll_value->setText(QString::number(t.acceleration_.z_, 'f', UIConstants::PRECISION));
+    ui->telemetry_yaw_value->setText(QString::number(t.magnetometer_.x_, 'f', UIConstants::PRECISION));
+    ui->telemetry_pitch_value->setText(QString::number(t.magnetometer_.y_, 'f', UIConstants::PRECISION));
+    ui->telemetry_roll_value->setText(QString::number(t.magnetometer_.z_, 'f', UIConstants::PRECISION));
 }
 
 void GSWidget::updateLoggingStatus(bool enabled) {
     QLabel *label = ui->status_logging;
     QPalette palette = label->palette();
-    palette.setColor(label->backgroundRole(), enabled ? GREEN : RED);
+    palette.setColor(label->backgroundRole(), enabled ? UIColors::GREEN : UIColors::RED);
     label->setPalette(palette);
 }
 
-void GSWidget::updateLinkStatus(bool radioStatus, bool videoStatus) {
+void GSWidget::updateLinkStatus(HandlerStatus status) {
+    QColor statusColor;
+
+    switch (status) {
+        case HandlerStatus::NOMINAL:
+            statusColor = UIColors::GREEN;
+            break;
+        case HandlerStatus::LOSSY:
+            statusColor = UIColors::YELLOW;
+            break;
+        case HandlerStatus::DOWN:
+            statusColor = UIColors::RED;
+            break;
+        default:
+            statusColor = UIColors::RED;
+            break;
+    }
+
+    QLabel *label = ui->status_radio1;
+    QPalette palette = label->palette();
+    palette.setColor(label->backgroundRole(), statusColor);
+    label->setPalette(palette);
 
 }
 
@@ -108,18 +131,26 @@ void GSWidget::updateGroundStatus(float temperature, float pressure) {
 
 void GSWidget::graphSetup() {
     QCustomPlot *customPlot = ui->graph_widget;
+    customPlot->plotLayout()->clear();
 
     // TODO: check if needed on RaspberryPi3
     //customPlot->setOpenGl(true);
 
-    customPlot->plotLayout()->clear();
+    QFont titleFont = QFont("sans", 10, QFont::Bold);
+
+    QCPTextElement *topTitle = new QCPTextElement(customPlot, "Altitude", titleFont);
+    QCPTextElement *bottomTitle = new QCPTextElement(customPlot, "Acceleration", titleFont);
 
     QCPAxisRect *topAxisRect = new QCPAxisRect(customPlot);
-    topAxisRect->setupFullAxesBox(true);
-    customPlot->plotLayout()->addElement(0, 0, topAxisRect);
     QCPAxisRect *bottomAxisRect = new QCPAxisRect(customPlot);
+
+    topAxisRect->setupFullAxesBox(true);
     bottomAxisRect->setupFullAxesBox(true);
-    customPlot->plotLayout()->addElement(1, 0, bottomAxisRect);
+
+    customPlot->plotLayout()->addElement(0, 0, topTitle);
+    customPlot->plotLayout()->addElement(1, 0, topAxisRect);
+    customPlot->plotLayout()->addElement(2, 0, bottomTitle);
+    customPlot->plotLayout()->addElement(3, 0, bottomAxisRect);
 
     QFont font;
     font.setPointSize(12);

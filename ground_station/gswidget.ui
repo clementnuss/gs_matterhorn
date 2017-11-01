@@ -267,7 +267,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>kPa</string>
+                     <string>hPa</string>
                  </property>
                 </widget>
                </item>
@@ -598,7 +598,7 @@
                                        </font>
                                    </property>
                                    <property name="text">
-                                       <string>kPa</string>
+                                       <string>hPa</string>
                                    </property>
                                </widget>
                            </item>
@@ -875,6 +875,9 @@
                <pointsize>10</pointsize>
               </font>
              </property>
+                <property name="readOnly">
+                    <bool>true</bool>
+                </property>
             </widget>
            </item>
           </layout>

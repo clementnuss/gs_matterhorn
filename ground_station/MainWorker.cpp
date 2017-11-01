@@ -4,6 +4,7 @@
 #include <DataHandlers/Receiver/RadioReceiver.h>
 #include "MainWorker.h"
 #include "Utilities/GraphUtils.h"
+#include "Utilities/TimeUtils.h"
 
 using namespace std;
 
@@ -19,7 +20,10 @@ Worker::Worker(std::string comPort) :
                                {0, 0, 0},
                                0,
                                0},
-        lastUIupdate{chrono::system_clock::now()} {
+        lastUIupdate{chrono::system_clock::now()},
+        timeOfLastLinkCheck{chrono::system_clock::now()},
+        timeOfLastReceivedTelemetry{chrono::system_clock::now()},
+        millisBetweenLastTwoPackets{0} {
     //TODO: catch error
     telemetryHandler->startup();
 
@@ -48,8 +52,12 @@ void Worker::mainRoutine() {
     //TODO: adapt sleep time so as to have proper framerate
     QThread::msleep(UIConstants::REFRESH_RATE);
 
+    checkLinkStatuses();
+
     vector<RocketEvent> rocketEvents = telemetryHandler->pollEvents();
     vector<TelemetryReading> data = telemetryHandler->pollData();
+
+    chrono::system_clock::time_point now = chrono::system_clock::now();
 
     if (loggingEnabled) {
         telemetryLogger.registerData(vector<reference_wrapper<ILoggable>>(begin(data), end(data)));
@@ -57,6 +65,8 @@ void Worker::mainRoutine() {
     }
 
     if (!data.empty()) {
+        millisBetweenLastTwoPackets = msecsBetween(timeOfLastReceivedTelemetry, now);
+        timeOfLastReceivedTelemetry = now;
         displayMostRecentTelemetry(data[data.size() - 1]);
 
         QVector<QCPGraphData> altitudeDataBuffer = extractGraphData(data, altitudeFromReading);
@@ -80,13 +90,40 @@ void Worker::updateLoggingStatus() {
     cout << "Logging is now " << (loggingEnabled ? "enabled" : "disabled") << endl;
 }
 
-void Worker::displayMostRecentTelemetry(TelemetryReading tr) {
-    chrono::system_clock::time_point currentTimePoint = chrono::system_clock::now();
+void Worker::checkLinkStatuses() {
+    chrono::system_clock::time_point now = chrono::system_clock::now();
+    long long elapsedMillis = msecsBetween(timeOfLastLinkCheck, now);
 
-    long long elapsedMillis = chrono::duration_cast<chrono::milliseconds>(currentTimePoint - lastUIupdate).count();
+    if (elapsedMillis > CommunicationsConstants::MSECS_BETWEEN_LINK_CHECKS) {
+
+        timeOfLastLinkCheck = now;
+
+        elapsedMillis = msecsBetween(timeOfLastReceivedTelemetry, now);
+
+        HandlerStatus status;
+
+        if (elapsedMillis > CommunicationsConstants::MSECS_LOSSY_RATE
+            || millisBetweenLastTwoPackets > CommunicationsConstants::MSECS_LOSSY_RATE) {
+            status = HandlerStatus::DOWN;
+        } else if (CommunicationsConstants::MSECS_NOMINAL_RATE < millisBetweenLastTwoPackets
+                   && millisBetweenLastTwoPackets <= CommunicationsConstants::MSECS_LOSSY_RATE) {
+            status = HandlerStatus::LOSSY;
+        } else {
+            status = HandlerStatus::NOMINAL;
+        }
+
+        emit linkStatusReady(status);
+    }
+}
+
+//TODO: harmonise with graph updates
+void Worker::displayMostRecentTelemetry(TelemetryReading tr) {
+
+    chrono::system_clock::time_point now = chrono::system_clock::now();
+    long long elapsedMillis = msecsBetween(lastUIupdate, now);
 
     if (elapsedMillis > UIConstants::NUMERICAL_VALUES_REFRESH_RATE) {
-        lastUIupdate = currentTimePoint;
+        lastUIupdate = now;
         emit telemetryReady(tr);
     }
 }
@@ -106,4 +143,5 @@ Worker::extractGraphData(vector<TelemetryReading> &data, QCPGraphData (*extracti
 
     return v;
 }
+
 

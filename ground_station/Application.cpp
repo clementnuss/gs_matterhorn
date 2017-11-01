@@ -56,6 +56,7 @@ void Application::connectSlotsAndSignals() {
     qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>&");
     qRegisterMetaType<vector<RocketEvent>>("vector<RocketEvent>&");
     qRegisterMetaType<GraphFeature>("GraphFeature");
+    qRegisterMetaType<HandlerStatus>("HandlerStatus");
 
     QObject::connect(worker_,
                      &Worker::dummySignal,
@@ -71,6 +72,11 @@ void Application::connectSlotsAndSignals() {
                      &Worker::loggingStatusReady,
                      &mainWidget_,
                      &GSWidget::updateLoggingStatus);
+
+    QObject::connect(worker_,
+                     &Worker::linkStatusReady,
+                     &mainWidget_,
+                     &GSWidget::updateLinkStatus);
 
     QObject::connect(worker_,
                      &Worker::newEventsReady,
