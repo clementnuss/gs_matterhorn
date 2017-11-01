@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <Utilities/RandUtils.h>
 #include "CRC/CRC.h"
 #include "ProgramConstants.h"
 #include "DataHandlers/Receiver/DatagramSpec.h"
@@ -30,11 +31,11 @@ TEST(CRCTest, bitChangeIsDetected) {
 }
 
 TEST(CRCTest, byteChangesAreDetectedOnTelemetryPayloads) {
-    int numberOfTests = 10000;
+    int numberOfTests = 100000;
     std::vector<uint8_t> originalSequence{};
     srand(0);
 
-    for (size_t i = 0; i < 4; i++) {
+    for (size_t i = 0; i < PAYLOAD_TYPES_LENGTH.at(DatagramPayloadType::TELEMETRY); i++) {
         originalSequence.push_back(rand() % 256);
     }
 
@@ -45,11 +46,55 @@ TEST(CRCTest, byteChangesAreDetectedOnTelemetryPayloads) {
 
         std::vector<uint8_t> sequence = originalSequence;
         size_t randomIndex = rand() % originalSequence.size();
-        sequence[randomIndex] = rand() % 255;
+        uint8_t newByte = rand() % 255;
+
+        if (newByte != sequence[randomIndex]) {
+            sequence[randomIndex] = newByte;
+        } else {
+            sequence[randomIndex] += 1;
+        }
 
         EXPECT_NE(originalCRC,
                   CRC::Calculate(&sequence[0], sequence.size(), CommunicationsConstants::CRC_16_GENERATOR_POLY));
     }
+}
+
+TEST(CRCTest, randomCollisionsOnUniformTelemetryPayloadsAreLow) {
+    int numberOfTests = 500'000;
+
+    Rand<uint8_t> uniformByteRand{};
+    std::vector<uint8_t> seq1{};
+    std::vector<uint8_t> seq2{};
+
+    int pass{0};
+    int fail{0};
+
+    for (int i = 0; i < numberOfTests; i++) {
+
+        seq1.clear();
+        seq2.clear();
+        for (size_t i = 0; i < PAYLOAD_TYPES_LENGTH.at(DatagramPayloadType::TELEMETRY) + 5; i++) {
+            seq1.push_back(uniformByteRand());
+            seq2.push_back(uniformByteRand());
+        }
+
+        if (seq1 == seq2) {
+            continue;
+        }
+
+        uint32_t crc1 = CRC::Calculate(&seq1[0], seq1.size(), CommunicationsConstants::CRC_16_GENERATOR_POLY);
+        uint32_t crc2 = CRC::Calculate(&seq2[0], seq2.size(), CommunicationsConstants::CRC_16_GENERATOR_POLY);
+
+        if (crc1 == crc2) {
+            fail++;
+        } else {
+            pass++;
+        }
+    }
+
+    double ratio = fail / static_cast<double>(pass);
+    std::cout << "Fail: " << fail << " Pass: " << pass << " Ratio: " << ratio << std::endl;
+    ASSERT_TRUE(ratio <= 1.5e-5);
 }
 
 TEST(CRCTest, multipleByteChangesAreDetectedOnTelemetryPayloads) {
