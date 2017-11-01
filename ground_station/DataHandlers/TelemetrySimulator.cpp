@@ -47,7 +47,7 @@ const vector<TelemetryReading> TelemetrySimulator::generateTelemetryVector() {
 
 const TelemetryReading TelemetrySimulator::generateTelemetry() {
 
-    long key = time.elapsed();
+    auto key = static_cast<uint32_t>(time.elapsed());
     double keysec = key / 1000.0;
 
     double rnd = qrand();
@@ -66,8 +66,8 @@ const TelemetryReading TelemetrySimulator::generateTelemetry() {
 RocketEvent TelemetrySimulator::generateEvent() {
 
     // Select an event randomly
-    int code = static_cast<int>(round((EVENT_CODES.size() - 1) * qrand() / static_cast<double>(RAND_MAX)));
+    auto code = static_cast<int>(round((EVENT_CODES.size() - 1) * qrand() / static_cast<double>(RAND_MAX)));
 
     assert(EVENT_CODES.find(code) != EVENT_CODES.end());
-    return RocketEvent {time.elapsed(), code, EVENT_CODES.at(code)};
+    return RocketEvent {static_cast<uint32_t>(time.elapsed()), code, EVENT_CODES.at(code)};
 }

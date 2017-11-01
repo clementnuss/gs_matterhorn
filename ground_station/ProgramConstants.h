@@ -4,6 +4,8 @@
 #include <map>
 #include <string>
 
+#define DEBUG true
+
 namespace PrintConstants {
     static constexpr int PRECISION = 4;
     static constexpr int FIELD_WIDTH = 12;
@@ -49,7 +51,8 @@ namespace SensorConstants {
 namespace DataConstants {
     static constexpr double DELETION_FACTOR = 0.25;
     static constexpr int MAX_DATA_VECTOR_SIZE =
-            (1.0 + DELETION_FACTOR) * (UIConstants::GRAPH_XRANGE_MSECS / UIConstants::REFRESH_RATE);
+            static_cast<const int>((1.0 + DELETION_FACTOR) *
+                                   (UIConstants::GRAPH_XRANGE_MSECS / UIConstants::REFRESH_RATE));
 }
 
 namespace CommunicationsConstants {

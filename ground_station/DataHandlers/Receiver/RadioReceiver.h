@@ -4,8 +4,7 @@
 #include <DataHandlers/TelemetryHandler.h>
 #include "Decoder.h"
 #include <boost/thread/thread.hpp>
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/serial_port.hpp>
+#include <boost/asio.hpp>
 #include <boost/array.hpp>
 #include <boost/lockfree/spsc_queue.hpp>
 
@@ -14,6 +13,7 @@ class RadioReceiver : public TelemetryHandler {
 public:
 
     explicit RadioReceiver(std::string);
+
     ~RadioReceiver();
 
     void startup() override;

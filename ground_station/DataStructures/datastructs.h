@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iomanip>
 #include <cmath>
+#include <utility>
 #include "ILoggable.h"
 #include "ProgramConstants.h"
 
@@ -18,9 +19,9 @@ struct IDeserializable {
 struct TimedData {
     TimedData() = default;
 
-    TimedData(long timestamp) : timestamp_{timestamp} {}
+    TimedData(uint32_t timestamp) : timestamp_{timestamp} {}
 
-    long timestamp_;
+    uint32_t timestamp_;
 };
 
 struct DataReading {
@@ -38,15 +39,15 @@ struct RocketEvent : TimedData, ILoggable {
 
     RocketEvent(const RocketEvent &that) = default;
 
-    RocketEvent(long timestamp, int code, std::string description) :
-            TimedData(timestamp), code{code}, description{description} {}
+    RocketEvent(uint32_t timestamp, int code, const std::string &description) :
+            TimedData{timestamp}, code{code}, description{std::move(description)} {}
 
     ~RocketEvent() = default;
 
     int code;
     std::string description;
 
-    virtual string toString() const override {
+    string toString() const override {
         stringstream ss;
 
         ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << timestamp_
@@ -85,10 +86,10 @@ struct XYZReading : ILoggable {
 struct TelemetryReading : TimedData, ILoggable, IDeserializable {
     TelemetryReading() = default;
 
-    TelemetryReading(long t, double altitude, XYZReading acceleration,
+    TelemetryReading(uint32_t t, double altitude, XYZReading acceleration,
                      XYZReading magnetometer, XYZReading gyroscope,
                      double pressure, double temperature) :
-            TimedData(t),
+            TimedData{t},
             altitude_{altitude},
             acceleration_{acceleration},
             magnetometer_{magnetometer},

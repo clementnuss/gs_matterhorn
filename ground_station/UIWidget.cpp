@@ -5,10 +5,9 @@
 #include <cassert>
 
 GSWidget::GSWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::GSWidget),
-    clockTimer(this)
-{
+        QWidget(parent),
+        ui(new Ui::GSWidget),
+        clockTimer(this) {
     ui->setupUi(this);
 
     graphSetup();
@@ -18,8 +17,7 @@ GSWidget::GSWidget(QWidget *parent) :
 
 }
 
-GSWidget::~GSWidget()
-{
+GSWidget::~GSWidget() {
     delete ui;
 }
 
@@ -68,7 +66,9 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
     int sizeDiff = g->data()->size() - DataConstants::MAX_DATA_VECTOR_SIZE;
     if (sizeDiff > 0) {
         g->data()->removeBefore(
-                (g->data()->at(DataConstants::DELETION_FACTOR * (sizeDiff + DataConstants::MAX_DATA_VECTOR_SIZE))->key)
+                (g->data()->at(static_cast<int>(
+                                       DataConstants::DELETION_FACTOR *
+                                       (sizeDiff + DataConstants::MAX_DATA_VECTOR_SIZE)))->key)
         );
     }
 
@@ -97,11 +97,11 @@ void GSWidget::updateLoggingStatus(bool enabled) {
     label->setPalette(palette);
 }
 
-void GSWidget::updateLinkStatus(bool radioStatus, bool videoStatus){
+void GSWidget::updateLinkStatus(bool radioStatus, bool videoStatus) {
 
 }
 
-void GSWidget::updateGroundStatus(float temperature, float pressure){
+void GSWidget::updateGroundStatus(float temperature, float pressure) {
     ui->ground_temperature_value->setText(QString::number(temperature, 'f', UIConstants::PRECISION));
     ui->ground_temperature_value->setText(QString::number(pressure, 'f', UIConstants::PRECISION));
 }
