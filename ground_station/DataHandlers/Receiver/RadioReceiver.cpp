@@ -59,16 +59,26 @@ void RadioReceiver::asyncRead() {
 void RadioReceiver::handleReceive(const boost::system::error_code &error,
                                   std::size_t bytesTransferred) {
 
-    for (int i = 0; i < bytesTransferred; ++i) {
-        //TODO: log every byte received
-        //cout << recvBuffer_[i];
+    if (!error) {
+        for (int i = 0; i < bytesTransferred; ++i) {
+            //TODO: log every byte received
 
-        if (byteDecoder_.processByte(recvBuffer_[i])) {
-            unpackPayload();
+#ifdef DEBUG
+            std::bitset<8> x(recvBuffer_[i]);
+            cout << x << ' ' << std::flush;
+#endif
+            if (byteDecoder_.processByte(recvBuffer_[i])) {
+                unpackPayload();
+            }
         }
+
+        cout << std::endl << std::endl;
+
+        asyncRead();
+    } else {
+        cout << "Problem while communicating with the serial port\n" << error.message() << endl;
     }
 
-    asyncRead();
 }
 
 void RadioReceiver::unpackPayload() {
