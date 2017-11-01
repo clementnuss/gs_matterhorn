@@ -1,5 +1,6 @@
 #include <memory>
 #include "Factories.h"
+#include "Utilities/ParsingUtilities.h"
 
 shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8_t> payloadBuffer) {
     auto it = payloadBuffer.begin();
@@ -30,13 +31,4 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
                        pressure.fl,
                        temperature.fl};
     return std::make_shared<TelemetryReading>(r);
-}
-
-
-int16_t Factories::parseInt16(vector<uint8_t>::iterator &it) {
-    return (*(it++) << 8) | *(it++);
-}
-
-uint32_t Factories::parseUint32(vector<uint8_t>::iterator &it) {
-    return (*(it++) << 24) | (*(it++) << 16) | (*(it++) << 8) | *(it++);
 }

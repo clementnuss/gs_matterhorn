@@ -3,6 +3,7 @@
 #include <utility>
 #include <DataStructures/datastructs.h>
 #include "Decoder.h"
+#include "Utilities/ParsingUtilities.h"
 
 Decoder::Decoder() {
     currentState_ = INITIAL_STATE;
@@ -113,7 +114,6 @@ void Decoder::seekControlFlag(uint8_t byte) {
     assert(byteBuffer_.empty());
 
     if (byte == CONTROL_FLAG) {
-        checksumAccumulator_.push_back(byte);
         jumpToNextState();
     } else {
         resetMachine();
@@ -146,9 +146,21 @@ void Decoder::accumulateChecksum(uint8_t byte) {
 
 void Decoder::validatePayload() {
 
-    //TODO: compute CRC checksum with checksumAccumulator.
-    currentDatagram_.complete = true;
-    jumpToNextState();
+    assert(byteBuffer_.size() == CHECKSUM_SIZE);
+
+    uint16_t crc = CRC::Calculate(&checksumAccumulator_[0], checksumAccumulator_.size(),
+                                  CommunicationsConstants::CRC_16_GENERATOR_POLY);
+
+    auto it = byteBuffer_.begin();
+    uint16_t receivedCRC = parseUint16(it);
+
+    if (crc == receivedCRC) {
+        currentDatagram_.complete = true;
+        jumpToNextState();
+    } else {
+        cout << "Invalid checksum" << endl;
+        resetMachine();
+    }
 }
 
 void Decoder::assertBufferSmallerThan(size_t bound) {

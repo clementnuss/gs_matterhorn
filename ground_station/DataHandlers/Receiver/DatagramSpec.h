@@ -9,6 +9,8 @@
 #include "DataStructures/datastructs.h"
 #include "Factories.h"
 
+typedef uint16_t checksum_t;
+
 enum class DecodingState {
     SEEKING_FRAMESTART,
     PARSING_HEADER,

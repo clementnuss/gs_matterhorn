@@ -34,34 +34,55 @@ vector<uint8_t> createDatagram(uint32_t seqnum,
             HEADER_PREAMBLE_FLAG,
             HEADER_PREAMBLE_FLAG,
             HEADER_PREAMBLE_FLAG};
+    vector<uint8_t> checksumAccumulator{};
 
-    for (int i = 3; i >= 0; --i)
+    for (int i = 3; i >= 0; --i) {
         datagram.push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
+        checksumAccumulator.push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
+    }
 
     datagram.push_back(static_cast<uint8_t>(DatagramPayloadType::TELEMETRY));
+    checksumAccumulator.push_back(static_cast<uint8_t>(DatagramPayloadType::TELEMETRY));
     datagram.push_back(CONTROL_FLAG);
 
-    for (int i = 3; i >= 0; --i)
+    for (int i = 3; i >= 0; --i) {
         datagram.push_back(static_cast<uint8_t>(timestamp >> (8 * i)));
+        checksumAccumulator.push_back(static_cast<uint8_t>(timestamp >> (8 * i)));
+    }
 
     push3D(datagram, 2, ax, ay, az);
+    push3D(checksumAccumulator, 2, ax, ay, az);
     push3D(datagram, 2, mx, my, mz);
+    push3D(checksumAccumulator, 2, mx, my, mz);
     push3D(datagram, 2, gx, gy, gz);
+    push3D(checksumAccumulator, 2, gx, gy, gz);
 
     float_cast temperature{.fl = temp};
-    for (int i = 3; i >= 0; --i)
+    for (int i = 3; i >= 0; --i) {
         datagram.push_back(static_cast<uint8_t>(temperature.uint32 >> (8 * i)));
+        checksumAccumulator.push_back(static_cast<uint8_t>(temperature.uint32 >> (8 * i)));
+    }
 
 
     float_cast pressure{.fl = pres};
-    for (int i = 3; i >= 0; --i)
+    for (int i = 3; i >= 0; --i) {
         datagram.push_back(static_cast<uint8_t>(pressure.uint32 >> (8 * i)));
+        checksumAccumulator.push_back(static_cast<uint8_t>(pressure.uint32 >> (8 * i)));
+    }
 
 
     float_cast altitude{.fl= alt};
-    for (int i = 3; i >= 0; --i)
+    for (int i = 3; i >= 0; --i) {
         datagram.push_back(static_cast<uint8_t>(altitude.uint32 >> (8 * i)));
+        checksumAccumulator.push_back(static_cast<uint8_t>(altitude.uint32 >> (8 * i)));
+    }
 
+    checksum_t crc = CRC::Calculate(&checksumAccumulator[0], checksumAccumulator.size(),
+                                    CommunicationsConstants::CRC_16_GENERATOR_POLY);
+
+    for (int i = sizeof(checksum_t) - 1; i >= 0; i--) {
+        datagram.push_back(static_cast<uint8_t>(crc >> (8 * i)));
+    }
 
     return datagram;
 }
@@ -331,6 +352,6 @@ TEST(DecoderTests, missingControlFlagResetsMachine) {
 
 }
 
-TEST(DecoderTests, checksumValidationIsCorrect) {
+TEST(DecoderTests, wrongChecksumDropsPacket) {
     ASSERT_TRUE(false);
 }
