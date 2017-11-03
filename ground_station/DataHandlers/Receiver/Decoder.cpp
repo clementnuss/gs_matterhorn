@@ -186,7 +186,7 @@ bool Decoder::validatePayload() {
         ss << PrintConstants::DELIMITER;
         ss << "Invalid checksum, expected: ";
         ss << setw(PrintConstants::FIELD_WIDTH) << std::hex << receivedCRC;
-        ss << " Got: ";
+        ss << " got: ";
         ss << std::hex << crc;
         logger_.registerString(ss.str());
 

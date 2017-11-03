@@ -22,16 +22,12 @@ public:
     void registerString(const std::string &);
     void close();
 
-    bool isReady() const;
-
     static const size_t bufferSize = 1000;
 
 private:
     void writeFile();
 
     void writeRoutine(array<string, bufferSize>, size_t);
-    void resetFlag();
-    void raiseFlag();
 
     const std::string path;
 

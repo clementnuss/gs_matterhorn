@@ -304,7 +304,7 @@ TEST(DecoderTests, resistsToRandomPayloads) {
     srand(0);
     vector<uint8_t> byteSeq{};
     const size_t datagramLength = 1000;
-    const size_t datagramCounts = 1000;
+    const size_t datagramCounts = 10000;
     Decoder decoder{};
 
     for (int i = 0; i < datagramCounts; i++) {
@@ -337,6 +337,7 @@ TEST(DecoderTests, missingControlFlagResetsMachine) {
         if (b == CONTROL_FLAG) {
             continue;
         }
+
         feedWithValidPreamble(decoder);
         feedWithValidSequenceNumber(decoder);
         feedWithValidPayloadType(decoder);

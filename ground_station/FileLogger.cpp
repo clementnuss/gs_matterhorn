@@ -15,7 +15,7 @@ FileLogger::~FileLogger() {
 }
 
 void FileLogger::close() {
-    cout << "Flushing file logger @ " << path << endl;
+    cout << "Flushing file logger @ " << path << endl << flush;
     if (bufferIndex != 0) {
         writeFile();
         bufferIndex = 0;
@@ -53,7 +53,7 @@ void FileLogger::registerString(const std::string &s) {
 void FileLogger::writeFile() {
 
     while (busyFlag) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     busyFlag = true;
@@ -67,7 +67,7 @@ void FileLogger::writeFile() {
 void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
 
     // The busy write flag should have been raised at this point
-    assert(busyFlag);
+    //assert(busyFlag);
     assert(tailIndex >= 1);
 
     stringstream ss;
@@ -76,7 +76,7 @@ void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
 
     if (!fileOutput) {
         //TODO: find an alternative way to save data ?
-        cerr << "Could not open file for writing, data will be lost." << endl;
+        cerr << "Could not open file for writing, data will be lost." << endl << flush;
         return;
     }
 
@@ -90,16 +90,4 @@ void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
 
     fileOutput.close();
     busyFlag = false;
-}
-
-bool FileLogger::isReady() const {
-    return !(this->busyFlag);
-}
-
-void FileLogger::raiseFlag() {
-    this->busyFlag = true;
-}
-
-void FileLogger::resetFlag() {
-    this->busyFlag = false;
 }
