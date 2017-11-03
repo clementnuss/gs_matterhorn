@@ -2,13 +2,16 @@
 #include <iostream>
 #include <utility>
 #include <DataStructures/datastructs.h>
+#include <Utilities/TimeUtils.h>
 #include "Decoder.h"
 #include "Utilities/ParsingUtilities.h"
 
-Decoder::Decoder() {
-    currentState_ = INITIAL_STATE;
-    action_ = &Decoder::seekHeader;
-}
+const std::map<DecodingState, std::pair<DecodingState, void (Decoder::*)(
+        uint8_t)>> Decoder::STATES_TABLE = Decoder::createStatesMap();
+
+Decoder::Decoder() : byteBuffer_{}, checksumAccumulator_{}, currentState_{INITIAL_STATE}, currentDatagram_{},
+                     logger_{LogConstants::DECODER_LOG_PATH}, startupTime_{std::chrono::system_clock::now()},
+                     action_{&Decoder::seekHeader} {}
 
 bool Decoder::processByte(uint8_t byte) {
     assert(!datagramReady());
@@ -23,19 +26,32 @@ bool Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
 
     uint32_t seqNum = 0;
     for (size_t i = 0; i < SEQUENCE_NUMBER_SIZE; i++) {
+
         seqNum <<= 8 * sizeof(uint8_t);
         seqNum |= headerBuffer[i];
+
     }
 
     uint8_t payloadType = headerBuffer[SEQUENCE_NUMBER_SIZE];
 
     if (0 <= payloadType && payloadType < static_cast<uint8_t >(DatagramPayloadType::Count)) {
+
         currentDatagram_.sequenceNumber_ = seqNum;
         currentDatagram_.payloadType_ = DatagramPayloadType(payloadType);
         return true;
+
     } else {
-        std::cout << "Wrong datagram payload type!\n";
+
+        // Log error
+        stringstream ss;
+        ss << setw(PrintConstants::FIELD_WIDTH) << msecsBetween(startupTime_, std::chrono::system_clock::now());
+        ss << PrintConstants::DELIMITER;
+        ss << "Wrong datagram payload type: ";
+        ss << std::hex << static_cast<int>(currentDatagram_.payloadType_);
+        logger_.registerString(ss.str());
+
         return false;
+
     };
 }
 
@@ -155,11 +171,24 @@ void Decoder::validatePayload() {
     checksum_t receivedCRC = parse16<checksum_t>(it);
 
     if (crc == receivedCRC) {
+
         currentDatagram_.complete = true;
         jumpToNextState();
+
     } else {
-        cout << "Invalid checksum" << endl;
+
+        // Log error
+        stringstream ss;
+        ss << setw(PrintConstants::FIELD_WIDTH) << msecsBetween(startupTime_, std::chrono::system_clock::now());
+        ss << PrintConstants::DELIMITER;
+        ss << "Invalid checksum, expected: ";
+        ss << setw(PrintConstants::FIELD_WIDTH) << std::hex << receivedCRC;
+        ss << " Got: ";
+        ss << std::hex << crc;
+        logger_.registerString(ss.str());
+
         resetMachine();
+
     }
 }
 

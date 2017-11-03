@@ -190,7 +190,7 @@ void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint32_t ti
 
 TEST(DecoderTests, singlePacketDecoding) {
 
-    Decoder decoder = Decoder{};
+    Decoder decoder{};
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
@@ -220,7 +220,7 @@ TEST(DecoderTests, singlePacketDecoding) {
 }
 
 TEST(DecoderTests, multipleConsecutivePacketsDecoding) {
-    Decoder decoder = Decoder{};
+    Decoder decoder{};
     srand(0);
     constexpr size_t measureCount = 10000;
 

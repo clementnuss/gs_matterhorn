@@ -5,7 +5,8 @@
 #include <cstdint>
 #include <vector>
 #include "DatagramSpec.h"
-
+#include <chrono>
+#include <FileLogger.h>
 
 class Decoder {
 
@@ -49,22 +50,27 @@ private:
 
     void assertBufferSmallerThan(size_t);
 
-    void (Decoder::*action_)(uint8_t);
+    static std::map<DecodingState, std::pair<DecodingState, void (Decoder::*)(uint8_t)>> createStatesMap() {
+        return std::map<DecodingState, std::pair<DecodingState, void (Decoder::*)(uint8_t)>>{
+                {DecodingState::SEEKING_FRAMESTART,   {DecodingState::PARSING_HEADER,       &Decoder::accumulateHeader}},
+                {DecodingState::PARSING_HEADER,       {DecodingState::SEEKING_CONTROL_FLAG, &Decoder::seekControlFlag}},
+                {DecodingState::SEEKING_CONTROL_FLAG, {DecodingState::PARSING_PAYLOAD,      &Decoder::accumulatePayload}},
+                {DecodingState::PARSING_PAYLOAD,      {DecodingState::PARSING_CHECKSUM,     &Decoder::accumulateChecksum}},
+                {DecodingState::PARSING_CHECKSUM,     {DecodingState::VALIDATING_PAYLOAD,   nullptr}},
+                {DecodingState::VALIDATING_PAYLOAD,   {DecodingState::SEEKING_FRAMESTART,   &Decoder::seekHeader}}
+        };
+    }
 
     std::vector<uint8_t> byteBuffer_;
     std::vector<uint8_t> checksumAccumulator_;
     DecodingState currentState_;
     Datagram currentDatagram_;
+    FileLogger logger_;
+    std::chrono::system_clock::time_point startupTime_;
 
+    static const std::map<DecodingState, std::pair<DecodingState, void (Decoder::*)(uint8_t)>> STATES_TABLE;
 
-    const std::map<DecodingState, std::pair<DecodingState, void (Decoder::*)(uint8_t)>> STATES_TABLE{
-            {DecodingState::SEEKING_FRAMESTART,   {DecodingState::PARSING_HEADER,       &Decoder::accumulateHeader}},
-            {DecodingState::PARSING_HEADER,       {DecodingState::SEEKING_CONTROL_FLAG, &Decoder::seekControlFlag}},
-            {DecodingState::SEEKING_CONTROL_FLAG, {DecodingState::PARSING_PAYLOAD,      &Decoder::accumulatePayload}},
-            {DecodingState::PARSING_PAYLOAD,      {DecodingState::PARSING_CHECKSUM,     &Decoder::accumulateChecksum}},
-            {DecodingState::PARSING_CHECKSUM,     {DecodingState::VALIDATING_PAYLOAD,   nullptr}},
-            {DecodingState::VALIDATING_PAYLOAD,   {DecodingState::SEEKING_FRAMESTART,   &Decoder::seekHeader}}
-    };
+    void (Decoder::*action_)(uint8_t);
 
 };
 

@@ -13,11 +13,13 @@ using namespace std;
 class FileLogger
 {
 public:
-    FileLogger(std::string);
+    FileLogger(const std::string &);
 
     ~FileLogger();
 
     void registerData(const vector<reference_wrapper<ILoggable>> &);
+
+    void registerString(const std::string &);
     void close();
 
     bool isReady() const;

@@ -14,8 +14,9 @@ namespace PrintConstants {
 }
 
 namespace LogConstants {
-    static const std::string TELEMETRY_PATH{"telemetry_data"};
-    static const std::string EVENTS_PATH{"events_data"};
+    static const std::string WORKER_TELEMETRY_LOG_PATH{"telemetry_data"};
+    static const std::string WORKER_EVENTS_LOG_PATH{"events_data"};
+    static const std::string DECODER_LOG_PATH{"radio_receiver_events"};
 }
 
 namespace TimeConstants {

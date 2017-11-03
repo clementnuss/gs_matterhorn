@@ -7,6 +7,7 @@
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
 #include <boost/lockfree/spsc_queue.hpp>
+#include <FileLogger.h>
 
 class RadioReceiver : public TelemetryHandler {
 
@@ -39,6 +40,7 @@ private:
     boost::thread thread_;
     boost::array<uint8_t, 500> recvBuffer_;
     boost::lockfree::spsc_queue<TelemetryReading> telemQueue_;
+
 
 };
 

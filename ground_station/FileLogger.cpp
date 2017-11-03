@@ -7,8 +7,8 @@
 
 using namespace std;
 
-FileLogger::FileLogger(std::string path) :
-        path{std::move(path)}, id{0}, bufferIndex{0}, busyFlag{false} {}
+FileLogger::FileLogger(const std::string &path) :
+        path{path}, id{0}, bufferIndex{0}, busyFlag{false} {}
 
 FileLogger::~FileLogger() {
     close();
@@ -37,13 +37,26 @@ void FileLogger::registerData(const vector<reference_wrapper<ILoggable>> &data) 
     }
 }
 
-void FileLogger::writeFile() {
+void FileLogger::registerString(const std::string &s) {
 
-    while (!isReady()) {
-        //cout << "Waiting for file to be written " << endl;
+    if (bufferIndex >= bufferSize) {
+        cout << "Writing log file.." << endl;
+        writeFile();
+        bufferIndex = 0;
     }
 
-    raiseFlag();
+    buffer[bufferIndex] = s;
+    bufferIndex++;
+
+}
+
+void FileLogger::writeFile() {
+
+    while (busyFlag) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+    busyFlag = true;
 
     array<string, bufferSize> a = buffer;
     thread t(&FileLogger::writeRoutine, this, a, bufferIndex);
@@ -54,7 +67,7 @@ void FileLogger::writeFile() {
 void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
 
     // The busy write flag should have been raised at this point
-    assert(!isReady());
+    assert(busyFlag);
     assert(tailIndex >= 1);
 
     stringstream ss;
@@ -76,7 +89,7 @@ void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
     }
 
     fileOutput.close();
-    resetFlag();
+    busyFlag = false;
 }
 
 bool FileLogger::isReady() const {
