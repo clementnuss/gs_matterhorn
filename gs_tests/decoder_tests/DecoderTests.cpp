@@ -289,9 +289,7 @@ TEST(DecoderTests, resistsToRandomHeader) {
     Decoder decoder{};
 
     for (int i = 0; i < datagramCounts; i++) {
-        for (int k = 0; k < PREAMBLE_SIZE; k++) {
-            decoder.processByte(HEADER_PREAMBLE_FLAG);
-        }
+        feedWithValidPreamble(decoder);
         for (int j = 0; j < datagramLength; j++) {
             if (decoder.processByte(static_cast<uint8_t>(rand() % 256))) {
                 decoder.retrieveDatagram();
@@ -353,5 +351,6 @@ TEST(DecoderTests, missingControlFlagResetsMachine) {
 }
 
 TEST(DecoderTests, wrongChecksumDropsPacket) {
+    //TODO: Checks that machine is correctly reset after invalid checksum
     ASSERT_TRUE(false);
 }

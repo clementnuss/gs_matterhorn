@@ -44,7 +44,7 @@ private:
 
     void accumulateChecksum(uint8_t);
 
-    void validatePayload();
+    bool validatePayload();
 
     void jumpToNextState();
 
@@ -56,8 +56,7 @@ private:
                 {DecodingState::PARSING_HEADER,       {DecodingState::SEEKING_CONTROL_FLAG, &Decoder::seekControlFlag}},
                 {DecodingState::SEEKING_CONTROL_FLAG, {DecodingState::PARSING_PAYLOAD,      &Decoder::accumulatePayload}},
                 {DecodingState::PARSING_PAYLOAD,      {DecodingState::PARSING_CHECKSUM,     &Decoder::accumulateChecksum}},
-                {DecodingState::PARSING_CHECKSUM,     {DecodingState::VALIDATING_PAYLOAD,   nullptr}},
-                {DecodingState::VALIDATING_PAYLOAD,   {DecodingState::SEEKING_FRAMESTART,   &Decoder::seekHeader}}
+                {DecodingState::PARSING_CHECKSUM,     {DecodingState::SEEKING_FRAMESTART,   &Decoder::seekHeader}}
         };
     }
 

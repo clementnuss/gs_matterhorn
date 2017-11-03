@@ -27,6 +27,7 @@ bool Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
     uint32_t seqNum = 0;
     for (size_t i = 0; i < SEQUENCE_NUMBER_SIZE; i++) {
 
+
         seqNum <<= 8 * sizeof(uint8_t);
         seqNum |= headerBuffer[i];
 
@@ -51,7 +52,6 @@ bool Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
         logger_.registerString(ss.str());
 
         return false;
-
     };
 }
 
@@ -155,12 +155,15 @@ void Decoder::accumulateChecksum(uint8_t byte) {
     byteBuffer_.push_back(byte);
 
     if (byteBuffer_.size() == CHECKSUM_SIZE) {
-        validatePayload();
-        jumpToNextState();
+        if (validatePayload()) {
+            jumpToNextState();
+        } else {
+            resetMachine();
+        }
     }
 }
 
-void Decoder::validatePayload() {
+bool Decoder::validatePayload() {
 
     assert(byteBuffer_.size() == CHECKSUM_SIZE);
 
@@ -173,7 +176,7 @@ void Decoder::validatePayload() {
     if (crc == receivedCRC) {
 
         currentDatagram_.complete = true;
-        jumpToNextState();
+        return true;
 
     } else {
 
@@ -187,7 +190,7 @@ void Decoder::validatePayload() {
         ss << std::hex << crc;
         logger_.registerString(ss.str());
 
-        resetMachine();
+        return false;
 
     }
 }
