@@ -10,7 +10,8 @@ using namespace std;
 
 Worker::Worker(std::string comPort) :
         loggingEnabled{false},
-        telemetryHandler{new RadioReceiver{"COM7"}},
+        //telemetryHandler{new RadioReceiver{"COM7"}},
+        telemetryHandler{new TelemetrySimulator()},
         telemetryLogger{LogConstants::TELEMETRY_PATH},
         eventLogger{LogConstants::EVENTS_PATH},
         lastDisplayableReading{0,
@@ -33,10 +34,17 @@ Worker::~Worker() {
     std::cout << "Destroying worker thread" << std::endl;
 }
 
+/**
+ * Emits all statuses boolean. This should be used once the UI has loaded to initialise
+ * the different status color markers.
+ */
 void Worker::emitAllStatuses() {
     emit loggingStatusReady(loggingEnabled);
 }
 
+/**
+ * Entry point of the executing thread
+ */
 void Worker::run() {
 
     while (!QThread::currentThread()->isInterruptionRequested()) {
@@ -48,6 +56,9 @@ void Worker::run() {
     eventLogger.close();
 }
 
+/**
+ * Work loop
+ */
 void Worker::mainRoutine() {
     //TODO: adapt sleep time so as to have proper framerate
     QThread::msleep(UIConstants::REFRESH_RATE);
@@ -84,12 +95,19 @@ void Worker::mainRoutine() {
     QCoreApplication::processEvents();
 }
 
+/**
+ * Emits a boolean to the UI indicating the current status of the logger.
+ */
 void Worker::updateLoggingStatus() {
+
     loggingEnabled = !loggingEnabled;
     emit loggingStatusReady(loggingEnabled);
     cout << "Logging is now " << (loggingEnabled ? "enabled" : "disabled") << endl;
 }
 
+/**
+ * Determine the status of the communication based on the quantity of data received during the past second.
+ */
 void Worker::checkLinkStatuses() {
     chrono::system_clock::time_point now = chrono::system_clock::now();
     long long elapsedMillis = msecsBetween(timeOfLastLinkCheck, now);
@@ -116,6 +134,12 @@ void Worker::checkLinkStatuses() {
     }
 }
 
+/**
+ * Emits to the UI the latest telemetry data. If the interval between two calls to this function is lower
+ * than the program constant regulating the UI telemetry refresh rate then the function has no effect.
+ *
+ * @param tr The telemetry struct to be displayed.
+ */
 //TODO: harmonise with graph updates
 void Worker::displayMostRecentTelemetry(TelemetryReading tr) {
 
@@ -129,6 +153,13 @@ void Worker::displayMostRecentTelemetry(TelemetryReading tr) {
 }
 
 
+/**
+ *
+ *
+ * @param data A reference to a vector of telemetry structs.
+ * @param extractionFct A helper function to convert the strucs to plottable objects (QCPGraphData).
+ * @return A QVector of QCPGraphData.
+ */
 QVector<QCPGraphData>
 Worker::extractGraphData(vector<TelemetryReading> &data, QCPGraphData (*extractionFct)(TelemetryReading)) {
     QVector<QCPGraphData> v;

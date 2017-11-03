@@ -27,7 +27,6 @@ TEST(CRCTest, bitChangeIsDetected) {
 
     ASSERT_NE(CRC::Calculate(invalidSequence, sizeof(invalidSequence), CommunicationsConstants::CRC_16_GENERATOR_POLY),
               CRC::Calculate(validSequence, sizeof(validSequence), CommunicationsConstants::CRC_16_GENERATOR_POLY));
-
 }
 
 TEST(CRCTest, byteChangesAreDetectedOnTelemetryPayloads) {

@@ -2,6 +2,12 @@
 #include "Factories.h"
 #include "Utilities/ParsingUtilities.h"
 
+/**
+ * Builds a Telemetry struct given a sequence of bytes
+ *
+ * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
+ * @return A Telemetry struct
+ */
 shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8_t> payloadBuffer) {
     auto it = payloadBuffer.begin();
 
