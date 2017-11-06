@@ -37,7 +37,7 @@ void FileLogger::registerData(const vector<reference_wrapper<ILoggable>> &data) 
     }
 }
 
-void FileLogger::registerString(const std::string &s) {
+void FileLogger::registerString(const std::string s) {
 
     if (bufferIndex >= bufferSize) {
         //cout << "\n Writing log file.." << endl;

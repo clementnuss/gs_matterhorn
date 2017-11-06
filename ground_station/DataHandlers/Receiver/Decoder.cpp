@@ -38,7 +38,7 @@ bool Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
     if (0 <= payloadType && payloadType < 1) {
 
         currentDatagram_.sequenceNumber_ = seqNum;
-        currentDatagram_.payloadType_ = PayloadType::TELEMETRY(static_cast<int>(payloadType));
+        currentDatagram_.payloadType_ = PayloadType::typeFromCode(payloadType);
         return true;
 
     } else {
