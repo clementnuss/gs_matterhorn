@@ -27,12 +27,12 @@ public:
 private:
     void writeFile();
 
-    void writeRoutine(array<string, bufferSize>, size_t);
+    static void writeRoutine(array<string, bufferSize>, size_t, std::string, size_t);
 
-    const std::string path;
+    const std::string path_;
 
-    std::atomic_size_t id;
-    size_t bufferIndex;
+    size_t id_;
+    size_t bufferIndex_;
 
     array<string, bufferSize> buffer;
 };
