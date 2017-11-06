@@ -23,10 +23,8 @@ public:
     DecodingState currentState() const;
 
 
-public:
+private:
     static const DecodingState INITIAL_STATE = DecodingState::SEEKING_FRAMESTART;
-
-//    void asyncRead();
 
     bool processHeader(std::vector<uint8_t>);
 

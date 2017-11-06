@@ -5,7 +5,7 @@
 
 static constexpr double epsilon = 1e-4;
 
-void push3D(std::vector<uint8_t> &v, size_t byteCount, uint32_t a, uint32_t b, uint32_t c) {
+static void push3D(std::vector<uint8_t> &v, size_t byteCount, uint32_t a, uint32_t b, uint32_t c) {
     for (int i = byteCount - 1; i >= 0; --i)
         v.push_back(static_cast<uint8_t>(a >> (8 * i)));
     for (int i = byteCount - 1; i >= 0; --i)
@@ -14,20 +14,20 @@ void push3D(std::vector<uint8_t> &v, size_t byteCount, uint32_t a, uint32_t b, u
         v.push_back(static_cast<uint8_t>(c >> (8 * i)));
 }
 
-vector<uint8_t> createDatagram(uint32_t seqnum,
-                               uint32_t timestamp,
-                               int16_t ax,
-                               int16_t ay,
-                               int16_t az,
-                               int16_t mx,
-                               int16_t my,
-                               int16_t mz,
-                               int16_t gx,
-                               int16_t gy,
-                               int16_t gz,
-                               float temp,
-                               float pres,
-                               float alt) {
+static vector<uint8_t> createDatagram(uint32_t seqnum,
+                                      uint32_t timestamp,
+                                      int16_t ax,
+                                      int16_t ay,
+                                      int16_t az,
+                                      int16_t mx,
+                                      int16_t my,
+                                      int16_t mz,
+                                      int16_t gx,
+                                      int16_t gy,
+                                      int16_t gz,
+                                      float temp,
+                                      float pres,
+                                      float alt) {
     // Create datagram header
     vector<uint8_t> datagram{
             HEADER_PREAMBLE_FLAG,
@@ -88,29 +88,39 @@ vector<uint8_t> createDatagram(uint32_t seqnum,
 }
 
 
-void feedWithValidPreamble(Decoder &decoder) {
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
-
-    for (int k = 0; k < PREAMBLE_SIZE; k++) {
-        decoder.processByte(HEADER_PREAMBLE_FLAG);
+static void feedWithValidPreamble(Decoder &decoder) {
+    if (decoder.currentState() != DecodingState::SEEKING_FRAMESTART) {
+        cerr << " problem " << endl;
     }
+
+    decoder.processByte(HEADER_PREAMBLE_FLAG);
+    decoder.processByte(HEADER_PREAMBLE_FLAG);
+    decoder.processByte(HEADER_PREAMBLE_FLAG);
+    decoder.processByte(HEADER_PREAMBLE_FLAG);
+
+    if (decoder.currentState() != DecodingState::PARSING_HEADER) {
+        cerr << " problem " << endl;
+    }
+}
+
+static void feedWithValidSequenceNumber(Decoder &decoder) {
+    ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_HEADER);
+
+    decoder.processByte(0x01);
+    decoder.processByte(0x01);
+    decoder.processByte(0x01);
+    decoder.processByte(0x01);
 
     ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_HEADER);
 }
 
-void feedWithValidSequenceNumber(Decoder &decoder) {
-    decoder.processByte(0x01);
-    decoder.processByte(0x01);
-    decoder.processByte(0x01);
-    decoder.processByte(0x01);
-}
-
-void feedWithValidPayloadType(Decoder &decoder) {
+static void feedWithValidPayloadType(Decoder &decoder) {
     // Select randomly one of the datagram payload types
-    decoder.processByte(rand() % static_cast<int>(DatagramPayloadType::Count));
+    decoder.processByte(
+            static_cast<uint8_t>(rand() % static_cast<int>(DatagramPayloadType::Count)));
 }
 
-void feedWithValidHeader(Decoder &decoder) {
+static void feedWithValidHeader(Decoder &decoder) {
 
     feedWithValidPreamble(decoder);
     feedWithValidSequenceNumber(decoder);
@@ -123,9 +133,9 @@ void feedWithValidHeader(Decoder &decoder) {
     ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_PAYLOAD);
 }
 
-void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint32_t timestamp,
-                        XYZReading accelReading, XYZReading magReading, XYZReading gyroReading,
-                        float temp, float pres, float alt
+static void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint32_t timestamp,
+                               XYZReading accelReading, XYZReading magReading, XYZReading gyroReading,
+                               float temp, float pres, float alt
 ) {
     size_t k = 0;
 
@@ -303,7 +313,7 @@ TEST(DecoderTests, resistsToRandomHeader) {
 TEST(DecoderTests, resistsToRandomPayloads) {
     srand(0);
     vector<uint8_t> byteSeq{};
-    const size_t datagramLength = 1000;
+    const size_t datagramLength = 100;
     const size_t datagramCounts = 10000;
     Decoder decoder{};
 
@@ -337,16 +347,17 @@ TEST(DecoderTests, missingControlFlagResetsMachine) {
         if (b == CONTROL_FLAG) {
             continue;
         }
+        EXPECT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
         feedWithValidPreamble(decoder);
         feedWithValidSequenceNumber(decoder);
         feedWithValidPayloadType(decoder);
 
-        ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_CONTROL_FLAG);
+        EXPECT_EQ(decoder.currentState(), DecodingState::SEEKING_CONTROL_FLAG);
 
         decoder.processByte(b);
 
-        ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+        EXPECT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
     }
 
 }
