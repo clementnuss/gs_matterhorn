@@ -8,6 +8,7 @@
 #include <memory>
 #include "DataStructures/datastructs.h"
 #include "Factories.h"
+#include "PayloadType.h"
 
 typedef uint16_t checksum_t;
 
@@ -21,17 +22,10 @@ enum class DecodingState {
     DATAGRAM_READY
 };
 
-enum class DatagramPayloadType {
-    TELEMETRY, Count
-};
-
-static const std::map<DatagramPayloadType, size_t> PAYLOAD_TYPES_LENGTH = {
-        {DatagramPayloadType::TELEMETRY, 32}// TODO: couple DatagramPayloadType and size and factory function
-};
-
 struct Datagram {
+    Datagram() : sequenceNumber_{0}, payloadType_{&PayloadType::NONE}, deserializedPayload_{}, complete{false} {}
     uint32_t sequenceNumber_;
-    DatagramPayloadType payloadType_;
+    const PayloadType *payloadType_;
     std::shared_ptr<IDeserializable> deserializedPayload_;
     bool complete;
 };
@@ -48,17 +42,6 @@ static constexpr size_t PREAMBLE_SIZE = 4;
 static constexpr size_t HEADER_SIZE = SEQUENCE_NUMBER_SIZE + PAYLOAD_TYPE_SIZE;
 static constexpr size_t CONTROL_FLAG_SIZE = 1;
 static constexpr size_t CHECKSUM_SIZE = 2;
-
-
-/**
- * This map specifies each payload type as well as its internal field lengths in bytes
- *
- * Any custom payload specification should be added here.
- */
-static const std::map<DatagramPayloadType, std::shared_ptr<IDeserializable>(*)(
-        std::vector<uint8_t>, uint32_t)> TELEMETRY_PAYLOAD_FACTORIES{
-        {DatagramPayloadType::TELEMETRY, &Factories::telemetryReadingFactory}
-};
 
 
 #endif //GS_MATTERHORN_PROTOCOL_H

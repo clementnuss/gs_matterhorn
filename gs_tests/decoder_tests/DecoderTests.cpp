@@ -41,8 +41,8 @@ static vector<uint8_t> createDatagram(uint32_t seqnum,
         checksumAccumulator.push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
     }
 
-    datagram.push_back(static_cast<uint8_t>(DatagramPayloadType::TELEMETRY));
-    checksumAccumulator.push_back(static_cast<uint8_t>(DatagramPayloadType::TELEMETRY));
+    datagram.push_back(static_cast<uint8_t>(PayloadType::TELEMETRY));
+    checksumAccumulator.push_back(static_cast<uint8_t>(PayloadType::TELEMETRY));
     datagram.push_back(CONTROL_FLAG);
 
     for (int i = 3; i >= 0; --i) {
@@ -117,7 +117,7 @@ static void feedWithValidSequenceNumber(Decoder &decoder) {
 static void feedWithValidPayloadType(Decoder &decoder) {
     // Select randomly one of the datagram payload types
     decoder.processByte(
-            static_cast<uint8_t>(rand() % static_cast<int>(DatagramPayloadType::Count)));
+            static_cast<uint8_t>(rand() % 1));
 }
 
 static void feedWithValidHeader(Decoder &decoder) {
@@ -159,7 +159,7 @@ static void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint
     decoder.processByte(datagram[k++]);
 
     // Process payload
-    for (size_t i = 0; i < PAYLOAD_TYPES_LENGTH.at(DatagramPayloadType::TELEMETRY); i++) {
+    for (size_t i = 0; i < PayloadType::TELEMETRY.length(); i++) {
         ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_PAYLOAD);
         ASSERT_FALSE(decoder.datagramReady());
         decoder.processByte(datagram[k++]);
