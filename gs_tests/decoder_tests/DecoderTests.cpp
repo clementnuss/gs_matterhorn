@@ -311,27 +311,28 @@ TEST(DecoderTests, resistsToRandomHeader) {
 }
 
 TEST(DecoderTests, resistsToRandomPayloads) {
-    srand(0);
-    vector<uint8_t> byteSeq{};
-    const size_t datagramLength = 100;
-    const size_t datagramCounts = 10000;
-    Decoder decoder{};
+    for (int j = 0; j < 10000; j++) {
+        vector<uint8_t> byteSeq{};
+        const size_t datagramLength = 100;
+        const size_t datagramCounts = 10000;
+        Decoder decoder{};
 
-    for (int i = 0; i < datagramCounts; i++) {
+        for (int i = 0; i < datagramCounts; i++) {
 
-        feedWithValidHeader(decoder);
+            feedWithValidHeader(decoder);
 
-        for (int j = 0; j < datagramLength; j++) {
+            for (int j = 0; j < datagramLength; j++) {
 
-            uint8_t randomByte = static_cast<uint8_t>(rand() % 256);
+                uint8_t randomByte = static_cast<uint8_t>(rand() % 256);
 
-            // Avoids frame starts
-            if (randomByte == HEADER_PREAMBLE_FLAG) {
-                randomByte -= 1;
-            }
+                // Avoids frame starts
+                if (randomByte == HEADER_PREAMBLE_FLAG) {
+                    randomByte -= 1;
+                }
 
-            if (decoder.processByte(randomByte)) {
-                decoder.retrieveDatagram();
+                if (decoder.processByte(randomByte)) {
+                    decoder.retrieveDatagram();
+                }
             }
         }
     }
@@ -364,6 +365,30 @@ TEST(DecoderTests, missingControlFlagResetsMachine) {
 }
 
 TEST(DecoderTests, wrongChecksumDropsPacket) {
-    //TODO: Checks that machine is correctly reset after invalid checksum
-    ASSERT_TRUE(false);
+    Decoder decoder{};
+
+    vector<uint8_t> datagram = createDatagram(1410, 999, -1, 2, -3, 4, -5, 6, -7, 8, -9, 12.34, 56.78, 9.0);
+    vector<uint8_t> validDatagram = datagram;
+
+    datagram[datagram.size() - 1] += 1;
+
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+
+    for (uint8_t b : datagram) {
+        ASSERT_FALSE(decoder.processByte(b));
+    }
+
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+
+    for (size_t i = 0; i < datagram.size(); i++) {
+        if (i == datagram.size() - 1) {
+            ASSERT_TRUE(decoder.processByte(validDatagram[i]));
+        } else {
+            ASSERT_FALSE(decoder.processByte(validDatagram[i]));
+        }
+    }
+
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+    ASSERT_TRUE(decoder.datagramReady());
+
 }
