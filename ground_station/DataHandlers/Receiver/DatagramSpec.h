@@ -23,7 +23,7 @@ enum class DecodingState {
 };
 
 struct Datagram {
-    Datagram() : sequenceNumber_{0}, payloadType_{&PayloadType::NONE}, deserializedPayload_{}, complete{false} {}
+    Datagram() : sequenceNumber_{0}, payloadType_{nullptr}, deserializedPayload_{}, complete{false} {}
     uint32_t sequenceNumber_;
     const PayloadType *payloadType_;
     std::shared_ptr<IDeserializable> deserializedPayload_;

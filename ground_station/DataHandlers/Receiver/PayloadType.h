@@ -7,11 +7,12 @@
 #include <memory>
 #include <vector>
 #include <map>
+#include <cassert>
+#include <c++/iostream>
 
 class PayloadType {
 public:
     static const PayloadType TELEMETRY;
-    static const PayloadType NONE;
 
 private:
     int code_;
@@ -19,10 +20,6 @@ private:
 
     std::shared_ptr<IDeserializable> (*factoryFunc_)(std::vector<uint8_t>);
 
-    //TODO: make this static
-    const std::map<int, PayloadType> typeForCode_{
-            {0, TELEMETRY}
-    };
 
 private:
     PayloadType(int code, size_t length, std::shared_ptr<IDeserializable>(*factoryFunc)(std::vector<uint8_t>)) :
@@ -47,8 +44,17 @@ public:
         return factoryFunc_(bytes);
     }
 
-    const PayloadType *operator()(int i) const {
-        return &typeForCode_.at(i);
+    static const PayloadType *typeFromCode(int code) {
+        switch (code) {
+            case 0:
+                return &TELEMETRY;
+            default:
+                std::cerr << "A payload type has not been associated with this code: ";
+                std::cerr << code << std::endl;
+                assert(false);
+                break;
+
+        }
     }
 };
 
