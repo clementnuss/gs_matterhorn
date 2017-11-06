@@ -205,6 +205,13 @@ public:
     static CRCType
     Calculate(const void *data, crcpp_size size, const Table<CRCType, CRCWidth> &lookupTable, CRCType crc);
 
+    template<typename CRCType, crcpp_uint16 CRCWidth>
+    static CRCType CalculateRemainderFromTable(uint8_t byte, const uint16_t *lookupTable,
+                                               const Parameters<CRCType, CRCWidth> &parameters, CRCType remainder);
+
+    template<typename CRCType, crcpp_uint16 CRCWidth>
+    static CRCType Finalize(CRCType remainder, CRCType finalXOR, bool reflectOutput);
+
     // Common CRCs up to 64 bits.
     // Note: Check values are the computed CRCs when given an ASCII input of "123456789" (without null terminator)
 #ifdef CRCPP_INCLUDE_ESOTERIC_CRC_DEFINITIONS
@@ -311,9 +318,6 @@ private:
 
     template<typename IntegerType>
     static IntegerType Reflect(IntegerType value, crcpp_uint16 numBits);
-
-    template<typename CRCType, crcpp_uint16 CRCWidth>
-    static CRCType Finalize(CRCType remainder, CRCType finalXOR, bool reflectOutput);
 
     template<typename CRCType, crcpp_uint16 CRCWidth>
     static CRCType UndoFinalize(CRCType remainder, CRCType finalXOR, bool reflectOutput);
@@ -605,6 +609,26 @@ inline CRCType CRC::UndoFinalize(CRCType crc, CRCType finalXOR, bool reflectOutp
 
     return crc;
 }
+
+/**
+    @brief Computes a CRC remainder using lookup table.
+    @param[in] remainder Running CRC remainder. Can be an initial value or the result of a previous CRC remainder calculation.
+    @tparam CRCType Integer type for storing the CRC result
+    @tparam CRCWidth Number of bits in the CRC
+    @return CRC remainder
+*/
+template<typename CRCType, crcpp_uint16 CRCWidth>
+CRCType CRC::CalculateRemainderFromTable(const uint8_t byte, const uint16_t* lookupTable,
+                                         const Parameters<CRCType, CRCWidth> &parameters,
+                                         CRCType remainder) {
+    /*
+    static crcpp_constexpr CRCType SHIFT(CRCWidth - CHAR_BIT);
+*/
+    remainder = (remainder << CHAR_BIT) ^ lookupTable[static_cast<unsigned char>((remainder >> 8) ^ byte)];
+
+    return remainder;
+}
+
 
 /**
     @brief Computes a CRC remainder.
