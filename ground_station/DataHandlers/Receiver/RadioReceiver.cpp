@@ -72,7 +72,7 @@ void RadioReceiver::handleReceive(const boost::system::error_code &error,
             }
         }
 
-        cout << std::endl << std::endl;
+        //cout << std::endl << std::endl;
 
         asyncRead();
     } else {

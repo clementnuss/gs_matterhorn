@@ -5,7 +5,7 @@
 #include <string>
 #include "CRC/CRC.h"
 
-#define DEBUG true
+//#define DEBUG true
 
 namespace PrintConstants {
     static constexpr int PRECISION = 4;

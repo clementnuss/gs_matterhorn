@@ -32,7 +32,6 @@ public slots:
     void updateGraphData(QVector<QCPGraphData> &, GraphFeature);
     void updateTelemetry(TelemetryReading);
     void updateLoggingStatus(bool);
-
     void updateLinkStatus(HandlerStatus);
     void updateGroundStatus(float, float);
 

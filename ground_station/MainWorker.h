@@ -32,7 +32,6 @@ signals:
 
     void telemetryReady(TelemetryReading);
     void graphDataReady(QVector<QCPGraphData> &, GraphFeature);
-
     void newEventsReady(vector<RocketEvent> &);
 
     void linkStatusReady(HandlerStatus);

@@ -63,6 +63,9 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 
     QCPGraph *g = ui->graph_widget->graph(static_cast<int>(feature));
 
+    // Clear any eventual datapoint ahead of current time point
+    g->data()->removeAfter(d.last().key);
+
     g->data()->add(d);
 
     int sizeDiff = g->data()->size() - DataConstants::MAX_DATA_VECTOR_SIZE;
@@ -80,6 +83,7 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 
     ui->graph_widget->replot();
 }
+
 
 void GSWidget::updateTelemetry(TelemetryReading t) {
     ui->telemetry_altitude_value->setText(QString::number(t.altitude_, 'f', UIConstants::PRECISION));

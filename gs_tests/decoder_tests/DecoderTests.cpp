@@ -194,7 +194,7 @@ static void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint
     EXPECT_NEAR(gyroReading.y_, (*data).gyroscope_.y_, epsilon);
     EXPECT_NEAR(gyroReading.z_, (*data).gyroscope_.z_, epsilon);
     EXPECT_NEAR(temp, (*data).temperature_, epsilon);
-    EXPECT_NEAR(pres, (*data).pressure_, epsilon);
+    EXPECT_NEAR(pres / 100.0f, (*data).pressure_, epsilon);
     EXPECT_NEAR(alt, (*data).altitude_, epsilon);
 }
 
@@ -311,31 +311,30 @@ TEST(DecoderTests, resistsToRandomHeader) {
 }
 
 TEST(DecoderTests, resistsToRandomPayloads) {
-    for (int j = 0; j < 10000; j++) {
-        vector<uint8_t> byteSeq{};
-        const size_t datagramLength = 100;
-        const size_t datagramCounts = 10000;
-        Decoder decoder{};
+    vector<uint8_t> byteSeq{};
+    const size_t datagramLength = 1000;
+    const size_t datagramCounts = 10000;
+    Decoder decoder{};
 
-        for (int i = 0; i < datagramCounts; i++) {
+    for (int i = 0; i < datagramCounts; i++) {
 
-            feedWithValidHeader(decoder);
+        feedWithValidHeader(decoder);
 
-            for (int j = 0; j < datagramLength; j++) {
+        for (int j = 0; j < datagramLength; j++) {
 
-                uint8_t randomByte = static_cast<uint8_t>(rand() % 256);
+            uint8_t randomByte = static_cast<uint8_t>(rand() % 256);
 
-                // Avoids frame starts
-                if (randomByte == HEADER_PREAMBLE_FLAG) {
-                    randomByte -= 1;
-                }
+            // Avoids frame starts
+            if (randomByte == HEADER_PREAMBLE_FLAG) {
+                randomByte -= 1;
+            }
 
-                if (decoder.processByte(randomByte)) {
-                    decoder.retrieveDatagram();
-                }
+            if (decoder.processByte(randomByte)) {
+                decoder.retrieveDatagram();
             }
         }
     }
+
 
     ASSERT_TRUE(true);
 }

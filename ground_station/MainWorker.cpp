@@ -10,7 +10,7 @@ using namespace std;
 
 Worker::Worker(std::string comPort) :
         loggingEnabled{false},
-        //telemetryHandler{new RadioReceiver{"COM4"}},
+        //telemetryHandler{new RadioReceiver{"COM6"}},
         telemetryHandler{new TelemetrySimulator()},
         telemetryLogger{LogConstants::WORKER_TELEMETRY_LOG_PATH},
         eventLogger{LogConstants::WORKER_EVENTS_LOG_PATH},
@@ -163,7 +163,7 @@ void Worker::displayMostRecentTelemetry(TelemetryReading tr) {
 QVector<QCPGraphData>
 Worker::extractGraphData(vector<TelemetryReading> &data, QCPGraphData (*extractionFct)(TelemetryReading)) {
     QVector<QCPGraphData> v;
-    long long lastTimestampSeen = 0;
+    long long int lastTimestampSeen = 0;
 
     for (TelemetryReading reading : data) {
         if (abs(lastTimestampSeen - reading.timestamp_) > UIConstants::GRAPH_DATA_INTERVAL_MSECS) {

@@ -15,7 +15,7 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
 
     auto it = payloadBuffer.begin();
 
-    auto measurement_time = parse32<uint32_t>(it) / 1000;
+    auto measurement_time = parse32<uint32_t>(it);
 
     float ax = parse16<int16_t>(it) * SensorConstants::MPU_ACCEL_MULTIPLIER;
     float ay = parse16<int16_t>(it) * SensorConstants::MPU_ACCEL_MULTIPLIER;
@@ -33,12 +33,12 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
     float_cast pressure = {.uint32 = parse32<uint32_t>(it)};
     float_cast altitude = {.uint32 = parse32<uint32_t>(it)};
 
-    TelemetryReading r{measurement_time,
+    TelemetryReading r{measurement_time / 1000,
                        altitude.fl,
                        {ax, ay, az},
                        {mx, my, mz},
                        {gx, gy, gz},
-                       pressure.fl,
+                       pressure.fl / 100.0f,
                        temperature.fl};
     return std::make_shared<TelemetryReading>(r);
 }
