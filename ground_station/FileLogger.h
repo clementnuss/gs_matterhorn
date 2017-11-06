@@ -19,7 +19,7 @@ public:
 
     void registerData(const vector<reference_wrapper<ILoggable>> &);
 
-    void registerString(const std::string);
+    void registerString(const std::string &);
     void close();
 
     static const size_t bufferSize = 1000;
