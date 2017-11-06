@@ -23,7 +23,7 @@ public:
     DecodingState currentState() const;
 
 
-private:
+public:
     static const DecodingState INITIAL_STATE = DecodingState::SEEKING_FRAMESTART;
 
 //    void asyncRead();

@@ -8,14 +8,14 @@
 using namespace std;
 
 FileLogger::FileLogger(const std::string &path) :
-        path{path}, id{0}, bufferIndex{0}, busyFlag{false} {}
+        path{path}, id{0}, bufferIndex{0} {}
 
 FileLogger::~FileLogger() {
     close();
 }
 
 void FileLogger::close() {
-    cout << "Flushing file logger @ " << path << endl << flush;
+    cout << "\n Flushing file logger @ " << path << endl;
     if (bufferIndex != 0) {
         writeFile();
         bufferIndex = 0;
@@ -27,7 +27,7 @@ void FileLogger::registerData(const vector<reference_wrapper<ILoggable>> &data) 
     for (const auto loggable : data) {
 
         if (bufferIndex >= bufferSize) {
-            cout << "Writing log file.." << endl;
+            cout << "\n Writing log file.." << endl;
             writeFile();
             bufferIndex = 0;
         }
@@ -40,7 +40,7 @@ void FileLogger::registerData(const vector<reference_wrapper<ILoggable>> &data) 
 void FileLogger::registerString(const std::string &s) {
 
     if (bufferIndex >= bufferSize) {
-        cout << "Writing log file.." << endl;
+        cout << "\n Writing log file.." << endl;
         writeFile();
         bufferIndex = 0;
     }
@@ -51,12 +51,6 @@ void FileLogger::registerString(const std::string &s) {
 }
 
 void FileLogger::writeFile() {
-
-    while (busyFlag) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
-
-    busyFlag = true;
 
     array<string, bufferSize> a = buffer;
     thread t(&FileLogger::writeRoutine, this, a, bufferIndex);
@@ -89,5 +83,4 @@ void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
     }
 
     fileOutput.close();
-    busyFlag = false;
 }

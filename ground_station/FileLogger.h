@@ -31,10 +31,8 @@ private:
 
     const std::string path;
 
-    size_t id;
+    std::atomic_size_t id;
     size_t bufferIndex;
-
-    std::atomic_bool busyFlag;
 
     array<string, bufferSize> buffer;
 };

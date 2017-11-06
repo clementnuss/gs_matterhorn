@@ -99,10 +99,10 @@ void feedWithValidPreamble(Decoder &decoder) {
 }
 
 void feedWithValidSequenceNumber(Decoder &decoder) {
-    decoder.processByte(0x00);
-    decoder.processByte(0x00);
-    decoder.processByte(0x00);
-    decoder.processByte(0x00);
+    decoder.processByte(0x01);
+    decoder.processByte(0x01);
+    decoder.processByte(0x01);
+    decoder.processByte(0x01);
 }
 
 void feedWithValidPayloadType(Decoder &decoder) {
