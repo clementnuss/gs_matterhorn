@@ -171,7 +171,7 @@ bool Decoder::validatePayload() {
                                   CommunicationsConstants::CRC_16_GENERATOR_POLY);
 
     auto it = byteBuffer_.begin();
-    checksum_t receivedCRC = parse16<checksum_t>(it);
+    auto receivedCRC = parse16<checksum_t>(it);
 
     if (crc == receivedCRC) {
 

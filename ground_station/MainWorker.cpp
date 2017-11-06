@@ -163,7 +163,7 @@ void Worker::displayMostRecentTelemetry(TelemetryReading tr) {
 QVector<QCPGraphData>
 Worker::extractGraphData(vector<TelemetryReading> &data, QCPGraphData (*extractionFct)(TelemetryReading)) {
     QVector<QCPGraphData> v;
-    long lastTimestampSeen = 0;
+    long long lastTimestampSeen = 0;
 
     for (TelemetryReading reading : data) {
         if (abs(lastTimestampSeen - reading.timestamp_) > UIConstants::GRAPH_DATA_INTERVAL_MSECS) {

@@ -13,7 +13,7 @@ using namespace std;
 class FileLogger
 {
 public:
-    FileLogger(const std::string &);
+    explicit FileLogger(const std::string &);
 
     ~FileLogger();
 

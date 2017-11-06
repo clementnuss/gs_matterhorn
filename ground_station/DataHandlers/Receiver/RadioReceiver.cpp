@@ -92,11 +92,6 @@ void RadioReceiver::unpackPayload() {
             telemQueue_.push(*data);
             break;
         }
-
-        case DatagramPayloadType::EVENT:
-            break;
-        case DatagramPayloadType::ROCKET_PAYLOAD:
-            break;
         case DatagramPayloadType::Count:
             std::cout << "Wrong datagram payload type!";
             break;

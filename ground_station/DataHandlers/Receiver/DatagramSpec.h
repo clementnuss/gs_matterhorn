@@ -22,13 +22,11 @@ enum class DecodingState {
 };
 
 enum class DatagramPayloadType {
-    TELEMETRY, EVENT, ROCKET_PAYLOAD, Count
+    TELEMETRY, Count
 };
 
 static const std::map<DatagramPayloadType, size_t> PAYLOAD_TYPES_LENGTH = {
-        {DatagramPayloadType::TELEMETRY,      34},
-        {DatagramPayloadType::EVENT,          5},
-        {DatagramPayloadType::ROCKET_PAYLOAD, 5}// TODO: couple DatagramPayloadType and size
+        {DatagramPayloadType::TELEMETRY, 34}// TODO: couple DatagramPayloadType and size and factory function
 };
 
 struct Datagram {
@@ -59,9 +57,7 @@ static constexpr size_t CHECKSUM_SIZE = 2;
  */
 static const std::map<DatagramPayloadType, std::shared_ptr<IDeserializable>(*)(
         std::vector<uint8_t>)> TELEMETRY_PAYLOAD_FACTORIES{
-        {DatagramPayloadType::TELEMETRY,      &Factories::telemetryReadingFactory},
-        {DatagramPayloadType::EVENT,          &Factories::telemetryReadingFactory},
-        {DatagramPayloadType::ROCKET_PAYLOAD, &Factories::telemetryReadingFactory}
+        {DatagramPayloadType::TELEMETRY, &Factories::telemetryReadingFactory}
 };
 
 

@@ -15,7 +15,7 @@ public:
 
     explicit RadioReceiver(std::string);
 
-    ~RadioReceiver();
+    ~RadioReceiver() override;
 
     void startup() override;
 

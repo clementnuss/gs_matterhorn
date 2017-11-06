@@ -1,6 +1,8 @@
 #include <memory>
+#include <cassert>
 #include "Factories.h"
 #include "Utilities/ParsingUtilities.h"
+#include "DatagramSpec.h"
 
 /**
  * Builds a Telemetry struct given a sequence of bytes
@@ -9,6 +11,8 @@
  * @return A Telemetry struct
  */
 shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8_t> payloadBuffer) {
+    assert(payloadBuffer.size() == PAYLOAD_TYPES_LENGTH.at(DatagramPayloadType::TELEMETRY));
+
     auto it = payloadBuffer.begin();
 
     auto measurement_time = parse32<uint32_t>(it) / 1000;

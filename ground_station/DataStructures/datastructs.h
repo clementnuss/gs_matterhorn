@@ -19,7 +19,7 @@ struct IDeserializable {
 struct TimedData {
     TimedData() = default;
 
-    TimedData(uint32_t timestamp) : timestamp_{timestamp} {}
+    explicit TimedData(uint32_t timestamp) : timestamp_{timestamp} {}
 
     uint32_t timestamp_;
 };
@@ -99,7 +99,7 @@ struct TelemetryReading : TimedData, ILoggable, IDeserializable {
 
     TelemetryReading(const TelemetryReading &that) = default;
 
-    ~TelemetryReading() = default;
+    ~TelemetryReading() override = default;
 
     XYZReading acceleration_;
     XYZReading magnetometer_;

@@ -13,7 +13,8 @@ using namespace SimulatorConstants;
 //TODO: make telemetry handler factory to provide either simulator or real one
 
 TelemetrySimulator::TelemetrySimulator() : time{QTime::currentTime()},
-                                           timeOfLastPolledData{chrono::system_clock::now()}, variableRate{true} {
+                                           timeOfLastPolledData{chrono::system_clock::now()}, variableRate{true},
+                                           simulatorStatus{HandlerStatus::NOMINAL} {
 }
 
 vector<TelemetryReading> TelemetrySimulator::pollData() {

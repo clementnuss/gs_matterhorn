@@ -347,6 +347,7 @@ TEST(DecoderTests, missingControlFlagResetsMachine) {
         if (b == CONTROL_FLAG) {
             continue;
         }
+
         EXPECT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
         feedWithValidPreamble(decoder);

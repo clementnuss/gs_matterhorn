@@ -25,8 +25,8 @@ using distributionType = std::conditional_t<std::is_integral<T>::value,
 template<typename T>
 class Rand {
 public:
-    Rand(T lo = std::numeric_limits<T>::min(),
-         T hi = std::numeric_limits<T>::max()) :
+    explicit Rand(T lo = std::numeric_limits<T>::min(),
+                  T hi = std::numeric_limits<T>::max()) :
             r(bind(distributionType<T>(lo, hi), std::mt19937{})) {}
 
     T operator()() const { return r(); }

@@ -15,7 +15,7 @@ class Worker : public QObject
     Q_OBJECT
 
 public:
-    Worker(std::string);
+    explicit Worker(std::string);
     ~Worker() override;
 
     void mainRoutine();
