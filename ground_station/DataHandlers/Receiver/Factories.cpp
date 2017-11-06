@@ -11,7 +11,7 @@
  * @return A Telemetry struct
  */
 shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8_t> payloadBuffer) {
-    assert(payloadBuffer.size() == PAYLOAD_TYPES_LENGTH.at(DatagramPayloadType::TELEMETRY));
+    assert(payloadBuffer.size() == PayloadType::TELEMETRY.length());
 
     auto it = payloadBuffer.begin();
 
