@@ -12,6 +12,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_subdirectory(lib/qcustomplot)
 add_subdirectory(lib/boost-cmake)
+add_subdirectory(lib/serial)
 
 add_subdirectory(ground_station)
 include_directories(ground_station/)

@@ -4,6 +4,7 @@
 
 #include "TelemetryHandler.h"
 #include <QTime>
+#include <chrono>
 
 using namespace std;
 
