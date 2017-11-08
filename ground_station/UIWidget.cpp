@@ -5,10 +5,9 @@
 #include <cassert>
 
 GSWidget::GSWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::GSWidget),
-    clockTimer(this)
-{
+        QWidget(parent),
+        ui(new Ui::GSWidget),
+        clockTimer(this) {
     ui->setupUi(this);
 
     graphSetup();
@@ -18,8 +17,7 @@ GSWidget::GSWidget(QWidget *parent) :
 
 }
 
-GSWidget::~GSWidget()
-{
+GSWidget::~GSWidget() {
     delete ui;
 }
 
@@ -70,14 +68,10 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 
     int sizeDiff = g->data()->size() - DataConstants::MAX_DATA_VECTOR_SIZE;
     if (sizeDiff > 0) {
-        g->data()->removeBefore(
-                (g->data()->at(static_cast<int>(
-                                       DataConstants::DELETION_FACTOR *
-                                       (sizeDiff + DataConstants::MAX_DATA_VECTOR_SIZE)))->key)
-        );
+        g->data()->removeBefore(d.last().key - UIConstants::GRAPH_XRANGE_SECS);
     }
 
-    g->keyAxis()->setRange(d.last().key, UIConstants::GRAPH_XRANGE_MSECS, Qt::AlignRight);
+    g->keyAxis()->setRange(d.last().key, UIConstants::GRAPH_XRANGE_SECS, Qt::AlignRight);
     g->valueAxis()->rescale(true);
     g->valueAxis()->scaleRange(UIConstants::GRAPH_RANGE_MARGIN_RATIO);
 
@@ -142,11 +136,11 @@ void GSWidget::graphSetup() {
 
     QFont titleFont = QFont("sans", 10, QFont::Bold);
 
-    QCPTextElement *topTitle = new QCPTextElement(customPlot, "Altitude", titleFont);
-    QCPTextElement *bottomTitle = new QCPTextElement(customPlot, "Acceleration", titleFont);
+    QCPTextElement *topTitle = new QCPTextElement(customPlot, "Altitude (m)", titleFont);
+    QCPTextElement *bottomTitle = new QCPTextElement(customPlot, "Acceleration (g)", titleFont);
 
-    QCPAxisRect *topAxisRect = new QCPAxisRect(customPlot);
-    QCPAxisRect *bottomAxisRect = new QCPAxisRect(customPlot);
+    auto topAxisRect = new QCPAxisRect(customPlot);
+    auto bottomAxisRect = new QCPAxisRect(customPlot);
 
     topAxisRect->setupFullAxesBox(true);
     bottomAxisRect->setupFullAxesBox(true);
@@ -160,6 +154,9 @@ void GSWidget::graphSetup() {
     font.setPointSize(12);
     topAxisRect->axis(QCPAxis::atLeft, 0)->setTickLabelFont(font);
     topAxisRect->axis(QCPAxis::atBottom, 0)->setTickLabelFont(font);
+//    This may be useful when implementing event, so as to display them with 2 figits precicion on the graph.
+//    topAxisRect->axis(QCPAxis::atBottom, 0)->setNumberFormat("f");
+//    topAxisRect->axis(QCPAxis::atBottom, 0)->setNumberPrecision(UIConstants::PRECISION);
     bottomAxisRect->axis(QCPAxis::atLeft, 0)->setTickLabelFont(font);
     bottomAxisRect->axis(QCPAxis::atBottom, 0)->setTickLabelFont(font);
 

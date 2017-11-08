@@ -37,8 +37,8 @@ namespace UIConstants {
     // Time in milliseconds between each data point in the real-time graphs
     static constexpr int GRAPH_DATA_INTERVAL_MSECS = 100;
 
-    static constexpr float GRAPH_RANGE_MARGIN_RATIO = 1.05;
-    static constexpr int GRAPH_XRANGE_MSECS = 20000;
+    static constexpr float GRAPH_RANGE_MARGIN_RATIO = 1.15;
+    static constexpr int GRAPH_XRANGE_SECS = 20;
 }
 
 namespace SimulatorConstants {
@@ -47,14 +47,22 @@ namespace SimulatorConstants {
 }
 
 namespace SensorConstants {
-    static constexpr float MPU_ACCEL_MULTIPLIER = 1.0f / 208.77f;
+    static constexpr float MPU_ACCEL_RANGE = 8.0f;
+    static constexpr uint32_t ACCEL_SENSITIVITY = 32768;
+    static constexpr float MPU_ACCEL_MULTIPLIER = MPU_ACCEL_RANGE / ACCEL_SENSITIVITY;
+
+    // Values can be found here: http://www.meteosuisse.admin.ch/home/meteo/valeurs-de-mesures/valeurs-de-mesures-aux-stations.html?param=airpressure-qfe
+    static float currentLocationReferenceHPa = 968.1f;
+    static float currentLocationHeight = 456.0f;
+    static float currentLocationTemperature = 8.2f;
 }
 
 namespace DataConstants {
-    static constexpr double DELETION_FACTOR = 0.25;
+    static constexpr double DELETION_FACTOR = 0.05;
+    static constexpr uint32_t READINGS_PER_SEC = 1000 / UIConstants::GRAPH_DATA_INTERVAL_MSECS;
     static constexpr int MAX_DATA_VECTOR_SIZE =
             static_cast<const int>((1.0 + DELETION_FACTOR) *
-                                   (UIConstants::GRAPH_XRANGE_MSECS / UIConstants::REFRESH_RATE));
+                                   (UIConstants::GRAPH_XRANGE_SECS * READINGS_PER_SEC));
 }
 
 namespace CommunicationsConstants {
