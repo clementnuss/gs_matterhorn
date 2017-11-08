@@ -85,11 +85,11 @@ void RadioReceiver::readSerialPort() {
     size_t bytesAvailable = 0;
     bool terminate = false;
     while (!terminate) {
-        if ((bytesAvailable = serialPort_.available()) == 0){
+        if ((bytesAvailable = serialPort_.available()) == 0) {
             std::this_thread::sleep_for(chrono::milliseconds(7));
             continue;
         }
-        if (bytesAvailable > BUFFER_SIZE){
+        if (bytesAvailable > BUFFER_SIZE) {
             bytesAvailable = BUFFER_SIZE; // We do not want to overflow the buffer.
             //TODO: Display warning message
         }
@@ -114,13 +114,10 @@ void RadioReceiver::handleReceive(std::size_t bytesTransferred) {
         }
     }
 
-    //cout << std::endl << std::endl;
-
 }
 
 void RadioReceiver::unpackPayload() {
     Datagram d = byteDecoder_.retrieveDatagram();
-    cout << d.sequenceNumber_ << endl;
     switch (d.payloadType_) {
         case DatagramPayloadType::TELEMETRY: {
             std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(
@@ -129,9 +126,9 @@ void RadioReceiver::unpackPayload() {
             telemQueue_.push(*data);
             break;
         }
-        case DatagramPayloadType::Count:
+        default:
             std::cout << "Wrong datagram payload type!";
-            break;
+            break;;
     }
 }
 

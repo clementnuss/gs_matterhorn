@@ -10,7 +10,7 @@ using namespace std;
 
 Worker::Worker(std::string comPort) :
         loggingEnabled{false},
-        telemetryHandler{new RadioReceiver{""}},
+        telemetryHandler{new RadioReceiver{comPort}},
 //        telemetryHandler{new TelemetrySimulator()},
         telemetryLogger{LogConstants::WORKER_TELEMETRY_LOG_PATH},
         eventLogger{LogConstants::WORKER_EVENTS_LOG_PATH},
