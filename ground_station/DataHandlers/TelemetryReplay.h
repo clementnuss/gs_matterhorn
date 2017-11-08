@@ -27,6 +27,8 @@ public:
 
     bool endOfPlayback() override;
 
+    bool isReplayHandler() override;
+
 private:
     boost::filesystem::path path_;
     vector<TelemetryReading> readings_;

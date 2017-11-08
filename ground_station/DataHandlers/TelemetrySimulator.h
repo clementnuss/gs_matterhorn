@@ -23,6 +23,8 @@ public:
 
     vector<TelemetryReading> pollData() override;
 
+    bool isReplayHandler() override;
+
     void setVariableRate(bool);
 private:
 

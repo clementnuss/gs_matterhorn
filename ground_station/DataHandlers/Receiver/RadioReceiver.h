@@ -27,6 +27,8 @@ public:
 
     vector<RocketEvent> pollEvents() override;
 
+    bool isReplayHandler() override;
+
 private:
 
     void readSerialPort();

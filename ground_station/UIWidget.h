@@ -68,6 +68,8 @@ public slots:
 
     void reversePlayback();
 
+    void selectFile();
+
 signals:
 
     void toggleLogging();
