@@ -78,7 +78,7 @@ struct XYZReading : ILoggable {
         return ss.str();
     }
 
-    double norm() {
+    double norm() const{
         return std::sqrt(x_ * x_ + y_ * y_ + z_ * z_);
     }
 

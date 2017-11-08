@@ -29,9 +29,22 @@ public:
 
 private:
 
+    enum State {
+        READY,
+        BURNING_PHASE,
+        BURNOUT,
+        PARACHUTE_DESCENT,
+        TOUCHDOWN
+    };
+
+    State currentState_ = READY;
+    TelemetryReading initialTelemetryState_{};
+
     static constexpr int MOVING_AVERAGE_POINTS = 5;
+    static constexpr double ACCELERATION_THRESHOLD = 1.5;
 
     boost::circular_buffer<TelemetryReading> readingsBuffer_;
+    vector<RocketEvent> pendingDetectedRocketEvents_;
 
     unique_ptr<TelemetryHandler> handler_;
     unique_ptr<TelemetryReplayHandler> replayHandler_;
@@ -39,6 +52,8 @@ private:
     bool isReplayHandler();
 
     TelemetryReading computeMA(const TelemetryReading &);
+
+    void computeState(const TelemetryReading &);
 };
 
 
