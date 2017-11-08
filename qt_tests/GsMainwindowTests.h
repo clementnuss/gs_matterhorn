@@ -13,8 +13,10 @@ private:
 private slots:
 
     void telemetryReadingCorrectlyDisplayed();
+
     void correctSignalsActivation();
 
+    void stackedWidgetsCorrectlyChanges();
 
 };
 

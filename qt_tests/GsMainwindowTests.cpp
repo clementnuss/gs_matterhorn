@@ -42,7 +42,6 @@ void GsMainwindowTests::telemetryReadingCorrectlyDisplayed() {
 }
 
 void GsMainwindowTests::correctSignalsActivation() {
-
     QSignalSpy loggingToggleSpy(&gsMainWindow_, &GSMainwindow::toggleLogging);
     QTest::keyEvent(QTest::KeyAction::Press, &gsMainWindow_, Qt::Key_Space);
     QCOMPARE(loggingToggleSpy.count(), 1);
@@ -64,5 +63,15 @@ void GsMainwindowTests::correctSignalsActivation() {
     gsMainWindow_.ui->time_unfolding_reverse_time->click();
     args = reverseTelemetryPlaybackSpy.takeFirst();
     QCOMPARE(args.at(0).toBool(), true);
+}
 
+void GsMainwindowTests::stackedWidgetsCorrectlyChanges() {
+    auto previousIndex = gsMainWindow_.ui->stackedWidget->currentIndex();
+
+    for (int i = 0; i < 2 * gsMainWindow_.ui->stackedWidget->count(); i++) {
+        QTest::keyEvent(QTest::KeyAction::Press, &gsMainWindow_, Qt::Key_Control);
+        previousIndex++;
+        previousIndex %= gsMainWindow_.ui->stackedWidget->count();
+        QCOMPARE(gsMainWindow_.ui->stackedWidget->currentIndex(), previousIndex);
+    }
 }
