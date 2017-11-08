@@ -37,6 +37,8 @@ public slots:
 
     void updateLoggingStatus();
 
+    void toggleTracking();
+
     void updatePlaybackSpeed(double);
 
     void resetPlayback();
@@ -63,6 +65,9 @@ signals:
 
 
 private:
+    double lastAltitude;
+
+    bool trackingEnabled_{false};
     bool loggingEnabled_;
     bool replayMode_;
     std::atomic<bool> updateHandler_;

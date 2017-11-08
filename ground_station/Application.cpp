@@ -73,6 +73,11 @@ void Application::connectSlotsAndSignals() {
                      &Worker::updateLoggingStatus);
 
     QObject::connect(&gsMainWindow_,
+                     &GSMainwindow::toggleTracking,
+                     worker_,
+                     &Worker::toggleTracking);
+
+    QObject::connect(&gsMainWindow_,
                      &GSMainwindow::changePlaybackSpeed,
                      worker_,
                      &Worker::updatePlaybackSpeed);

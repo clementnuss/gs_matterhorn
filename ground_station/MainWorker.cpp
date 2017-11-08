@@ -195,6 +195,14 @@ void Worker::updateLoggingStatus() {
     cout << "Logging is now " << (loggingEnabled_ ? "enabled" : "disabled") << endl;
 }
 
+
+void Worker::toggleTracking() {
+    trackingEnabled_ = !trackingEnabled_;
+
+    SensorConstants::launchAltitude = static_cast<float>(lastAltitude);
+    SensorConstants::trackingAltitude = static_cast<float>(lastAltitude + 1);
+}
+
 /**
  * Determine the status of the communication based on the quantity of data received during the past second.
  */
@@ -311,6 +319,7 @@ void Worker::defineRealtimeMode(const QString &parameters) {
 }
 
 void Worker::moveTrackingSystem(double currentAltitude) {
+    lastAltitude = currentAltitude;
 #if USE_TRACKING
     /**
      * We use the law of sines to get the correct angle. The tracking altitude corresponds to the ground station's
@@ -339,9 +348,11 @@ void Worker::moveTrackingSystem(double currentAltitude) {
         lastTrackingAngleUpdate = chrono::system_clock::now();
         std::string toSend = std::to_string(static_cast<int>(movAverage)) + "\r\n";
         cout << "angle for tracking: " << toSend;
-        serialPort_.write(toSend);
-        uint8_t carriageReturn = 0x0d;
-        serialPort_.write(&carriageReturn, 1);
+        if (trackingEnabled_) {
+            serialPort_.write(toSend);
+            uint8_t carriageReturn = 0x0d;
+            serialPort_.write(&carriageReturn, 1);
+        }
     }
 
 #endif

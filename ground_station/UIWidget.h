@@ -93,6 +93,8 @@ signals:
 
     void toggleLogging();
 
+    void toggleTracking();
+
     void changePlaybackSpeed(double);
 
     void resetTelemetryReplayPlayback();
@@ -137,6 +139,7 @@ private:
     const QFlags<QCP::Interaction> interactionsAll_ = QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems;
 
     void changeToReplayModeAction();
+
     void changeToRealTimeModeAction();
 };
 
