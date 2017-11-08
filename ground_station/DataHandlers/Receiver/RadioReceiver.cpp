@@ -2,6 +2,7 @@
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/asio/placeholders.hpp>
 #include <boost/bind.hpp>
+#include <thread>
 #include "RadioReceiver.h"
 
 
@@ -116,8 +117,8 @@ void RadioReceiver::handleReceive(std::size_t bytesTransferred) {
         }
     }
 
-    BytesReading bytesReading {chrono::system_clock::now(), bytes};
-    vector<reference_wrapper<ILoggable>> bytesReadingVector {};
+    BytesReading bytesReading{chrono::system_clock::now(), bytes};
+    vector<reference_wrapper<ILoggable>> bytesReadingVector{};
     bytesReadingVector.push_back(bytesReading);
     bytesLogger_.registerData(bytesReadingVector);
 
@@ -125,18 +126,14 @@ void RadioReceiver::handleReceive(std::size_t bytesTransferred) {
 
 void RadioReceiver::unpackPayload() {
     Datagram d = byteDecoder_.retrieveDatagram();
-    cout << d.sequenceNumber_ << endl;
-    switch (d.payloadType_->code()) {
-        case PayloadType::TELEMETRY.code(): {
-            std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(
-                    d.deserializedPayload_);
-            //TODO: make sure that the memory behaviour is correct
-            telemQueue_.push(*data);
-            break;
-        }
-        default:
-            std::cout << "Wrong datagram payload type!";
-            break;
+//    cout << d.sequenceNumber_ << endl;
+    if (d.payloadType_->code() == PayloadType::TELEMETRY.code()) {
+        std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(
+                d.deserializedPayload_);
+        //TODO: make sure that the memory behaviour is correct
+        telemQueue_.push(*data);
+    } else {
+        std::cout << "Wrong datagram payload type!";
     }
 }
 

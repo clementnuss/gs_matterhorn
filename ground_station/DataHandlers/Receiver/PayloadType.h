@@ -20,8 +20,6 @@ private:
 
     std::shared_ptr<IDeserializable> (*factoryFunc_)(std::vector<uint8_t>);
 
-
-private:
     PayloadType(int code, size_t length, std::shared_ptr<IDeserializable>(*factoryFunc)(std::vector<uint8_t>)) :
             code_{code}, length_{length}, factoryFunc_{factoryFunc} {}
 

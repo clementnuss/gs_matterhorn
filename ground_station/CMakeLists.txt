@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.7)
 project(ground_station LANGUAGES CXX)
 
-find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport Qml Quick Quickwidgets
+find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport Quick Quickwidgets
         3DCore 3DExtras 3DRender 3DInput REQUIRED)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -38,4 +38,4 @@ target_link_libraries(ground_station
 target_link_libraries(ground_station_lib
         Qt5::Core Qt5::Gui Qt5::Widgets
         Qt5::3DCore Qt5::3DExtras Qt5::3DRender Qt5::3DInput
-        Qt5::Qml Qt5::Quick Qt5::QuickWidgets)
+        Qt5::Quick Qt5::QuickWidgets)

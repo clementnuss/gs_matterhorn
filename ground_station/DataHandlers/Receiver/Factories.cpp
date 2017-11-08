@@ -10,7 +10,7 @@
  * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
  * @return A Telemetry struct
  */
-shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8_t> payloadBuffer, uint32_t seqNumber) {
+shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8_t> payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::TELEMETRY.length());
 
     auto it = payloadBuffer.begin();
@@ -57,6 +57,6 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
                        pressure_hPa,
                        temperature.fl,
                        air_speed,
-                       seqNumber};
+                       0};
     return std::make_shared<TelemetryReading>(r);
 }
