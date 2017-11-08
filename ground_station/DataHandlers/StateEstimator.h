@@ -5,6 +5,8 @@
 #include "TelemetryHandler.h"
 #include "TelemetryReplay.h"
 
+#include <boost/circular_buffer.hpp>
+
 class StateEstimator : public TelemetryReplayHandler, public TelemetryHandler {
 
 public:
@@ -27,10 +29,16 @@ public:
 
 private:
 
+    static constexpr int MOVING_AVERAGE_POINTS = 5;
+
+    boost::circular_buffer<TelemetryReading> readingsBuffer_;
+
     unique_ptr<TelemetryHandler> handler_;
     unique_ptr<TelemetryReplayHandler> replayHandler_;
 
     bool isReplayHandler();
+
+    TelemetryReading computeMA(const TelemetryReading &);
 };
 
 

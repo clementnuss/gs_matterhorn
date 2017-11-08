@@ -60,7 +60,7 @@ struct RocketEvent : TimedData, ILoggable {
 };
 
 struct XYZReading : ILoggable {
-    XYZReading() = default;
+    XYZReading() : x_{0}, y_{0}, z_{0} {};
 
     XYZReading(double x, double y, double z) : x_{x}, y_{y}, z_{z} {}
 
@@ -81,10 +81,39 @@ struct XYZReading : ILoggable {
     double norm() {
         return std::sqrt(x_ * x_ + y_ * y_ + z_ * z_);
     }
+
+    XYZReading operator+(XYZReading &rhs) const {
+        XYZReading result{};
+        result.x_ = this->x_ + rhs.x_;
+        result.y_ = this->y_ + rhs.y_;
+        result.z_ = this->z_ + rhs.z_;
+        return result;
+    }
+
+    XYZReading operator*=(double coeff) {
+        x_ *= coeff;
+        y_ *= coeff;
+        z_ *= coeff;
+
+    }
+
+    XYZReading operator+=(const XYZReading &rhs) {
+        x_ += rhs.x_;
+        y_ += rhs.y_;
+        z_ += rhs.z_;
+    }
 };
 
 struct TelemetryReading : TimedData, ILoggable, IDeserializable {
-    TelemetryReading() = default;
+    TelemetryReading() : TimedData{0},
+                         altitude_{0},
+                         acceleration_{},
+                         magnetometer_{},
+                         gyroscope_{},
+                         pressure_{0},
+                         temperature_{0},
+                         air_speed_{0},
+                         sequenceNumber_{0} {};
 
     TelemetryReading(uint32_t t, double altitude, XYZReading acceleration,
                      XYZReading magnetometer, XYZReading gyroscope,
@@ -129,6 +158,28 @@ struct TelemetryReading : TimedData, ILoggable, IDeserializable {
 
         return ss.str();
     }
+
+    TelemetryReading operator+=(const TelemetryReading &rhs) {
+        air_speed_ += rhs.air_speed_;
+        pressure_ += rhs.pressure_;
+        temperature_ += rhs.temperature_;
+        altitude_ += rhs.altitude_;
+        acceleration_ += rhs.acceleration_;
+        magnetometer_ += rhs.magnetometer_;
+        gyroscope_ += rhs.gyroscope_;
+    }
+
+
+    TelemetryReading operator*=(double coeff) {
+        air_speed_ *= coeff;
+        pressure_ *= coeff;
+        temperature_ *= coeff;
+        altitude_ *= coeff;
+        acceleration_ *= coeff;
+        magnetometer_ *= coeff;
+        gyroscope_ *= coeff;
+    }
+
 };
 
 #endif // DATASTRUCTS_H
