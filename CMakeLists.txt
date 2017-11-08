@@ -13,6 +13,8 @@ add_subdirectory(lib/boost-cmake)
 add_subdirectory(lib/serial)
 
 add_subdirectory(ground_station)
+
+include_directories(ground_station)
 add_subdirectory(gs_tests)
 
 

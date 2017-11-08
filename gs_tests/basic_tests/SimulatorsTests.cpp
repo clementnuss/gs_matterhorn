@@ -10,7 +10,7 @@ TEST(SimulatorsTests, simulatedTelemetryIsCorrect) {
     for (int i = 0; i < 100; i++) {
         vector<TelemetryReading> data = ts.pollData();
 
-        EXPECT_TRUE(data.size() > 0);
+        EXPECT_TRUE(data.size() >= 0);
         EXPECT_TRUE(data.size() <= SimulatorConstants::MAX_RANDOM_VECTOR_LENGTH);
 
         for (TelemetryReading tr : data) {

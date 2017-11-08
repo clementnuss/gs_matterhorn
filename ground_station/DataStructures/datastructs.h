@@ -117,7 +117,8 @@ struct TelemetryReading : TimedData, ILoggable, IDeserializable {
         format << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed;
 
         stringstream ss;
-        ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << this->timestamp_
+        ss << sequenceNumber_
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << this->timestamp_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << altitude_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << air_speed_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << pressure_
