@@ -795,7 +795,7 @@
           <item>
            <widget class="QStackedWidget" name="stackedWidget">
             <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
+                <enum>QFrame::StyledPanel</enum>
             </property>
             <property name="frameShadow">
              <enum>QFrame::Plain</enum>
@@ -814,7 +814,21 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="Map"/>
+               <widget class="QWidget" name="Map">
+                   <widget class="QLabel" name="label_3">
+                       <property name="geometry">
+                           <rect>
+                               <x>120</x>
+                               <y>40</y>
+                               <width>35</width>
+                               <height>10</height>
+                           </rect>
+                       </property>
+                       <property name="text">
+                           <string>TextLabel</string>
+                       </property>
+                   </widget>
+               </widget>
            </widget>
           </item>
          </layout>

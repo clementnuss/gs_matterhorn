@@ -10,8 +10,8 @@ using namespace std;
 
 Worker::Worker(std::string comPort) :
         loggingEnabled{false},
-        telemetryHandler{new RadioReceiver{"COM6"}},
-        //telemetryHandler{new TelemetrySimulator()},
+        //telemetryHandler{new RadioReceiver{"COM6"}},
+        telemetryHandler{new TelemetrySimulator()},
         telemetryLogger{LogConstants::WORKER_TELEMETRY_LOG_PATH},
         eventLogger{LogConstants::WORKER_EVENTS_LOG_PATH},
         lastDisplayableReading{0,

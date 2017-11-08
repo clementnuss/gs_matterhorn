@@ -6,6 +6,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
 #include <qcustomplot.h>
+#include <Qt3DCore/QEntity>
 #include "MainWorker.h"
 #include "ProgramConstants.h"
 
@@ -40,6 +41,7 @@ signals:
     void toggleLogging();
 
 private:
+    Qt3DCore::QEntity *createTestScene();
     Ui::GSWidget *ui;
     QTimer clockTimer;
 

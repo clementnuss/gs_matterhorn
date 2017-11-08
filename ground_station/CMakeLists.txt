@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.7)
 project(ground_station LANGUAGES CXX)
 
-find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Widgets 3DCore 3DExtras 3DRender 3DInput PrintSupport REQUIRED)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)
@@ -22,4 +22,4 @@ IF (WIN32)
 ENDIF ()
 
 # This will link_libraries for the specified Qt modules
-qt5_use_modules(ground_station_lib Core Gui Widgets)
+qt5_use_modules(ground_station_lib Core Gui Widgets 3DCore 3DExtras 3DRender 3DInput)
