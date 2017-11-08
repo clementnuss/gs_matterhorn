@@ -86,6 +86,7 @@ void RadioReceiver::readSerialPort() {
     bool terminate = false;
     while (!terminate) {
         if ((bytesAvailable = serialPort_.available()) == 0){
+            std::this_thread::sleep_for(chrono::milliseconds(7));
             continue;
         }
         if (bytesAvailable > BUFFER_SIZE){

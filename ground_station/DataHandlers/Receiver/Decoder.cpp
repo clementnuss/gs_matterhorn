@@ -49,7 +49,7 @@ bool Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
         ss << PrintConstants::DELIMITER;
         ss << "Wrong datagram payload type: ";
         ss << std::hex << static_cast<int>(payloadType);
-        //logger_.registerString(ss.str());
+        logger_.registerString(ss.str());
 
         return false;
     };
@@ -188,7 +188,7 @@ bool Decoder::validatePayload() {
         ss << setw(PrintConstants::FIELD_WIDTH) << std::hex << receivedCRC;
         ss << " got: ";
         ss << std::hex << crc;
-        //logger_.registerString(ss.str());
+        logger_.registerString(ss.str());
 
         return false;
 
