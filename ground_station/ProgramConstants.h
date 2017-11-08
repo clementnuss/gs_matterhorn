@@ -16,6 +16,7 @@ namespace PrintConstants {
 namespace LogConstants {
     static const std::string WORKER_TELEMETRY_LOG_PATH{"telemetry_data"};
     static const std::string WORKER_EVENTS_LOG_PATH{"events_data"};
+    static const std::string BYTES_LOG_PATH{"bytes_received"};
     static const std::string DECODER_LOG_PATH{"radio_receiver_events"};
 }
 
@@ -35,7 +36,7 @@ namespace UIConstants {
     static constexpr int REFRESH_RATE = 20; // 20ms = 50 FPS
 
     // Time in microseconds between each data point in the real-time graphs
-    static constexpr int GRAPH_DATA_INTERVAL_USECS = 15'000;
+    static constexpr int GRAPH_DATA_INTERVAL_USECS = 12'000;
 
     static constexpr float GRAPH_RANGE_MARGIN_RATIO = 1.15;
     static constexpr int GRAPH_XRANGE_SECS = 20;
@@ -51,6 +52,12 @@ namespace SensorConstants {
     static constexpr uint32_t ACCEL_SENSITIVITY = 32768;
     static constexpr float MPU_ACCEL_MULTIPLIER = MPU_ACCEL_RANGE / ACCEL_SENSITIVITY;
 
+    /* SSCMRNN015PG5A3 0 - 15 psi*/
+    static constexpr float PRESSURE_SENSOR2_MAX = 103421.f;    /* [Pa] */
+    static constexpr float PRESSURE_SENSOR2_MIN = 0.f;         /* [Pa] */
+    static constexpr float AIR_DENSITY = 1.225f;         /* [Pa] */
+
+
     // Values can be found here:
     // http://www.meteosuisse.admin.ch/home/meteo/valeurs-de-mesures/valeurs-de-mesures-aux-stations.html?param=airpressure-qfe
     static float currentLocationReferenceHPa = 968.1f;
@@ -59,7 +66,7 @@ namespace SensorConstants {
 }
 
 namespace DataConstants {
-    static constexpr double DELETION_FACTOR = 0.05;
+    static constexpr double DELETION_FACTOR = -0.05;
     static constexpr uint32_t READINGS_PER_SEC = 1'000'000 / UIConstants::GRAPH_DATA_INTERVAL_USECS;
     static constexpr int MAX_DATA_VECTOR_SIZE =
             static_cast<const int>((1.0 + DELETION_FACTOR) *

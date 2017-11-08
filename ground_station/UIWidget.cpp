@@ -86,10 +86,7 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 
     g->data()->add(d);
 
-    int sizeDiff = g->data()->size() - DataConstants::MAX_DATA_VECTOR_SIZE;
-    if (sizeDiff > 0) {
-        g->data()->removeBefore(d.last().key - UIConstants::GRAPH_XRANGE_SECS);
-    }
+    g->data()->removeBefore(d.last().key - UIConstants::GRAPH_XRANGE_SECS);
 
     g->keyAxis()->setRange(d.last().key, UIConstants::GRAPH_XRANGE_SECS, Qt::AlignRight);
     g->valueAxis()->rescale(true);

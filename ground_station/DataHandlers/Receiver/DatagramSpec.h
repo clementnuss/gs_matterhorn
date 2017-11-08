@@ -26,7 +26,7 @@ enum class DatagramPayloadType {
 };
 
 static const std::map<DatagramPayloadType, size_t> PAYLOAD_TYPES_LENGTH = {
-        {DatagramPayloadType::TELEMETRY, 34}// TODO: couple DatagramPayloadType and size and factory function
+        {DatagramPayloadType::TELEMETRY, 32}// TODO: couple DatagramPayloadType and size and factory function
 };
 
 struct Datagram {

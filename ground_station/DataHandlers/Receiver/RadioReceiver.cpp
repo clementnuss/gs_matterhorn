@@ -14,7 +14,8 @@
  */
 RadioReceiver::RadioReceiver(string portAddress)
         : byteDecoder_{}, device_{std::move(portAddress)}, serialPort_{}, thread_{},
-          recvBuffer_{}, telemQueue_{100} {
+          recvBuffer_{}, telemQueue_{100},
+          bytesLogger_{LogConstants::BYTES_LOG_PATH} {
 
     vector<serial::PortInfo> devices_found = serial::list_ports();
     if (!devices_found.empty()) {
@@ -102,9 +103,11 @@ void RadioReceiver::readSerialPort() {
 
 void RadioReceiver::handleReceive(std::size_t bytesTransferred) {
 
+    vector<uint8_t> bytes{};
+
     for (int i = 0; i < bytesTransferred; ++i) {
         //TODO: log every byte received
-
+        bytes.push_back(recvBuffer_[i]);
 #if DEBUG
         std::bitset<8> x(recvBuffer_[i]);
         cout << x << ' ' << std::flush;
@@ -113,6 +116,11 @@ void RadioReceiver::handleReceive(std::size_t bytesTransferred) {
             unpackPayload();
         }
     }
+
+    BytesReading bytesReading {chrono::system_clock::now(), bytes};
+    vector<reference_wrapper<ILoggable>> bytesReadingVector {};
+    bytesReadingVector.push_back(bytesReading);
+    bytesLogger_.registerData(bytesReadingVector);
 
 }
 

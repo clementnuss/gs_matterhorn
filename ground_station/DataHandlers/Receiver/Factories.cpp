@@ -41,7 +41,13 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
 
     double altitude = 44330 * (1.0 - pow(pressure_hPa / adjustedSealevelPressure, 0.1903));
 
-    float_cast air_speed = {.uint32 = parse32<uint32_t>(it)};
+    auto press = parse16<uint16_t>(it);
+
+    double p_press = (((float) press) - 1652) * (SensorConstants::PRESSURE_SENSOR2_MAX - SensorConstants::PRESSURE_SENSOR2_MIN) /
+            (14745 - 1652) +
+            SensorConstants::PRESSURE_SENSOR2_MIN;
+
+    double air_speed = sqrt(2 * p_press / SensorConstants::AIR_DENSITY);
 
     TelemetryReading r{measurement_time,
                        altitude,
@@ -50,7 +56,7 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
                        {gx, gy, gz},
                        pressure_hPa,
                        temperature.fl,
-                       air_speed.fl,
+                       air_speed,
                        seqNumber};
     return std::make_shared<TelemetryReading>(r);
 }
