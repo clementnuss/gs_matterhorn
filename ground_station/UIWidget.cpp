@@ -3,6 +3,7 @@
 #include "UI/Colors.h"
 #include <iostream>
 #include <Utilities/TimeUtils.h>
+#include <assert.h>
 
 /**
  * GSWidget is the main user interface class. It communicate through Qt SLOTS system with the main worker thread of the
@@ -21,7 +22,8 @@ GSWidget::GSWidget(QWidget *parent) :
         userItems_{std::vector<std::tuple<QCPAbstractItem *, QCPAbstractItem *>>()},
         lastRemoteTime_{-1000},
         autoPlay_{true},
-        replayPlaybackSpeed_{1} {
+        replayPlaybackSpeed_{1},
+        playbackReversed_{false} {
     ui->setupUi(this);
 
     graphWidgetSetup();
@@ -49,6 +51,7 @@ void GSWidget::connectComponents() {
     connect(ui->time_unfolding_increase, &QPushButton::clicked, this, &GSWidget::increaseSpeed);
     connect(ui->time_unfolding_decrease, &QPushButton::clicked, this, &GSWidget::decreaseSpeed);
     connect(ui->time_unfolding_reset, &QPushButton::clicked, this, &GSWidget::resetPlayback);
+    connect(ui->time_unfolding_reverse_time, &QPushButton::clicked, this, &GSWidget::reversePlayback);
 
     // Connect components related to graphs
     applyToAllPlots(
@@ -116,16 +119,30 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 
     if (d.isEmpty()) {
 
-        if (autoPlay_) {
+        if (autoPlay_ | playbackReversed_) {
             auto elapsed = usecsBetween(lastGraphUpdate_, chrono::system_clock::now());
             if (elapsed > UIConstants::GRAPH_DATA_INTERVAL_USECS) {
+                lastGraphUpdate_ = chrono::system_clock::now();
                 double elapsedSeconds = replayPlaybackSpeed_ * elapsed / 1'000'000.0;
 
                 for (auto &g_idx : plotVector_) {
                     QCPGraph *g = g_idx->graph();
-                    g->keyAxis()->setRange(lastRemoteTime_ + elapsedSeconds,
-                                           UIConstants::GRAPH_XRANGE_SECS,
-                                           Qt::AlignRight);
+                    if (playbackReversed_) {
+                        lastRemoteTime_ -= elapsedSeconds;
+                        if (!g->data()->isEmpty()) {
+                            g->data()->removeAfter(lastRemoteTime_);
+
+                        }
+                        if (autoPlay_) {
+                            g->keyAxis()->setRange(lastRemoteTime_,
+                                                   UIConstants::GRAPH_XRANGE_SECS,
+                                                   Qt::AlignRight);
+                        }
+                    } else {
+                        g->keyAxis()->setRange(lastRemoteTime_ + elapsedSeconds,
+                                               UIConstants::GRAPH_XRANGE_SECS,
+                                               Qt::AlignRight);
+                    }
                     g_idx->replot();
 
                 };
@@ -135,20 +152,27 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
         return;
     }
 
-    lastGraphUpdate_ = chrono::system_clock::now();
-    lastRemoteTime_ = d.last().key;
-
     QCPGraph *g = plotVector_[static_cast<int>(feature)]->graph();
 
+    auto elapsed = usecsBetween(lastGraphUpdate_, chrono::system_clock::now());
+    double elapsedSeconds = replayPlaybackSpeed_ * elapsed / 1'000'000.0;
+    lastGraphUpdate_ = chrono::system_clock::now();
+
+    if (playbackReversed_) { lastRemoteTime_ -= elapsedSeconds; }
+    else { lastRemoteTime_ = d.last().key; }
+
     // Clear any eventual datapoint ahead of current time point
-    g->data()->removeAfter(d.last().key);
+    if (!replayMode_) { g->data()->removeAfter(d.last().key); }
 
-    g->data()->add(d);
-
-    g->data()->removeBefore(d.last().key - UIConstants::GRAPH_MEMORY_SECS);
+    g->data()->add(d, /*alreadySorted*/ true);
+    if (playbackReversed_) {
+        g->data()->removeAfter(lastRemoteTime_);
+    } else {
+        g->data()->removeBefore(lastRemoteTime_ - UIConstants::GRAPH_MEMORY_SECS);
+    }
 
     if (autoPlay_) {
-        g->keyAxis()->setRange(d.last().key, UIConstants::GRAPH_XRANGE_SECS, Qt::AlignRight);
+        g->keyAxis()->setRange(lastRemoteTime_, UIConstants::GRAPH_XRANGE_SECS, Qt::AlignRight);
         g->valueAxis()->rescale(true);
         g->valueAxis()->scaleRange(UIConstants::GRAPH_RANGE_MARGIN_RATIO);
     }
@@ -413,6 +437,7 @@ void GSWidget::increaseSpeed() {
 }
 
 void GSWidget::decreaseSpeed() {
+    assert(replayMode_);
     replayPlaybackSpeed_ *= DataConstants::DECREASE_FACTOR;
     emit changePlaybackSpeed(replayPlaybackSpeed_);
     ui->time_unfolding_current_speed->setText(
@@ -420,6 +445,7 @@ void GSWidget::decreaseSpeed() {
 }
 
 void GSWidget::resetPlayback() {
+    assert(replayMode_);
     emit resetTelemetryReplayPlayback();
 
     for (auto &g_idx : plotVector_) {
@@ -433,13 +459,20 @@ void GSWidget::resetPlayback() {
 
 
 void GSWidget::setRealTimeMode() {
+    replayMode_ = false;
     ui->time_unfolding_mode->setText(QString("REAL-TIME"));
     ui->replay_controls->hide();
 }
 
 void GSWidget::setReplayMode() {
+    replayMode_ = true;
     ui->time_unfolding_mode->setText(QString("REPLAY"));
     ui->replay_controls->show();
+}
+
+void GSWidget::reversePlayback() {
+    playbackReversed_ = !playbackReversed_;
+    emit reverseTelemetryReplayPlayback(playbackReversed_);
 }
 
 /**

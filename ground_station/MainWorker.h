@@ -33,6 +33,8 @@ public slots:
 
     void resetPlayback();
 
+    void reversePlayback(bool);
+
     void setReplayMode(bool);
 
 signals:

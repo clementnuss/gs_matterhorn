@@ -22,6 +22,7 @@ namespace LogConstants {
 
 namespace TimeConstants {
     static constexpr int MSECS_IN_SEC = 1000;
+    static constexpr int USECS_IN_SEC = 1000 * MSECS_IN_SEC;
     static constexpr int SECS_IN_MINUTE = 60;
     static constexpr int MINUTES_IN_HOUR = 60;
     static constexpr int SECS_AND_MINS_WIDTH = 2;
@@ -41,6 +42,7 @@ namespace UIConstants {
     static constexpr float GRAPH_RANGE_MARGIN_RATIO = 1.15;
     static constexpr int GRAPH_XRANGE_SECS = 20;
     static constexpr int GRAPH_MEMORY_SECS = 600;
+    static constexpr int GRAPH_MEMORY_USECS = GRAPH_MEMORY_SECS * TimeConstants::USECS_IN_SEC;
 }
 
 namespace SimulatorConstants {

@@ -9,7 +9,8 @@ using namespace boost::filesystem;
  * @param path location of the file/directory to read.
  */
 TelemetryReplay::TelemetryReplay(std::string &path) :
-        path_{path}, readings_{}, lastPlaybackTime_{}, lastReadingIter_{}, playbackSpeed_{1} {}
+        path_{path}, readings_{}, lastPlaybackTime_{}, endReadingsIter_{}, frontReadingsIter_{}, playbackSpeed_{1},
+        playbackReversed_{} {}
 
 void TelemetryReplay::startup() {
     if (exists(path_)) {
@@ -42,22 +43,60 @@ vector<RocketEvent> TelemetryReplay::pollEvents() {
 vector<TelemetryReading> TelemetryReplay::pollData() {
     vector<TelemetryReading> vec{};
     uint32_t adjustedTime =
-            static_cast<uint32_t>(
-                    std::chrono::duration_cast<std::chrono::microseconds>(
-                            std::chrono::system_clock::now().time_since_epoch()).count() -
-                    lastPlaybackTime_);
+            static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::microseconds>(
+                    std::chrono::system_clock::now().time_since_epoch()).count() - lastPlaybackTime_);
 
     lastPlaybackTime_ = std::chrono::duration_cast<std::chrono::microseconds>(
             std::chrono::system_clock::now().time_since_epoch()).count();
 
     adjustedTime *= playbackSpeed_;
-    adjustedTime += (*lastReadingIter_).timestamp_;
 
-    while ((*lastReadingIter_).timestamp_ < adjustedTime) {
-        if (endOfPlayback()) {
-            return vec;
+    if (playbackReversed_) {
+
+        if ((*endReadingsIter_).timestamp_ > UIConstants::GRAPH_MEMORY_USECS + adjustedTime) {
+            //WARNING, if the timestamp becomes an uint_64t, problems will appear with this code!!
+            //TODO: make all these timestamps cyclic ?
+
+            uint64_t adjustedFrontTime =
+                    static_cast<uint64_t>((*endReadingsIter_).timestamp_) -
+                    UIConstants::GRAPH_MEMORY_USECS - adjustedTime;
+            auto newFrontPosition = frontReadingsIter_;
+            while ((*newFrontPosition).timestamp_ > adjustedFrontTime) {
+                if (newFrontPosition == readings_.begin()) {
+                    continue;
+                }
+                newFrontPosition--;
+            }
+            if (newFrontPosition != frontReadingsIter_) {
+                vec.insert(vec.begin(), newFrontPosition, --frontReadingsIter_);
+                frontReadingsIter_ = newFrontPosition;
+            }
         }
-        vec.push_back(*lastReadingIter_++);
+
+
+        double adjustedLastTime = (*endReadingsIter_).timestamp_ - adjustedTime;
+        while (endReadingsIter_ != readings_.begin() && (*endReadingsIter_).timestamp_ > adjustedLastTime) {
+            endReadingsIter_--;
+        }
+
+    } else {
+        adjustedTime += (*endReadingsIter_).timestamp_;
+        while ((*endReadingsIter_).timestamp_ < adjustedTime) {
+            if (endReadingsIter_ == readings_.end()) {
+                return vec;
+            }
+            vec.push_back(*endReadingsIter_++);
+        }
+
+        if ((*endReadingsIter_).timestamp_ >= UIConstants::GRAPH_MEMORY_USECS) /* Test that we don't have overflow*/{
+            while (((*endReadingsIter_).timestamp_ - UIConstants::GRAPH_MEMORY_USECS) >
+                   (*frontReadingsIter_).timestamp_) {
+                /*if (frontReadingsIter_ == readings_.end()){
+                    break;
+                }*/
+                frontReadingsIter_++;
+            }
+        }
     }
 
     return vec;
@@ -113,12 +152,21 @@ void TelemetryReplay::updatePlaybackSpeed(double newPlaybackSpeed) {
 }
 
 void TelemetryReplay::resetPlayback() {
-    lastReadingIter_ = readings_.begin();
+    frontReadingsIter_ = readings_.begin();
+    endReadingsIter_ = readings_.begin();
     lastPlaybackTime_ = std::chrono::duration_cast<std::chrono::microseconds>(
             std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 bool TelemetryReplay::endOfPlayback() {
-    return lastReadingIter_ == readings_.end();
+    if (playbackReversed_) {
+        return endReadingsIter_ == readings_.begin();
+    } else {
+        return endReadingsIter_ == readings_.end();
+    }
+}
+
+void TelemetryReplay::setPlaybackReversed(bool reversed) {
+    playbackReversed_ = reversed;
 }
 

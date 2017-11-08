@@ -118,6 +118,11 @@ void Application::connectSlotsAndSignals() {
                      &GSWidget::resetTelemetryReplayPlayback,
                      worker_,
                      &Worker::resetPlayback);
+    
+    QObject::connect(&mainWidget_,
+                     &GSWidget::reverseTelemetryReplayPlayback,
+                     worker_,
+                     &Worker::reversePlayback);
 
 }
 

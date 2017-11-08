@@ -197,6 +197,12 @@ void Worker::resetPlayback() {
     telemReplay->resetPlayback();
 }
 
+void Worker::reversePlayback(bool reversed) {
+    assert(replayMode_);
+    auto *telemReplay = dynamic_cast<TelemetryReplay *>(telemetryHandler_.get());
+    telemReplay->setPlaybackReversed(reversed);
+}
+
 void Worker::setReplayMode(bool b) {
     replayMode_ = b;
 }

@@ -90,13 +90,16 @@
    <string>Ground Station</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_10">
+   <property name="leftMargin">
+    <number>11</number>
+   </property>
    <item>
-       <layout class="QVBoxLayout" name="verticalLayout" stretch="2,6">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="2,6">
      <property name="sizeConstraint">
       <enum>QLayout::SetNoConstraint</enum>
      </property>
      <item>
-         <layout class="QHBoxLayout" name="horizontalLayout" stretch="40,1,16">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="40,1,16">
        <property name="sizeConstraint">
         <enum>QLayout::SetNoConstraint</enum>
        </property>
@@ -523,7 +526,7 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-              <width>15</width>
+           <width>15</width>
            <height>20</height>
           </size>
          </property>
@@ -746,7 +749,7 @@
       </layout>
      </item>
      <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="40,1,16">
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="40,1,16">
        <item>
         <widget class="QFrame" name="frame">
          <property name="minimumSize">
@@ -779,7 +782,7 @@
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="1,5">
+            <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="0,2">
              <item>
               <widget class="QLabel" name="time_unfolding_mode">
                <property name="sizePolicy">
@@ -809,7 +812,29 @@
                <property name="frameShadow">
                 <enum>QFrame::Raised</enum>
                </property>
-               <layout class="QHBoxLayout" name="horizontalLayout_14">
+               <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="0,0,0,0,0,8">
+                <item>
+                 <widget class="QPushButton" name="time_unfolding_reverse_time">
+                  <property name="font">
+                   <font>
+                    <strikeout>false</strikeout>
+                    <kerning>true</kerning>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Reverse time</string>
+                  </property>
+                  <property name="autoDefault">
+                   <bool>false</bool>
+                  </property>
+                  <property name="default">
+                   <bool>false</bool>
+                  </property>
+                  <property name="flat">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
                 <item>
                  <widget class="QPushButton" name="time_unfolding_reset">
                   <property name="text">
@@ -872,22 +897,22 @@
              <layout class="QVBoxLayout" name="verticalLayout_4">
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,100">
-                   <property name="spacing">
-                       <number>0</number>
-                   </property>
+                <property name="spacing">
+                 <number>0</number>
+                </property>
                 <property name="sizeConstraint">
                  <enum>QLayout::SetDefaultConstraint</enum>
                 </property>
-                   <property name="leftMargin">
-                       <number>1</number>
-                   </property>
-                   <property name="rightMargin">
-                       <number>1</number>
-                   </property>
+                <property name="leftMargin">
+                 <number>1</number>
+                </property>
+                <property name="rightMargin">
+                 <number>1</number>
+                </property>
                 <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0">
+                 <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0">
                   <property name="spacing">
-                      <number>0</number>
+                   <number>0</number>
                   </property>
                   <property name="sizeConstraint">
                    <enum>QLayout::SetFixedSize</enum>
@@ -896,196 +921,196 @@
                    <number>0</number>
                   </property>
                   <item>
-                      <widget class="QFrame" name="grah_item_manipulators">
-                          <property name="minimumSize">
-                              <size>
-                                  <width>0</width>
-                                  <height>0</height>
-                              </size>
-                          </property>
-                          <property name="palette">
-                              <palette>
-                                  <active>
-                                      <colorrole role="Base">
-                                          <brush brushstyle="SolidPattern">
-                                              <color alpha="255">
-                                                  <red>255</red>
-                                                  <green>255</green>
-                                                  <blue>255</blue>
-                                              </color>
-                                          </brush>
-                                      </colorrole>
-                                      <colorrole role="Window">
-                                          <brush brushstyle="SolidPattern">
-                                              <color alpha="255">
-                                                  <red>240</red>
-                                                  <green>240</green>
-                                                  <blue>240</blue>
-                                              </color>
-                                          </brush>
-                                      </colorrole>
-                                  </active>
-                                  <inactive>
-                                      <colorrole role="Base">
-                                          <brush brushstyle="SolidPattern">
-                                              <color alpha="255">
-                                                  <red>255</red>
-                                                  <green>255</green>
-                                                  <blue>255</blue>
-                                              </color>
-                                          </brush>
-                                      </colorrole>
-                                      <colorrole role="Window">
-                                          <brush brushstyle="SolidPattern">
-                                              <color alpha="255">
-                                                  <red>240</red>
-                                                  <green>240</green>
-                                                  <blue>240</blue>
-                                              </color>
-                                          </brush>
-                                      </colorrole>
-                                  </inactive>
-                                  <disabled>
-                                      <colorrole role="Base">
-                                          <brush brushstyle="SolidPattern">
-                                              <color alpha="255">
-                                                  <red>240</red>
-                                                  <green>240</green>
-                                                  <blue>240</blue>
-                                              </color>
-                                          </brush>
-                                      </colorrole>
-                                      <colorrole role="Window">
-                                          <brush brushstyle="SolidPattern">
-                                              <color alpha="255">
-                                                  <red>240</red>
-                                                  <green>240</green>
-                                                  <blue>240</blue>
-                                              </color>
-                                          </brush>
-                                      </colorrole>
-                                  </disabled>
-                              </palette>
-                          </property>
-                          <property name="autoFillBackground">
-                              <bool>true</bool>
-                          </property>
-                          <property name="frameShape">
-                              <enum>QFrame::StyledPanel</enum>
-                          </property>
-                          <property name="lineWidth">
-                              <number>2</number>
-                          </property>
-                          <layout class="QHBoxLayout" name="horizontalLayout_15">
-                              <property name="spacing">
-                                  <number>1</number>
-                              </property>
-                              <property name="leftMargin">
-                                  <number>6</number>
-                              </property>
-                              <property name="topMargin">
-                                  <number>4</number>
-                              </property>
-                              <property name="bottomMargin">
-                                  <number>4</number>
-                              </property>
-                              <item>
-                                  <widget class="QLabel" name="grap_shift_tip">
-                                      <property name="font">
-                                          <font>
-                                              <pointsize>10</pointsize>
-                                          </font>
-                                      </property>
-                                      <property name="text">
-                                          <string>Use SHIFT to change drag and zoom axis</string>
-                                      </property>
-                                  </widget>
-                              </item>
-                              <item>
-                                  <spacer name="horizontalSpacer">
-                                      <property name="orientation">
-                                          <enum>Qt::Horizontal</enum>
-                                      </property>
-                                      <property name="sizeHint" stdset="0">
-                                          <size>
-                                              <width>593</width>
-                                              <height>20</height>
-                                          </size>
-                                      </property>
-                                  </spacer>
-                              </item>
-                              <item>
-                                  <widget class="QPushButton" name="graph_clear_items_button">
-                                      <property name="minimumSize">
-                                          <size>
-                                              <width>0</width>
-                                              <height>0</height>
-                                          </size>
-                                      </property>
-                                      <property name="maximumSize">
-                                          <size>
-                                              <width>16777215</width>
-                                              <height>16777215</height>
-                                          </size>
-                                      </property>
-                                      <property name="text">
-                                          <string>Clear labels</string>
-                                      </property>
-                                      <property name="flat">
-                                          <bool>false</bool>
-                                      </property>
-                                  </widget>
-                              </item>
-                              <item>
-                                  <widget class="QPushButton" name="graph_sync_button">
-                                      <property name="text">
-                                          <string>Synchronise axes</string>
-                                      </property>
-                                      <property name="checkable">
-                                          <bool>true</bool>
-                                      </property>
-                                      <property name="checked">
-                                          <bool>true</bool>
-                                      </property>
-                                  </widget>
-                              </item>
-                              <item>
-                                  <widget class="QPushButton" name="graph_autoplay_button">
-                                      <property name="maximumSize">
-                                          <size>
-                                              <width>16777215</width>
-                                              <height>16777215</height>
-                                          </size>
-                                      </property>
-                                      <property name="text">
-                                          <string>Auto Play</string>
-                                      </property>
-                                      <property name="checkable">
-                                          <bool>true</bool>
-                                      </property>
-                                      <property name="checked">
-                                          <bool>true</bool>
-                                      </property>
-                                      <property name="flat">
-                                          <bool>false</bool>
-                                      </property>
-                                  </widget>
-                              </item>
-                          </layout>
+                   <widget class="QFrame" name="grah_item_manipulators">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="palette">
+                     <palette>
+                      <active>
+                       <colorrole role="Base">
+                        <brush brushstyle="SolidPattern">
+                         <color alpha="255">
+                          <red>255</red>
+                          <green>255</green>
+                          <blue>255</blue>
+                         </color>
+                        </brush>
+                       </colorrole>
+                       <colorrole role="Window">
+                        <brush brushstyle="SolidPattern">
+                         <color alpha="255">
+                          <red>240</red>
+                          <green>240</green>
+                          <blue>240</blue>
+                         </color>
+                        </brush>
+                       </colorrole>
+                      </active>
+                      <inactive>
+                       <colorrole role="Base">
+                        <brush brushstyle="SolidPattern">
+                         <color alpha="255">
+                          <red>255</red>
+                          <green>255</green>
+                          <blue>255</blue>
+                         </color>
+                        </brush>
+                       </colorrole>
+                       <colorrole role="Window">
+                        <brush brushstyle="SolidPattern">
+                         <color alpha="255">
+                          <red>240</red>
+                          <green>240</green>
+                          <blue>240</blue>
+                         </color>
+                        </brush>
+                       </colorrole>
+                      </inactive>
+                      <disabled>
+                       <colorrole role="Base">
+                        <brush brushstyle="SolidPattern">
+                         <color alpha="255">
+                          <red>240</red>
+                          <green>240</green>
+                          <blue>240</blue>
+                         </color>
+                        </brush>
+                       </colorrole>
+                       <colorrole role="Window">
+                        <brush brushstyle="SolidPattern">
+                         <color alpha="255">
+                          <red>240</red>
+                          <green>240</green>
+                          <blue>240</blue>
+                         </color>
+                        </brush>
+                       </colorrole>
+                      </disabled>
+                     </palette>
+                    </property>
+                    <property name="autoFillBackground">
+                     <bool>true</bool>
+                    </property>
+                    <property name="frameShape">
+                     <enum>QFrame::StyledPanel</enum>
+                    </property>
+                    <property name="lineWidth">
+                     <number>2</number>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout_15">
+                     <property name="spacing">
+                      <number>1</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>6</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>4</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>4</number>
+                     </property>
+                     <item>
+                      <widget class="QLabel" name="grap_shift_tip">
+                       <property name="font">
+                        <font>
+                         <pointsize>10</pointsize>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Use SHIFT to change drag and zoom axis</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <spacer name="horizontalSpacer">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>593</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="graph_clear_items_button">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>16777215</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Clear labels</string>
+                       </property>
+                       <property name="flat">
+                        <bool>false</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="graph_sync_button">
+                       <property name="text">
+                        <string>Synchronise axes</string>
+                       </property>
+                       <property name="checkable">
+                        <bool>true</bool>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="graph_autoplay_button">
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>16777215</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Auto Play</string>
+                       </property>
+                       <property name="checkable">
+                        <bool>true</bool>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
+                       <property name="flat">
+                        <bool>false</bool>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </widget>
                   </item>
                  </layout>
                 </item>
                 <item>
-                    <widget class="QFrame" name="plot_container">
-                        <property name="frameShape">
-                            <enum>QFrame::StyledPanel</enum>
-                        </property>
-                        <property name="frameShadow">
-                            <enum>QFrame::Plain</enum>
-                        </property>
-                        <property name="lineWidth">
-                            <number>2</number>
+                 <widget class="QFrame" name="plot_container">
+                  <property name="frameShape">
+                   <enum>QFrame::StyledPanel</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Plain</enum>
+                  </property>
+                  <property name="lineWidth">
+                   <number>2</number>
                   </property>
                  </widget>
                 </item>
@@ -1128,8 +1153,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-               <width>446</width>
-               <height>884</height>
+            <width>441</width>
+            <height>875</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">

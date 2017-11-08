@@ -20,6 +20,8 @@ public:
 
     void updatePlaybackSpeed(double);
 
+    void setPlaybackReversed(bool);
+
     void resetPlayback();
 
     bool endOfPlayback();
@@ -27,9 +29,11 @@ public:
 private:
     boost::filesystem::path path_;
     vector<TelemetryReading> readings_;
-    vector<TelemetryReading>::const_iterator lastReadingIter_;
+    vector<TelemetryReading>::const_iterator endReadingsIter_;
+    vector<TelemetryReading>::const_iterator frontReadingsIter_;
     int64_t lastPlaybackTime_;
     double playbackSpeed_;
+    bool playbackReversed_;
 
     void parseFile(boost::filesystem::path);
 

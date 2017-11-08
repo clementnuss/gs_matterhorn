@@ -66,6 +66,8 @@ public slots:
 
     void resetPlayback();
 
+    void reversePlayback();
+
 signals:
 
     void toggleLogging();
@@ -73,6 +75,8 @@ signals:
     void changePlaybackSpeed(double);
 
     void resetTelemetryReplayPlayback();
+
+    void reverseTelemetryReplayPlayback(bool);
 
 private:
 
@@ -93,6 +97,8 @@ private:
     chrono::system_clock::time_point lastGraphUpdate_;
     std::vector<std::tuple<QCPAbstractItem *, QCPAbstractItem *>> userItems_;
     bool autoPlay_;
+    bool replayMode_;
+    bool playbackReversed_;
     double lastRemoteTime_;
     double replayPlaybackSpeed_;
 
