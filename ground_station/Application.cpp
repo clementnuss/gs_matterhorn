@@ -1,9 +1,5 @@
 #include <QObject>
-#include <iostream>
 #include <DataHandlers/TelemetrySimulator.h>
-#include <DataHandlers/Receiver/RadioReceiver.h>
-#include <DataHandlers/TelemetryReplay.h>
-#include <DataHandlers/StateEstimator.h>
 #include "Application.h"
 
 Application::Application(int &argc, char **argv) : qApplication_{argc, argv}, gsMainWindow_{}, workerThread_{} {

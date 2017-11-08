@@ -8,7 +8,7 @@
 #include <Qt3DCore/QEntity>
 #include <3D/Line/Line.h>
 #include <3D/Scene/RootEntity.h>
-#include <ground_station_autogen/include/ui_gswidget.h>
+#include <ui_gswidget.h>
 #include "MainWorker.h"
 #include "ProgramConstants.h"
 
