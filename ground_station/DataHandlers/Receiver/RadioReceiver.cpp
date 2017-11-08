@@ -114,13 +114,10 @@ void RadioReceiver::handleReceive(std::size_t bytesTransferred) {
         }
     }
 
-    //cout << std::endl << std::endl;
-
 }
 
 void RadioReceiver::unpackPayload() {
     Datagram d = byteDecoder_.retrieveDatagram();
-    cout << d.sequenceNumber_ << endl;
     if (d.payloadType_->code() == PayloadType::TELEMETRY.code()) {
 
         std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(
