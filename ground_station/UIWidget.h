@@ -61,11 +61,18 @@ public slots:
     void updatePlotSync(bool);
 
     void increaseSpeed();
+
+    void decreaseSpeed();
+
+    void resetPlayback();
+
 signals:
 
     void toggleLogging();
 
     void changePlaybackSpeed(double);
+
+    void resetTelemetryReplayPlayback();
 
 private:
 

@@ -31,6 +31,8 @@ public slots:
 
     void updatePlaybackSpeed(double);
 
+    void resetPlayback();
+
 signals:
 
     void loggingStatusReady(bool);
@@ -57,7 +59,6 @@ private:
     unique_ptr<TelemetryHandler> telemetryHandler_;
     FileLogger telemetryLogger;
     FileLogger eventLogger;
-    TelemetryReading lastDisplayableReading;
     chrono::system_clock::time_point lastUIupdate;
     chrono::system_clock::time_point lastIteration;
     chrono::system_clock::time_point timeOfLastLinkCheck;
