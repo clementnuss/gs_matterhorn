@@ -54,7 +54,7 @@ vector<TelemetryReading> TelemetryReplay::pollData() {
     adjustedTime += (*lastReadingIter_).timestamp_;
 
     while ((*lastReadingIter_).timestamp_ < adjustedTime) {
-        if (lastReadingIter_ == readings_.end()) {
+        if (endOfPlayback()) {
             return vec;
         }
         vec.push_back(*lastReadingIter_++);
@@ -118,4 +118,7 @@ void TelemetryReplay::resetPlayback() {
             std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
+bool TelemetryReplay::endOfPlayback() {
+    return lastReadingIter_ == readings_.end();
+}
 

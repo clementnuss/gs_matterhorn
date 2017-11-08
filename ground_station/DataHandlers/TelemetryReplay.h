@@ -22,6 +22,8 @@ public:
 
     void resetPlayback();
 
+    bool endOfPlayback();
+
 private:
     boost::filesystem::path path_;
     vector<TelemetryReading> readings_;

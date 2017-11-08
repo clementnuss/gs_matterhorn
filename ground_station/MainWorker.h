@@ -33,6 +33,8 @@ public slots:
 
     void resetPlayback();
 
+    void setReplayMode(bool);
+
 signals:
 
     void loggingStatusReady(bool);
@@ -51,6 +53,7 @@ signals:
 
 private:
     bool loggingEnabled;
+    bool replayMode_;
 
     void checkLinkStatuses();
 

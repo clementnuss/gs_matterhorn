@@ -8,11 +8,11 @@ set(CMAKE_AUTOMOC ON)
 
 file(GLOB SOURCES "*.cpp")
 message("sources: ${SOURCES}")
-#${CMAKE_BINARY_DIR}/qcustomplot-src/qcustomplot.cpp
-add_library(qcustomplot_lib SHARED ${CMAKE_BINARY_DIR}/qcustomplot-src/qcustomplot.cpp)
 
+add_library(qcustomplot_lib SHARED ${CMAKE_BINARY_DIR}/qcustomplot-src/qcustomplot.cpp)
+#add_definitions(-DQCUSTOMPLOT_USE_OPENGL -lopengl32)
 find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport REQUIRED)
-qt5_use_modules(qcustomplot_lib Widgets PrintSupport)
+target_link_libraries(qcustomplot_lib Qt5::Widgets Qt5::PrintSupport)
 
 install(TARGETS qcustomplot_lib
         ARCHIVE DESTINATION lib

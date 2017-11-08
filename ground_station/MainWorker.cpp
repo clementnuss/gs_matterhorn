@@ -18,7 +18,8 @@ Worker::Worker(TelemetryHandler *telemetryHandler) :
         lastIteration{chrono::system_clock::now()},
         timeOfLastLinkCheck{chrono::system_clock::now()},
         timeOfLastReceivedTelemetry{chrono::system_clock::now()},
-        millisBetweenLastTwoPackets{0} {
+        millisBetweenLastTwoPackets{0},
+        replayMode_{false} {
 }
 
 Worker::~Worker() {
@@ -80,8 +81,16 @@ void Worker::mainRoutine() {
         emit graphDataReady(altitudeDataBuffer, GraphFeature::FEATURE1);
         emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
     } else {
-        QVector<QCPGraphData> empty;
-        emit graphDataReady(empty, GraphFeature::Count);
+        if (replayMode_) {
+            auto *telemReplay = dynamic_cast<TelemetryReplay *>(telemetryHandler_.get());
+            if (!telemReplay->endOfPlayback()) {
+                QVector<QCPGraphData> empty;
+                emit graphDataReady(empty, GraphFeature::Count);
+            }
+        } else {
+            QVector<QCPGraphData> empty;
+            emit graphDataReady(empty, GraphFeature::Count);
+        }
     }
 
     if (!rocketEvents.empty()) {
@@ -173,12 +182,17 @@ Worker::extractGraphData(vector<TelemetryReading> &data, QCPGraphData (*extracti
 }
 
 void Worker::updatePlaybackSpeed(double newSpeed) {
+    assert(replayMode_);
     auto *telemReplay = dynamic_cast<TelemetryReplay *>(telemetryHandler_.get());
     telemReplay->updatePlaybackSpeed(newSpeed);
 }
 
 void Worker::resetPlayback() {
+    assert(replayMode_);
     auto *telemReplay = dynamic_cast<TelemetryReplay *>(telemetryHandler_.get());
     telemReplay->resetPlayback();
 }
 
+void Worker::setReplayMode(bool b) {
+    replayMode_ = b;
+}
