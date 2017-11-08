@@ -31,7 +31,8 @@ private:
     vector<TelemetryReading> readings_;
     vector<TelemetryReading>::const_iterator endReadingsIter_;
     vector<TelemetryReading>::const_iterator frontReadingsIter_;
-    int64_t lastPlaybackTime_;
+    chrono::system_clock::time_point lastPlaybackTime_;
+    uint32_t lastTimeStamp_;
     double playbackSpeed_;
     bool playbackReversed_;
 

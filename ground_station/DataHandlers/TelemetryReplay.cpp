@@ -1,6 +1,7 @@
 #include "TelemetryReplay.h"
 #include <iostream>
 #include <boost/algorithm/string.hpp>
+#include <Utilities/TimeUtils.h>
 
 using namespace boost::filesystem;
 
@@ -10,7 +11,7 @@ using namespace boost::filesystem;
  */
 TelemetryReplay::TelemetryReplay(std::string &path) :
         path_{path}, readings_{}, lastPlaybackTime_{}, endReadingsIter_{}, frontReadingsIter_{}, playbackSpeed_{1},
-        playbackReversed_{} {}
+        playbackReversed_{}, lastTimeStamp_{0} {}
 
 void TelemetryReplay::startup() {
     if (exists(path_)) {
@@ -42,50 +43,52 @@ vector<RocketEvent> TelemetryReplay::pollEvents() {
 
 vector<TelemetryReading> TelemetryReplay::pollData() {
     vector<TelemetryReading> vec{};
-    uint32_t adjustedTime =
-            static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::microseconds>(
-                    std::chrono::system_clock::now().time_since_epoch()).count() - lastPlaybackTime_);
-
-    lastPlaybackTime_ = std::chrono::duration_cast<std::chrono::microseconds>(
-            std::chrono::system_clock::now().time_since_epoch()).count();
+    double adjustedTime = usecsBetween(lastPlaybackTime_, std::chrono::system_clock::now());
 
     adjustedTime *= playbackSpeed_;
 
     if (playbackReversed_) {
 
-        if ((*endReadingsIter_).timestamp_ > UIConstants::GRAPH_MEMORY_USECS + adjustedTime) {
-            //WARNING, if the timestamp becomes an uint_64t, problems will appear with this code!!
-            //TODO: make all these timestamps cyclic ?
-
-            uint64_t adjustedFrontTime =
-                    static_cast<uint64_t>((*endReadingsIter_).timestamp_) -
-                    UIConstants::GRAPH_MEMORY_USECS - adjustedTime;
-            auto newFrontPosition = frontReadingsIter_;
-            while ((*newFrontPosition).timestamp_ > adjustedFrontTime) {
-                if (newFrontPosition == readings_.begin()) {
-                    continue;
-                }
-                newFrontPosition--;
+        double adjustedFrontTime =
+                lastTimeStamp_ -
+                UIConstants::GRAPH_MEMORY_USECS - adjustedTime;
+        auto newFrontPosition = frontReadingsIter_;
+        while ((*newFrontPosition).timestamp_ > adjustedFrontTime) {
+            if (newFrontPosition == readings_.begin()) {
+                continue;
             }
-            if (newFrontPosition != frontReadingsIter_) {
-                vec.insert(vec.begin(), newFrontPosition, --frontReadingsIter_);
-                frontReadingsIter_ = newFrontPosition;
-            }
+            newFrontPosition--;
+        }
+        if (newFrontPosition != frontReadingsIter_) {
+            vec.insert(vec.begin(), newFrontPosition, --frontReadingsIter_);
+            frontReadingsIter_ = newFrontPosition;
         }
 
+        double adjustedLastTime = (double) lastTimeStamp_ - adjustedTime;
+        auto newEndReadingsPosition = endReadingsIter_;
+        while (newEndReadingsPosition != readings_.begin() && (*newEndReadingsPosition).timestamp_ > adjustedLastTime) {
+            newEndReadingsPosition--;
+        }
 
-        double adjustedLastTime = (*endReadingsIter_).timestamp_ - adjustedTime;
-        while (endReadingsIter_ != readings_.begin() && (*endReadingsIter_).timestamp_ > adjustedLastTime) {
-            endReadingsIter_--;
+        if (newEndReadingsPosition != endReadingsIter_) {
+            lastTimeStamp_ = (*newEndReadingsPosition).timestamp_;
+            endReadingsIter_ = newEndReadingsPosition;
+            lastPlaybackTime_ = std::chrono::system_clock::now();
         }
 
     } else {
-        adjustedTime += (*endReadingsIter_).timestamp_;
+        adjustedTime += lastTimeStamp_;
         while ((*endReadingsIter_).timestamp_ < adjustedTime) {
             if (endReadingsIter_ == readings_.end()) {
-                return vec;
+                continue;
             }
             vec.push_back(*endReadingsIter_++);
+            lastTimeStamp_ = (*endReadingsIter_).timestamp_;
+        }
+
+        if (!vec.empty()) {
+            lastTimeStamp_ = (*--vec.end()).timestamp_;
+            lastPlaybackTime_ = std::chrono::system_clock::now();
         }
 
         if ((*endReadingsIter_).timestamp_ >= UIConstants::GRAPH_MEMORY_USECS) /* Test that we don't have overflow*/{
@@ -152,10 +155,12 @@ void TelemetryReplay::updatePlaybackSpeed(double newPlaybackSpeed) {
 }
 
 void TelemetryReplay::resetPlayback() {
+    playbackSpeed_ = 1;
+    setPlaybackReversed(false);
     frontReadingsIter_ = readings_.begin();
     endReadingsIter_ = readings_.begin();
-    lastPlaybackTime_ = std::chrono::duration_cast<std::chrono::microseconds>(
-            std::chrono::system_clock::now().time_since_epoch()).count();
+    lastPlaybackTime_ = std::chrono::system_clock::now();
+    lastTimeStamp_ = readings_.front().timestamp_;
 }
 
 bool TelemetryReplay::endOfPlayback() {
