@@ -10,20 +10,23 @@
 #include "FileLogger.h"
 
 using namespace std;
-class Worker : public QObject
-{
-    Q_OBJECT
+
+class Worker : public QObject {
+Q_OBJECT
 
 public:
-    explicit Worker(std::string);
+    explicit Worker(TelemetryHandler*);
+
     ~Worker() override;
 
     void mainRoutine();
 
 public slots:
+
     void run();
 
     void emitAllStatuses();
+
     void updateLoggingStatus();
 
 signals:
@@ -31,20 +34,25 @@ signals:
     void loggingStatusReady(bool);
 
     void telemetryReady(TelemetryReading);
+
     void graphDataReady(QVector<QCPGraphData> &, GraphFeature);
+
     void newEventsReady(vector<RocketEvent> &);
 
     void linkStatusReady(HandlerStatus);
+
     void groundStatusReady(float, float);
+
     void dummySignal();
 
 private:
     bool loggingEnabled;
 
     void checkLinkStatuses();
+
     void displayMostRecentTelemetry(TelemetryReading);
 
-    unique_ptr<TelemetryHandler> telemetryHandler;
+    unique_ptr<TelemetryHandler> telemetryHandler_;
     FileLogger telemetryLogger;
     FileLogger eventLogger;
     TelemetryReading lastDisplayableReading;

@@ -1,4 +1,8 @@
 #include <QObject>
+#include <iostream>
+#include <DataHandlers/TelemetrySimulator.h>
+#include <DataHandlers/Receiver/RadioReceiver.h>
+#include <DataHandlers/TelemetryReplay.h>
 #include "Application.h"
 
 Application::Application(int &argc, char **argv) : qApplication_{argc, argv}, mainWidget_{nullptr}, workerThread_{} {
@@ -33,8 +37,18 @@ Application::Application(int &argc, char **argv) : qApplication_{argc, argv}, ma
 }
 
 void Application::run() {
+    std::string path{R"(D:\EPFL\matterhorn\Eric Launch 18.11.2017\telemetry)"};
 
-    worker_ = new Worker(std::string(""));
+    TelemetryHandler *handler;
+    try {
+        handler = new TelemetryReplay(path);
+        handler->startup();
+    } catch (std::runtime_error &e) {
+        std::cerr << "Error when starting the telemetry handler:\n" << e.what();
+        return; // This prevents the worker from being instantiated
+    }
+
+    worker_ = new Worker(handler);
     worker_->moveToThread(&workerThread_);
 
     connectSlotsAndSignals();

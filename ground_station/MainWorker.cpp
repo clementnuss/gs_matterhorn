@@ -8,10 +8,9 @@
 
 using namespace std;
 
-Worker::Worker(std::string comPort) :
+Worker::Worker(TelemetryHandler *telemetryHandler) :
         loggingEnabled{false},
-//        telemetryHandler{new RadioReceiver{comPort}},
-        telemetryHandler{new TelemetrySimulator()},
+        telemetryHandler_{telemetryHandler},
         telemetryLogger{LogConstants::WORKER_TELEMETRY_LOG_PATH},
         eventLogger{LogConstants::WORKER_EVENTS_LOG_PATH},
         lastDisplayableReading{0,
@@ -28,9 +27,6 @@ Worker::Worker(std::string comPort) :
         timeOfLastLinkCheck{chrono::system_clock::now()},
         timeOfLastReceivedTelemetry{chrono::system_clock::now()},
         millisBetweenLastTwoPackets{0} {
-    //TODO: catch error
-    telemetryHandler->startup();
-
 }
 
 Worker::~Worker() {
@@ -71,8 +67,8 @@ void Worker::mainRoutine() {
     lastIteration = chrono::system_clock::now();
     checkLinkStatuses();
 
-    vector<RocketEvent> rocketEvents = telemetryHandler->pollEvents();
-    vector<TelemetryReading> data = telemetryHandler->pollData();
+    vector<RocketEvent> rocketEvents = telemetryHandler_->pollEvents();
+    vector<TelemetryReading> data = telemetryHandler_->pollData();
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
 

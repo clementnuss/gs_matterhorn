@@ -66,7 +66,7 @@ void RadioReceiver::openSerialPort() {
         serialPort_.open();
     } catch (serial::SerialException &e) {
         std::cerr << "Unable to open the serial port" << std::endl << e.what() << std::endl;
-        throw (::std::runtime_error("Unable to open COM port for device " + device_ + "\n"));
+        throw (std::runtime_error("Unable to open COM port for device " + device_ + "\n"));
     }
 //    serialPort_.flush();
 }
