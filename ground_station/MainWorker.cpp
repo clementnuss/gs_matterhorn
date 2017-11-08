@@ -21,8 +21,10 @@ Worker::Worker(std::string comPort) :
                                {0, 0, 0},
                                0,
                                0,
+                               0,
                                0},
         lastUIupdate{chrono::system_clock::now()},
+        lastIteration{chrono::system_clock::now()},
         timeOfLastLinkCheck{chrono::system_clock::now()},
         timeOfLastReceivedTelemetry{chrono::system_clock::now()},
         millisBetweenLastTwoPackets{0} {
@@ -62,8 +64,11 @@ void Worker::run() {
  */
 void Worker::mainRoutine() {
     //TODO: adapt sleep time so as to have proper framerate
-    QThread::msleep(UIConstants::REFRESH_RATE);
-
+    auto elapsed = msecsBetween(lastIteration, chrono::system_clock::now());
+    if (elapsed < UIConstants::REFRESH_RATE) {
+        QThread::msleep(UIConstants::REFRESH_RATE - static_cast<unsigned long>(elapsed));
+    }
+    lastIteration = chrono::system_clock::now();
     checkLinkStatuses();
 
     vector<RocketEvent> rocketEvents = telemetryHandler->pollEvents();
@@ -86,6 +91,9 @@ void Worker::mainRoutine() {
 
         emit graphDataReady(altitudeDataBuffer, GraphFeature::FEATURE1);
         emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
+    } else {
+        QVector<QCPGraphData> empty;
+        emit graphDataReady(empty, GraphFeature::Count);
     }
 
     if (!rocketEvents.empty()) {

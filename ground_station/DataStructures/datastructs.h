@@ -88,7 +88,7 @@ struct TelemetryReading : TimedData, ILoggable, IDeserializable {
 
     TelemetryReading(uint32_t t, double altitude, XYZReading acceleration,
                      XYZReading magnetometer, XYZReading gyroscope,
-                     double pressure, double temperature, double air_speed) :
+                     double pressure, double temperature, double air_speed, uint32_t sequenceNumber) :
             TimedData{t},
             altitude_{altitude},
             acceleration_{acceleration},
@@ -96,7 +96,8 @@ struct TelemetryReading : TimedData, ILoggable, IDeserializable {
             gyroscope_{gyroscope},
             pressure_{pressure},
             temperature_{temperature},
-            air_speed_{air_speed} {}
+            air_speed_{air_speed},
+            sequenceNumber_{sequenceNumber} {}
 
     TelemetryReading(const TelemetryReading &that) = default;
 
@@ -109,6 +110,7 @@ struct TelemetryReading : TimedData, ILoggable, IDeserializable {
     double pressure_;
     double temperature_;
     double air_speed_;
+    uint32_t sequenceNumber_;
 
     string toString() const override {
         stringstream format;

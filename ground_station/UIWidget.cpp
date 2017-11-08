@@ -3,11 +3,14 @@
 #include "UI/Colors.h"
 #include <iostream>
 #include <cassert>
+#include <Utilities/TimeUtils.h>
 
 GSWidget::GSWidget(QWidget *parent) :
         QWidget(parent),
         ui(new Ui::GSWidget),
-        clockTimer(this) {
+        clockTimer(this),
+        lastGraphUpdate_{chrono::system_clock::now()},
+        lastRemoteTime_{-1000} {
     ui->setupUi(this);
 
     graphSetup();
@@ -56,8 +59,25 @@ void GSWidget::updateEvents(vector<RocketEvent> &events) {
 void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 
     if (d.isEmpty()) {
+
+        auto elapsed = usecsBetween(lastGraphUpdate_, chrono::system_clock::now());
+        if (elapsed > UIConstants::GRAPH_DATA_INTERVAL_USECS) {
+            double elapsedSeconds = elapsed / 1'000'000.0;
+
+            for (int g_idx = 0; g_idx < static_cast<int>(GraphFeature::Count); g_idx++) {
+                QCPGraph *g = ui->graph_widget->graph(g_idx);
+                g->keyAxis()->setRange(lastRemoteTime_ + elapsedSeconds,
+                                       UIConstants::GRAPH_XRANGE_SECS,
+                                       Qt::AlignRight);
+            };
+
+            ui->graph_widget->replot();
+        }
         return;
     }
+
+    lastGraphUpdate_ = chrono::system_clock::now();
+    lastRemoteTime_ = d.last().key;
 
     QCPGraph *g = ui->graph_widget->graph(static_cast<int>(feature));
 

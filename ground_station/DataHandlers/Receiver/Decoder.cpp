@@ -59,9 +59,9 @@ bool Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
 void Decoder::processTelemetryPayload(std::vector<uint8_t> payloadBuffer) {
 
     std::shared_ptr<IDeserializable>
-    (*f)(std::vector<uint8_t>) = TELEMETRY_PAYLOAD_FACTORIES.at(currentDatagram_.payloadType_);
+    (*f)(std::vector<uint8_t>, uint32_t) = TELEMETRY_PAYLOAD_FACTORIES.at(currentDatagram_.payloadType_);
 
-    currentDatagram_.deserializedPayload_ = std::move(f(payloadBuffer));
+    currentDatagram_.deserializedPayload_ = std::move(f(std::move(payloadBuffer), currentDatagram_.sequenceNumber_));
 }
 
 bool Decoder::datagramReady() {

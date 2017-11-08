@@ -17,7 +17,7 @@ typedef union {
 class Factories {
 
 public:
-    static std::shared_ptr<IDeserializable> telemetryReadingFactory(std::vector<uint8_t>);
+    static std::shared_ptr<IDeserializable> telemetryReadingFactory(std::vector<uint8_t>, uint32_t seqNumber);
 };
 
 

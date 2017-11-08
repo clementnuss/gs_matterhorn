@@ -120,8 +120,8 @@ void RadioReceiver::unpackPayload() {
     Datagram d = byteDecoder_.retrieveDatagram();
     switch (d.payloadType_) {
         case DatagramPayloadType::TELEMETRY: {
-            std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(
-                    d.deserializedPayload_);
+            std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>
+                    (d.deserializedPayload_);
             //TODO: make sure that the memory behaviour is correct
             telemQueue_.push(*data);
             break;

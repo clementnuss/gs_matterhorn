@@ -56,7 +56,7 @@ static constexpr size_t CHECKSUM_SIZE = 2;
  * Any custom payload specification should be added here.
  */
 static const std::map<DatagramPayloadType, std::shared_ptr<IDeserializable>(*)(
-        std::vector<uint8_t>)> TELEMETRY_PAYLOAD_FACTORIES{
+        std::vector<uint8_t>, uint32_t)> TELEMETRY_PAYLOAD_FACTORIES{
         {DatagramPayloadType::TELEMETRY, &Factories::telemetryReadingFactory}
 };
 

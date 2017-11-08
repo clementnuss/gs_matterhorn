@@ -49,6 +49,7 @@ private:
     FileLogger eventLogger;
     TelemetryReading lastDisplayableReading;
     chrono::system_clock::time_point lastUIupdate;
+    chrono::system_clock::time_point lastIteration;
     chrono::system_clock::time_point timeOfLastLinkCheck;
     chrono::system_clock::time_point timeOfLastReceivedTelemetry;
     long long int millisBetweenLastTwoPackets;
