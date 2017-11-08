@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="main.qml">Qt/main.qml</file>
+        <file alias="AnimatedEntity.qml">Qt/AnimatedEntity.qml</file>
+    </qresource>
+</RCC>

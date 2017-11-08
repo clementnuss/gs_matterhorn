@@ -3,6 +3,7 @@
 #include "UI/Colors.h"
 #include <iostream>
 #include <cassert>
+#include <QtQuickWidgets/QQuickWidget>
 #include <Qt3DCore/QTransform>
 #include <Qt3DExtras/QTorusMesh>
 #include <Qt3DExtras/QPlaneMesh>
@@ -19,6 +20,11 @@ GSWidget::GSWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    auto *quickWidget = new QQuickWidget;
+    quickWidget->setMinimumSize(300, 300);
+    quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    quickWidget->setSource(QUrl("qrc:/main.qml"));
+    ui->stackedWidget->addWidget(quickWidget);
     graphSetup();
 
     connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
