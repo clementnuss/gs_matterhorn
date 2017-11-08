@@ -5,8 +5,9 @@
 #include <boost/filesystem.hpp>
 #include <chrono>
 #include "TelemetryHandler.h"
+#include "TelemetryReplayHandler.h"
 
-class TelemetryReplay : public TelemetryHandler {
+class TelemetryReplay : public TelemetryHandler, public TelemetryReplayHandler {
 
 public:
 
@@ -18,13 +19,13 @@ public:
 
     vector<TelemetryReading> pollData() override;
 
-    void updatePlaybackSpeed(double);
+    void updatePlaybackSpeed(double) override;
 
-    void setPlaybackReversed(bool);
+    void setPlaybackReversed(bool) override;
 
-    void resetPlayback();
+    void resetPlayback() override;
 
-    bool endOfPlayback();
+    bool endOfPlayback() override;
 
 private:
     boost::filesystem::path path_;

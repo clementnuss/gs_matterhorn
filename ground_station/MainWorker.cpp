@@ -86,7 +86,7 @@ void Worker::mainRoutine() {
         emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
     } else {
         if (replayMode_) {
-            auto *telemReplay = dynamic_cast<TelemetryReplay *>(telemetryHandler_.get());
+            auto *telemReplay = dynamic_cast<TelemetryReplayHandler *>(telemetryHandler_.get());
             if (!telemReplay->endOfPlayback()) {
                 QVector<QCPGraphData> empty;
                 emit graphDataReady(empty, GraphFeature::Count);
@@ -187,19 +187,19 @@ Worker::extractGraphData(vector<TelemetryReading> &data, QCPGraphData (*extracti
 
 void Worker::updatePlaybackSpeed(double newSpeed) {
     assert(replayMode_);
-    auto *telemReplay = dynamic_cast<TelemetryReplay *>(telemetryHandler_.get());
+    auto *telemReplay = dynamic_cast<TelemetryReplayHandler *>(telemetryHandler_.get());
     telemReplay->updatePlaybackSpeed(newSpeed);
 }
 
 void Worker::resetPlayback() {
     assert(replayMode_);
-    auto *telemReplay = dynamic_cast<TelemetryReplay *>(telemetryHandler_.get());
+    auto *telemReplay = dynamic_cast<TelemetryReplayHandler *>(telemetryHandler_.get());
     telemReplay->resetPlayback();
 }
 
 void Worker::reversePlayback(bool reversed) {
     assert(replayMode_);
-    auto *telemReplay = dynamic_cast<TelemetryReplay *>(telemetryHandler_.get());
+    auto *telemReplay = dynamic_cast<TelemetryReplayHandler *>(telemetryHandler_.get());
     telemReplay->setPlaybackReversed(reversed);
 }
 

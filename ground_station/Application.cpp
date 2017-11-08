@@ -3,6 +3,7 @@
 #include <DataHandlers/TelemetrySimulator.h>
 #include <DataHandlers/Receiver/RadioReceiver.h>
 #include <DataHandlers/TelemetryReplay.h>
+#include <DataHandlers/StateEstimator.h>
 #include "Application.h"
 
 Application::Application(int &argc, char **argv) : qApplication_{argc, argv}, mainWidget_{nullptr}, workerThread_{} {
@@ -41,7 +42,7 @@ void Application::run() {
 
     TelemetryHandler *handler;
     try {
-        handler = new TelemetryReplay(path);
+        handler = new StateEstimator(new TelemetryReplay(path));
         handler->startup();
         mainWidget_.setReplayMode();
     } catch (std::runtime_error &e) {
