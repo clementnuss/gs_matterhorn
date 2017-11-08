@@ -47,9 +47,11 @@ vector<TelemetryReading> TelemetryReplay::pollData() {
             std::chrono::duration_cast<std::chrono::microseconds>(
                     std::chrono::system_clock::now().time_since_epoch()).count() - deltaT_);
 
-    TelemetryReading r;
-    while ((r = *lastReadingIter_++).timestamp_ < adjustedTime){
-        vec.push_back(r);
+    while ((*lastReadingIter_).timestamp_ < adjustedTime) {
+        if (lastReadingIter_ == readings_.end()){
+            return vector<TelemetryReading>();
+        }
+        vec.push_back(*lastReadingIter_++);
     }
 
     return vec;
