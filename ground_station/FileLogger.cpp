@@ -53,7 +53,7 @@ void FileLogger::registerString(const std::string s) {
 void FileLogger::writeFile() {
 
     array<string, bufferSize> a = buffer;
-    thread t(&FileLogger::writeRoutine, a, bufferIndex_, path_, id_);
+    thread t(&FileLogger::writeRoutine, a, bufferIndex_, path_, id_++);
 
     t.detach();
 }
@@ -63,7 +63,7 @@ void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex, std
     assert(tailIndex >= 1);
 
     stringstream ss;
-    ss << path << "_" << setw(3) << setfill('0') << ++id;
+    ss << path << "_" << setw(3) << setfill('0') << id;
     ss << "_" << std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()).count();
     ofstream fileOutput(ss.str());
