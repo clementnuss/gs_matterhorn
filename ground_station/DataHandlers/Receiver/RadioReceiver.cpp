@@ -146,3 +146,7 @@ bool RadioReceiver::isReplayHandler() {
     return false;
 }
 
+vector<XYZReading> RadioReceiver::pollLocations() {
+    return vector<XYZReading>();
+}
+
