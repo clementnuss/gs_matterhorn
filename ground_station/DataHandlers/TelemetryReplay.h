@@ -3,6 +3,7 @@
 #define GS_MATTERHORN_TELEMETRYREPLAY_H
 
 #include <boost/filesystem.hpp>
+#include <chrono>
 #include "TelemetryHandler.h"
 
 class TelemetryReplay : public TelemetryHandler {
@@ -21,10 +22,10 @@ private:
     boost::filesystem::path path_;
     vector<TelemetryReading> readings_;
     vector<TelemetryReading>::const_iterator lastReadingIter_;
+    int64_t deltaT_;
 
     void parseFile(boost::filesystem::path);
 
-    static TimedData parseLine(string &reading);
 };
 
 #endif //GS_MATTERHORN_TELEMETRYREPLAY_H

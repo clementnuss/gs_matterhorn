@@ -9,7 +9,7 @@ using namespace boost::filesystem;
  * @param path location of the file/directory to read.
  */
 TelemetryReplay::TelemetryReplay(std::string &path) :
-        path_{path}, readings_{} {}
+        path_{path}, readings_{}, deltaT_{}, lastReadingIter_{} {}
 
 void TelemetryReplay::startup() {
     if (exists(path_)) {
@@ -33,6 +33,8 @@ void TelemetryReplay::startup() {
     }
 
     lastReadingIter_ = readings_.begin();
+    deltaT_ = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::system_clock::now().time_since_epoch()).count() - readings_.front().timestamp_;
 }
 
 vector<RocketEvent> TelemetryReplay::pollEvents() {
@@ -41,9 +43,13 @@ vector<RocketEvent> TelemetryReplay::pollEvents() {
 
 vector<TelemetryReading> TelemetryReplay::pollData() {
     vector<TelemetryReading> vec;
+    uint32_t adjustedTime = static_cast<uint32_t>(
+            std::chrono::duration_cast<std::chrono::microseconds>(
+                    std::chrono::system_clock::now().time_since_epoch()).count() - deltaT_);
 
-    for (int i = 0; i < 14; ++i) {
-        vec.push_back(*lastReadingIter_++);
+    TelemetryReading r;
+    while ((r = *lastReadingIter_++).timestamp_ < adjustedTime){
+        vec.push_back(r);
     }
 
     return vec;
@@ -51,6 +57,7 @@ vector<TelemetryReading> TelemetryReplay::pollData() {
 
 void TelemetryReplay::parseFile(boost::filesystem::path p) {
     boost::filesystem::ifstream ifs{p, ios::in};
+    cout << "Parsing telemetry file " << p.string() << endl;
 
     string reading;
     while (getline(ifs, reading)) {
@@ -59,7 +66,8 @@ void TelemetryReplay::parseFile(boost::filesystem::path p) {
                      boost::algorithm::token_compress_mode_type::token_compress_on);
 
         if (values.size() != 15) {
-            cout << "Invalid reading" << endl;
+            cout << "\tInvalid reading, only " << values.size() << " values on the line:" << endl;
+            cout << "\t" << reading << endl;
         }
         try {
 
@@ -85,14 +93,11 @@ void TelemetryReplay::parseFile(boost::filesystem::path p) {
                     pressure, temperature, air_speed, seqNumber};
             readings_.push_back(r);
 
-        } catch (std::invalid_argument &e) {
-
+        } catch (std::logic_error &e) {
+            cout << "\tunable to decode this reading:\n\t" << reading;
         }
     }
-}
-
-TimedData TelemetryReplay::parseLine(string &reading) {
-
+    ifs.close();
 }
 
 

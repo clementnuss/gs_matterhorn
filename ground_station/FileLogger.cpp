@@ -63,8 +63,8 @@ void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex, std
     assert(tailIndex >= 1);
 
     stringstream ss;
-    ss << path << "_" << ++id << "_";
-    ss << std::chrono::duration_cast<std::chrono::milliseconds>(
+    ss << path << "_" << setw(3) << setfill('0') << ++id;
+    ss << "_" << std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()).count();
     ofstream fileOutput(ss.str());
 
