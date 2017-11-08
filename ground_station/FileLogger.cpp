@@ -15,7 +15,7 @@ FileLogger::~FileLogger() {
 }
 
 void FileLogger::close() {
-    // cout << "\n Flushing file logger @ " << path << endl;
+    cout << "\n Flushing file logger @ " << path_ << endl;
     if (bufferIndex_ != 0) {
         writeFile();
         bufferIndex_ = 0;
@@ -27,7 +27,7 @@ void FileLogger::registerData(const vector<reference_wrapper<ILoggable>> &data) 
     for (const auto loggable : data) {
 
         if (bufferIndex_ >= bufferSize) {
-            //cout << "\n Writing log file.." << endl;
+            cout << "\n Writing log file.." << endl;
             writeFile();
             bufferIndex_ = 0;
         }
@@ -40,7 +40,7 @@ void FileLogger::registerData(const vector<reference_wrapper<ILoggable>> &data) 
 void FileLogger::registerString(const std::string &s) {
 
     if (bufferIndex_ >= bufferSize) {
-        //cout << "\n Writing log file.." << endl;
+        cout << "\n Writing log file.." << endl;
         writeFile();
         bufferIndex_ = 0;
     }
@@ -70,7 +70,7 @@ void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex, std
 
     if (!fileOutput) {
         //TODO: find an alternative way to save data ?
-        //cerr << "Could not open file for writing, data will be lost." << endl << flush;
+        cerr << "Could not open file for writing, data will be lost." << endl << flush;
         return;
     }
 

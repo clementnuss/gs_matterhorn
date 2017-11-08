@@ -4,12 +4,15 @@
 #include <DataHandlers/TelemetryHandler.h>
 #include "Decoder.h"
 #include <boost/thread/thread.hpp>
-#include <boost/asio.hpp>
 #include <boost/array.hpp>
 #include <boost/lockfree/spsc_queue.hpp>
 #include <FileLogger.h>
+#include <serial/serial.h>
+
 
 class RadioReceiver : public TelemetryHandler {
+
+    static constexpr uint32_t BUFFER_SIZE = 4096;
 
 public:
 
@@ -25,20 +28,19 @@ public:
 
 private:
 
-    void asyncRead();
+    void readSerialPort();
 
     void openSerialPort();
 
-    void handleReceive(const boost::system::error_code &error, std::size_t);
+    void handleReceive(std::size_t);
 
     void unpackPayload();
 
     Decoder byteDecoder_;
     std::string device_;
-    boost::asio::io_service ioService_;
-    boost::asio::serial_port serialPort_;
+    serial::Serial serialPort_;
     boost::thread thread_;
-    boost::array<uint8_t, 500> recvBuffer_;
+    uint8_t* recvBuffer_;
     boost::lockfree::spsc_queue<TelemetryReading> telemQueue_;
 
 

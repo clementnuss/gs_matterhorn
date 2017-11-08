@@ -13,9 +13,14 @@ add_library(ground_station_lib ${SOURCES} ${HEADERS})
 
 # Include QCustomPlot libtrary and include file
 include_directories(${CMAKE_BINARY_DIR}/qcustomplot-src/)
-target_link_libraries(ground_station_lib Boost::boost Boost::system Boost::thread Boost::program_options)
 target_link_libraries(ground_station_lib qcustomplot_lib ${CMAKE_THREAD_LIBS_INIT})
-include_directories(${CMAKE_BINARY_DIR}/qcustomplot-src/)
+
+#Include Boost
+target_link_libraries(ground_station_lib Boost::boost Boost::system Boost::thread Boost::program_options)
+
+# Include serial library
+include_directories(${CMAKE_BINARY_DIR}/serial-src/include/)
+target_link_libraries(ground_station_lib serial)
 
 IF (WIN32)
     target_link_libraries(ground_station_lib ws2_32)
