@@ -34,8 +34,6 @@ public:
 
     bool isReplayHandler() override;
 
-    std::vector<XYZReading> pollLocations() override;
-
 private:
 
     /**
@@ -51,7 +49,7 @@ private:
     void unpackPayload();
 
     Decoder byteDecoder_;
-    std::string device_;
+    std::string devicePort_;
     serial::Serial serialPort_;
     boost::thread thread_;
     uint8_t *recvBuffer_;

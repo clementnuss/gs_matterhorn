@@ -34,16 +34,19 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
     float pressure_hPa = pressure.fl / 100.0f;
 
     // more info here: https://barani.biz/apps/sea-level-pressure/
-    double adjustedSealevelPressure = SensorConstants::currentLocationReferenceHPa * pow(
+    /*
+    double adjustedSeaLevelPressure = SensorConstants::currentLocationReferenceHPa * pow(
             (1 - (0.0065 * SensorConstants::currentLocationHeight) /
                  (SensorConstants::currentLocationTemperature + 0.006 * SensorConstants::currentLocationHeight +
                   273.15)), -5.257);
+      */
 
-    double altitude = 44330 * (1.0 - pow(pressure_hPa / adjustedSealevelPressure, 0.1903));
+    double altitude = 44330 * (1.0 - pow(pressure_hPa / SensorConstants::adjustedSeaLevelPressure, 0.1903));
 
     auto press = parse16<uint16_t>(it);
 
-    double p_press = (((float) press) - 1652) * (SensorConstants::PRESSURE_SENSOR2_MAX - SensorConstants::PRESSURE_SENSOR2_MIN) /
+    double p_press =
+            (((float) press) - 1652) * (SensorConstants::PRESSURE_SENSOR2_MAX - SensorConstants::PRESSURE_SENSOR2_MIN) /
             (14745 - 1652) +
             SensorConstants::PRESSURE_SENSOR2_MIN;
 

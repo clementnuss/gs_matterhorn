@@ -8,6 +8,8 @@
 #include <chrono>
 #include "GraphFeature.h"
 #include "FileLogger.h"
+#include <serial/serial.h>
+#include <boost/circular_buffer.hpp>
 
 class GSMainwindow;
 using namespace std;
@@ -65,6 +67,12 @@ private:
     bool replayMode_;
     std::atomic<bool> updateHandler_;
 
+#if USE_TRACKING
+    boost::circular_buffer<int> angleBuffer_{25};
+    chrono::system_clock::time_point lastTrackingAngleUpdate;
+    serial::Serial serialPort_{};
+#endif
+
     void checkLinkStatuses();
 
     void displayMostRecentTelemetry(TelemetryReading);
@@ -81,6 +89,8 @@ private:
     long long int millisBetweenLastTwoPackets;
 
     QVector<QCPGraphData> extractGraphData(vector<TelemetryReading> &, QCPGraphData (*)(TelemetryReading));
+
+    void moveTrackingSystem(double currentAltitude);
 };
 
 #endif // WORKER_H

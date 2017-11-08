@@ -8,6 +8,8 @@
 #include <Qt3DRender/QLayer>
 
 #define DEBUG false
+#define USE_TRACKING true
+
 namespace UnitsConstants {
     static constexpr float KNOTS_TO_MS = 0.514444;
 }
@@ -80,9 +82,17 @@ namespace SensorConstants {
 
     // Values can be found here:
     // http://www.meteosuisse.admin.ch/home/meteo/valeurs-de-mesures/valeurs-de-mesures-aux-stations.html?param=airpressure-qfe
+    /*
     static float currentLocationReferenceHPa = 964.9f;
     static float currentLocationHeight = 456.0f;
     static float currentLocationTemperature = 1.6f;
+     */
+
+    static float adjustedSeaLevelPressure = 1015.8;
+    static float launchAltitude = 408.3;
+    static float trackingAltitude = 409;
+    static float distanceToLaunchSite = 1.5;
+
 }
 
 namespace DataConstants {
