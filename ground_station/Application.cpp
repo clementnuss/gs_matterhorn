@@ -37,12 +37,13 @@ Application::Application(int &argc, char **argv) : qApplication_{argc, argv}, ma
 }
 
 void Application::run() {
-    std::string path{R"(D:\EPFL\matterhorn\Eric Launch 18.11.2017\telemetry)"};
+    std::string path{R"(D:\EPFL\matterhorn\Eric Launch 18.11.2017\telemetry\2)"};
 
     TelemetryHandler *handler;
     try {
         handler = new TelemetryReplay(path);
         handler->startup();
+        mainWidget_.setReplayMode();
     } catch (std::runtime_error &e) {
         std::cerr << "Error when starting the telemetry handler:\n" << e.what();
         return; // This prevents the worker from being instantiated
@@ -108,6 +109,12 @@ void Application::connectSlotsAndSignals() {
                      &GSWidget::toggleLogging,
                      worker_,
                      &Worker::updateLoggingStatus);
+
+    QObject::connect(&mainWidget_,
+                     &GSWidget::changePlaybackSpeed,
+                     worker_,
+                     &Worker::updatePlaybackSpeed);
+
 }
 
 

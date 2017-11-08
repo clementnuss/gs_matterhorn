@@ -15,7 +15,7 @@ class Worker : public QObject {
 Q_OBJECT
 
 public:
-    explicit Worker(TelemetryHandler*);
+    explicit Worker(TelemetryHandler *);
 
     ~Worker() override;
 
@@ -28,6 +28,8 @@ public slots:
     void emitAllStatuses();
 
     void updateLoggingStatus();
+
+    void updatePlaybackSpeed(double);
 
 signals:
 

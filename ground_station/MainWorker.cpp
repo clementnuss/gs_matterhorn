@@ -2,6 +2,7 @@
 #include <iostream>
 #include <DataHandlers/TelemetrySimulator.h>
 #include <DataHandlers/Receiver/RadioReceiver.h>
+#include <DataHandlers/TelemetryReplay.h>
 #include "MainWorker.h"
 #include "Utilities/GraphUtils.h"
 #include "Utilities/TimeUtils.h"
@@ -68,22 +69,22 @@ void Worker::mainRoutine() {
     checkLinkStatuses();
 
     vector<RocketEvent> rocketEvents = telemetryHandler_->pollEvents();
-    vector<TelemetryReading> data = telemetryHandler_->pollData();
+    vector<TelemetryReading> telemReadings = telemetryHandler_->pollData();
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
 
     if (loggingEnabled) {
-        telemetryLogger.registerData(vector<reference_wrapper<ILoggable>>(begin(data), end(data)));
+        telemetryLogger.registerData(vector<reference_wrapper<ILoggable>>(begin(telemReadings), end(telemReadings)));
         eventLogger.registerData(vector<reference_wrapper<ILoggable>>(begin(rocketEvents), end(rocketEvents)));
     }
 
-    if (!data.empty()) {
+    if (!telemReadings.empty()) {
         millisBetweenLastTwoPackets = msecsBetween(timeOfLastReceivedTelemetry, now);
         timeOfLastReceivedTelemetry = now;
-        displayMostRecentTelemetry(data[data.size() - 1]);
+        displayMostRecentTelemetry(telemReadings[telemReadings.size() - 1]);
 
-        QVector<QCPGraphData> altitudeDataBuffer = extractGraphData(data, altitudeFromReading);
-        QVector<QCPGraphData> accelDataBuffer = extractGraphData(data, accelerationFromReading);
+        QVector<QCPGraphData> altitudeDataBuffer = extractGraphData(telemReadings, altitudeFromReading);
+        QVector<QCPGraphData> accelDataBuffer = extractGraphData(telemReadings, accelerationFromReading);
 
         emit graphDataReady(altitudeDataBuffer, GraphFeature::FEATURE1);
         emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
@@ -178,6 +179,11 @@ Worker::extractGraphData(vector<TelemetryReading> &data, QCPGraphData (*extracti
     }
 
     return v;
+}
+
+void Worker::updatePlaybackSpeed(double newSpeed) {
+    TelemetryReplay* telemReplay = dynamic_cast<TelemetryReplay*>(telemetryHandler_.get());
+    telemReplay->updatePlaybackSpeed(newSpeed);
 }
 
 

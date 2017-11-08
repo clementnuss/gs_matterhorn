@@ -14,7 +14,8 @@ GSWidget::GSWidget(QWidget *parent) :
         lastGraphUpdate_{chrono::system_clock::now()},
         userItems_{std::vector<std::tuple<QCPAbstractItem *, QCPAbstractItem *>>()},
         lastRemoteTime_{-1000},
-        autoPlay_{true} {
+        autoPlay_{true},
+        replayPlaybackSpeed_{1} {
     ui->setupUi(this);
 
     graphWidgetSetup();
@@ -35,6 +36,8 @@ void GSWidget::connectComponents() {
     connect(ui->graph_clear_items_button, &QPushButton::clicked, this, &GSWidget::clearAllGraphItems);
     connect(ui->graph_autoplay_button, &QPushButton::clicked, this, &GSWidget::updateAutoPlay);
     connect(ui->graph_sync_button, &QPushButton::clicked, this, &GSWidget::updatePlotSync);
+
+    connect(ui->time_unfolding_increase, &QPushButton::clicked, this, &GSWidget::increaseSpeed);
 
     // Connect components related to graphs
     applyToAllPlots(
@@ -329,6 +332,23 @@ void GSWidget::applyToAllPlots(const std::function<void(QCustomPlot *)> &f) {
     for (auto &plot : plotVector_) {
         f(plot);
     }
+}
+
+void GSWidget::increaseSpeed() {
+    replayPlaybackSpeed_ *= 1.5;
+    emit changePlaybackSpeed(replayPlaybackSpeed_);
+    ui->time_unfolding_current_speed->setText(
+            QString::number(replayPlaybackSpeed_, 'f', 2));
+}
+
+void GSWidget::setRealTimeMode() {
+    ui->time_unfolding_mode->setText(QString("REAL-TIME"));
+    ui->replay_controls->hide();
+}
+
+void GSWidget::setReplayMode() {
+    ui->time_unfolding_mode->setText(QString("REPLAY"));
+    ui->replay_controls->show();
 }
 
 bool GSWidget::event(QEvent *event) {

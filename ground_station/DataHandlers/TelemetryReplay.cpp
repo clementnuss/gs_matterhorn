@@ -9,7 +9,7 @@ using namespace boost::filesystem;
  * @param path location of the file/directory to read.
  */
 TelemetryReplay::TelemetryReplay(std::string &path) :
-        path_{path}, readings_{}, deltaT_{}, lastReadingIter_{} {}
+        path_{path}, readings_{}, lastPlaybackTime_{}, lastReadingIter_{}, playbackSpeed_{1} {}
 
 void TelemetryReplay::startup() {
     if (exists(path_)) {
@@ -33,8 +33,8 @@ void TelemetryReplay::startup() {
     }
 
     lastReadingIter_ = readings_.begin();
-    deltaT_ = std::chrono::duration_cast<std::chrono::microseconds>(
-            std::chrono::system_clock::now().time_since_epoch()).count() - readings_.front().timestamp_;
+    lastPlaybackTime_ = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 vector<RocketEvent> TelemetryReplay::pollEvents() {
@@ -43,12 +43,20 @@ vector<RocketEvent> TelemetryReplay::pollEvents() {
 
 vector<TelemetryReading> TelemetryReplay::pollData() {
     vector<TelemetryReading> vec;
-    uint32_t adjustedTime = static_cast<uint32_t>(
-            std::chrono::duration_cast<std::chrono::microseconds>(
-                    std::chrono::system_clock::now().time_since_epoch()).count() - deltaT_);
+    uint32_t adjustedTime =
+            static_cast<uint32_t>(
+                    std::chrono::duration_cast<std::chrono::microseconds>(
+                            std::chrono::system_clock::now().time_since_epoch()).count() -
+                    lastPlaybackTime_);
+
+    lastPlaybackTime_ = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::system_clock::now().time_since_epoch()).count();
+
+    adjustedTime *= playbackSpeed_;
+    adjustedTime += (*lastReadingIter_).timestamp_;
 
     while ((*lastReadingIter_).timestamp_ < adjustedTime) {
-        if (lastReadingIter_ == readings_.end()){
+        if (lastReadingIter_ == readings_.end()) {
             return vector<TelemetryReading>();
         }
         vec.push_back(*lastReadingIter_++);
@@ -64,7 +72,7 @@ void TelemetryReplay::parseFile(boost::filesystem::path p) {
     string reading;
     while (getline(ifs, reading)) {
         std::vector<std::string> values;
-        boost::split(values, reading, boost::is_any_of("\t "),
+        boost::split(values, reading, boost::is_any_of("\t ,"),
                      boost::algorithm::token_compress_mode_type::token_compress_on);
 
         if (values.size() != 15) {
@@ -93,13 +101,17 @@ void TelemetryReplay::parseFile(boost::filesystem::path p) {
             TelemetryReading r{
                     timestamp, altitude, XYZReading{ax, ay, az}, XYZReading{mx, my, mz}, XYZReading{gx, gy, gz},
                     pressure, temperature, air_speed, seqNumber};
-            readings_.push_back(r);
+            readings_.push_back(std::move(r));
 
         } catch (std::logic_error &e) {
             cout << "\tunable to decode this reading:\n\t" << reading;
         }
     }
     ifs.close();
+}
+
+void TelemetryReplay::updatePlaybackSpeed(double newPlaybackSpeed) {
+    playbackSpeed_ = newPlaybackSpeed;
 }
 
 

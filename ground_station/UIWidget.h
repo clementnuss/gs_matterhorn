@@ -26,6 +26,10 @@ public:
 
     ~GSWidget() override;
 
+    void setReplayMode();
+
+    void setRealTimeMode();
+
 public slots:
 
     void dummySlot(bool);
@@ -56,9 +60,12 @@ public slots:
 
     void updatePlotSync(bool);
 
+    void increaseSpeed();
 signals:
 
     void toggleLogging();
+
+    void changePlaybackSpeed(double);
 
 private:
 
@@ -79,6 +86,7 @@ private:
     std::vector<std::tuple<QCPAbstractItem *, QCPAbstractItem *>> userItems_;
     bool autoPlay_;
     double lastRemoteTime_;
+    double replayPlaybackSpeed_;
 };
 
 #endif // GSWIDGET_H

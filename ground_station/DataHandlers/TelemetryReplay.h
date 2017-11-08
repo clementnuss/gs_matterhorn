@@ -18,11 +18,14 @@ public:
 
     vector<TelemetryReading> pollData() override;
 
+    void updatePlaybackSpeed(double);
+
 private:
     boost::filesystem::path path_;
     vector<TelemetryReading> readings_;
     vector<TelemetryReading>::const_iterator lastReadingIter_;
-    int64_t deltaT_;
+    int64_t lastPlaybackTime_;
+    double playbackSpeed_;
 
     void parseFile(boost::filesystem::path);
 
