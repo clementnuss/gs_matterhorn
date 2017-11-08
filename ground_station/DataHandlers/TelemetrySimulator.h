@@ -30,7 +30,7 @@ private:
     const TelemetryReading generateTelemetry();
     const vector<TelemetryReading> generateTelemetryVector();
 
-    QTime time;
+    chrono::system_clock::time_point startTime_;
     HandlerStatus simulatorStatus;
     chrono::system_clock::time_point timeOfLastPolledData;
     bool variableRate;

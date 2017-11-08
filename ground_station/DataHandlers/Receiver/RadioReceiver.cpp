@@ -105,7 +105,7 @@ void RadioReceiver::handleReceive(std::size_t bytesTransferred) {
     for (int i = 0; i < bytesTransferred; ++i) {
         //TODO: log every byte received
 
-#ifdef DEBUG
+#if DEBUG
         std::bitset<8> x(recvBuffer_[i]);
         cout << x << ' ' << std::flush;
 #endif

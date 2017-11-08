@@ -20,6 +20,7 @@ Worker::Worker(std::string comPort) :
                                {0, 0, 0},
                                {0, 0, 0},
                                0,
+                               0,
                                0},
         lastUIupdate{chrono::system_clock::now()},
         timeOfLastLinkCheck{chrono::system_clock::now()},
@@ -166,7 +167,7 @@ Worker::extractGraphData(vector<TelemetryReading> &data, QCPGraphData (*extracti
     long long int lastTimestampSeen = 0;
 
     for (TelemetryReading reading : data) {
-        if (abs(lastTimestampSeen - reading.timestamp_) > UIConstants::GRAPH_DATA_INTERVAL_MSECS) {
+        if (abs(lastTimestampSeen - reading.timestamp_) > UIConstants::GRAPH_DATA_INTERVAL_USECS) {
             v.append(extractionFct(reading));
             lastTimestampSeen = reading.timestamp_;
         }

@@ -12,7 +12,7 @@ using namespace SimulatorConstants;
 
 //TODO: make telemetry handler factory to provide either simulator or real one
 
-TelemetrySimulator::TelemetrySimulator() : time{QTime::currentTime()},
+TelemetrySimulator::TelemetrySimulator() : startTime_{chrono::system_clock::now()},
                                            timeOfLastPolledData{chrono::system_clock::now()}, variableRate{true},
                                            simulatorStatus{HandlerStatus::NOMINAL} {
 }
@@ -86,8 +86,8 @@ const vector<TelemetryReading> TelemetrySimulator::generateTelemetryVector() {
 
 const TelemetryReading TelemetrySimulator::generateTelemetry() {
 
-    auto key = static_cast<uint32_t>(time.elapsed());
-    double keysec = key / 1000.0;
+    auto key = static_cast<uint32_t>(usecsBetween(startTime_, chrono::system_clock::now()));
+    double keysec = key / 1'000'000.0;
 
     double rnd = qrand();
 
@@ -110,7 +110,8 @@ const TelemetryReading TelemetrySimulator::generateTelemetry() {
                     100 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 10.0 * sin(keysec / 0.4)
             },
             50 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 5.0 * sin(keysec / 0.7),
-            90.0 * sin(key) + rnd / static_cast<double>(RAND_MAX) * 1 * sin(keysec / 0.7)
+            90.0 * sin(key) + rnd / static_cast<double>(RAND_MAX) * 1 * sin(keysec / 0.7),
+            14 + 30 * sin(key)
     };
 }
 
@@ -120,7 +121,7 @@ RocketEvent TelemetrySimulator::generateEvent() {
     auto code = static_cast<int>(round((EVENT_CODES.size() - 1) * qrand() / static_cast<double>(RAND_MAX)));
 
     assert(EVENT_CODES.find(code) != EVENT_CODES.end());
-    return RocketEvent {static_cast<uint32_t>(time.elapsed()), code, EVENT_CODES.at(code)};
+    return RocketEvent {static_cast<uint32_t>(usecsBetween(startTime_, chrono::system_clock::now())), code, EVENT_CODES.at(code)};
 }
 
 

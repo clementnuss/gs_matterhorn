@@ -33,6 +33,7 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
     float_cast pressure = {.uint32 = parse32<uint32_t>(it)};
     float pressure_hPa = pressure.fl / 100.0f;
 
+    // more info here: https://barani.biz/apps/sea-level-pressure/
     double adjustedSealevelPressure = SensorConstants::currentLocationReferenceHPa * pow(
             (1 - (0.0065 * SensorConstants::currentLocationHeight) /
                  (SensorConstants::currentLocationTemperature + 0.006 * SensorConstants::currentLocationHeight +
@@ -40,12 +41,15 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
 
     double altitude = 44330 * (1.0 - pow(pressure_hPa / adjustedSealevelPressure, 0.1903));
 
-    TelemetryReading r{measurement_time / 1000,
+    float_cast air_speed = {.uint32 = parse32<uint32_t>(it)};
+
+    TelemetryReading r{measurement_time,
                        altitude,
                        {ax, ay, az},
                        {mx, my, mz},
                        {gx, gy, gz},
                        pressure_hPa,
-                       temperature.fl};
+                       temperature.fl,
+                       air_speed.fl};
     return std::make_shared<TelemetryReading>(r);
 }

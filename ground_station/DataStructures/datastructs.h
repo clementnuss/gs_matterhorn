@@ -88,14 +88,15 @@ struct TelemetryReading : TimedData, ILoggable, IDeserializable {
 
     TelemetryReading(uint32_t t, double altitude, XYZReading acceleration,
                      XYZReading magnetometer, XYZReading gyroscope,
-                     double pressure, double temperature) :
+                     double pressure, double temperature, double air_speed) :
             TimedData{t},
             altitude_{altitude},
             acceleration_{acceleration},
             magnetometer_{magnetometer},
             gyroscope_{gyroscope},
             pressure_{pressure},
-            temperature_{temperature} {}
+            temperature_{temperature},
+            air_speed_{air_speed} {}
 
     TelemetryReading(const TelemetryReading &that) = default;
 
@@ -107,6 +108,7 @@ struct TelemetryReading : TimedData, ILoggable, IDeserializable {
     double altitude_;
     double pressure_;
     double temperature_;
+    double air_speed_;
 
     string toString() const override {
         stringstream format;
@@ -115,7 +117,7 @@ struct TelemetryReading : TimedData, ILoggable, IDeserializable {
         stringstream ss;
         ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << this->timestamp_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << altitude_
-           //           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << speed.value
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << air_speed_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << pressure_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << temperature_
            << acceleration_.toString()
