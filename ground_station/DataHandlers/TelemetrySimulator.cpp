@@ -3,7 +3,7 @@
 #include <QtCore/QTime>
 #include <cassert>
 #include <iostream>
-#include <c++/chrono>
+#include <chrono>
 #include <Utilities/TimeUtils.h>
 #include "TelemetrySimulator.h"
 

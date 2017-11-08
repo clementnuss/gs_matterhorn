@@ -28,7 +28,7 @@ namespace TimeConstants {
     static constexpr int MSECS_WIDTH = 3;
 }
 
-namespace UIConstants {
+namespace UserIfaceConstants {
     static constexpr int PRECISION = 2;
 
     // Refresh rates are in milliseconds
@@ -67,10 +67,10 @@ namespace SensorConstants {
 
 namespace DataConstants {
     static constexpr double DELETION_FACTOR = -0.05;
-    static constexpr uint32_t READINGS_PER_SEC = 1'000'000 / UIConstants::GRAPH_DATA_INTERVAL_USECS;
+    static constexpr uint32_t READINGS_PER_SEC = 1'000'000 / UserIfaceConstants::GRAPH_DATA_INTERVAL_USECS;
     static constexpr int MAX_DATA_VECTOR_SIZE =
             static_cast<const int>((1.0 + DELETION_FACTOR) *
-                                   (UIConstants::GRAPH_XRANGE_SECS * READINGS_PER_SEC));
+                                   (UserIfaceConstants::GRAPH_XRANGE_SECS * READINGS_PER_SEC));
 }
 
 namespace CommunicationsConstants {
