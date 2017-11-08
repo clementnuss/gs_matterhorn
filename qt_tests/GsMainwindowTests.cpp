@@ -2,10 +2,7 @@
 #include <QtWidgets/QLineEdit>
 #include <DataStructures/datastructs.h>
 #include <Application.h>
-#include "DummyTests.h"
 #include "GsMainwindowTests.h"
-
-QTEST_MAIN(GsMainwindowTests)
 
 void GsMainwindowTests::telemetryReadingCorrectlyDisplayed() {
     qRegisterMetaType<TelemetryReading>("TelemetryReading");
