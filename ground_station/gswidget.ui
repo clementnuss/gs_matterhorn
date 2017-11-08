@@ -812,9 +812,16 @@
                <property name="frameShadow">
                 <enum>QFrame::Raised</enum>
                </property>
-               <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="0,0,0,0,0,8">
+                  <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="0,0,0,0,0,0,8">
                 <item>
-                 <widget class="QPushButton" name="time_unfolding_reverse_time">
+                    <widget class="QToolButton" name="time_unfolding_select_files">
+                        <property name="text">
+                            <string>Select data</string>
+                        </property>
+                    </widget>
+                </item>
+                      <item>
+                          <widget class="QToolButton" name="time_unfolding_reverse_time">
                   <property name="font">
                    <font>
                     <strikeout>false</strikeout>
@@ -824,33 +831,24 @@
                   <property name="text">
                    <string>Reverse time</string>
                   </property>
-                  <property name="autoDefault">
-                   <bool>false</bool>
-                  </property>
-                  <property name="default">
-                   <bool>false</bool>
-                  </property>
-                  <property name="flat">
-                   <bool>false</bool>
-                  </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="time_unfolding_reset">
+                    <widget class="QToolButton" name="time_unfolding_reset">
                   <property name="text">
                    <string>Restart</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="time_unfolding_decrease">
+                    <widget class="QToolButton" name="time_unfolding_decrease">
                   <property name="text">
                    <string>Decrease speed</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="time_unfolding_increase">
+                    <widget class="QToolButton" name="time_unfolding_increase">
                   <property name="text">
                    <string>Increase speed</string>
                   </property>

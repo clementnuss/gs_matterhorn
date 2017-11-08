@@ -142,3 +142,7 @@ RadioReceiver::~RadioReceiver() {
     serialPort_.close();
 }
 
+bool RadioReceiver::isReplayHandler() {
+    return false;
+}
+

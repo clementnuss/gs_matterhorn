@@ -167,3 +167,7 @@ void TelemetrySimulator::updateHandlerStatus() {
         simulatorStatus = HandlerStatus::DOWN;
     }
 }
+
+bool TelemetrySimulator::isReplayHandler() {
+    return false;
+}

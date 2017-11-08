@@ -2,6 +2,7 @@
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 #include <Utilities/TimeUtils.h>
+#include <QtWidgets/QFileDialog>
 
 using namespace boost::filesystem;
 
@@ -43,8 +44,8 @@ vector<RocketEvent> TelemetryReplay::pollEvents() {
 
 vector<TelemetryReading> TelemetryReplay::pollData() {
     vector<TelemetryReading> vec{};
-    double adjustedTime = usecsBetween(lastPlaybackTime_, std::chrono::system_clock::now());
-
+    auto localLastPlaybackTime = std::chrono::system_clock::now();
+    double adjustedTime = usecsBetween(lastPlaybackTime_, localLastPlaybackTime);
     adjustedTime *= playbackSpeed_;
 
     if (playbackReversed_) {
@@ -55,7 +56,7 @@ vector<TelemetryReading> TelemetryReplay::pollData() {
         auto newFrontPosition = frontReadingsIter_;
         while ((*newFrontPosition).timestamp_ > adjustedFrontTime) {
             if (newFrontPosition == readings_.begin()) {
-                continue;
+                break;
             }
             newFrontPosition--;
         }
@@ -73,14 +74,14 @@ vector<TelemetryReading> TelemetryReplay::pollData() {
         if (newEndReadingsPosition != endReadingsIter_) {
             lastTimeStamp_ = (*newEndReadingsPosition).timestamp_;
             endReadingsIter_ = newEndReadingsPosition;
-            lastPlaybackTime_ = std::chrono::system_clock::now();
+            lastPlaybackTime_ = localLastPlaybackTime;
         }
 
     } else {
         adjustedTime += lastTimeStamp_;
         while ((*endReadingsIter_).timestamp_ < adjustedTime) {
             if (endReadingsIter_ == readings_.end()) {
-                continue;
+                break;
             }
             vec.push_back(*endReadingsIter_++);
             lastTimeStamp_ = (*endReadingsIter_).timestamp_;
@@ -88,7 +89,7 @@ vector<TelemetryReading> TelemetryReplay::pollData() {
 
         if (!vec.empty()) {
             lastTimeStamp_ = (*--vec.end()).timestamp_;
-            lastPlaybackTime_ = std::chrono::system_clock::now();
+            lastPlaybackTime_ = localLastPlaybackTime;
         }
 
         if ((*endReadingsIter_).timestamp_ >= UIConstants::GRAPH_MEMORY_USECS) /* Test that we don't have overflow*/{
@@ -177,5 +178,9 @@ void TelemetryReplay::setPlaybackReversed(bool reversed) {
 
 vector<XYZReading> TelemetryReplay::pollLocations() {
     return vector<XYZReading>();
+}
+
+bool TelemetryReplay::isReplayHandler() {
+    return true;
 }
 

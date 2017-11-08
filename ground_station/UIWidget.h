@@ -76,6 +76,8 @@ public slots:
     // 3D visualisation slots
     void register3DPoints(const QVector<QVector3D> &);
 
+    void selectFile();
+
 signals:
 
     void toggleLogging();

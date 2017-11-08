@@ -26,6 +26,9 @@ public:
      * @return The locations received by this TelemetryHandler since the last call to the function
      */
     virtual std::vector<XYZReading> pollLocations() = 0;
+
+    virtual bool isReplayHandler()= 0;
+
 };
 
 

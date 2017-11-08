@@ -40,13 +40,12 @@ Application::Application(int &argc, char **argv) : qApplication_{argc, argv}, ma
 void Application::run() {
     std::string path{R"(D:\EPFL\matterhorn\Launches\Greg)"};
 
+    bool replayTelemetry = false;
     TelemetryHandler *handler;
     try {
-        //handler = new StateEstimator(new TelemetryReplay(path));
-        handler = new TelemetrySimulator();
+        handler = new StateEstimator(new TelemetryReplay(path));
+//        handler = new TelemetrySimulator();
         handler->startup();
-        //mainWidget_.setReplayMode();
-        mainWidget_.setRealTimeMode();
     } catch (std::runtime_error &e) {
         std::cerr << "Error when starting the telemetry handler:\n" << e.what();
         return; // This prevents the worker from being instantiated
@@ -54,7 +53,14 @@ void Application::run() {
 
     worker_ = new Worker(handler);
     worker_->moveToThread(&workerThread_);
-    worker_->setReplayMode(false);
+    if (handler->isReplayHandler()) {
+        mainWidget_.setReplayMode();
+        worker_->setReplayMode(true);
+    } else {
+        mainWidget_.setRealTimeMode();
+        worker_->setReplayMode(false);
+    }
+
     connectSlotsAndSignals();
 
     // Initialize UI status fields
@@ -120,7 +126,7 @@ void Application::connectSlotsAndSignals() {
                      &GSWidget::resetTelemetryReplayPlayback,
                      worker_,
                      &Worker::resetPlayback);
-    
+
     QObject::connect(&mainWidget_,
                      &GSWidget::reverseTelemetryReplayPlayback,
                      worker_,

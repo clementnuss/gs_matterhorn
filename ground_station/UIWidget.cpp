@@ -83,6 +83,7 @@ void GSWidget::connectComponents() {
     connect(ui->time_unfolding_decrease, &QPushButton::clicked, this, &GSWidget::decreaseSpeed);
     connect(ui->time_unfolding_reset, &QPushButton::clicked, this, &GSWidget::resetPlayback);
     connect(ui->time_unfolding_reverse_time, &QPushButton::clicked, this, &GSWidget::reversePlayback);
+    connect(ui->time_unfolding_select_files, &QPushButton::clicked, this, &GSWidget::selectFile);
 
     // Connect components related to graphs
     applyToAllPlots(
@@ -167,14 +168,14 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
             if (elapsed > UIConstants::GRAPH_DATA_INTERVAL_USECS) {
                 lastGraphUpdate_ = chrono::system_clock::now();
                 double elapsedSeconds = replayPlaybackSpeed_ * elapsed / 1'000'000.0;
-
+                if (playbackReversed_) {
+                    lastRemoteTime_ -= elapsedSeconds;
+                }
                 for (auto &g_idx : plotVector_) {
                     QCPGraph *g = g_idx->graph();
                     if (playbackReversed_) {
-                        lastRemoteTime_ -= elapsedSeconds;
                         if (!g->data()->isEmpty()) {
                             g->data()->removeAfter(lastRemoteTime_);
-
                         }
                         if (autoPlay_) {
                             g->keyAxis()->setRange(lastRemoteTime_,
@@ -201,8 +202,9 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
     double elapsedSeconds = replayPlaybackSpeed_ * elapsed / 1'000'000.0;
     lastGraphUpdate_ = chrono::system_clock::now();
 
-    if (playbackReversed_) { lastRemoteTime_ -= elapsedSeconds; }
-    else { lastRemoteTime_ = d.last().key; }
+    if (playbackReversed_) {
+        lastRemoteTime_ -= elapsedSeconds;
+    } else { lastRemoteTime_ = d.last().key; }
 
     // Clear any eventual datapoint ahead of current time point
     if (!replayMode_) { g->data()->removeAfter(d.last().key); }
@@ -494,12 +496,19 @@ void GSWidget::decreaseSpeed() {
 void GSWidget::resetPlayback() {
     assert(replayMode_);
     emit resetTelemetryReplayPlayback();
+    playbackReversed_ = false;
+    lastGraphUpdate_ = chrono::system_clock::now();
+    lastRemoteTime_ = -1000;
+    autoPlay_ = true;
+    replayPlaybackSpeed_ = 1;
+    ui->time_unfolding_current_speed->setText(
+            QString::number(replayPlaybackSpeed_, 'f', 2));
+
+    ui->event_log->clear();
 
     for (auto &g_idx : plotVector_) {
         QCPGraph *g = g_idx->graph();
         g->data()->clear();
-        lastGraphUpdate_ = chrono::system_clock::now();
-        lastRemoteTime_ = -1000;
         g_idx->replot();
     };
 }
@@ -555,3 +564,8 @@ bool GSWidget::event(QEvent *event) {
     return QWidget::event(event);
 }
 
+void GSWidget::selectFile() {
+/*    QString fileName = QFileDialog::getOpenFileName(this,
+                                            tr("Open Files"), "./", tr("Telemetry data (*)"));
+    cout << fileName.toStdString() << endl;*/
+}
