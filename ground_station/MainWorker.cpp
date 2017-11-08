@@ -199,8 +199,14 @@ void Worker::updateLoggingStatus() {
 void Worker::toggleTracking() {
     trackingEnabled_ = !trackingEnabled_;
 
-    SensorConstants::launchAltitude = static_cast<float>(lastAltitude);
-    SensorConstants::trackingAltitude = static_cast<float>(lastAltitude + 1);
+    double movAverage = 0;
+    for (double i: altitudeBuffer) {
+        movAverage += i;
+    }
+    movAverage /= altitudeBuffer.size();
+
+    SensorConstants::launchAltitude = static_cast<float>(movAverage);
+    SensorConstants::trackingAltitude = static_cast<float>(movAverage + 1);
 }
 
 /**
@@ -319,34 +325,35 @@ void Worker::defineRealtimeMode(const QString &parameters) {
 }
 
 void Worker::moveTrackingSystem(double currentAltitude) {
-    lastAltitude = currentAltitude;
 #if USE_TRACKING
+
+    altitudeBuffer.push_back(currentAltitude);
+    double movAverage = 0;
+    for (double i: altitudeBuffer) {
+        movAverage += i;
+    }
+    movAverage /= altitudeBuffer.size();
+
     /**
      * We use the law of sines to get the correct angle. The tracking altitude corresponds to the ground station's
      * relative elevation with regards to the launch site altitude.
      * The distanceToLaunchSite variable is the horizontal distance between the launch site and the GS.
      */
 
-    double beta = atan(SensorConstants::distanceToLaunchSite / abs(currentAltitude - SensorConstants::launchAltitude));
+    double beta = atan(SensorConstants::distanceToLaunchSite / abs(movAverage - SensorConstants::launchAltitude));
     double hypothenuseToLaunchSite = sqrt(
             pow(SensorConstants::distanceToLaunchSite, 2) +
-            pow(SensorConstants::trackingAltitude - currentAltitude, 2));
-    double gamma = asin(abs(currentAltitude - SensorConstants::launchAltitude) * sin(beta) / hypothenuseToLaunchSite);
+            pow(SensorConstants::trackingAltitude - movAverage, 2));
+    double gamma = asin(abs(movAverage - SensorConstants::launchAltitude) * sin(beta) / hypothenuseToLaunchSite);
 
     gamma *= 180 / M_PI;
     gamma = 123 - gamma;
-    angleBuffer_.push_back((int) gamma);
 
 
-    float movAverage = 0;
-    for (int i: angleBuffer_) {
-        movAverage += i;
-    }
-    movAverage /= angleBuffer_.size();
 
     if (msecsBetween(lastTrackingAngleUpdate, chrono::system_clock::now()) > 100) {
         lastTrackingAngleUpdate = chrono::system_clock::now();
-        std::string toSend = std::to_string(static_cast<int>(movAverage)) + "\r\n";
+        std::string toSend = std::to_string(static_cast<int>(gamma)) + "\r\n";
         cout << "angle for tracking: " << toSend;
         if (trackingEnabled_) {
             serialPort_.write(toSend);

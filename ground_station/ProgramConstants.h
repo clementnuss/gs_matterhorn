@@ -89,10 +89,10 @@ namespace SensorConstants {
     static float currentLocationTemperature = 1.6f;
      */
 
-    static float adjustedSeaLevelPressure = 1015.8;
+    static float adjustedSeaLevelPressure = 1029;
     static float launchAltitude = 408.3;
     static float trackingAltitude = 409;
-    static float distanceToLaunchSite = 1.5;
+    static float distanceToLaunchSite = 0.9;
 
 }
 
