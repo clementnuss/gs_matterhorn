@@ -63,10 +63,7 @@ Entity {
     property real phi: 0.0
     property color tint: Qt.rgba( 0.0, 0.0, 0.0, 1.0 )
     property real intensity: 0.3
-    property alias wireframe: material.wireframe
     property Layer layer: null
-
-    components: [ transform, mesh, material, layer ]
 
     Transform {
         id: transform
@@ -75,10 +72,31 @@ Entity {
         scale: root.scale
     }
 
-    WaveMaterial {
+    Material {
         id: material
-        ambient: Qt.rgba( root.tint.r, root.tint.g, root.tint.b, 1.0 ) // Set color tint
-        diffuse: Qt.rgba( root.intensity, root.intensity, root.intensity, 1.0 ) // Set how bright the wave is
+
+        effect: WaveEffect { id: effect }
+
+        parameters: [
+                        Parameter {
+                            name: "diffuseTexture"
+                            value: Texture2D {
+                                id: diffuseTexture
+                                minificationFilter: Texture.LinearMipMapLinear
+                                magnificationFilter: Texture.Linear
+                                wrapMode {
+                                    x: WrapMode.Repeat
+                                    y: WrapMode.Repeat
+                                }
+                                generateMipMaps: true
+                                maximumAnisotropy: 16.0
+                                TextureImage {
+                                    id: diffuseTextureImage
+                                    source: "qrc:/textures/default.png"
+                                }
+                            }
+                        }
+                    ]
     }
 
     PlaneMesh {
@@ -87,4 +105,7 @@ Entity {
         height: 25.0
         meshResolution: Qt.size( 50, 50 )
     }
+
+    components: [ transform, mesh, material, layer ]
+
 }

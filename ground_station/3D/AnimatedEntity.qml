@@ -133,15 +133,14 @@ Entity {
         running: true
     }
 
-Entity {
+    Entity {
         id: sphereEntity
         components: [ sphereMesh, material, sphereTransform, renderSettings.activeFrameGraph.waveLayer]
     }
+
     Wave {
             id: wave
             layer: renderSettings.activeFrameGraph.waveLayer
         }
-
-
 
 }
