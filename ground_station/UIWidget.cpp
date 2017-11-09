@@ -4,14 +4,6 @@
 #include <iostream>
 #include <cassert>
 #include <QtQuickWidgets/QQuickWidget>
-#include <Qt3DCore/QTransform>
-#include <Qt3DExtras/QTorusMesh>
-#include <Qt3DExtras/QPlaneMesh>
-#include <Qt3DRender/QMaterial>
-#include <Qt3DRender/QCamera>
-#include <Qt3DExtras/QPhongMaterial>
-#include <Qt3DExtras/Qt3DWindow>
-#include <Qt3DExtras/QFirstPersonCameraController>
 
 GSWidget::GSWidget(QWidget *parent) :
     QWidget(parent),
@@ -30,59 +22,6 @@ GSWidget::GSWidget(QWidget *parent) :
     connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
     clockTimer.start(std::lround((1.0 / 60.0) * 1000));
 
-    Qt3DExtras::Qt3DWindow *view = new Qt3DExtras::Qt3DWindow();
-    QWidget *container = QWidget::createWindowContainer(view);
-    Qt3DCore::QEntity *scene = createTestScene();
-
-    // camera
-    Qt3DRender::QCamera *camera = view->camera();
-    camera->lens()->setPerspectiveProjection(45.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
-    camera->setPosition(QVector3D(0, 0, 40.0f));
-    camera->setViewCenter(QVector3D(0, 0, 0));
-
-    // manipulator
-    Qt3DExtras::QFirstPersonCameraController *manipulator = new Qt3DExtras::QFirstPersonCameraController(scene);
-    manipulator->setLinearSpeed(50.f);
-    manipulator->setLookSpeed(180.f);
-    manipulator->setCamera(camera);
-
-
-    view->setRootEntity(scene);
-    ui->stackedWidget->addWidget(container);
-
-}
-
-Qt3DCore::QEntity *GSWidget::createTestScene() {
-    Qt3DCore::QEntity *root = new Qt3DCore::QEntity;
-    Qt3DCore::QEntity *torus = new Qt3DCore::QEntity(root);
-    Qt3DCore::QEntity *plane = new Qt3DCore::QEntity(root);
-
-    Qt3DExtras::QTorusMesh *mesh = new Qt3DExtras::QTorusMesh;
-    Qt3DExtras::QPlaneMesh *planeMesh = new Qt3DExtras::QPlaneMesh;
-
-    mesh->setRadius(5);
-    mesh->setMinorRadius(1);
-    mesh->setRings(100);
-    mesh->setSlices(20);
-
-    planeMesh->setWidth(5.0f);
-    planeMesh->setHeight(5.0f);
-
-    Qt3DCore::QTransform *transform = new Qt3DCore::QTransform;
-//    transform->setScale3D(QVector3D(1.5, 1, 0.5));
-    transform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), 45.f));
-
-    Qt3DRender::QMaterial *material = new Qt3DExtras::QPhongMaterial(root);
-
-    torus->addComponent(mesh);
-    torus->addComponent(transform);
-    torus->addComponent(material);
-
-    plane->addComponent(planeMesh);
-    plane->addComponent(material);
-    plane->addComponent(transform);
-
-    return root;
 }
 
 void GSWidget::dummySlot() {

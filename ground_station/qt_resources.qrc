@@ -1,6 +1,15 @@
 <RCC>
     <qresource prefix="/">
-        <file alias="main.qml">Qt/main.qml</file>
-        <file alias="AnimatedEntity.qml">Qt/AnimatedEntity.qml</file>
+        <file alias="main.qml">3D/main.qml</file>
+        <file alias="AnimatedEntity.qml">3D/AnimatedEntity.qml</file>
+        <file alias="Wave.qml">3D/Wave.qml</file>
+        <file alias="WaveEffect.qml">3D/WaveEffect.qml</file>
+        <file alias="WaveForwardRenderer.qml">3D/WaveForwardRenderer.qml</file>
+        <file alias="WaveMaterial.qml">3D/WaveMaterial.qml</file>
+        <file alias="shaders/ribbon.frag">3D/shaders/ribbon.frag</file>
+        <file alias="shaders/ribbon.vert">3D/shaders/ribbon.vert</file>
+        <file alias="shaders/ribbonwire.frag">3D/shaders/ribbonwireframe.frag</file>
+        <file alias="shaders/ribbonwireframe.frag">3D/shaders/ribbonwireframe.frag</file>
+        <file alias="shaders/robustwireframe.geom">3D/shaders/robustwireframe.geom</file>
     </qresource>
 </RCC>

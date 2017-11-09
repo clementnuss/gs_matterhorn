@@ -41,7 +41,6 @@ signals:
     void toggleLogging();
 
 private:
-    Qt3DCore::QEntity *createTestScene();
     Ui::GSWidget *ui;
     QTimer clockTimer;
 
