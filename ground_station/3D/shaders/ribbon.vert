@@ -127,23 +127,6 @@ void main()
 {
     // Calculate y value based upon input coordinates and time
     vec3 pos = vertexPosition;
-    pos.y = height( pos );
-
-    // Estimate normal vector by calculating the y value at small offsets
-    // and then taking the cross product of the differences
-    float offset = 0.5;
-    vec3 posOffsetX = vertexPosition + vec3( offset, 0.0, 0.0 );
-    posOffsetX.y = height( posOffsetX );
-    vec3 posOffsetZ = vertexPosition + vec3( 0.0, 0.0, offset );
-    posOffsetZ.y = height( posOffsetZ );
-
-    vec3 dydx = posOffsetX - pos;
-    vec3 dydz = posOffsetZ - pos;
-    vec3 normal = cross( dydz, dydx );
-
-    // Transform the position and normal to eye space for lighting
-    vs_out.normal = normalize( modelViewNormal * normal );
-    vs_out.position = vec3( modelView * vec4( pos, 1.0 ) );
 
     gl_Position = mvp * vec4( pos, 1.0 );
 }
