@@ -1,13 +1,13 @@
 #version 330 core
 
-out vec4 fragColor;
+in vec2 texCoord;
 
-uniform vec3 ka;            // Ambient reflectivity
-uniform vec3 kd;            // Diffuse reflectivity
+out vec4 fragColor;
 
 uniform sampler2D diffuseTexture;
 
 void main()
 {
-    fragColor = vec4(texture(diffuseTexture, texCoord).rgb , 1.0);
+
+    fragColor = vec4(texture(diffuseTexture, texCoord).rgb, 1.0);
 }

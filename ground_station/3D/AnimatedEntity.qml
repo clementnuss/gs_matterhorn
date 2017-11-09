@@ -93,6 +93,4 @@ Entity {
             layer: renderSettings.activeFrameGraph.waveLayer
         }
 
-
-
 }

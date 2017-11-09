@@ -11,6 +11,8 @@ Entity {
     property real scale: 1.0
     property real theta: 0.0
     property real phi: 0.0
+    property color tint: Qt.rgba( 0.0, 0.0, 0.0, 1.0 )
+    property real intensity: 0.3
     property Layer layer: null
 
     Transform {
@@ -21,31 +23,30 @@ Entity {
     }
 
     Material {
-        id: waveMaterial
-            property string diffuseMap
-            property string specularMap
-            property string normalMap
+        id: material
 
-            parameters: [
-                Parameter {
-                    name: "diffuseTexture"
-                    value: Texture2D {
-                        id: diffuseTexture
-                        minificationFilter: Texture.LinearMipMapLinear
-                        magnificationFilter: Texture.Linear
-                        wrapMode {
-                            x: WrapMode.Repeat
-                            y: WrapMode.Repeat
+        effect: WaveEffect { id: effect }
+
+        parameters: [
+                        Parameter {
+                            name: "diffuseTexture"
+                            value: Texture2D {
+                                id: diffuseTexture
+                                minificationFilter: Texture.LinearMipMapLinear
+                                magnificationFilter: Texture.Linear
+                                wrapMode {
+                                    x: WrapMode.Repeat
+                                    y: WrapMode.Repeat
+                                }
+                                generateMipMaps: true
+                                maximumAnisotropy: 16.0
+                                TextureImage {
+                                    id: diffuseTextureImage
+                                    source: "qrc:/textures/default.png"
+                                }
+                            }
                         }
-                        generateMipMaps: true
-                        maximumAnisotropy: 16.0
-                        TextureImage {
-                            id: diffuseTextureImage
-                            source: "qrc:/textures/default.png"
-                        }
-                    }
-                }
-            ]
+                    ]
     }
 
     PlaneMesh {
@@ -55,5 +56,6 @@ Entity {
         meshResolution: Qt.size( 50, 50 )
     }
 
-    components: [ transform, mesh, waveMaterial, layer ]
+    components: [ transform, mesh, material, layer ]
+
 }
