@@ -1,19 +1,22 @@
 <RCC>
     <qresource prefix="/">
         <file alias="main.qml">3D/main.qml</file>
-        <file alias="AnimatedEntity.qml">3D/AnimatedEntity.qml</file>
-        <file alias="Wave.qml">3D/Wave.qml</file>
-        <file alias="WaveEffect.qml">3D/WaveEffect.qml</file>
-        <file alias="WaveForwardRenderer.qml">3D/WaveForwardRenderer.qml</file>
-        <file alias="WaveMaterial.qml">3D/WaveMaterial.qml</file>
+        <file alias="SceneRoot.qml">3D/SceneRoot.qml</file>
+        <file alias="Terrain.qml">3D/Terrain.qml</file>
+        <file alias="TerrainEffect.qml">3D/TerrainEffect.qml</file>
+        <file alias="TerrainForwardRenderer.qml">3D/TerrainForwardRenderer.qml</file>
+        <file alias="TerrainMaterial.qml">3D/TerrainMaterial.qml</file>
         <file alias="PlanetMaterial.qml">3D/PlanetMaterial.qml</file>
 
-        <file alias="shaders/ribbon.frag">3D/shaders/ribbon.frag</file>
-        <file alias="shaders/ribbon.vert">3D/shaders/ribbon.vert</file>
+        <file alias="shaders/terrain.frag">3D/shaders/terrain.frag</file>
+        <file alias="shaders/terrain.vert">3D/shaders/terrain.vert</file>
         <file alias="shaders/ribbonwire.frag">3D/shaders/ribbonwireframe.frag</file>
         <file alias="shaders/ribbonwireframe.frag">3D/shaders/ribbonwireframe.frag</file>
         <file alias="shaders/robustwireframe.geom">3D/shaders/robustwireframe.geom</file>
 
         <file alias="textures/default.png">3D/textures/default.png</file>
+        <file>3D/textures/yosemite_hm.jpg</file>
+        <file>3D/textures/heightmap_1024.jpg</file>
+        <file>3D/textures/diffusemap_photo_1024.jpg</file>
     </qresource>
 </RCC>

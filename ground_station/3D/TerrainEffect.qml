@@ -41,18 +41,10 @@ Effect {
                 RenderPass {
                     shaderProgram: standardShader
 
-                    // Disable depth testing and use simple additive blending
-                    renderStates: [
-                        BlendEquationArguments {
-                            sourceRgb: BlendEquationArguments.One
-                            destinationRgb: BlendEquationArguments.OneMinusSourceColor
-                        }
-                    ]
-
                     ShaderProgram {
                         id: standardShader
-                        vertexShaderCode:   loadSource("qrc:/shaders/ribbon.vert")
-                        fragmentShaderCode: loadSource("qrc:/shaders/ribbon.frag")
+                        vertexShaderCode:   loadSource("qrc:/shaders/terrain.vert")
+                        fragmentShaderCode: loadSource("qrc:/shaders/terrain.frag")
                     }
                 }
             ]
