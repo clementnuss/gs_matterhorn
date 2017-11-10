@@ -18,5 +18,6 @@
         <file>3D/textures/yosemite_hm.jpg</file>
         <file>3D/textures/heightmap_1024.jpg</file>
         <file>3D/textures/diffusemap_photo_1024.jpg</file>
+        <file>3D/textures/diffusemap_photo_2048.jpg</file>
     </qresource>
 </RCC>

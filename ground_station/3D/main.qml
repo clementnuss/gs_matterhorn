@@ -44,6 +44,7 @@ Item {
 
         Scene3D {
             id: scene3d
+            multisample : false
             anchors.fill: parent
             anchors.margins: 10
             focus: true
