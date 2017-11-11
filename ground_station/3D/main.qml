@@ -53,6 +53,16 @@ Item {
 
             SceneRoot {}
         }
+
+        Rectangle {
+
+                Text{
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    font.family: "Helvetica"
+                    text: "Viewing\nDistance"
+                    }
+            }
     }
 
     SequentialAnimation {
