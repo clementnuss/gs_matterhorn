@@ -43,68 +43,23 @@ Entity {
         radius: 1
     }
 
-    CuboidMesh{
-        id: cubeMesh
-    }
-
     Transform {
             id: sphereTransform
             property real userAngle: 0.0
-            matrix: {
-                var m = Qt.matrix4x4();
-                m.rotate(userAngle, Qt.vector3d(0, 1, 0))
-                m.translate(Qt.vector3d(20, 10, 0));
-                return m;
-            }
+            property matrix4x4 m
+            property vector3d position
+
+            onUserAngleChanged :{
+                                  var newm = Qt.matrix4x4();
+                                  newm.rotate(userAngle, Qt.vector3d(0, 1, 0))
+                                  newm.translate(Qt.vector3d(20, 10, 0))
+                                  m = newm
+                                  position = Qt.vector3d(newm.m14,newm.m24,newm.m34)
+                                }
+            matrix: m
         }
 
-    Transform {
-            id: cubeTransform
-            matrix: billboard(Qt.vector3d(0.0,0.0,0.0), camera.position, camera.upVector)
-        }
 
-    function billboard(position, cameraPos, cameraUp) {
-        var look = cameraPos.minus(position).normalized();
-        var right = cameraUp.crossProduct(look);
-        var up2 = look.crossProduct(right);
-        var transform = Qt.matrix4x4();
-
-        transform.m11 = right.x;
-        transform.m12 = right.y;
-        transform.m13 = right.z;
-        transform.m14 = 0;
-
-        transform.m21 = up2.x;
-        transform.m22 = up2.y;
-        transform.m23 = up2.z;
-        transform.m24 = 0;
-
-        transform.m31 = look.x;
-        transform.m32 = look.y;
-        transform.m33 = look.z;
-        transform.m34 = 0;
-
-        transform.m41 = 0;
-        transform.m42 = 0;
-        transform.m43 = 0;
-        transform.m44 = 1;
-
-        // Uncomment this line to translate the position as well
-        // (without it, it's just a rotation)
-        //transform[3] = vec4(position, 1);
-
-        return transform.transposed()
-    }
-
-    Transform {
-            id: textTransform
-            matrix: {
-                var mat = billboard(Qt.vector3d(0.0,0.0,0.0), camera.position, Qt.vector3d(0.0,1.0,0.0))
-                //mat.translate(Qt.vector3d(-2,-2,0))
-                mat.scale(0.1,0.1,0.1)
-                return mat
-            }
-        }
 
     QQ2.NumberAnimation {
         target: sphereTransform
@@ -122,24 +77,20 @@ Entity {
         components: [ sphereMesh, material, sphereTransform, renderSettings.activeFrameGraph.waveLayer]
     }
 
-    Entity {
-        id: cubeEntity
-        components: [cubeMesh, material, cubeTransform, renderSettings.activeFrameGraph.waveLayer]
-    }
+
 
     Terrain {
             id: terrain
             layer: renderSettings.activeFrameGraph.waveLayer
     }
 
-    Text2DEntity {
-        id: text
-        text: "Hello World"
-        font.pointSize : 3
-        width: 40
-        height: 10
-
-        components: [textTransform]
+    TrackingText{
+        id: trackingText
+        cameraMatrix : camera.viewMatrix
+        parentPosition :sphereTransform.position
+        useBold: true
+        text: "ROCKET"
+        pointSize : 0.5
     }
 
 
