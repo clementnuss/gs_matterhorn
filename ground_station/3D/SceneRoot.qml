@@ -94,5 +94,5 @@ Entity {
         pointSize : 0.5
     }
 
-    GroundStation { position : Qt.vector3d(0, 5, 0)}
+    GroundStation { position : Qt.vector3d(0.3, 1.15, -5.1)}
 }
