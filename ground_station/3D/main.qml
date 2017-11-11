@@ -9,7 +9,6 @@ Item {
 
             multisample : false
             anchors.fill: parent
-            anchors.margins: 10
             focus: true
             aspects: ["input", "logic"]
             cameraAspectRatioMode: Scene3D.AutomaticAspectRatio

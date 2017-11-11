@@ -79,7 +79,7 @@ TechniqueFilter {
 
                 ClearBuffers {
                     buffers: ClearBuffers.ColorDepthBuffer
-                    clearColor: "steelblue"
+                    clearColor: "black"
                 }
             }
         }
