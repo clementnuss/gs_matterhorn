@@ -16,6 +16,9 @@ GSWidget::GSWidget(QWidget *parent) :
     quickWidget->setMinimumSize(300, 300);
     quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
     quickWidget->setSource(QUrl("qrc:/main.qml"));
+
+    // Replace placeholder widget by the quickWidget
+    ui->stackedWidget->removeWidget(ui->stackedWidget->widget(1));
     ui->stackedWidget->addWidget(quickWidget);
     graphSetup();
 
