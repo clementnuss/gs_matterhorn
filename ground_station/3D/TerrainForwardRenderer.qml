@@ -59,8 +59,8 @@ TechniqueFilter {
     property alias window: surfaceSelector.surface
 
     // Expose the layers we'll manage during rendering
-    readonly property Layer backgroundLayer: Layer {}
-    readonly property Layer waveLayer: Layer {}
+    readonly property Layer terrainLayer: Layer {}
+    readonly property Layer markerLayer: Layer {}
 
     // Select the forward rendering Technique of any used Effect
     matchAll: [ FilterKey { name: "renderingStyle"; value: "forward" } ]
@@ -79,8 +79,11 @@ TechniqueFilter {
 
                 ClearBuffers {
                     buffers: ClearBuffers.ColorDepthBuffer
-                    clearColor: "black"
+                    clearColor: "steelblue"
+
                 }
+                LayerFilter { layers: root.terrainLayer }
+                LayerFilter { layers: root.markerLayer }
             }
         }
     }

@@ -26,7 +26,7 @@ Entity{
 
     }
 
-    components : [groundStationMesh, groundStationTransform, groundStationMaterial]
+    components : [groundStationMesh, groundStationTransform, groundStationMaterial, renderSettings.activeFrameGraph.terrainLayer]
 
     TrackingText{
             id: trackingText
@@ -35,4 +35,6 @@ Entity{
             text: "GROUND STATION"
             pointSize : 0.5
     }
+
+    Marker { texturePath : "qrc:/3D/textures/double_down_arrow.png"}
 }

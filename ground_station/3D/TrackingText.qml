@@ -12,6 +12,7 @@ Entity{
 
     property matrix4x4 cameraMatrix
     property vector3d parentPosition : Qt.vector3d(0,0,0)
+    property vector3d offset : Qt.vector3d(1,0,0)
     property real pointSize : 0.5
     property bool useBold : false
     property string text : ""
@@ -20,8 +21,10 @@ Entity{
     Transform {
         id: textTransform
         matrix: {
-            var mat = Helpers.billboardMV(parentPosition, cameraMatrix)
-            return mat
+            var m = Qt.matrix4x4()
+            m.translate(offset)
+            m = Helpers.billboardMV(parentPosition, cameraMatrix).times(m)
+            return m
         }
     }
 
@@ -40,6 +43,6 @@ Entity{
         width: textMetrics.width
         height: textMetrics.height
 
-        components: [textTransform]
+        components: [textTransform, renderSettings.activeFrameGraph.markerLayer]
     }
 }

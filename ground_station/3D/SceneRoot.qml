@@ -9,6 +9,7 @@ import QtQuick 2.9 as QQ2
 Entity {
     id: sceneRoot
 
+    property vector3d groundStationPosition : Qt.vector3d(0.3, 1.15, -5.1)
     property alias cameraPosition : camera.position
 
     Camera {
@@ -21,6 +22,7 @@ Entity {
         upVector: Qt.vector3d( 0.0, 1.0, 0.0 )
         viewCenter: Qt.vector3d( 0.0, 0.0, 0.0 )
     }
+
 
     FirstPersonCameraController { camera: camera }
 
@@ -37,11 +39,6 @@ Entity {
 
     PhongMaterial {
         id: material
-    }
-
-    SphereMesh {
-        id: sphereMesh
-        radius: 1
     }
 
     Transform {
@@ -73,16 +70,9 @@ Entity {
         running: true
     }
 
-    Entity {
-        id: sphereEntity
-        components: [ sphereMesh, material, sphereTransform, renderSettings.activeFrameGraph.waveLayer]
-    }
-
-
-
     Terrain {
             id: terrain
-            layer: renderSettings.activeFrameGraph.waveLayer
+            layer: renderSettings.activeFrameGraph.terrainLayer
     }
 
     TrackingText{
@@ -94,5 +84,10 @@ Entity {
         pointSize : 0.5
     }
 
-    GroundStation { position : Qt.vector3d(0.3, 1.15, -5.1)}
+    Marker {
+        position: sphereTransform.position
+        texturePath : "qrc:/3D/textures/caret_down.png"
+    }
+
+    GroundStation { position : groundStationPosition}
 }

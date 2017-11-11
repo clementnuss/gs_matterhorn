@@ -44,7 +44,7 @@ Effect {
                     ShaderProgram {
                         id: standardShader
                         vertexShaderCode:   loadSource("qrc:/shaders/terrain.vert")
-                        fragmentShaderCode: loadSource("qrc:/shaders/terrain.frag")
+                        fragmentShaderCode: loadSource("qrc:/shaders/DShader.frag")
                     }
                 }
             ]

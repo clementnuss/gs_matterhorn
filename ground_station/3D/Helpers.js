@@ -24,3 +24,33 @@ function billboardMV(position, viewMatrix){
 
     return transform
 }
+
+
+function billboard(position, cameraPos, cameraUp) {
+            var look = cameraPos.minus(position).normalized();
+            var right = cameraUp.crossProduct(look);
+            var up2 = look.crossProduct(right);
+            var transform = Qt.matrix4x4();
+
+            transform.m11 = right.x;
+            transform.m12 = right.y;
+            transform.m13 = right.z;
+            transform.m14 = 0;
+
+            transform.m21 = up2.x;
+            transform.m22 = up2.y;
+            transform.m23 = up2.z;
+            transform.m24 = 0;
+
+            transform.m31 = look.x;
+            transform.m32 = look.y;
+            transform.m33 = look.z;
+            transform.m34 = 0;
+
+            transform.m41 = position.x;
+            transform.m42 = position.y;
+            transform.m43 = position.z;
+            transform.m44 = 1;
+
+            return transform.transposed()
+}

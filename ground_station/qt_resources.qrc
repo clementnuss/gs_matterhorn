@@ -5,6 +5,8 @@
         <file alias="main.qml">3D/main.qml</file>
         <file alias="SceneRoot.qml">3D/SceneRoot.qml</file>
         <file alias="Terrain.qml">3D/Terrain.qml</file>
+        <file alias="Marker.qml">3D/Marker.qml</file>
+        <file alias="MarkerEffect.qml">3D/MarkerEffect.qml</file>
         <file alias="GroundStation.qml">3D/GroundStation.qml</file>
         <file alias="TrackingText.qml">3D/TrackingText.qml</file>
         <file alias="TerrainEffect.qml">3D/TerrainEffect.qml</file>
@@ -13,6 +15,8 @@
         <file alias="PlanetMaterial.qml">3D/PlanetMaterial.qml</file>
 
         <file alias="shaders/terrain.frag">3D/shaders/terrain.frag</file>
+        <file alias="shaders/DShader.frag">3D/shaders/DShader.frag</file>
+        <file alias="shaders/marker.vert">3D/shaders/marker.vert</file>
         <file alias="shaders/terrain.vert">3D/shaders/terrain.vert</file>
         <file alias="shaders/ribbonwire.frag">3D/shaders/ribbonwireframe.frag</file>
         <file alias="shaders/ribbonwireframe.frag">3D/shaders/ribbonwireframe.frag</file>
@@ -23,5 +27,7 @@
         <file>3D/textures/heightmap_1024.jpg</file>
         <file>3D/textures/diffusemap_photo_1024.jpg</file>
         <file>3D/textures/diffusemap_photo_2048.jpg</file>
+        <file>3D/textures/double_down_arrow.png</file>
+        <file>3D/textures/caret_down.png</file>
     </qresource>
 </RCC>
