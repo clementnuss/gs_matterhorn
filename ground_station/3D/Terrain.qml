@@ -17,6 +17,7 @@ Entity {
 
     Transform {
         id: transform
+
         translation: Qt.vector3d(root.x, root.y, root.z);
         rotation: fromEulerAngles(root.theta, root.phi)
         scale: root.scale
@@ -28,8 +29,9 @@ Entity {
 
     PlaneMesh {
         id: mesh
-        width: 25.0
-        height: 25.0
+
+        width: 100.0
+        height: 100.0
         meshResolution: Qt.size( 100, 100 )
     }
 

@@ -11,12 +11,13 @@ uniform sampler2D heightTexture;
 void main()
 {
     // Flipped texture coordinates
-    texCoord = 1.0 - vertexTexCoord;
+    texCoord = vertexTexCoord;
+    texCoord.x = 1.0 - texCoord.x;
 
     // Calculate y value based upon input coordinates and time
     vec3 pos = vertexPosition;
 
-    pos.y = 1.5 * length(texture(heightTexture, texCoord).rgb);
+    pos.y = 5 * length(texture(heightTexture, texCoord).rgb);
 
     gl_Position = mvp * vec4( pos, 1.0 );
 }

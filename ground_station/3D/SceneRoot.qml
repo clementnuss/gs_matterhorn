@@ -9,6 +9,7 @@ import QtQuick 2.9 as QQ2
 Entity {
     id: sceneRoot
 
+    property alias cameraPosition : camera.position
 
     Camera {
         id: camera
@@ -93,5 +94,5 @@ Entity {
         pointSize : 0.5
     }
 
-
+    GroundStation { position : Qt.vector3d(0, 5, 0)}
 }
