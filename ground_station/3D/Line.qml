@@ -36,7 +36,7 @@ Entity{
                 vertexSize: 3
                 byteOffset: 0
                 byteStride: 3 * 4
-                count: 4
+                count: traceData.count
                 buffer : traceData.buffer
             }
         }

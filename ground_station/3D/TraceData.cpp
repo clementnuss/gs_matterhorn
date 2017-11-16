@@ -1,4 +1,5 @@
 
+#include <iostream>
 #include "TraceData.h"
 
 
@@ -22,6 +23,30 @@ void TraceData::setData(const QVector<QVector3D> &positions) {
     }
     m_buffer->setData(ba);
     m_count = positions.count();
+    emit countChanged(m_count);
+}
+
+void TraceData::appendData(const QVector3D position) {
+    // Add space for one additional position
+
+    QByteArray tempBuffer = m_buffer->data();
+
+    std::cout << tempBuffer.size() << std::endl;
+
+    tempBuffer.resize(tempBuffer.size() + 1 * sizeof(TraceVBOData));
+
+    std::cout << tempBuffer.size() << std::endl;
+    // View QByteArray as array of TraceVBOData
+    TraceVBOData *vboData = reinterpret_cast<TraceVBOData *>(tempBuffer.data());
+
+    // Get a reference to last array element
+    TraceVBOData &vbo = vboData[m_count];
+    vbo.position = position;
+
+    // Sets back buffer's data
+    m_buffer->setData(tempBuffer);
+
+    m_count += 1;
     emit countChanged(m_count);
 }
 

@@ -30,6 +30,8 @@ public:
 
     void setData(const QVector<QVector3D> &positions);
 
+    void appendData(const QVector3D position);
+
     int count() const;
 
 signals:

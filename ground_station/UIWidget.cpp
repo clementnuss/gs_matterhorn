@@ -42,6 +42,9 @@ GSWidget::GSWidget(QWidget *parent) :
             QVector3D{0.0, 10.0, 0.0}};
 
     traceData->setData(positions);
+    traceData->appendData(QVector3D{-10.0, 10.0, 0.0});
+    traceData->appendData(QVector3D{-10.0, 0.0, 0.0});
+    traceData->appendData(QVector3D{-20.0, 10.0, 0.0});
 }
 
 void GSWidget::dummySlot() {
