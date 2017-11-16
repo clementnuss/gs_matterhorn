@@ -25,6 +25,11 @@ GSWidget::GSWidget(QWidget *parent) :
     connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
     clockTimer.start(std::lround((1.0 / 60.0) * 1000));
 
+
+    //QObject* line = quickWidget->findChild<QObject*>("LineTest");
+    //TraceData *trace = qobject_cast<TraceData*>(line);
+
+    //std::cout << trace->count() << std::endl;
 }
 
 void GSWidget::dummySlot() {

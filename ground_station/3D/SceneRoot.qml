@@ -5,6 +5,7 @@ import Qt3D.Extras 2.9
 
 import QtQuick 2.9 as QQ2
 
+import ch.epfl.ert.groundstation 1.0
 
 Entity {
     id: sceneRoot
@@ -90,4 +91,10 @@ Entity {
     }
 
     GroundStation { position : groundStationPosition}
+
+    TraceData{
+        id: data
+    }
+
+    LineTest{traceData : data}
 }

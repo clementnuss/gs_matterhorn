@@ -1,4 +1,6 @@
 #include <QObject>
+#include <3D/TraceData.h>
+#include <QtQml/QtQml>
 #include "Application.h"
 
 Application::Application(int &argc, char **argv) : qApplication_{argc, argv}, mainWidget_{nullptr}, workerThread_{} {
@@ -52,11 +54,6 @@ int Application::exec() {
 }
 
 void Application::connectSlotsAndSignals() {
-    qRegisterMetaType<TelemetryReading>("TelemetryReading");
-    qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>&");
-    qRegisterMetaType<vector<RocketEvent>>("vector<RocketEvent>&");
-    qRegisterMetaType<GraphFeature>("GraphFeature");
-    qRegisterMetaType<HandlerStatus>("HandlerStatus");
 
     QObject::connect(worker_,
                      &Worker::dummySignal,
