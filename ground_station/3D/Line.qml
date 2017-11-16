@@ -7,7 +7,7 @@ import ch.epfl.ert.groundstation 1.0
 
 
 Entity{
-    objectName:"LineTest"
+    objectName:"Line"
 
     property TraceData traceData
 
@@ -20,18 +20,6 @@ Entity{
     CuboidMesh{
         id: mesh
     }
-
-    Transform {
-            id: textTransform
-            matrix: {
-                var m = Qt.matrix4x4()
-
-                console.log(traceData.buffer)
-
-                return m
-            }
-        }
-
 
     GeometryRenderer{
         id: geometryRenderer

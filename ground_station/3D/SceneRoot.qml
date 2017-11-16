@@ -25,7 +25,9 @@ Entity {
     }
 
 
-    FirstPersonCameraController { camera: camera }
+    FirstPersonCameraController {
+        camera: camera
+    }
 
     components: [
         RenderSettings {
@@ -96,5 +98,5 @@ Entity {
         id: data
     }
 
-    LineTest{traceData : data}
+    Line{traceData : data}
 }

@@ -12,7 +12,7 @@ TraceData::TraceData(Qt3DCore::QNode *parent)
             QVector3D{0.0, 10.0, 0.0},
             QVector3D{0.0, 0.0, 0.0}};
 
-    QByteArray ba;
+    QByteArray ba;                   
     ba.resize(positions.size() * sizeof(TraceVBOData));
     TraceVBOData *vboData = reinterpret_cast<TraceVBOData *>(ba.data());
     for (int i = 0; i < positions.size(); i++) {

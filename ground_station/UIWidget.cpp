@@ -4,6 +4,9 @@
 #include <iostream>
 #include <cassert>
 #include <QtQuickWidgets/QQuickWidget>
+#include <QQuickItem>
+#include <3D/TraceData.h>
+#include <QtQml/QQmlProperty>
 
 GSWidget::GSWidget(QWidget *parent) :
     QWidget(parent),
@@ -26,10 +29,13 @@ GSWidget::GSWidget(QWidget *parent) :
     clockTimer.start(std::lround((1.0 / 60.0) * 1000));
 
 
-    //QObject* line = quickWidget->findChild<QObject*>("LineTest");
-    //TraceData *trace = qobject_cast<TraceData*>(line);
+    QQuickItem *rootItem = quickWidget->rootObject();
+    QObject *line = rootItem->findChild<QObject *>("Line");
 
-    //std::cout << trace->count() << std::endl;
+    QVariant traceDataProperty = QQmlProperty::read(line, "traceData");
+    auto *traceData = qvariant_cast<TraceData *>(traceDataProperty);
+
+    std::cout << traceData->count() << std::endl;
 }
 
 void GSWidget::dummySlot() {

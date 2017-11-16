@@ -5,7 +5,7 @@
         <file alias="main.qml">3D/main.qml</file>
         <file alias="SceneRoot.qml">3D/SceneRoot.qml</file>
         <file alias="Terrain.qml">3D/Terrain.qml</file>
-        <file alias="LineTest.qml">3D/LineTest.qml</file>
+        <file alias="Line.qml">3D/Line.qml</file>
         <file alias="LineEffect.qml">3D/LineEffect.qml</file>
         <file alias="Marker.qml">3D/Marker.qml</file>
         <file alias="MarkerEffect.qml">3D/MarkerEffect.qml</file>
