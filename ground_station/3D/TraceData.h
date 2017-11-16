@@ -28,13 +28,7 @@ public:
 
     Qt3DRender::QBuffer *buffer();
 
-    void setData(QVector<TraceVBOData> data);
-
     void setData(const QVector<QVector3D> &positions);
-
-    void setData(QByteArray byteArray, int count);
-
-    void setPositions(QVector<QVector3D> positions);
 
     int count() const;
 

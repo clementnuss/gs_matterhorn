@@ -33,9 +33,15 @@ GSWidget::GSWidget(QWidget *parent) :
     QObject *line = rootItem->findChild<QObject *>("Line");
 
     QVariant traceDataProperty = QQmlProperty::read(line, "traceData");
-    auto *traceData = qvariant_cast<TraceData *>(traceDataProperty);
+    TraceData *traceData = qvariant_cast<TraceData *>(traceDataProperty);
 
-    std::cout << traceData->count() << std::endl;
+    QVector<QVector3D> positions{
+            QVector3D{10.0f, 10.0, 0.0},
+            QVector3D{10.0, 0.0, 0.0},
+            QVector3D{0.0, 0.0, 0.0},
+            QVector3D{0.0, 10.0, 0.0}};
+
+    traceData->setData(positions);
 }
 
 void GSWidget::dummySlot() {
