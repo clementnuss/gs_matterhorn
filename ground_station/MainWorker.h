@@ -34,6 +34,8 @@ signals:
     void graphDataReady(QVector<QCPGraphData> &, GraphFeature);
     void newEventsReady(vector<RocketEvent> &);
 
+    void point3DReady(QVector3D &);
+
     void linkStatusReady(HandlerStatus);
     void groundStatusReady(float, float);
     void dummySignal();

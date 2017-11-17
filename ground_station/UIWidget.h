@@ -7,6 +7,7 @@
 #include <QtCore/QThread>
 #include <qcustomplot.h>
 #include <Qt3DCore/QEntity>
+#include <3D/TraceData.h>
 #include "MainWorker.h"
 #include "ProgramConstants.h"
 
@@ -36,13 +37,16 @@ public slots:
     void updateLinkStatus(HandlerStatus);
     void updateGroundStatus(float, float);
 
-signals:
+    // 3D visualisation slots
+    void register3DPoint(const QVector3D &);
 
+signals:
     void toggleLogging();
 
 private:
     Ui::GSWidget *ui;
     QTimer clockTimer;
+    TraceData *traceData_;
 
     void graphSetup();
 };

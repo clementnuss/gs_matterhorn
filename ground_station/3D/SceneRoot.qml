@@ -98,5 +98,11 @@ Entity {
         id: data
     }
 
+    TraceData{
+        id: data2
+    }
+
     Line{traceData : data}
+
+    LineCPP{}
 }

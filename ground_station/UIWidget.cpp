@@ -5,7 +5,6 @@
 #include <cassert>
 #include <QtQuickWidgets/QQuickWidget>
 #include <QQuickItem>
-#include <3D/TraceData.h>
 #include <QtQml/QQmlProperty>
 
 GSWidget::GSWidget(QWidget *parent) :
@@ -32,8 +31,9 @@ GSWidget::GSWidget(QWidget *parent) :
     QQuickItem *rootItem = quickWidget->rootObject();
     QObject *line = rootItem->findChild<QObject *>("Line");
 
+
     QVariant traceDataProperty = QQmlProperty::read(line, "traceData");
-    TraceData *traceData = qvariant_cast<TraceData *>(traceDataProperty);
+    traceData_ = qvariant_cast<TraceData *>(traceDataProperty);
 
     QVector<QVector3D> positions{
             QVector3D{10.0f, 10.0, 0.0},
@@ -41,10 +41,10 @@ GSWidget::GSWidget(QWidget *parent) :
             QVector3D{0.0, 0.0, 0.0},
             QVector3D{0.0, 10.0, 0.0}};
 
-    traceData->setData(positions);
-    traceData->appendData(QVector3D{-10.0, 10.0, 0.0});
-    traceData->appendData(QVector3D{-10.0, 0.0, 0.0});
-    traceData->appendData(QVector3D{-20.0, 10.0, 0.0});
+    traceData_->setData(positions);
+    traceData_->appendData(QVector3D{-10.0, 10.0, 0.0});
+    traceData_->appendData(QVector3D{-10.0, 0.0, 0.0});
+    traceData_->appendData(QVector3D{-20.0, 10.0, 0.0});
 }
 
 void GSWidget::dummySlot() {
@@ -155,6 +155,11 @@ void GSWidget::updateLinkStatus(HandlerStatus status) {
 void GSWidget::updateGroundStatus(float temperature, float pressure) {
     ui->ground_temperature_value->setText(QString::number(temperature, 'f', UIConstants::PRECISION));
     ui->ground_temperature_value->setText(QString::number(pressure, 'f', UIConstants::PRECISION));
+}
+
+
+void GSWidget::register3DPoint(const QVector3D &position) {
+    traceData_->appendData(position);
 }
 
 void GSWidget::graphSetup() {
