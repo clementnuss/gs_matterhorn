@@ -1,5 +1,4 @@
 
-#include <iostream>
 #include "TraceData.h"
 
 
@@ -31,11 +30,8 @@ void TraceData::appendData(const QVector3D position) {
 
     QByteArray tempBuffer = m_buffer->data();
 
-    std::cout << tempBuffer.size() << std::endl;
-
     tempBuffer.resize(tempBuffer.size() + 1 * sizeof(TraceVBOData));
 
-    std::cout << tempBuffer.size() << std::endl;
     // View QByteArray as array of TraceVBOData
     TraceVBOData *vboData = reinterpret_cast<TraceVBOData *>(tempBuffer.data());
 
