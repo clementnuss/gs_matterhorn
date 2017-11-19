@@ -21,6 +21,10 @@ public:
 
     void appendData(const QVector3D position);
 
+    void appendData(const QVector<QVector3D> &positions);
+
+    void clearData();
+
 public slots:
 
 private:

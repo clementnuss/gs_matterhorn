@@ -4,7 +4,7 @@
 
 Line::Line(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent), mesh_{this}, material_{this}, effect_{this},
                                       geometryRenderer_{this}, geometry_{&geometryRenderer_}, attribute_{&geometry_},
-                                      buffer_{Qt3DRender::QBuffer::VertexBuffer, this},
+                                      buffer_{},
                                       technique_{&effect_}, filterKey_{&technique_}, renderPass_{&technique_},
                                       shaderProgram_{&renderPass_}, renderState_{&renderPass_}, count_{0} {
 
@@ -40,7 +40,6 @@ Line::Line(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent), mesh_{this}, ma
     attribute_.setByteOffset(0);
     attribute_.setByteStride(3 * 4);
     attribute_.setCount(count_);
-
     attribute_.setBuffer(&buffer_);
 
     geometry_.addAttribute(&attribute_);
@@ -49,14 +48,8 @@ Line::Line(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent), mesh_{this}, ma
     geometryRenderer_.setPrimitiveType(Qt3DRender::QGeometryRenderer::PrimitiveType::LineStrip);
     geometryRenderer_.setGeometry(&geometry_);
 
-    this->appendData(QVector3D{0.0, 0.0, 0.0});
-    this->appendData(QVector3D{0.0, 20.0, 0.0});
-    this->appendData(QVector3D{0.0, 40.0, 0.0});
-    this->appendData(QVector3D{0.0, 20.0, 10.0});
-
     this->addComponent(&geometryRenderer_);
     this->addComponent(&material_);
-
 }
 
 
@@ -71,6 +64,15 @@ void Line::setData(const QVector<QVector3D> &positions) {
 
     buffer_.setData(ba);
     count_ = positions.count();
+    attribute_.setCount(count_);
+    geometryRenderer_.setInstanceCount(count_);
+}
+
+void Line::clearData() {
+
+    buffer_.setData(QByteArray{});
+    attribute_.setCount(0);
+    geometryRenderer_.setInstanceCount(0);
 }
 
 void Line::appendData(const QVector3D position) {
@@ -78,11 +80,8 @@ void Line::appendData(const QVector3D position) {
 
     QByteArray tempBuffer = buffer_.data();
 
-    std::cout << tempBuffer.size() << std::endl;
-
     tempBuffer.resize(tempBuffer.size() + 1 * sizeof(VBOData));
 
-    std::cout << tempBuffer.size() << std::endl;
     // View QByteArray as array of VBOData
     VBOData *vboData = reinterpret_cast<VBOData *>(tempBuffer.data());
 
@@ -97,4 +96,11 @@ void Line::appendData(const QVector3D position) {
 
     attribute_.setCount(count_);
     geometryRenderer_.setInstanceCount(count_);
+}
+
+void Line::appendData(const QVector<QVector3D> &positions) {
+    // TODO: do not call append data individually, resize needed each time
+    for (auto position : positions) {
+        appendData(position);
+    }
 }

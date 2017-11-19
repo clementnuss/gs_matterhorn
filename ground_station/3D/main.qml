@@ -7,7 +7,7 @@ Item {
 
             property alias exported_sceneRoot : sceneRoot
 
-            multisample : false
+            multisample : true
             anchors.fill: parent
             focus: true
             aspects: ["input", "logic"]

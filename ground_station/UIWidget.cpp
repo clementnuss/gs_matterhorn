@@ -8,9 +8,10 @@
 #include <QtQml/QQmlProperty>
 
 GSWidget::GSWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::GSWidget),
-    clockTimer(this)
+        QWidget(parent),
+        ui(new Ui::GSWidget),
+        clockTimer(this),
+        currentTrace_{nullptr}
 {
     ui->setupUi(this);
 
@@ -29,22 +30,10 @@ GSWidget::GSWidget(QWidget *parent) :
 
 
     QQuickItem *rootItem = quickWidget->rootObject();
-    QObject *line = rootItem->findChild<QObject *>("Line");
+    auto *sceneRoot = rootItem->findChild<Qt3DCore::QNode *>("SceneRoot");
 
-
-    QVariant traceDataProperty = QQmlProperty::read(line, "traceData");
-    traceData_ = qvariant_cast<TraceData *>(traceDataProperty);
-
-    QVector<QVector3D> positions{
-            QVector3D{10.0f, 10.0, 0.0},
-            QVector3D{10.0, 0.0, 0.0},
-            QVector3D{0.0, 0.0, 0.0},
-            QVector3D{0.0, 10.0, 0.0}};
-
-    traceData_->setData(positions);
-    traceData_->appendData(QVector3D{-10.0, 10.0, 0.0});
-    traceData_->appendData(QVector3D{-10.0, 0.0, 0.0});
-    traceData_->appendData(QVector3D{-20.0, 10.0, 0.0});
+    // Add dynamic 3D objects
+    currentTrace_ = new Line{sceneRoot};
 }
 
 void GSWidget::dummySlot() {
@@ -158,8 +147,8 @@ void GSWidget::updateGroundStatus(float temperature, float pressure) {
 }
 
 
-void GSWidget::register3DPoint(const QVector3D &position) {
-    traceData_->appendData(position);
+void GSWidget::register3DPoints(const QVector<QVector3D> &positions) {
+    currentTrace_->appendData(positions);
 }
 
 void GSWidget::graphSetup() {
@@ -238,4 +227,5 @@ bool GSWidget::event(QEvent *event) {
 
 GSWidget::~GSWidget() {
     delete ui;
+    delete currentTrace_;
 }

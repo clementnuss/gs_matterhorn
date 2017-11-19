@@ -14,6 +14,8 @@ public:
     virtual void startup() = 0;
 
     virtual std::vector<RocketEvent> pollEvents() = 0;
+
+    virtual std::vector<XYZReading> pollLocations() = 0;
 };
 
 

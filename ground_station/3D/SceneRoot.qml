@@ -9,6 +9,7 @@ import ch.epfl.ert.groundstation 1.0
 
 Entity {
     id: sceneRoot
+    objectName : "SceneRoot"
 
     property vector3d groundStationPosition : Qt.vector3d(0.3, 1.15, -5.1)
     property alias cameraPosition : camera.position
@@ -93,16 +94,4 @@ Entity {
     }
 
     GroundStation { position : groundStationPosition}
-
-    TraceData{
-        id: data
-    }
-
-    TraceData{
-        id: data2
-    }
-
-    Line{traceData : data}
-
-    LineCPP{}
 }

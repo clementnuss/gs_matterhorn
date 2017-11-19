@@ -13,7 +13,10 @@ using namespace SimulatorConstants;
 //TODO: make telemetry handler factory to provide either simulator or real one
 
 TelemetrySimulator::TelemetrySimulator() : time{QTime::currentTime()},
-                                           timeOfLastPolledData{chrono::system_clock::now()}, variableRate{true},
+                                           timeOfLastPolledData{chrono::system_clock::now()},
+                                           timeOfLastPolledGeoData{chrono::system_clock::now()},
+                                           timeOfInitialization{chrono::system_clock::now()},
+                                           variableRate{true},
                                            simulatorStatus{HandlerStatus::NOMINAL} {
 }
 
@@ -62,6 +65,31 @@ vector<RocketEvent> TelemetrySimulator::pollEvents() {
     }
 
     return v;
+}
+
+vector<XYZReading> TelemetrySimulator::pollLocations() {
+
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+    vector<XYZReading> generatedVector{};
+
+    long long millisSinceLastPoll = msecsBetween(timeOfLastPolledGeoData, now);
+    if (millisSinceLastPoll > TimeConstants::MSECS_IN_SEC / 10) {
+        timeOfLastPolledGeoData = now;
+
+        long long int msecs = msecsBetween(timeOfInitialization, chrono::system_clock::now());
+
+        double x = 2 * static_cast<double>(msecs) / 1000;
+
+        XYZReading r;
+
+        r.x_ = 0;
+        r.y_ = 5 * log(x);
+        r.z_ = -x;
+
+        generatedVector.push_back(r);
+    }
+
+    return generatedVector;
 }
 
 void TelemetrySimulator::setVariableRate(bool enable) {

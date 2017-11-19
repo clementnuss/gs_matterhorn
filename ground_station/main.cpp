@@ -1,6 +1,5 @@
 #include <Application.h>
 #include <QtQml/QtQml>
-#include <3D/Line.h>
 
 
 int main(int argc, char **argv) {
@@ -10,6 +9,7 @@ int main(int argc, char **argv) {
     qmlRegisterType<Line>("ch.epfl.ert.groundstation", 1, 0, "LineCPP");
     qRegisterMetaType<TelemetryReading>("TelemetryReading");
     qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>&");
+    qRegisterMetaType<QVector<QVector3D>>("QVector<QVector3D>&");
     qRegisterMetaType<vector<RocketEvent>>("vector<RocketEvent>&");
     qRegisterMetaType<GraphFeature>("GraphFeature");
     qRegisterMetaType<HandlerStatus>("HandlerStatus");

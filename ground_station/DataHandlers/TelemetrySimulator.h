@@ -19,6 +19,8 @@ public:
 
     vector<TelemetryReading> pollData() override;
 
+    vector<XYZReading> pollLocations() override;
+
     void setVariableRate(bool);
 private:
 
@@ -33,6 +35,8 @@ private:
     QTime time;
     HandlerStatus simulatorStatus;
     chrono::system_clock::time_point timeOfLastPolledData;
+    chrono::system_clock::time_point timeOfLastPolledGeoData;
+    chrono::system_clock::time_point timeOfInitialization;
     bool variableRate;
 };
 
