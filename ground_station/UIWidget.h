@@ -5,9 +5,7 @@
 #include <DataStructures/datastructs.h>
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
-#include <qcustomplot.h>
 #include <Qt3DCore/QEntity>
-#include <3D/TraceData.h>
 #include <3D/Line.h>
 #include "MainWorker.h"
 #include "ProgramConstants.h"

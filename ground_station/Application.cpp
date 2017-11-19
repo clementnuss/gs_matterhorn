@@ -1,5 +1,4 @@
 #include <QObject>
-#include <3D/TraceData.h>
 #include <QtQml/QtQml>
 #include "Application.h"
 

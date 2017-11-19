@@ -3,7 +3,7 @@
 
 
 Line::Line(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent), mesh_{this}, material_{this}, effect_{this},
-                                      geometryRenderer_{this}, geometry_{&geometryRenderer_}, attribute_{&geometry_},
+                                      geometryRenderer_{this}, geometry_{&geometryRenderer_},
                                       buffer_{},
                                       technique_{&effect_}, filterKey_{&technique_}, renderPass_{&technique_},
                                       shaderProgram_{&renderPass_}, renderState_{&renderPass_}, count_{0} {
@@ -31,8 +31,8 @@ Line::Line(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent), mesh_{this}, ma
     effect_.addTechnique(&technique_);
 
     material_.setEffect(&effect_);
-    //Build GeometryRenderer
 
+    //Build GeometryRenderer
     attribute_.setName("vertexPosition");
     attribute_.setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
     attribute_.setVertexBaseType(Qt3DRender::QAttribute::Float);
