@@ -6,7 +6,7 @@
 #include <QtQuickWidgets/QQuickWidget>
 #include <QQuickItem>
 #include <QtQml/QQmlProperty>
-#include <3D/Ground/Ground.h>
+#include <3D/Scene/RootEntity.h>
 
 GSWidget::GSWidget(QWidget *parent) :
         QWidget(parent),
@@ -15,7 +15,11 @@ GSWidget::GSWidget(QWidget *parent) :
         currentTrace_{nullptr}
 {
     ui->setupUi(this);
+    graphSetup();
 
+    connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
+    clockTimer.start(std::lround((1.0 / 60.0) * 1000));
+    /*
     auto *quickWidget = new QQuickWidget;
     quickWidget->setMinimumSize(300, 300);
     quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
@@ -26,16 +30,30 @@ GSWidget::GSWidget(QWidget *parent) :
     ui->stackedWidget->addWidget(quickWidget);
     graphSetup();
 
-    connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
-    clockTimer.start(std::lround((1.0 / 60.0) * 1000));
-
-
     QQuickItem *rootItem = quickWidget->rootObject();
     auto *sceneRoot = rootItem->findChild<Qt3DCore::QNode *>("SceneRoot");
 
     // Add dynamic 3D objects
     currentTrace_ = new Line{sceneRoot};
-    auto *test = new Ground{sceneRoot};
+    new Ground{sceneRoot};
+    */
+    Qt3DExtras::Qt3DWindow *view = new Qt3DExtras::Qt3DWindow();
+    view->defaultFrameGraph()->setClearColor(QColor("steelblue"));
+    QWidget *container = QWidget::createWindowContainer(view);
+    container->setMinimumSize(QSize(200, 100));
+
+    Qt3DInput::QInputAspect *input = new Qt3DInput::QInputAspect;
+
+    view->registerAspect(input);
+
+
+    RootEntity *rootEntity = new RootEntity(view, nullptr);
+    view->setRootEntity(rootEntity);
+
+
+    ui->stackedWidget->removeWidget(ui->stackedWidget->widget(1));
+    ui->stackedWidget->addWidget(container);
+
 }
 
 void GSWidget::dummySlot() {
@@ -150,7 +168,7 @@ void GSWidget::updateGroundStatus(float temperature, float pressure) {
 
 
 void GSWidget::register3DPoints(const QVector<QVector3D> &positions) {
-    currentTrace_->appendData(positions);
+    //currentTrace_->appendData(positions);
 }
 
 void GSWidget::graphSetup() {

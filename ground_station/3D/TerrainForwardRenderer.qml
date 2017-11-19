@@ -32,8 +32,6 @@ TechniqueFilter {
                     clearColor: "steelblue"
 
                 }
-                LayerFilter { layers: root.terrainLayer }
-                LayerFilter { layers: root.markerLayer }
             }
         }
     }

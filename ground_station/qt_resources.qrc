@@ -4,17 +4,11 @@
 
         <file alias="main.qml">3D/main.qml</file>
         <file alias="SceneRoot.qml">3D/SceneRoot.qml</file>
-        <file alias="Terrain.qml">3D/Terrain.qml</file>
-        <file alias="Line.qml">3D/Line.qml</file>
-        <file alias="LineEffect.qml">3D/LineEffect.qml</file>
         <file alias="Marker.qml">3D/Marker.qml</file>
         <file alias="MarkerEffect.qml">3D/MarkerEffect.qml</file>
         <file alias="GroundStation.qml">3D/GroundStation.qml</file>
         <file alias="TrackingText.qml">3D/TrackingText.qml</file>
-        <file alias="TerrainEffect.qml">3D/TerrainEffect.qml</file>
         <file alias="TerrainForwardRenderer.qml">3D/TerrainForwardRenderer.qml</file>
-        <file alias="TerrainMaterial.qml">3D/TerrainMaterial.qml</file>
-        <file alias="PlanetMaterial.qml">3D/PlanetMaterial.qml</file>
 
         <file alias="shaders/terrain.frag">3D/shaders/terrain.frag</file>
         <file alias="shaders/line.frag">3D/shaders/line.frag</file>
