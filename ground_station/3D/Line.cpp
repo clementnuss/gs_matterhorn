@@ -99,8 +99,21 @@ void Line::appendData(const QVector3D position) {
 }
 
 void Line::appendData(const QVector<QVector3D> &positions) {
-    // TODO: do not call append data individually, resize needed each time
-    for (auto position : positions) {
-        appendData(position);
+    QByteArray tempBuffer = buffer_.data();
+    tempBuffer.resize(tempBuffer.size() + positions.size() * sizeof(VBOData));
+
+    // View QByteArray as array of VBOData
+    VBOData *vboData = reinterpret_cast<VBOData *>(tempBuffer.data());
+
+    for (int i = 0; i < positions.size(); i++) {
+        VBOData &vbo = vboData[count_ + i];
+        vbo.position = positions[i];
     }
+
+    // Sets back buffer's data
+    buffer_.setData(tempBuffer);
+
+    count_ += positions.size();
+    attribute_.setCount(count_);
+    geometryRenderer_.setInstanceCount(count_);
 }
