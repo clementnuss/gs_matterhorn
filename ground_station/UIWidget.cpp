@@ -48,6 +48,7 @@ GSWidget::GSWidget(QWidget *parent) :
 
 
     RootEntity *rootEntity = new RootEntity(view, nullptr);
+    //currentTrace_ = new Line{rootEntity};
     view->setRootEntity(rootEntity);
 
 

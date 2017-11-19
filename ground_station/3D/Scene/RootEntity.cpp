@@ -1,5 +1,6 @@
 
 #include <3D/Ground/Ground.h>
+#include <3D/Marker/Marker.h>
 #include "RootEntity.h"
 
 RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
@@ -17,6 +18,13 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     cameraController_->setCamera(camera);
 
+    /*
+    auto *renderSettings = new Qt3DRender::QRenderSettings(this);
+    auto *forwardRenderer = new ForwardRenderer(camera, this);
+    renderSettings->setActiveFrameGraph(forwardRenderer);
+     */
 
     new Ground(this);
+    QVector3D markerpos{0, 10, 0};
+    new Marker(QStringLiteral("qrc:/3D/textures/caret_down.png"), markerpos, camera, this);
 }
