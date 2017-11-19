@@ -74,10 +74,6 @@ Entity {
         running: true
     }
 
-    Terrain {
-            id: terrain
-            layer: renderSettings.activeFrameGraph.terrainLayer
-    }
 
     TrackingText{
         id: trackingText

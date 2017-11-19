@@ -19,7 +19,7 @@ Material {
                                             y: WrapMode.ClampToEdge
                                         }
                                         generateMipMaps: true
-                                        maximumAnisotropy: 16.0
+                                          maximumAnisotropy: 16.0
                                         TextureImage {
                                             id: diffuseTextureImage
                                             source: "qrc:3D/textures/diffusemap_photo_1024.jpg"

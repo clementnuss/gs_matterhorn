@@ -6,6 +6,7 @@
 #include <QtQuickWidgets/QQuickWidget>
 #include <QQuickItem>
 #include <QtQml/QQmlProperty>
+#include <3D/Ground/Ground.h>
 
 GSWidget::GSWidget(QWidget *parent) :
         QWidget(parent),
@@ -34,6 +35,7 @@ GSWidget::GSWidget(QWidget *parent) :
 
     // Add dynamic 3D objects
     currentTrace_ = new Line{sceneRoot};
+    auto *test = new Ground{sceneRoot};
 }
 
 void GSWidget::dummySlot() {

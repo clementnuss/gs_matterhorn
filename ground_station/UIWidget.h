@@ -6,7 +6,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
 #include <Qt3DCore/QEntity>
-#include <3D/Line.h>
+#include <3D/Line/Line.h>
 #include "MainWorker.h"
 #include "ProgramConstants.h"
 
