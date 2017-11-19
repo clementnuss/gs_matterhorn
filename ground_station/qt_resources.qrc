@@ -4,8 +4,6 @@
 
         <file alias="main.qml">3D/main.qml</file>
         <file alias="SceneRoot.qml">3D/SceneRoot.qml</file>
-        <file alias="Marker.qml">3D/Marker.qml</file>
-        <file alias="MarkerEffect.qml">3D/MarkerEffect.qml</file>
         <file alias="GroundStation.qml">3D/GroundStation.qml</file>
         <file alias="TrackingText.qml">3D/TrackingText.qml</file>
         <file alias="TerrainForwardRenderer.qml">3D/TerrainForwardRenderer.qml</file>
