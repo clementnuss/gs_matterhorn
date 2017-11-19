@@ -7,6 +7,11 @@
 
 //#define DEBUG true
 
+namespace OpenGLConstants {
+    static constexpr int VERSION_MAJOR = 3;
+    static constexpr int VERSION_MINOR = 2;
+}
+
 namespace PrintConstants {
     static constexpr int PRECISION = 4;
     static constexpr int FIELD_WIDTH = 12;
