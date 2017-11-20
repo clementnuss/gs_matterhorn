@@ -1,6 +1,6 @@
-#version 330 core
+#version 120
 
-in vec3 vertexPosition;
+attribute vec3 vertexPosition;
 
 uniform mat4 mvp;
 

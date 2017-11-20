@@ -12,10 +12,6 @@
         <file alias="shaders/DShader.frag">3D/shaders/DShader.frag</file>
         <file alias="shaders/marker.vert">3D/shaders/marker.vert</file>
         <file alias="shaders/terrain.vert">3D/shaders/terrain.vert</file>
-        <file alias="shaders/ribbonwire.frag">3D/shaders/ribbonwireframe.frag</file>
-        <file alias="shaders/ribbonwireframe.frag">3D/shaders/ribbonwireframe.frag</file>
-        <file alias="shaders/robustwireframe.geom">3D/shaders/robustwireframe.geom</file>
-
         <file alias="textures/default.png">3D/textures/default.png</file>
         <file>3D/textures/yosemite_hm.jpg</file>
         <file>3D/textures/heightmap_1024.jpg</file>

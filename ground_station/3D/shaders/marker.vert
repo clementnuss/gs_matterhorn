@@ -1,9 +1,9 @@
-#version 330 core
+#version 120
 
-in vec3 vertexPosition;
-in vec2 vertexTexCoord;
+attribute vec3 vertexPosition;
+attribute vec2 vertexTexCoord;
 
-out vec2 texCoord;
+varying vec2 texCoord;
 
 uniform mat4 mvp;
 
