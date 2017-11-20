@@ -1,7 +1,7 @@
 #include <QtGui/QFont>
 #include <3D/Utils.h>
-#include <3D/Marker/Marker.h>
-#include <3D/Text/Text.h>
+#include <3D/Billboards/Marker.h>
+#include <3D/Billboards/Text.h>
 #include "Tracker.h"
 
 const QVector3D Tracker::textOffset_{1.5, 0, 0};

@@ -3,8 +3,8 @@
 #define GS_MATTERHORN_TRACKER_H
 
 
-#include <3D/Marker/Marker.h>
-#include <3D/Text/Text.h>
+#include <3D/Billboards/Marker.h>
+#include <3D/Billboards/Text.h>
 
 
 class Tracker : public Qt3DCore::QEntity {

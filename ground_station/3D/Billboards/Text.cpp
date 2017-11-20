@@ -2,7 +2,7 @@
 #include <QtGui/QFont>
 #include <QtGui/QFontMetrics>
 #include <3D/Utils.h>
-#include <3D/Marker/Marker.h>
+#include <3D/Billboards/Marker.h>
 #include "Text.h"
 
 const QVector3D Text::basePosition_{0, 0, 0};

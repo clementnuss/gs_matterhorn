@@ -1,8 +1,8 @@
 #include <QtGui/QFont>
 #include <QtGui/QFontMetrics>
 #include <3D/Utils.h>
-#include <3D/Marker/Marker.h>
-#include <3D/Text/Text.h>
+#include <3D/Billboards/Marker.h>
+#include <3D/Billboards/Tracker.h>
 #include "GroundStation.h"
 
 GroundStation::GroundStation(QVector3D position, Qt3DRender::QCamera *camera, Qt3DCore::QNode *parent)
@@ -22,7 +22,8 @@ GroundStation::GroundStation(QVector3D position, Qt3DRender::QCamera *camera, Qt
     this->addComponent(material);
     this->addComponent(transform_);
 
-    new Marker(QUrl(QStringLiteral("qrc:/3D/textures/double_down_arrow.png")), markerOffset_, camera, this);
-    new Text(QStringLiteral("GROUND STATION"), textOffset_, camera, this);
+    new Tracker(QVector3D{0, 1, 0}, camera,
+                QUrl(QStringLiteral("qrc:/3D/textures/double_down_arrow.png")), QStringLiteral("GROUND STATION"),
+                this);
 }
 

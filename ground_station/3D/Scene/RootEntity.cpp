@@ -1,6 +1,5 @@
 
 #include <3D/Ground/Ground.h>
-#include <3D/Marker/Marker.h>
 #include <3D/GroundStation/GroundStation.h>
 #include <3D/Billboards/Tracker.h>
 #include "RootEntity.h"
@@ -30,11 +29,9 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     QVector3D markerpos{0, 10, 0};
     QVector3D gsPos{5, 2, 0};
-    QVector3D markerpos2{0, 20, 0};
 
     new GroundStation(gsPos, camera, this);
-    new Marker(QStringLiteral("qrc:/3D/textures/caret_down.png"), markerpos, camera, this);
-    new Tracker(markerpos2, camera,
+    new Tracker(markerpos, camera,
                 QUrl(QStringLiteral("qrc:/3D/textures/caret_down.png")), QStringLiteral("TEST"),
                 this);
 }
