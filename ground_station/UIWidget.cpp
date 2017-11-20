@@ -6,13 +6,13 @@
 #include <QtQuickWidgets/QQuickWidget>
 #include <QQuickItem>
 #include <QtQml/QQmlProperty>
-#include <3D/Scene/RootEntity.h>
 
 GSWidget::GSWidget(QWidget *parent) :
         QWidget(parent),
         ui(new Ui::GSWidget),
         clockTimer(this),
-        currentTrace_{nullptr}
+        currentTrace_{nullptr},
+        rootEntity3D_{nullptr}
 {
     ui->setupUi(this);
     graphSetup();
@@ -47,9 +47,8 @@ GSWidget::GSWidget(QWidget *parent) :
     view->registerAspect(input);
 
 
-    RootEntity *rootEntity = new RootEntity(view, nullptr);
-    //currentTrace_ = new Line{rootEntity};
-    view->setRootEntity(rootEntity);
+    rootEntity3D_ = new RootEntity(view, nullptr);
+    view->setRootEntity(rootEntity3D_);
 
 
     ui->stackedWidget->removeWidget(ui->stackedWidget->widget(1));
@@ -169,7 +168,7 @@ void GSWidget::updateGroundStatus(float temperature, float pressure) {
 
 
 void GSWidget::register3DPoints(const QVector<QVector3D> &positions) {
-    //currentTrace_->appendData(positions);
+    rootEntity3D_->updateRocketTracker(positions);
 }
 
 void GSWidget::graphSetup() {

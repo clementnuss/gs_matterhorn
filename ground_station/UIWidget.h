@@ -7,6 +7,7 @@
 #include <QtCore/QThread>
 #include <Qt3DCore/QEntity>
 #include <3D/Line/Line.h>
+#include <3D/Scene/RootEntity.h>
 #include "MainWorker.h"
 #include "ProgramConstants.h"
 
@@ -46,6 +47,7 @@ private:
     Ui::GSWidget *ui;
     QTimer clockTimer;
     Line *currentTrace_;
+    RootEntity *rootEntity3D_;
 
     void graphSetup();
 };
