@@ -19,26 +19,10 @@ GSWidget::GSWidget(QWidget *parent) :
 
     connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
     clockTimer.start(std::lround((1.0 / 60.0) * 1000));
-    /*
-    auto *quickWidget = new QQuickWidget;
-    quickWidget->setMinimumSize(300, 300);
-    quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
-    quickWidget->setSource(QUrl("qrc:/main.qml"));
 
-    // Replace placeholder widget by the quickWidget
-    ui->stackedWidget->removeWidget(ui->stackedWidget->widget(1));
-    ui->stackedWidget->addWidget(quickWidget);
-    graphSetup();
 
-    QQuickItem *rootItem = quickWidget->rootObject();
-    auto *sceneRoot = rootItem->findChild<Qt3DCore::QNode *>("SceneRoot");
-
-    // Add dynamic 3D objects
-    currentTrace_ = new Line{sceneRoot};
-    new Ground{sceneRoot};
-    */
     Qt3DExtras::Qt3DWindow *view = new Qt3DExtras::Qt3DWindow();
-    view->defaultFrameGraph()->setClearColor(QColor("steelblue"));
+    //view->defaultFrameGraph()->setClearColor(QColor("steelblue"));
     QWidget *container = QWidget::createWindowContainer(view);
     container->setMinimumSize(QSize(200, 100));
 

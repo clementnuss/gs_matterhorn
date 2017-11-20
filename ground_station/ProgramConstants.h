@@ -9,7 +9,7 @@
 
 namespace OpenGLConstants {
     static constexpr int VERSION_MAJOR = 3;
-    static constexpr int VERSION_MINOR = 2;
+    static constexpr int VERSION_MINOR = 3;
     static constexpr int ANISOTROPY_MAX = 8;
 }
 

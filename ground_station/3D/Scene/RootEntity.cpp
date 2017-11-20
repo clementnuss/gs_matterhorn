@@ -2,6 +2,7 @@
 #include <3D/Ground/Ground.h>
 #include <3D/GroundStation/GroundStation.h>
 #include <3D/Billboards/Tracker.h>
+#include <3D/ForwardRenderer/ForwardRenderer.h>
 #include "RootEntity.h"
 
 RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
@@ -9,6 +10,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         cameraController_{new Qt3DExtras::QFirstPersonCameraController(this)},
         rocketTracker_{nullptr},
         rocketTrace_{nullptr} {
+
 
     Qt3DRender::QCamera *camera = view->camera();
     camera->setProjectionType(Qt3DRender::QCameraLens::PerspectiveProjection);
@@ -19,13 +21,13 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     camera->setUpVector(QVector3D{0.0, 1.0, 0.0});
     camera->setViewCenter(QVector3D{0.0, 0.0, 0.0});
 
-    cameraController_->setCamera(camera);
-
-    /*
     auto *renderSettings = new Qt3DRender::QRenderSettings(this);
-    auto *forwardRenderer = new ForwardRenderer(camera, this);
+    auto *forwardRenderer = new ForwardRenderer(view, renderSettings);
     renderSettings->setActiveFrameGraph(forwardRenderer);
-     */
+
+    this->addComponent(renderSettings);
+
+    cameraController_->setCamera(camera);
 
     new Ground(this);
     rocketTracker_ = new Tracker(QVector3D{0, 20, 0}, view->camera(),
