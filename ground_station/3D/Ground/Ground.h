@@ -11,7 +11,7 @@
 class Ground : public Qt3DCore::QEntity {
 Q_OBJECT
 public:
-    explicit Ground(Qt3DCore::QNode *parent = 0);
+    explicit Ground(Qt3DCore::QNode *parent = nullptr);
 
 public slots:
 

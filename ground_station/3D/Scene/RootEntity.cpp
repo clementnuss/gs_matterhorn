@@ -35,7 +35,6 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
                                  this);
     rocketTrace_ = new Line(this);
 
-    QVector3D markerpos{0, 10, 0};
     QVector3D gsPos{5, 2, 0};
 
     new GroundStation(gsPos, camera, this);

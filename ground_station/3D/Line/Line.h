@@ -15,7 +15,7 @@ struct VBOData {
 class Line : public Qt3DCore::QEntity {
 Q_OBJECT
 public:
-    explicit Line(Qt3DCore::QNode *parent = 0);
+    explicit Line(Qt3DCore::QNode *parent = nullptr);
 
     void setData(const QVector<QVector3D> &positions);
 

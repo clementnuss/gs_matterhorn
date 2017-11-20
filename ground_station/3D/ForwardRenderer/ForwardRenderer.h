@@ -11,7 +11,7 @@
 class ForwardRenderer : public Qt3DRender::QTechniqueFilter {
 Q_OBJECT
 public:
-    explicit ForwardRenderer(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent = 0);
+    explicit ForwardRenderer(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent = nullptr);
 
 public slots:
 

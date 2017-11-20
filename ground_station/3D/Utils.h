@@ -6,7 +6,7 @@
 #include <Qt3DRender>
 #include <ProgramConstants.h>
 
-static Qt3DRender::QTexture2D *loadTextureImage(QUrl textureUrl, Qt3DCore::QNode *owner) {
+static Qt3DRender::QTexture2D *loadTextureImage(const QUrl &textureUrl, Qt3DCore::QNode *owner) {
     auto *texture2D = new Qt3DRender::QTexture2D(owner);
     auto *textureImage = new Qt3DRender::QTextureImage(texture2D);
 

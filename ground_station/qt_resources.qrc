@@ -1,11 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file alias="Helpers.js">3D/Helpers.js</file>
-
-        <file alias="main.qml">3D/main.qml</file>
-        <file alias="SceneRoot.qml">3D/SceneRoot.qml</file>
-        <file alias="TerrainForwardRenderer.qml">3D/TerrainForwardRenderer.qml</file>
-
         <file alias="shaders/terrain.frag">3D/shaders/terrain.frag</file>
         <file alias="shaders/line.frag">3D/shaders/line.frag</file>
         <file alias="shaders/line.vert">3D/shaders/line.vert</file>

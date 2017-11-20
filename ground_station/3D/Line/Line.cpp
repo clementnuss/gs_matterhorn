@@ -70,7 +70,7 @@ Line::Line(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent),
 void Line::setData(const QVector<QVector3D> &positions) {
     QByteArray ba;
     ba.resize(positions.size() * sizeof(VBOData));
-    VBOData *vboData = reinterpret_cast<VBOData *>(ba.data());
+    auto *vboData = reinterpret_cast<VBOData *>(ba.data());
     for (int i = 0; i < positions.size(); i++) {
         VBOData &vbo = vboData[i];
         vbo.position = positions[i];
@@ -97,7 +97,7 @@ void Line::appendData(const QVector3D position) {
     tempBuffer.resize(tempBuffer.size() + 1 * sizeof(VBOData));
 
     // View QByteArray as array of VBOData
-    VBOData *vboData = reinterpret_cast<VBOData *>(tempBuffer.data());
+    auto *vboData = reinterpret_cast<VBOData *>(tempBuffer.data());
 
     // Get a reference to last array element
     VBOData &vbo = vboData[count_];
@@ -117,7 +117,7 @@ void Line::appendData(const QVector<QVector3D> &positions) {
     tempBuffer.resize(tempBuffer.size() + positions.size() * sizeof(VBOData));
 
     // View QByteArray as array of VBOData
-    VBOData *vboData = reinterpret_cast<VBOData *>(tempBuffer.data());
+    auto *vboData = reinterpret_cast<VBOData *>(tempBuffer.data());
 
     for (int i = 0; i < positions.size(); i++) {
         VBOData &vbo = vboData[count_ + i];
