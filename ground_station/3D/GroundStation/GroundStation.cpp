@@ -22,9 +22,7 @@ GroundStation::GroundStation(QVector3D position, Qt3DRender::QCamera *camera, Qt
     this->addComponent(material);
     this->addComponent(transform_);
 
-    new Text(QStringLiteral("GROUND STATION"), textOffset_, camera, this);
-
-
     new Marker(QUrl(QStringLiteral("qrc:/3D/textures/double_down_arrow.png")), markerOffset_, camera, this);
+    new Text(QStringLiteral("GROUND STATION"), textOffset_, camera, this);
 }
 

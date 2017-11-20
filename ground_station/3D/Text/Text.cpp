@@ -5,10 +5,12 @@
 #include <3D/Marker/Marker.h>
 #include "Text.h"
 
-Text::Text(QString text, QVector3D position, Qt3DRender::QCamera *camera, Qt3DCore::QNode *parent) :
+const QVector3D Text::basePosition_{0, 0, 0};
+
+Text::Text(QString text, QVector3D offset, Qt3DRender::QCamera *camera, Qt3DCore::QNode *parent) :
         Qt3DCore::QEntity(parent),
         camera_{camera},
-        position_{position},
+        offset_{offset},
         transform_{new Qt3DCore::QTransform(this)},
         font_{} {
 
@@ -26,9 +28,6 @@ Text::Text(QString text, QVector3D position, Qt3DRender::QCamera *camera, Qt3DCo
     textEntity->setHeight(rect.height());
     textEntity->setFont(font_);
 
-    QMatrix4x4 m{};
-    m.rotate(180, QVector3D(0, 1, 0));
-    transform_->setMatrix(m);
 
     // Set up transform
     updateTransform();
@@ -38,12 +37,12 @@ Text::Text(QString text, QVector3D position, Qt3DRender::QCamera *camera, Qt3DCo
     connect(camera, &Qt3DRender::QCamera::viewMatrixChanged,
             this, &Text::updateTransform);
 
-    //new Marker(QUrl{"qrc:/3D/textures/caret_down.png"}, position + QVector3D(5,0,0), camera, this);
-
 }
 
 void Text::updateTransform() {
     QMatrix4x4 t{};
+    t.translate(offset_);
     // Make it face camera since default is like laying flat on ground
-    transform_->setMatrix(billboardMV(position_, camera_->viewMatrix()) * t);
+    transform_->setMatrix(billboardMV(basePosition_, camera_->viewMatrix()) * t);
 }
+

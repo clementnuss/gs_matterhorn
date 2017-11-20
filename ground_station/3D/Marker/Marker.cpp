@@ -2,9 +2,11 @@
 #include <3D/Utils.h>
 #include "Marker.h"
 
-Marker::Marker(QUrl textureUrl, QVector3D position, Qt3DRender::QCamera *camera, Qt3DCore::QNode *parent)
+const QVector3D Marker::basePosition_{0, 0, 0};
+
+Marker::Marker(QUrl textureUrl, QVector3D offset, Qt3DRender::QCamera *camera, Qt3DCore::QNode *parent)
         : Qt3DCore::QEntity(parent),
-          camera_{camera}, position_{position}, transform_{new Qt3DCore::QTransform(this)} {
+          camera_{camera}, offset_{offset}, transform_{new Qt3DCore::QTransform(this)} {
     // Build effect
     auto *shaderProgram = new Qt3DRender::QShaderProgram(this);
     shaderProgram->setVertexShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/marker.vert"}));
@@ -62,11 +64,8 @@ Marker::Marker(QUrl textureUrl, QVector3D position, Qt3DRender::QCamera *camera,
 void Marker::updateTransform() {
     QMatrix4x4 t{};
     // Make it face camera since default is like laying flat on ground
+    t.translate(offset_);
     t.rotate(180, QVector3D(0, 1, 0));
     t.rotate(-90, QVector3D(1, 0, 0));
-    transform_->setMatrix(billboardMV(position_, camera_->viewMatrix()) * t);
-}
-
-void Marker::updatePosition(const QVector3D &newPosition) {
-    position_ = newPosition;
+    transform_->setMatrix(billboardMV(basePosition_, camera_->viewMatrix()) * t);
 }

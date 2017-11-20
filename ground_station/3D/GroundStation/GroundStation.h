@@ -12,7 +12,7 @@ public slots:
 
 private:
     Qt3DCore::QTransform *transform_;
-    const QVector3D textOffset_{-2, 1.5, 0};
+    const QVector3D textOffset_{1, 1, 0};
     const QVector3D markerOffset_{0, 2, 0};
     QVector3D position_;
 };

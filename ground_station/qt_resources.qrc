@@ -4,7 +4,6 @@
 
         <file alias="main.qml">3D/main.qml</file>
         <file alias="SceneRoot.qml">3D/SceneRoot.qml</file>
-        <file alias="GroundStation.qml">3D/GroundStation.qml</file>
         <file alias="TerrainForwardRenderer.qml">3D/TerrainForwardRenderer.qml</file>
 
         <file alias="shaders/terrain.frag">3D/shaders/terrain.frag</file>
