@@ -36,8 +36,7 @@ namespace UIConstants {
     static constexpr int REFRESH_RATE = 20; // 20ms = 50 FPS
 
     // Time in microseconds between each data point in the real-time graphs
-    static constexpr int GRAPH_DATA_INTERVAL_USECS = 15000;
-    static constexpr int GRAPH_DATA_INTERVAL_USECS = 12'000;
+    static constexpr int GRAPH_DATA_INTERVAL_USECS = 12000;
 
     static constexpr float GRAPH_RANGE_MARGIN_RATIO = 1.15;
     static constexpr int GRAPH_XRANGE_SECS = 20;
@@ -68,7 +67,7 @@ namespace SensorConstants {
 
 namespace DataConstants {
     static constexpr double DELETION_FACTOR = -0.05;
-    static constexpr uint32_t READINGS_PER_SEC = 1'000'000 / UserIfaceConstants::GRAPH_DATA_INTERVAL_USECS;
+    static constexpr uint32_t READINGS_PER_SEC = 1'000'000 / UIConstants::GRAPH_DATA_INTERVAL_USECS;
     static constexpr int MAX_DATA_VECTOR_SIZE =
             static_cast<const int>((1.0 + DELETION_FACTOR) *
                                    (UIConstants::GRAPH_XRANGE_SECS * READINGS_PER_SEC));

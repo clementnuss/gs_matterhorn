@@ -65,8 +65,8 @@ void Worker::run() {
 void Worker::mainRoutine() {
     //TODO: adapt sleep time so as to have proper framerate
     auto elapsed = msecsBetween(lastIteration, chrono::system_clock::now());
-    if (elapsed < UserIfaceConstants::REFRESH_RATE) {
-        QThread::msleep(UserIfaceConstants::REFRESH_RATE - static_cast<unsigned long>(elapsed));
+    if (elapsed < UIConstants::REFRESH_RATE) {
+        QThread::msleep(UIConstants::REFRESH_RATE - static_cast<unsigned long>(elapsed));
     }
     lastIteration = chrono::system_clock::now();
     checkLinkStatuses();
@@ -155,7 +155,7 @@ void Worker::displayMostRecentTelemetry(TelemetryReading tr) {
     chrono::system_clock::time_point now = chrono::system_clock::now();
     long long elapsedMillis = msecsBetween(lastUIupdate, now);
 
-    if (elapsedMillis > UserIfaceConstants::NUMERICAL_VALUES_REFRESH_RATE) {
+    if (elapsedMillis > UIConstants::NUMERICAL_VALUES_REFRESH_RATE) {
         lastUIupdate = now;
         emit telemetryReady(tr);
     }
@@ -175,7 +175,7 @@ Worker::extractGraphData(vector<TelemetryReading> &data, QCPGraphData (*extracti
     long long int lastTimestampSeen = 0;
 
     for (TelemetryReading reading : data) {
-        if (abs(lastTimestampSeen - reading.timestamp_) > UserIfaceConstants::GRAPH_DATA_INTERVAL_USECS) {
+        if (abs(lastTimestampSeen - reading.timestamp_) > UIConstants::GRAPH_DATA_INTERVAL_USECS) {
             v.append(extractionFct(reading));
             lastTimestampSeen = reading.timestamp_;
         }

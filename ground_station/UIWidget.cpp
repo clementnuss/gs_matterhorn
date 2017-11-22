@@ -61,13 +61,13 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
     if (d.isEmpty()) {
 
         auto elapsed = usecsBetween(lastGraphUpdate_, chrono::system_clock::now());
-        if (elapsed > UserIfaceConstants::GRAPH_DATA_INTERVAL_USECS) {
+        if (elapsed > UIConstants::GRAPH_DATA_INTERVAL_USECS) {
             double elapsedSeconds = elapsed / 1'000'000.0;
 
             for (int g_idx = 0; g_idx < static_cast<int>(GraphFeature::Count); g_idx++) {
                 QCPGraph *g = ui->graph_widget->graph(g_idx);
                 g->keyAxis()->setRange(lastRemoteTime_ + elapsedSeconds,
-                                       UserIfaceConstants::GRAPH_XRANGE_SECS,
+                                       UIConstants::GRAPH_XRANGE_SECS,
                                        Qt::AlignRight);
             };
 
@@ -86,25 +86,25 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 
     g->data()->add(d);
 
-    g->data()->removeBefore(d.last().key - UserIfaceConstants::GRAPH_XRANGE_SECS);
+    g->data()->removeBefore(d.last().key - UIConstants::GRAPH_XRANGE_SECS);
 
-    g->keyAxis()->setRange(d.last().key, UserIfaceConstants::GRAPH_XRANGE_SECS, Qt::AlignRight);
+    g->keyAxis()->setRange(d.last().key, UIConstants::GRAPH_XRANGE_SECS, Qt::AlignRight);
     g->valueAxis()->rescale(true);
-    g->valueAxis()->scaleRange(UserIfaceConstants::GRAPH_RANGE_MARGIN_RATIO);
+    g->valueAxis()->scaleRange(UIConstants::GRAPH_RANGE_MARGIN_RATIO);
 
     ui->graph_widget->replot();
 }
 
 
 void GSWidget::updateTelemetry(TelemetryReading t) {
-    ui->telemetry_altitude_value->setText(QString::number(t.altitude_, 'f', UserIfaceConstants::PRECISION));
-    ui->telemetry_speed_value->setText(QString::number(t.air_speed_, 'f', UserIfaceConstants::PRECISION));
-    ui->telemetry_acceleration_value->setText(QString::number(t.acceleration_.norm(), 'f', UserIfaceConstants::PRECISION));
-    ui->telemetry_pressure_value->setText(QString::number(t.pressure_, 'f', UserIfaceConstants::PRECISION));
-    ui->telemetry_temperature_value->setText(QString::number(t.temperature_, 'f', UserIfaceConstants::PRECISION));
-    ui->telemetry_yaw_value->setText(QString::number(t.magnetometer_.x_, 'f', UserIfaceConstants::PRECISION));
-    ui->telemetry_pitch_value->setText(QString::number(t.magnetometer_.y_, 'f', UserIfaceConstants::PRECISION));
-    ui->telemetry_roll_value->setText(QString::number(t.magnetometer_.z_, 'f', UserIfaceConstants::PRECISION));
+    ui->telemetry_altitude_value->setText(QString::number(t.altitude_, 'f', UIConstants::PRECISION));
+    ui->telemetry_speed_value->setText(QString::number(t.air_speed_, 'f', UIConstants::PRECISION));
+    ui->telemetry_acceleration_value->setText(QString::number(t.acceleration_.norm(), 'f', UIConstants::PRECISION));
+    ui->telemetry_pressure_value->setText(QString::number(t.pressure_, 'f', UIConstants::PRECISION));
+    ui->telemetry_temperature_value->setText(QString::number(t.temperature_, 'f', UIConstants::PRECISION));
+    ui->telemetry_yaw_value->setText(QString::number(t.magnetometer_.x_, 'f', UIConstants::PRECISION));
+    ui->telemetry_pitch_value->setText(QString::number(t.magnetometer_.y_, 'f', UIConstants::PRECISION));
+    ui->telemetry_roll_value->setText(QString::number(t.magnetometer_.z_, 'f', UIConstants::PRECISION));
 }
 
 void GSWidget::updateLoggingStatus(bool enabled) {
@@ -140,8 +140,8 @@ void GSWidget::updateLinkStatus(HandlerStatus status) {
 }
 
 void GSWidget::updateGroundStatus(float temperature, float pressure) {
-    ui->ground_temperature_value->setText(QString::number(temperature, 'f', UserIfaceConstants::PRECISION));
-    ui->ground_temperature_value->setText(QString::number(pressure, 'f', UserIfaceConstants::PRECISION));
+    ui->ground_temperature_value->setText(QString::number(temperature, 'f', UIConstants::PRECISION));
+    ui->ground_temperature_value->setText(QString::number(pressure, 'f', UIConstants::PRECISION));
 }
 
 void GSWidget::graphSetup() {
