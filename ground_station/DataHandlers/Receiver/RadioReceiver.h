@@ -6,6 +6,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/array.hpp>
 #include <boost/lockfree/spsc_queue.hpp>
+#include <utility>
 #include <FileLogger.h>
 #include <serial/serial.h>
 
@@ -40,8 +41,35 @@ private:
     std::string device_;
     serial::Serial serialPort_;
     boost::thread thread_;
-    uint8_t* recvBuffer_;
+    uint8_t *recvBuffer_;
+    FileLogger bytesLogger_;
     boost::lockfree::spsc_queue<TelemetryReading> telemQueue_;
+
+};
+
+
+struct BytesReading : public ILoggable {
+
+    BytesReading() = default;
+
+    BytesReading(chrono::system_clock::time_point recvTime, vector<uint8_t> bytes) :
+            recvTime_{recvTime}, bytes_{std::move(bytes)} {}
+
+    chrono::system_clock::time_point recvTime_;
+    vector<uint8_t> bytes_;
+
+
+    string toString() const override {
+
+        stringstream ss;
+        ss << std::chrono::duration_cast<std::chrono::microseconds>(recvTime_.time_since_epoch()).count() << "\t\t";
+
+        for (uint8_t b: bytes_) {
+            ss << setw(2) << setfill('0') << std::hex << +b << " ";
+        }
+
+        return ss.str();
+    }
 
 
 };

@@ -8,17 +8,17 @@
 using namespace std;
 
 FileLogger::FileLogger(const std::string &path) :
-        path{path}, id{0}, bufferIndex{0} {}
+        path_{path}, id_{0}, bufferIndex_{0} {}
 
 FileLogger::~FileLogger() {
     close();
 }
 
 void FileLogger::close() {
-    cout << "\n Flushing file logger @ " << path << endl;
-    if (bufferIndex != 0) {
+    cout << "\n Flushing file logger @ " << path_ << endl;
+    if (bufferIndex_ != 0) {
         writeFile();
-        bufferIndex = 0;
+        bufferIndex_ = 0;
     }
 }
 
@@ -26,44 +26,46 @@ void FileLogger::registerData(const vector<reference_wrapper<ILoggable>> &data) 
 
     for (const auto loggable : data) {
 
-        if (bufferIndex >= bufferSize) {
-            cout << "\n Writing log file.." << endl;
+        if (bufferIndex_ >= bufferSize) {
+            //cout << "\n Writing log file.." << endl;
             writeFile();
-            bufferIndex = 0;
+            bufferIndex_ = 0;
         }
 
-        buffer[bufferIndex] = loggable.get().toString();
-        bufferIndex++;
+        buffer[bufferIndex_] = loggable.get().toString();
+        bufferIndex_++;
     }
 }
 
-void FileLogger::registerString(const std::string &s) {
+void FileLogger::registerString(const std::string s) {
 
-    if (bufferIndex >= bufferSize) {
+    if (bufferIndex_ >= bufferSize) {
         cout << "\n Writing log file.." << endl;
         writeFile();
-        bufferIndex = 0;
+        bufferIndex_ = 0;
     }
 
-    buffer[bufferIndex] = s;
-    bufferIndex++;
+    buffer[bufferIndex_] = s;
+    bufferIndex_++;
 
 }
 
 void FileLogger::writeFile() {
 
     array<string, bufferSize> a = buffer;
-    thread t(&FileLogger::writeRoutine, this, a, bufferIndex);
+    thread t(&FileLogger::writeRoutine, a, bufferIndex_, path_, id_);
 
     t.detach();
 }
 
-void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex) {
+void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex, std::string path, size_t id) {
 
     assert(tailIndex >= 1);
 
     stringstream ss;
-    ss << path << "_" << ++id;
+    ss << path << "_" << ++id << "_";
+    ss << std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch()).count();
     ofstream fileOutput(ss.str());
 
     if (!fileOutput) {

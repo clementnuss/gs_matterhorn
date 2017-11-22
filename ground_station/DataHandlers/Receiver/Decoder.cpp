@@ -35,10 +35,10 @@ bool Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
 
     uint8_t payloadType = headerBuffer[SEQUENCE_NUMBER_SIZE];
 
-    if (0 <= payloadType && payloadType < static_cast<uint8_t >(DatagramPayloadType::Count)) {
+    if (0 <= payloadType && payloadType < 1) {
 
         currentDatagram_.sequenceNumber_ = seqNum;
-        currentDatagram_.payloadType_ = DatagramPayloadType(payloadType);
+        currentDatagram_.payloadType_ = PayloadType::typeFromCode(payloadType);
         return true;
 
     } else {
@@ -58,10 +58,9 @@ bool Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
 
 void Decoder::processTelemetryPayload(std::vector<uint8_t> payloadBuffer) {
 
-    std::shared_ptr<IDeserializable>
-    (*f)(std::vector<uint8_t>, uint32_t) = TELEMETRY_PAYLOAD_FACTORIES.at(currentDatagram_.payloadType_);
-
-    currentDatagram_.deserializedPayload_ = std::move(f(std::move(payloadBuffer), currentDatagram_.sequenceNumber_));
+    currentDatagram_.deserializedPayload_ = std::move(
+            (*currentDatagram_.payloadType_)(payloadBuffer)
+    );
 }
 
 bool Decoder::datagramReady() {
@@ -137,12 +136,12 @@ void Decoder::seekControlFlag(uint8_t byte) {
 }
 
 void Decoder::accumulatePayload(uint8_t byte) {
-    assertBufferSmallerThan(PAYLOAD_TYPES_LENGTH.at(currentDatagram_.payloadType_));
+    assertBufferSmallerThan(currentDatagram_.payloadType_->length());
 
     byteBuffer_.push_back(byte);
     checksumAccumulator_.push_back(byte);
 
-    if (byteBuffer_.size() == PAYLOAD_TYPES_LENGTH.at(currentDatagram_.payloadType_)) {
+    if (byteBuffer_.size() == currentDatagram_.payloadType_->length()) {
         processTelemetryPayload(byteBuffer_);
         byteBuffer_.clear();
         jumpToNextState();

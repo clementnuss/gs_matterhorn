@@ -10,8 +10,8 @@
  * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
  * @return A Telemetry struct
  */
-shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8_t> payloadBuffer, uint32_t seqNumber) {
-    assert(payloadBuffer.size() == PAYLOAD_TYPES_LENGTH.at(DatagramPayloadType::TELEMETRY));
+shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8_t> payloadBuffer) {
+    assert(payloadBuffer.size() == PayloadType::TELEMETRY.length());
 
     auto it = payloadBuffer.begin();
 
@@ -41,7 +41,13 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
 
     double altitude = 44330 * (1.0 - pow(pressure_hPa / adjustedSealevelPressure, 0.1903));
 
-    float_cast air_speed = {.uint32 = parse32<uint32_t>(it)};
+    auto press = parse16<uint16_t>(it);
+
+    double p_press = (((float) press) - 1652) * (SensorConstants::PRESSURE_SENSOR2_MAX - SensorConstants::PRESSURE_SENSOR2_MIN) /
+            (14745 - 1652) +
+            SensorConstants::PRESSURE_SENSOR2_MIN;
+
+    double air_speed = sqrt(2 * p_press / SensorConstants::AIR_DENSITY);
 
     TelemetryReading r{measurement_time,
                        altitude,
@@ -50,7 +56,7 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
                        {gx, gy, gz},
                        pressure_hPa,
                        temperature.fl,
-                       air_speed.fl,
-                       seqNumber};
+                       air_speed,
+                       0};
     return std::make_shared<TelemetryReading>(r);
 }

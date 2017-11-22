@@ -34,7 +34,7 @@ TEST(CRCTest, byteChangesAreDetectedOnTelemetryPayloads) {
     std::vector<uint8_t> originalSequence{};
     srand(0);
 
-    for (size_t i = 0; i < PAYLOAD_TYPES_LENGTH.at(DatagramPayloadType::TELEMETRY); i++) {
+    for (size_t i = 0; i < PayloadType::TELEMETRY.length(); i++) {
         originalSequence.push_back(rand() % 256);
     }
 
@@ -72,7 +72,7 @@ TEST(CRCTest, randomCollisionsOnUniformTelemetryPayloadsAreLow) {
 
         seq1.clear();
         seq2.clear();
-        for (size_t i = 0; i < PAYLOAD_TYPES_LENGTH.at(DatagramPayloadType::TELEMETRY) + 5; i++) {
+        for (size_t i = 0; i < PayloadType::TELEMETRY.length() + 5; i++) {
             seq1.push_back(uniformByteRand());
             seq2.push_back(uniformByteRand());
         }
