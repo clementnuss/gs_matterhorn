@@ -35,7 +35,7 @@ namespace UIConstants {
     static constexpr int REFRESH_RATE = 20; // 20ms = 50 FPS
 
     // Time in microseconds between each data point in the real-time graphs
-    static constexpr int GRAPH_DATA_INTERVAL_USECS = 15'000;
+    static constexpr int GRAPH_DATA_INTERVAL_USECS = 15000;
 
     static constexpr float GRAPH_RANGE_MARGIN_RATIO = 1.15;
     static constexpr int GRAPH_XRANGE_SECS = 20;
