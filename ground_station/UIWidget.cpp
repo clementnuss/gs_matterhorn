@@ -3,8 +3,6 @@
 #include "UI/Colors.h"
 #include <iostream>
 #include <cassert>
-#include <QtQuickWidgets/QQuickWidget>
-#include <QtQml/QQmlProperty>
 
 GSWidget::GSWidget(QWidget *parent) :
         QWidget(parent),

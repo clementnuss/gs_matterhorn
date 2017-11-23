@@ -3,7 +3,6 @@
 #define GS_MATTERHORN_TELEMETRYSIMULATOR_H
 
 #include "TelemetryHandler.h"
-#include <QTime>
 #include <chrono>
 
 using namespace std;
@@ -32,7 +31,6 @@ private:
     const TelemetryReading generateTelemetry();
     const vector<TelemetryReading> generateTelemetryVector();
 
-    QTime time;
     HandlerStatus simulatorStatus;
     chrono::system_clock::time_point timeOfLastPolledData;
     chrono::system_clock::time_point timeOfLastPolledGeoData;

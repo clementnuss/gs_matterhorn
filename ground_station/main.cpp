@@ -1,6 +1,4 @@
 #include <Application.h>
-#include <QtQml/QtQml>
-
 
 int main(int argc, char **argv) {
 

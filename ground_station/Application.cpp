@@ -1,5 +1,4 @@
 #include <QObject>
-#include <QtQml/QtQml>
 #include "Application.h"
 
 Application::Application(int &argc, char **argv) : qApplication_{argc, argv}, mainWidget_{nullptr}, workerThread_{} {

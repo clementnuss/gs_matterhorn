@@ -1,10 +1,10 @@
 #include <DataStructures/datastructs.h>
 #include <vector>
-#include <QtCore/QTime>
 #include <cassert>
 #include <iostream>
 #include <chrono>
 #include <Utilities/TimeUtils.h>
+#include <QtGui/QtGui>
 #include "TelemetrySimulator.h"
 
 using namespace std;
@@ -12,8 +12,7 @@ using namespace SimulatorConstants;
 
 //TODO: make telemetry handler factory to provide either simulator or real one
 
-TelemetrySimulator::TelemetrySimulator() : time{QTime::currentTime()},
-                                           timeOfLastPolledData{chrono::system_clock::now()},
+TelemetrySimulator::TelemetrySimulator() : timeOfLastPolledData{chrono::system_clock::now()},
                                            timeOfLastPolledGeoData{chrono::system_clock::now()},
                                            timeOfInitialization{chrono::system_clock::now()},
                                            variableRate{true},
@@ -114,13 +113,13 @@ const vector<TelemetryReading> TelemetrySimulator::generateTelemetryVector() {
 
 const TelemetryReading TelemetrySimulator::generateTelemetry() {
 
-    auto key = static_cast<uint32_t>(time.elapsed());
-    double keysec = key / 1000.0;
+    long long int msecs = msecsBetween(timeOfInitialization, chrono::system_clock::now());
+    double keysec = msecs / 1000.0;
 
     double rnd = qrand();
 
     return TelemetryReading{
-            key,
+            msecs,
             10000 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 1000.0 * sin(keysec / 0.8),
             XYZReading{
                     900 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 90.0 * sin(keysec / 0.38),
@@ -138,7 +137,7 @@ const TelemetryReading TelemetrySimulator::generateTelemetry() {
                     100 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 10.0 * sin(keysec / 0.4)
             },
             50 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 5.0 * sin(keysec / 0.7),
-            90.0 * sin(key) + rnd / static_cast<double>(RAND_MAX) * 1 * sin(keysec / 0.7)
+            90.0 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 1 * sin(keysec / 0.7)
     };
 }
 
@@ -146,9 +145,10 @@ RocketEvent TelemetrySimulator::generateEvent() {
 
     // Select an event randomly
     auto code = static_cast<int>(round((EVENT_CODES.size() - 1) * qrand() / static_cast<double>(RAND_MAX)));
+    long long int msecs = msecsBetween(timeOfInitialization, chrono::system_clock::now());
 
     assert(EVENT_CODES.find(code) != EVENT_CODES.end());
-    return RocketEvent {static_cast<uint32_t>(time.elapsed()), code, EVENT_CODES.at(code)};
+    return RocketEvent {static_cast<uint32_t>(msecs), code, EVENT_CODES.at(code)};
 }
 
 

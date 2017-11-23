@@ -82,8 +82,8 @@ void Line::clearData() {
 }
 
 void Line::appendData(const QVector3D position) {
-    // Add space for one additional position
 
+    // Add space for one additional position
     QByteArray tempBuffer = buffer_->data();
 
     tempBuffer.resize(tempBuffer.size() + 1 * sizeof(VBOData));
