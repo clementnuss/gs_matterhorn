@@ -7,24 +7,17 @@ Line::Line(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent),
                                       geometryRenderer_{new Qt3DRender::QGeometryRenderer(this)},
                                       geometry_{new Qt3DRender::QGeometry(this)},
                                       attribute_{new Qt3DRender::QAttribute(this)},
-                                      buffer_{new Qt3DRender::QBuffer(this)},
+                                      buffer_{new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, this)},
                                       count_{0} {
 
     // Build effect
-
-
     auto *shaderProgram = new Qt3DRender::QShaderProgram(this);
     shaderProgram->setVertexShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/line.vert"}));
     shaderProgram->setFragmentShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/line.frag"}));
 
     auto *renderPass = new Qt3DRender::QRenderPass(this);
 
-    //TODO: find why setting line width not working anymore
-    auto *lineWidthRenderState = new Qt3DRender::QLineWidth(renderPass);
-    lineWidthRenderState->setValue(5.0);
-
     renderPass->setShaderProgram(shaderProgram);
-    renderPass->addRenderState(lineWidthRenderState);
 
     auto *filterKey = new Qt3DRender::QFilterKey(this);
     filterKey->setName("renderingStyle");
@@ -63,7 +56,6 @@ Line::Line(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent),
 
     this->addComponent(geometryRenderer_);
     this->addComponent(material);
-    lineWidthRenderState->setValue(5.0);
 }
 
 

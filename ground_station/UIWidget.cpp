@@ -4,7 +4,6 @@
 #include <iostream>
 #include <cassert>
 #include <QtQuickWidgets/QQuickWidget>
-#include <QQuickItem>
 #include <QtQml/QQmlProperty>
 
 GSWidget::GSWidget(QWidget *parent) :
