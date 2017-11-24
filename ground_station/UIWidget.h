@@ -30,6 +30,8 @@ public slots:
 
     void dummySlot();
 
+    void graphClicked(QCPAbstractPlottable *, int);
+
     void updateTime();
 
     void updateEvents(vector<RocketEvent> &);

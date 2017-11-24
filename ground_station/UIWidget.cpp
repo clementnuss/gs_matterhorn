@@ -16,6 +16,9 @@ GSWidget::GSWidget(QWidget *parent) :
     graphSetup();
 
     connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
+    connect(ui->graph_widget, SIGNAL(plottableClick(QCPAbstractPlottable * , int, QMouseEvent * )), this,
+            SLOT(graphClicked(QCPAbstractPlottable * , int)));
+
     clockTimer.start(std::lround((1.0 / 60.0) * 1000));
 
 }
@@ -146,6 +149,8 @@ void GSWidget::updateGroundStatus(float temperature, float pressure) {
 
 void GSWidget::graphSetup() {
     QCustomPlot *customPlot = ui->graph_widget;
+    customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+
     customPlot->plotLayout()->clear();
 
     // TODO: check if needed on RaspberryPi3
@@ -158,6 +163,9 @@ void GSWidget::graphSetup() {
 
     auto topAxisRect = new QCPAxisRect(customPlot);
     auto bottomAxisRect = new QCPAxisRect(customPlot);
+
+    topAxisRect->setRangeDrag(Qt::Horizontal);
+    bottomAxisRect->setRangeDrag(Qt::Horizontal);
 
     topAxisRect->setupFullAxesBox(true);
     bottomAxisRect->setupFullAxesBox(true);
@@ -200,6 +208,28 @@ void GSWidget::graphSetup() {
     // Check if the number of graphs corresponds to the number of available features
     assert(ui->graph_widget->graphCount() == static_cast<int>(GraphFeature::Count));
 
+}
+
+
+void GSWidget::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) {
+
+    std::cout << "Test" << std::endl;
+
+    QCPItemText *textLabel = new QCPItemText(ui->graph_widget);
+    textLabel->setPositionAlignment(Qt::AlignTop | Qt::AlignHCenter);
+    textLabel->position->setType(QCPItemPosition::ptAxisRectRatio);
+    textLabel->position->setCoords(0.5, 0); // place position at center/top of axis rect
+    textLabel->setText("Text Item Demo");
+    textLabel->setFont(QFont(font().family(), 16)); // make font a bit larger
+    textLabel->setPen(QPen(Qt::black)); // show black border around text
+
+    /*
+    // since we know we only have QCPGraphs in the plot, we can immediately access interface1D()
+    // usually it's better to first check whether interface1D() returns non-zero, and only then use it.
+    double dataValue = plottable->interface1D()->dataMainValue(dataIndex);
+    QString message = QString("Clicked on graph '%1' at data point #%2 with value %3.").arg(plottable->name()).arg(dataIndex).arg(dataValue);
+    ui->statusBar->showMessage(message, 2500);
+     */
 }
 
 
