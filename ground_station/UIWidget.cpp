@@ -213,23 +213,29 @@ void GSWidget::graphSetup() {
 
 void GSWidget::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) {
 
-    std::cout << "Test" << std::endl;
+    //TODO: Add the items to a list so we can reaccess them later
 
-    QCPItemText *textLabel = new QCPItemText(ui->graph_widget);
-    textLabel->setPositionAlignment(Qt::AlignTop | Qt::AlignHCenter);
-    textLabel->position->setType(QCPItemPosition::ptAxisRectRatio);
-    textLabel->position->setCoords(0.5, 0); // place position at center/top of axis rect
-    textLabel->setText("Text Item Demo");
-    textLabel->setFont(QFont(font().family(), 16)); // make font a bit larger
-    textLabel->setPen(QPen(Qt::black)); // show black border around text
-
-    /*
     // since we know we only have QCPGraphs in the plot, we can immediately access interface1D()
     // usually it's better to first check whether interface1D() returns non-zero, and only then use it.
     double dataValue = plottable->interface1D()->dataMainValue(dataIndex);
-    QString message = QString("Clicked on graph '%1' at data point #%2 with value %3.").arg(plottable->name()).arg(dataIndex).arg(dataValue);
-    ui->statusBar->showMessage(message, 2500);
-     */
+    double dataKey = plottable->interface1D()->dataMainKey(dataIndex);
+    QString message = QString("[x: %1 y: %2]").arg(dataKey).arg(dataValue);
+
+    QCPItemText *textLabel = new QCPItemText(ui->graph_widget);
+    textLabel->setPositionAlignment(Qt::AlignTop | Qt::AlignHCenter);
+    textLabel->position->setTypeY(QCPItemPosition::ptAxisRectRatio);
+    textLabel->position->setCoords(dataKey, 0.0); // place position at center/top of axis rect
+
+    textLabel->setFont(QFont(font().family(), 8)); // make font a bit larger
+    //textLabel->setPen(QPen(Qt::black)); // show black border around text
+    textLabel->setText(message);
+
+    // add the arrow:
+    QCPItemLine *arrow = new QCPItemLine(ui->graph_widget);
+    arrow->start->setParentAnchor(textLabel->bottom);
+    arrow->end->setCoords(dataKey, dataValue);
+
+    std::cout << "Added item to plot: " << textLabel->text().toStdString() << std::endl;
 }
 
 
