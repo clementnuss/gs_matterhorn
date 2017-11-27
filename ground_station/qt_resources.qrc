@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>UI/icons/remove.png</file>
+        <file>UI/icons/sync.png</file>
+        <file>UI/icons/play.png</file>
+    </qresource>
+</RCC>

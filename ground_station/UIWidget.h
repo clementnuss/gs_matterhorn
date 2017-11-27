@@ -48,7 +48,7 @@ public slots:
 
     void updateGroundStatus(float, float);
 
-    void stopAutoPlay();
+    void mouseWheelOnPlot();
 
     void updateAutoPlay(bool);
 

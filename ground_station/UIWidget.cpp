@@ -1,7 +1,6 @@
 #include "UIWidget.h"
 #include "ui_gswidget.h"
 #include "UI/Colors.h"
-#include "../cmake-build-debug/qcustomplot-src/qcustomplot.h"
 #include <iostream>
 #include <Utilities/TimeUtils.h>
 
@@ -37,7 +36,7 @@ void GSWidget::connectComponents() {
     for (auto plot : plotVector_) {
         connect(plot, SIGNAL(plottableClick(QCPAbstractPlottable * , int, QMouseEvent * )), this,
                 SLOT(graphClicked(QCPAbstractPlottable * , int)));
-        connect(plot, SIGNAL(mouseWheel(QWheelEvent * )), this, SLOT(stopAutoPlay()));
+        connect(plot, SIGNAL(mouseWheel(QWheelEvent * )), this, SLOT(mouseWheelOnPlot()));
     }
 }
 
@@ -109,10 +108,9 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 
     if (autoPlay_) {
         g->keyAxis()->setRange(d.last().key, UIConstants::GRAPH_XRANGE_SECS, Qt::AlignRight);
+        g->valueAxis()->rescale(true);
+        g->valueAxis()->scaleRange(UIConstants::GRAPH_RANGE_MARGIN_RATIO);
     }
-
-    g->valueAxis()->rescale(true);
-    g->valueAxis()->scaleRange(UIConstants::GRAPH_RANGE_MARGIN_RATIO);
 
     plotVector_[static_cast<int>(feature)]->replot();
 }
@@ -261,9 +259,12 @@ void GSWidget::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) {
 #endif
 }
 
-void GSWidget::stopAutoPlay() {
+void GSWidget::mouseWheelOnPlot() {
     autoPlay_ = false;
     ui->graph_autoplay_button->setChecked(false);
+
+    plot1_->axisRect()->setRangeZoom(
+            (Qt::ShiftModifier & QGuiApplication::keyboardModifiers()) ? Qt::Horizontal : Qt::Vertical);
 }
 
 void GSWidget::updateAutoPlay(bool checked) {
@@ -276,7 +277,6 @@ void GSWidget::updateAutoPlay(bool checked) {
  * @param checked the boolean value indicating synchronisation
  */
 void GSWidget::updatePlotSync(bool checked) {
-
     if (checked) {
         for (int i = 0; i < plotVector_.size(); i++) {
             for (int j = 0; j < plotVector_.size(); j++) {
@@ -323,6 +323,5 @@ bool GSWidget::event(QEvent *event) {
         }
 
     }
-
     return QWidget::event(event);
 }

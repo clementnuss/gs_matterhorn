@@ -8,6 +8,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 
+qt5_add_resources(RESOURCES qt_resources.qrc)
+
 file(GLOB_RECURSE SOURCES "*.cpp")
 file(GLOB_RECURSE HEADERS "*.h")
 
