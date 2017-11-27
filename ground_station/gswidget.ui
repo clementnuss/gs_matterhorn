@@ -817,7 +817,7 @@
                  <enum>QLayout::SetDefaultConstraint</enum>
                 </property>
                 <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,1">
+                 <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,1,1">
                   <property name="spacing">
                    <number>4</number>
                   </property>
@@ -839,6 +839,19 @@
                      </size>
                     </property>
                    </spacer>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="graph_sync_button">
+                    <property name="text">
+                     <string>Synchronise axes</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
                   </item>
                   <item>
                    <widget class="QPushButton" name="graph_clear_items_button">

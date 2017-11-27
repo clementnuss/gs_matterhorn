@@ -14,24 +14,31 @@ GSWidget::GSWidget(QWidget *parent) :
         clockTimer(this),
         lastGraphUpdate_{chrono::system_clock::now()},
         userItems_{std::vector<std::tuple<QCPAbstractItem *, QCPAbstractItem *>>()},
-        lastRemoteTime_{-1000} {
+        lastRemoteTime_{-1000},
+        autoPlay_{true} {
     ui->setupUi(this);
 
     graphWidgetSetup();
-
-    connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
-    connect(plot1_, SIGNAL(plottableClick(QCPAbstractPlottable * , int, QMouseEvent * )), this,
-            SLOT(graphClicked(QCPAbstractPlottable * , int)));
-    connect(plot2_, SIGNAL(plottableClick(QCPAbstractPlottable * , int, QMouseEvent * )), this,
-            SLOT(graphClicked(QCPAbstractPlottable * , int)));
-    connect(ui->graph_clear_items_button, &QPushButton::clicked, this, &GSWidget::clearAllGraphItems);
-
+    connectComponents();
     clockTimer.start(std::lround((1.0 / 60.0) * 1000));
-
 }
 
 GSWidget::~GSWidget() {
     delete ui;
+}
+
+void GSWidget::connectComponents() {
+    connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
+    connect(ui->graph_clear_items_button, &QPushButton::clicked, this, &GSWidget::clearAllGraphItems);
+    connect(ui->graph_autoplay_button, &QPushButton::clicked, this, &GSWidget::enableAutoPlay);
+
+    // Connect components related to graphs
+    for (auto plot : plotVector_) {
+        connect(plot, SIGNAL(plottableClick(QCPAbstractPlottable * , int, QMouseEvent * )), this,
+                SLOT(graphClicked(QCPAbstractPlottable * , int)));
+        connect(plot, SIGNAL(mousePress(QMouseEvent * )), this, SLOT(stopAutoPlay()));
+        connect(plot, SIGNAL(mouseWheel(QWheelEvent * )), this, SLOT(stopAutoPlay()));
+    }
 }
 
 void GSWidget::dummySlot(bool b) {
@@ -70,18 +77,20 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 
     if (d.isEmpty()) {
 
-        auto elapsed = usecsBetween(lastGraphUpdate_, chrono::system_clock::now());
-        if (elapsed > UIConstants::GRAPH_DATA_INTERVAL_USECS) {
-            double elapsedSeconds = elapsed / 1'000'000.0;
+        if (autoPlay_) {
+            auto elapsed = usecsBetween(lastGraphUpdate_, chrono::system_clock::now());
+            if (elapsed > UIConstants::GRAPH_DATA_INTERVAL_USECS) {
+                double elapsedSeconds = elapsed / 1'000'000.0;
 
-            for (int g_idx = 0; g_idx < plotVector_.size(); g_idx++) {
-                QCPGraph *g = plotVector_[g_idx]->graph();
-                g->keyAxis()->setRange(lastRemoteTime_ + elapsedSeconds,
-                                       UIConstants::GRAPH_XRANGE_SECS,
-                                       Qt::AlignRight);
-                plotVector_[g_idx]->replot();
-            };
+                for (int g_idx = 0; g_idx < plotVector_.size(); g_idx++) {
+                    QCPGraph *g = plotVector_[g_idx]->graph();
+                    g->keyAxis()->setRange(lastRemoteTime_ + elapsedSeconds,
+                                           UIConstants::GRAPH_XRANGE_SECS,
+                                           Qt::AlignRight);
+                    plotVector_[g_idx]->replot();
+                };
 
+            }
         }
         return;
     }
@@ -96,9 +105,12 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 
     g->data()->add(d);
 
-    g->data()->removeBefore(d.last().key - UIConstants::GRAPH_XRANGE_SECS);
+    g->data()->removeBefore(d.last().key - UIConstants::GRAPH_MEMORY_SECS);
 
-    g->keyAxis()->setRange(d.last().key, UIConstants::GRAPH_XRANGE_SECS, Qt::AlignRight);
+    if (autoPlay_) {
+        g->keyAxis()->setRange(d.last().key, UIConstants::GRAPH_XRANGE_SECS, Qt::AlignRight);
+    }
+
     g->valueAxis()->rescale(true);
     g->valueAxis()->scaleRange(UIConstants::GRAPH_RANGE_MARGIN_RATIO);
 
@@ -246,6 +258,14 @@ void GSWidget::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) {
 #ifdef DEBUG
     std::cout << "Added item to plot: " << textLabel->text().toStdString() << std::endl;
 #endif
+}
+
+void GSWidget::stopAutoPlay() {
+    autoPlay_ = false;
+}
+
+void GSWidget::enableAutoPlay() {
+    autoPlay_ = true;
 }
 
 void GSWidget::clearAllGraphItems(bool checked) {

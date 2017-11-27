@@ -48,11 +48,21 @@ public slots:
 
     void updateGroundStatus(float, float);
 
+    void stopAutoPlay();
+
+    void enableAutoPlay();
+
 signals:
 
     void toggleLogging();
 
 private:
+
+    void graphWidgetSetup();
+
+    void plotSetup(QCustomPlot *, QString, QColor);
+
+    void connectComponents();
 
     Ui::GSWidget *ui;
     QCustomPlot *plot1_;
@@ -61,11 +71,8 @@ private:
     QTimer clockTimer;
     chrono::system_clock::time_point lastGraphUpdate_;
     std::vector<std::tuple<QCPAbstractItem *, QCPAbstractItem *>> userItems_;
+    bool autoPlay_;
     double lastRemoteTime_;
-
-    void graphWidgetSetup();
-
-    void plotSetup(QCustomPlot *, QString, QColor);
 };
 
 #endif // GSWIDGET_H
