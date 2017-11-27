@@ -50,7 +50,9 @@ public slots:
 
     void stopAutoPlay();
 
-    void enableAutoPlay();
+    void updateAutoPlay(bool);
+
+    void updatePlotSync(bool);
 
 signals:
 

@@ -30,13 +30,13 @@ GSWidget::~GSWidget() {
 void GSWidget::connectComponents() {
     connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
     connect(ui->graph_clear_items_button, &QPushButton::clicked, this, &GSWidget::clearAllGraphItems);
-    connect(ui->graph_autoplay_button, &QPushButton::clicked, this, &GSWidget::enableAutoPlay);
+    connect(ui->graph_autoplay_button, &QPushButton::clicked, this, &GSWidget::updateAutoPlay);
+    connect(ui->graph_sync_button, &QPushButton::clicked, this, &GSWidget::updatePlotSync);
 
     // Connect components related to graphs
     for (auto plot : plotVector_) {
         connect(plot, SIGNAL(plottableClick(QCPAbstractPlottable * , int, QMouseEvent * )), this,
                 SLOT(graphClicked(QCPAbstractPlottable * , int)));
-        connect(plot, SIGNAL(mousePress(QMouseEvent * )), this, SLOT(stopAutoPlay()));
         connect(plot, SIGNAL(mouseWheel(QWheelEvent * )), this, SLOT(stopAutoPlay()));
     }
 }
@@ -176,6 +176,7 @@ void GSWidget::graphWidgetSetup() {
     layout->addWidget(plot1_);
     layout->addWidget(plot2_);
 
+    updatePlotSync(ui->graph_sync_button->isChecked());
     // Check if the number of graphs corresponds to the number of available features
     //assert(plot1_->graphCount() == static_cast<int>(GraphFeature::Count));
 
@@ -262,10 +263,43 @@ void GSWidget::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) {
 
 void GSWidget::stopAutoPlay() {
     autoPlay_ = false;
+    ui->graph_autoplay_button->setChecked(false);
 }
 
-void GSWidget::enableAutoPlay() {
-    autoPlay_ = true;
+void GSWidget::updateAutoPlay(bool checked) {
+    autoPlay_ = checked;
+}
+
+/**
+ * Connects or disconnects the x-axis of all plots
+ *
+ * @param checked the boolean value indicating synchronisation
+ */
+void GSWidget::updatePlotSync(bool checked) {
+
+    if (checked) {
+        for (int i = 0; i < plotVector_.size(); i++) {
+            for (int j = 0; j < plotVector_.size(); j++) {
+                if (i == j) {
+                    continue;
+                } else {
+                    connect(plotVector_[i]->xAxis, SIGNAL(rangeChanged(QCPRange)), plotVector_[j]->xAxis,
+                            SLOT(setRange(QCPRange)));
+                }
+            }
+        }
+    } else {
+        for (int i = 0; i < plotVector_.size(); i++) {
+            for (int j = 0; j < plotVector_.size(); j++) {
+                if (i == j) {
+                    continue;
+                } else {
+                    disconnect(plotVector_[i]->xAxis, SIGNAL(rangeChanged(QCPRange)), plotVector_[j]->xAxis,
+                               SLOT(setRange(QCPRange)));
+                }
+            }
+        }
+    }
 }
 
 void GSWidget::clearAllGraphItems(bool checked) {
