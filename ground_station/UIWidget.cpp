@@ -1,6 +1,7 @@
 #include "UIWidget.h"
 #include "ui_gswidget.h"
 #include "UI/Colors.h"
+#include "../cmake-build-debug/qcustomplot-src/qcustomplot.h"
 #include <iostream>
 #include <cassert>
 #include <Utilities/TimeUtils.h>
@@ -8,16 +9,20 @@
 GSWidget::GSWidget(QWidget *parent) :
         QWidget(parent),
         ui(new Ui::GSWidget),
+        plot1_{new QCustomPlot(this)},
+        plot2_{new QCustomPlot(this)},
         clockTimer(this),
         lastGraphUpdate_{chrono::system_clock::now()},
+        userItems_{std::vector<std::tuple<QCPAbstractItem *, QCPAbstractItem *>>()},
         lastRemoteTime_{-1000} {
     ui->setupUi(this);
 
     graphSetup();
 
     connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
-    connect(ui->graph_widget, SIGNAL(plottableClick(QCPAbstractPlottable * , int, QMouseEvent * )), this,
-            SLOT(graphClicked(QCPAbstractPlottable * , int)));
+    //connect(ui->graph_widget, SIGNAL(plottableClick(QCPAbstractPlottable * , int, QMouseEvent * )), this,
+    //        SLOT(graphClicked(QCPAbstractPlottable * , int)));
+    //connect(ui->graph_clear_items_button, &QPushButton::clicked, this, &GSWidget::clearAllGraphItems);
 
     clockTimer.start(std::lround((1.0 / 60.0) * 1000));
 
@@ -27,7 +32,7 @@ GSWidget::~GSWidget() {
     delete ui;
 }
 
-void GSWidget::dummySlot() {
+void GSWidget::dummySlot(bool b) {
     std::cout << "The dummy slot was called. Time was: "
               << QTime::currentTime().toString().toStdString()
               << "." << std::setw(3) << std::setfill('0')
@@ -68,13 +73,13 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
             double elapsedSeconds = elapsed / 1'000'000.0;
 
             for (int g_idx = 0; g_idx < static_cast<int>(GraphFeature::Count); g_idx++) {
-                QCPGraph *g = ui->graph_widget->graph(g_idx);
+                QCPGraph *g = plot1_->graph(g_idx);
                 g->keyAxis()->setRange(lastRemoteTime_ + elapsedSeconds,
                                        UIConstants::GRAPH_XRANGE_SECS,
                                        Qt::AlignRight);
             };
 
-            ui->graph_widget->replot();
+            plot1_->replot();
         }
         return;
     }
@@ -82,7 +87,7 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
     lastGraphUpdate_ = chrono::system_clock::now();
     lastRemoteTime_ = d.last().key;
 
-    QCPGraph *g = ui->graph_widget->graph(static_cast<int>(feature));
+    QCPGraph *g = plot1_->graph(static_cast<int>(feature));
 
     // Clear any eventual datapoint ahead of current time point
     g->data()->removeAfter(d.last().key);
@@ -95,7 +100,7 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
     g->valueAxis()->rescale(true);
     g->valueAxis()->scaleRange(UIConstants::GRAPH_RANGE_MARGIN_RATIO);
 
-    ui->graph_widget->replot();
+    plot1_->replot();
 }
 
 
@@ -148,21 +153,26 @@ void GSWidget::updateGroundStatus(float temperature, float pressure) {
 }
 
 void GSWidget::graphSetup() {
-    QCustomPlot *customPlot = ui->graph_widget;
-    customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+    QWidget *plotContainer = ui->plot_container;
 
-    customPlot->plotLayout()->clear();
+    QVBoxLayout *layout = new QVBoxLayout(plotContainer);
+
+    layout->addWidget(plot1_);
+
+    plot1_->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems);
+
+    plot1_->plotLayout()->clear();
 
     // TODO: check if needed on RaspberryPi3
     //customPlot->setOpenGl(true);
 
     QFont titleFont = QFont("sans", 10, QFont::Bold);
 
-    QCPTextElement *topTitle = new QCPTextElement(customPlot, "Altitude (m)", titleFont);
-    QCPTextElement *bottomTitle = new QCPTextElement(customPlot, "Acceleration (g)", titleFont);
+    QCPTextElement *topTitle = new QCPTextElement(plot1_, "Altitude (m)", titleFont);
+    QCPTextElement *bottomTitle = new QCPTextElement(plot1_, "Acceleration (g)", titleFont);
 
-    auto topAxisRect = new QCPAxisRect(customPlot);
-    auto bottomAxisRect = new QCPAxisRect(customPlot);
+    auto topAxisRect = new QCPAxisRect(plot1_);
+    auto bottomAxisRect = new QCPAxisRect(plot1_);
 
     topAxisRect->setRangeDrag(Qt::Horizontal);
     bottomAxisRect->setRangeDrag(Qt::Horizontal);
@@ -170,10 +180,10 @@ void GSWidget::graphSetup() {
     topAxisRect->setupFullAxesBox(true);
     bottomAxisRect->setupFullAxesBox(true);
 
-    customPlot->plotLayout()->addElement(0, 0, topTitle);
-    customPlot->plotLayout()->addElement(1, 0, topAxisRect);
-    customPlot->plotLayout()->addElement(2, 0, bottomTitle);
-    customPlot->plotLayout()->addElement(3, 0, bottomAxisRect);
+    plot1_->plotLayout()->addElement(0, 0, topTitle);
+    plot1_->plotLayout()->addElement(1, 0, topAxisRect);
+    plot1_->plotLayout()->addElement(2, 0, bottomTitle);
+    plot1_->plotLayout()->addElement(3, 0, bottomAxisRect);
 
     QFont font;
     font.setPointSize(12);
@@ -199,14 +209,14 @@ void GSWidget::graphSetup() {
             axis->grid()->setLayer("grid");
         }
 
-    QCPGraph *g1 = customPlot->addGraph(topAxisRect->axis(QCPAxis::atBottom), topAxisRect->axis(QCPAxis::atLeft));
-    QCPGraph *g2 = customPlot->addGraph(bottomAxisRect->axis(QCPAxis::atBottom), bottomAxisRect->axis(QCPAxis::atLeft));
+    QCPGraph *g1 = plot1_->addGraph(topAxisRect->axis(QCPAxis::atBottom), topAxisRect->axis(QCPAxis::atLeft));
+    QCPGraph *g2 = plot1_->addGraph(bottomAxisRect->axis(QCPAxis::atBottom), bottomAxisRect->axis(QCPAxis::atLeft));
 
     g1->setPen(penFeature1);
     g2->setPen(penFeature2);
 
     // Check if the number of graphs corresponds to the number of available features
-    assert(ui->graph_widget->graphCount() == static_cast<int>(GraphFeature::Count));
+    assert(plot1_->graphCount() == static_cast<int>(GraphFeature::Count));
 
 }
 
@@ -219,25 +229,40 @@ void GSWidget::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) {
     // usually it's better to first check whether interface1D() returns non-zero, and only then use it.
     double dataValue = plottable->interface1D()->dataMainValue(dataIndex);
     double dataKey = plottable->interface1D()->dataMainKey(dataIndex);
-    QString message = QString("[x: %1 y: %2]").arg(dataKey).arg(dataValue);
+    QString message = QString("(%1 , %2)").arg(dataKey).arg(dataValue);
 
-    QCPItemText *textLabel = new QCPItemText(ui->graph_widget);
+
+    QCPItemText *textLabel = new QCPItemText(plot1_);
     textLabel->setPositionAlignment(Qt::AlignTop | Qt::AlignHCenter);
-    textLabel->position->setTypeY(QCPItemPosition::ptAxisRectRatio);
-    textLabel->position->setCoords(dataKey, 0.0); // place position at center/top of axis rect
+    textLabel->position->setType(QCPItemPosition::ptPlotCoords);
+    textLabel->position->setAxisRect(plottable->keyAxis()->axisRect());
+    textLabel->position->setCoords(dataKey, dataValue); // place position at center/top of axis rect
 
     textLabel->setFont(QFont(font().family(), 8)); // make font a bit larger
     //textLabel->setPen(QPen(Qt::black)); // show black border around text
     textLabel->setText(message);
 
     // add the arrow:
-    QCPItemLine *arrow = new QCPItemLine(ui->graph_widget);
+    QCPItemLine *arrow = new QCPItemLine(plot1_);
     arrow->start->setParentAnchor(textLabel->bottom);
     arrow->end->setCoords(dataKey, dataValue);
 
+    userItems_.push_back(std::make_tuple<QCPAbstractItem *, QCPAbstractItem *>(textLabel, arrow));
+
+
+#ifdef DEBUG
     std::cout << "Added item to plot: " << textLabel->text().toStdString() << std::endl;
+#endif
 }
 
+void GSWidget::clearAllGraphItems(bool checked) {
+
+#ifdef DEBUG
+    std::cout << "Cleared all graph items" << std::endl;
+#endif
+
+    plot1_->clearItems();
+}
 
 bool GSWidget::event(QEvent *event) {
     if (event->type() == QEvent::KeyPress) {

@@ -28,7 +28,7 @@ public:
 
 public slots:
 
-    void dummySlot();
+    void dummySlot(bool);
 
     void graphClicked(QCPAbstractPlottable *, int);
 
@@ -37,6 +37,8 @@ public slots:
     void updateEvents(vector<RocketEvent> &);
 
     void updateGraphData(QVector<QCPGraphData> &, GraphFeature);
+
+    void clearAllGraphItems(bool);
 
     void updateTelemetry(TelemetryReading);
 
@@ -51,9 +53,13 @@ signals:
     void toggleLogging();
 
 private:
+
     Ui::GSWidget *ui;
+    QCustomPlot *plot1_;
+    QCustomPlot *plot2_;
     QTimer clockTimer;
     chrono::system_clock::time_point lastGraphUpdate_;
+    std::vector<std::tuple<QCPAbstractItem *, QCPAbstractItem *>> userItems_;
     double lastRemoteTime_;
 
     void graphSetup();
