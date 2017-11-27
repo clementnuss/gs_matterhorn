@@ -57,12 +57,15 @@ private:
     Ui::GSWidget *ui;
     QCustomPlot *plot1_;
     QCustomPlot *plot2_;
+    std::vector<QCustomPlot *> plotVector_;
     QTimer clockTimer;
     chrono::system_clock::time_point lastGraphUpdate_;
     std::vector<std::tuple<QCPAbstractItem *, QCPAbstractItem *>> userItems_;
     double lastRemoteTime_;
 
-    void graphSetup();
+    void graphWidgetSetup();
+
+    void plotSetup(QCustomPlot *, QString);
 };
 
 #endif // GSWIDGET_H
