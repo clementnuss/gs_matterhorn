@@ -10,8 +10,6 @@
 using namespace std;
 using namespace SimulatorConstants;
 
-//TODO: make telemetry handler factory to provide either simulator or real one
-
 TelemetrySimulator::TelemetrySimulator() : startTime_{chrono::system_clock::now()},
                                            sequenceNumber_{0},
                                            timeOfLastPolledData{chrono::system_clock::now()}, variableRate{true},
