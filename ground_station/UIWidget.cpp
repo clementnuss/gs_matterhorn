@@ -33,11 +33,14 @@ void GSWidget::connectComponents() {
     connect(ui->graph_sync_button, &QPushButton::clicked, this, &GSWidget::updatePlotSync);
 
     // Connect components related to graphs
-    for (auto plot : plotVector_) {
-        connect(plot, SIGNAL(plottableClick(QCPAbstractPlottable * , int, QMouseEvent * )), this,
-                SLOT(graphClicked(QCPAbstractPlottable * , int)));
-        connect(plot, SIGNAL(mouseWheel(QWheelEvent * )), this, SLOT(mouseWheelOnPlot()));
-    }
+    applyToAllPlots(
+            [this](QCustomPlot *p) {
+                connect(p, SIGNAL(plottableClick(QCPAbstractPlottable * , int, QMouseEvent * )), this,
+                        SLOT(graphClicked(QCPAbstractPlottable * , int)));
+                connect(p, SIGNAL(mouseWheel(QWheelEvent * )), this, SLOT(mouseWheelOnPlot()));
+                connect(p, SIGNAL(mousePress(QMouseEvent * )), this, SLOT(mousePressOnPlot()));
+            }
+    );
 }
 
 void GSWidget::dummySlot(bool b) {
@@ -228,10 +231,6 @@ void GSWidget::plotSetup(QCustomPlot *plot, QString title, QColor color) {
 
 void GSWidget::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) {
 
-    //TODO: Add the items to a list so we can reaccess them later
-
-    // since we know we only have QCPGraphs in the plot, we can immediately access interface1D()
-    // usually it's better to first check whether interface1D() returns non-zero, and only then use it.
     double dataValue = plottable->interface1D()->dataMainValue(dataIndex);
     double dataKey = plottable->interface1D()->dataMainKey(dataIndex);
     QString message = QString("(%1 , %2)").arg(dataKey).arg(dataValue);
@@ -243,7 +242,6 @@ void GSWidget::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) {
     textLabel->position->setCoords(dataKey, 0.0); // place position at center/top of axis rect
 
     textLabel->setFont(QFont(font().family(), 8)); // make font a bit larger
-    //textLabel->setPen(QPen(Qt::black)); // show black border around text
     textLabel->setText(message);
 
     // add the arrow:
@@ -264,7 +262,14 @@ void GSWidget::mouseWheelOnPlot() {
     ui->graph_autoplay_button->setChecked(false);
 
     plot1_->axisRect()->setRangeZoom(
-            (Qt::ShiftModifier & QGuiApplication::keyboardModifiers()) ? Qt::Horizontal : Qt::Vertical);
+            (Qt::ShiftModifier & QGuiApplication::keyboardModifiers()) ? Qt::Vertical : Qt::Horizontal);
+}
+
+void GSWidget::mousePressOnPlot() {
+    if (!autoPlay_) {
+        plot1_->axisRect()->setRangeDrag(
+                (Qt::ShiftModifier & QGuiApplication::keyboardModifiers()) ? Qt::Vertical : Qt::Horizontal);
+    }
 }
 
 void GSWidget::updateAutoPlay(bool checked) {
@@ -272,7 +277,8 @@ void GSWidget::updateAutoPlay(bool checked) {
 }
 
 /**
- * Connects or disconnects the x-axis of all plots
+ * Connects or disconnects the x-axis of every plot with the x axis of all
+ * its siblings.
  *
  * @param checked the boolean value indicating synchronisation
  */
@@ -280,6 +286,7 @@ void GSWidget::updatePlotSync(bool checked) {
     if (checked) {
         for (int i = 0; i < plotVector_.size(); i++) {
             for (int j = 0; j < plotVector_.size(); j++) {
+                // Skip such as not to connect a plot with itself
                 if (i == j) {
                     continue;
                 } else {
@@ -303,12 +310,12 @@ void GSWidget::updatePlotSync(bool checked) {
 }
 
 void GSWidget::clearAllGraphItems(bool checked) {
+    applyToAllPlots([](QCustomPlot *p) { p->clearItems(); });
+}
 
-#ifdef DEBUG
-    std::cout << "Cleared all graph items" << std::endl;
-#endif
+void GSWidget::applyToAllPlots(const std::function<void(QCustomPlot *)> &f) {
     for (auto plot : plotVector_) {
-        plot->clearItems();
+        f(plot);
     }
 }
 

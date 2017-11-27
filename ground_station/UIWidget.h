@@ -50,6 +50,8 @@ public slots:
 
     void mouseWheelOnPlot();
 
+    void mousePressOnPlot();
+
     void updateAutoPlay(bool);
 
     void updatePlotSync(bool);
@@ -65,6 +67,8 @@ private:
     void plotSetup(QCustomPlot *, QString, QColor);
 
     void connectComponents();
+
+    void applyToAllPlots(const std::function<void(QCustomPlot *)> &);
 
     Ui::GSWidget *ui;
     QCustomPlot *plot1_;
