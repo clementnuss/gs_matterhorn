@@ -20,9 +20,11 @@ GSWidget::GSWidget(QWidget *parent) :
     graphWidgetSetup();
 
     connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
-    //connect(ui->graph_widget, SIGNAL(plottableClick(QCPAbstractPlottable * , int, QMouseEvent * )), this,
-    //        SLOT(graphClicked(QCPAbstractPlottable * , int)));
-    //connect(ui->graph_clear_items_button, &QPushButton::clicked, this, &GSWidget::clearAllGraphItems);
+    connect(plot1_, SIGNAL(plottableClick(QCPAbstractPlottable * , int, QMouseEvent * )), this,
+            SLOT(graphClicked(QCPAbstractPlottable * , int)));
+    connect(plot2_, SIGNAL(plottableClick(QCPAbstractPlottable * , int, QMouseEvent * )), this,
+            SLOT(graphClicked(QCPAbstractPlottable * , int)));
+    connect(ui->graph_clear_items_button, &QPushButton::clicked, this, &GSWidget::clearAllGraphItems);
 
     clockTimer.start(std::lround((1.0 / 60.0) * 1000));
 
@@ -155,8 +157,8 @@ void GSWidget::updateGroundStatus(float temperature, float pressure) {
 void GSWidget::graphWidgetSetup() {
     QWidget *plotContainer = ui->plot_container;
 
-    plotSetup(plot1_, QStringLiteral("Altitude [m]"));
-    plotSetup(plot2_, QStringLiteral("Acceleration [G]"));
+    plotSetup(plot1_, QStringLiteral("Altitude [m]"), QColor(180, 0, 0));
+    plotSetup(plot2_, QStringLiteral("Acceleration [G]"), QColor(0, 180, 0));
 
     QVBoxLayout *layout = new QVBoxLayout(plotContainer);
     layout->addWidget(plot1_);
@@ -167,7 +169,7 @@ void GSWidget::graphWidgetSetup() {
 
 }
 
-void GSWidget::plotSetup(QCustomPlot *plot, QString title) {
+void GSWidget::plotSetup(QCustomPlot *plot, QString title, QColor color) {
     plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems);
     plot->plotLayout()->clear();
 
@@ -198,7 +200,7 @@ void GSWidget::plotSetup(QCustomPlot *plot, QString title) {
 
     QPen pen;
     pen.setWidth(1);
-    pen.setColor(QColor(180, 0, 0));
+    pen.setColor(color);
 
     QList<QCPAxis *> allAxes;
     allAxes << axisRect->axes();
@@ -224,18 +226,17 @@ void GSWidget::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) {
     QString message = QString("(%1 , %2)").arg(dataKey).arg(dataValue);
 
 
-    QCPItemText *textLabel = new QCPItemText(plot1_);
+    QCPItemText *textLabel = new QCPItemText(plottable->parentPlot());
     textLabel->setPositionAlignment(Qt::AlignTop | Qt::AlignHCenter);
-    textLabel->position->setType(QCPItemPosition::ptPlotCoords);
-    textLabel->position->setAxisRect(plottable->keyAxis()->axisRect());
-    textLabel->position->setCoords(dataKey, dataValue); // place position at center/top of axis rect
+    textLabel->position->setTypeY(QCPItemPosition::ptAxisRectRatio);
+    textLabel->position->setCoords(dataKey, 0.0); // place position at center/top of axis rect
 
     textLabel->setFont(QFont(font().family(), 8)); // make font a bit larger
     //textLabel->setPen(QPen(Qt::black)); // show black border around text
     textLabel->setText(message);
 
     // add the arrow:
-    QCPItemLine *arrow = new QCPItemLine(plot1_);
+    QCPItemLine *arrow = new QCPItemLine(plottable->parentPlot());
     arrow->start->setParentAnchor(textLabel->bottom);
     arrow->end->setCoords(dataKey, dataValue);
 
@@ -252,8 +253,9 @@ void GSWidget::clearAllGraphItems(bool checked) {
 #ifdef DEBUG
     std::cout << "Cleared all graph items" << std::endl;
 #endif
-
-    plot1_->clearItems();
+    for (auto plot : plotVector_) {
+        plot->clearItems();
+    }
 }
 
 bool GSWidget::event(QEvent *event) {

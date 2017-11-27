@@ -65,7 +65,7 @@ private:
 
     void graphWidgetSetup();
 
-    void plotSetup(QCustomPlot *, QString);
+    void plotSetup(QCustomPlot *, QString, QColor);
 };
 
 #endif // GSWIDGET_H
