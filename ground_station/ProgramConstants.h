@@ -40,6 +40,7 @@ namespace UIConstants {
 
     static constexpr float GRAPH_RANGE_MARGIN_RATIO = 1.15;
     static constexpr int GRAPH_XRANGE_SECS = 20;
+    static constexpr int GRAPH_MEMORY_SECS = 600;
 }
 
 namespace SimulatorConstants {

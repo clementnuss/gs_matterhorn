@@ -28,7 +28,7 @@ public:
 
 public slots:
 
-    void dummySlot();
+    void dummySlot(bool);
 
     void graphClicked(QCPAbstractPlottable *, int);
 
@@ -38,6 +38,8 @@ public slots:
 
     void updateGraphData(QVector<QCPGraphData> &, GraphFeature);
 
+    void clearAllGraphItems(bool);
+
     void updateTelemetry(TelemetryReading);
 
     void updateLoggingStatus(bool);
@@ -46,17 +48,31 @@ public slots:
 
     void updateGroundStatus(float, float);
 
+    void stopAutoPlay();
+
+    void enableAutoPlay();
+
 signals:
 
     void toggleLogging();
 
 private:
+
+    void graphWidgetSetup();
+
+    void plotSetup(QCustomPlot *, QString, QColor);
+
+    void connectComponents();
+
     Ui::GSWidget *ui;
+    QCustomPlot *plot1_;
+    QCustomPlot *plot2_;
+    std::vector<QCustomPlot *> plotVector_;
     QTimer clockTimer;
     chrono::system_clock::time_point lastGraphUpdate_;
+    std::vector<std::tuple<QCPAbstractItem *, QCPAbstractItem *>> userItems_;
+    bool autoPlay_;
     double lastRemoteTime_;
-
-    void graphSetup();
 };
 
 #endif // GSWIDGET_H

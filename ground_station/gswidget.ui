@@ -96,7 +96,7 @@
       <enum>QLayout::SetNoConstraint</enum>
      </property>
      <item>
-         <layout class="QHBoxLayout" name="horizontalLayout" stretch="10,0,4">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="10,0,4">
        <property name="sizeConstraint">
         <enum>QLayout::SetNoConstraint</enum>
        </property>
@@ -113,7 +113,7 @@
         <number>10</number>
        </property>
        <item>
-           <widget class="QGroupBox" name="telemetry_group">
+        <widget class="QGroupBox" name="telemetry_group">
          <property name="minimumSize">
           <size>
            <width>500</width>
@@ -267,7 +267,7 @@
                   </font>
                  </property>
                  <property name="text">
-                     <string>hPa</string>
+                  <string>hPa</string>
                  </property>
                 </widget>
                </item>
@@ -530,13 +530,13 @@
         </spacer>
        </item>
        <item>
-           <widget class="QGroupBox" name="ground_group">
-               <property name="sizePolicy">
-                   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                   </sizepolicy>
-               </property>
+        <widget class="QGroupBox" name="ground_group">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
            <width>100</width>
@@ -552,199 +552,199 @@
           </font>
          </property>
          <property name="title">
-             <string>GROUND STATION STATUS</string>
+          <string>GROUND STATION STATUS</string>
          </property>
-               <layout class="QGridLayout" name="gridLayout_2" columnstretch="2,0,3">
-                   <item row="0" column="2">
-                       <widget class="QLabel" name="ground_time">
-                           <property name="font">
-                               <font>
-                                   <pointsize>14</pointsize>
-                               </font>
-                           </property>
-                           <property name="layoutDirection">
-                               <enum>Qt::LeftToRight</enum>
-                           </property>
-                           <property name="text">
-                               <string>00:00:00</string>
-                           </property>
-                           <property name="alignment">
-                               <set>Qt::AlignCenter</set>
-                           </property>
-                       </widget>
-                   </item>
-                   <item row="1" column="2">
-                       <layout class="QHBoxLayout" name="horizontalLayout_11">
-                           <item>
-                               <widget class="QLabel" name="ground_pressure_value">
-                                   <property name="font">
-                                       <font>
-                                           <pointsize>12</pointsize>
-                                       </font>
-                                   </property>
-                                   <property name="text">
-                                       <string>0.0</string>
-                                   </property>
-                                   <property name="alignment">
-                                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                                   </property>
-                               </widget>
-                           </item>
-                           <item>
-                               <widget class="QLabel" name="ground_pressure_units">
-                                   <property name="font">
-                                       <font>
-                                           <pointsize>12</pointsize>
-                                       </font>
-                                   </property>
-                                   <property name="text">
-                                       <string>hPa</string>
-                                   </property>
-                               </widget>
-                           </item>
-                       </layout>
+         <layout class="QGridLayout" name="gridLayout_2" columnstretch="2,0,3">
+          <item row="0" column="2">
+           <widget class="QLabel" name="ground_time">
+            <property name="font">
+             <font>
+              <pointsize>14</pointsize>
+             </font>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="text">
+             <string>00:00:00</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
           </item>
-                   <item row="2" column="2">
-                       <layout class="QHBoxLayout" name="horizontalLayout_13">
-                           <item>
-                               <widget class="QLabel" name="ground_temperature_value">
-                                   <property name="font">
-                                       <font>
-                                           <pointsize>12</pointsize>
-                                       </font>
-                                   </property>
-                                   <property name="text">
-                                       <string>0.0</string>
-                                   </property>
-                                   <property name="alignment">
-                                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                                   </property>
-                               </widget>
-                           </item>
-                           <item>
-                               <widget class="QLabel" name="ground_temperature_units">
-                                   <property name="font">
-                                       <font>
-                                           <pointsize>12</pointsize>
-                                       </font>
-                                   </property>
-                                   <property name="text">
-                                       <string>°C</string>
-                                   </property>
-                               </widget>
-                           </item>
-                       </layout>
+          <item row="1" column="2">
+           <layout class="QHBoxLayout" name="horizontalLayout_11">
+            <item>
+             <widget class="QLabel" name="ground_pressure_value">
+              <property name="font">
+               <font>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>0.0</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="ground_pressure_units">
+              <property name="font">
+               <font>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>hPa</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
-                   <item row="0" column="0" rowspan="3">
-                       <widget class="QFrame" name="frame_10">
-                           <property name="sizePolicy">
-                               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                                   <horstretch>0</horstretch>
-                                   <verstretch>0</verstretch>
-                               </sizepolicy>
-                           </property>
-                           <property name="frameShape">
-                               <enum>QFrame::StyledPanel</enum>
-                           </property>
-                           <property name="frameShadow">
-                               <enum>QFrame::Raised</enum>
-                           </property>
-                           <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,1,0,0,0,10">
-                               <item>
-                                   <widget class="QLabel" name="status_logging">
-                                       <property name="autoFillBackground">
-                                           <bool>true</bool>
-                                       </property>
-                                       <property name="frameShape">
-                                           <enum>QFrame::StyledPanel</enum>
-                                       </property>
-                                       <property name="text">
-                                           <string>Logging</string>
-                                       </property>
-                                       <property name="margin">
-                                           <number>5</number>
-                                       </property>
-                                   </widget>
-                               </item>
-                               <item>
-                                   <widget class="QLabel" name="status_battery">
-                                       <property name="autoFillBackground">
-                                           <bool>true</bool>
-                                       </property>
-                                       <property name="frameShape">
-                                           <enum>QFrame::StyledPanel</enum>
-                                       </property>
-                                       <property name="text">
-                                           <string>Battery</string>
-                                       </property>
-                                       <property name="margin">
-                                           <number>5</number>
-                                       </property>
-                                   </widget>
-                               </item>
-                               <item>
-                                   <widget class="QLabel" name="status_radio1">
-                                       <property name="autoFillBackground">
-                                           <bool>true</bool>
-                                       </property>
-                                       <property name="frameShape">
-                                           <enum>QFrame::StyledPanel</enum>
-                                       </property>
-                                       <property name="text">
-                                           <string>Radio I</string>
-                                       </property>
-                                       <property name="margin">
-                                           <number>5</number>
-                                       </property>
-                                   </widget>
-                               </item>
-                               <item>
-                                   <widget class="QLabel" name="status_radio2">
-                                       <property name="autoFillBackground">
-                                           <bool>true</bool>
-                                       </property>
-                                       <property name="frameShape">
-                                           <enum>QFrame::StyledPanel</enum>
-                                       </property>
-                                       <property name="text">
-                                           <string>Radio II</string>
-                                       </property>
-                                       <property name="margin">
-                                           <number>5</number>
-                                       </property>
-                                   </widget>
-                               </item>
-                               <item>
-                                   <widget class="QLabel" name="status_video">
-                                       <property name="autoFillBackground">
-                                           <bool>true</bool>
-                                       </property>
-                                       <property name="frameShape">
-                                           <enum>QFrame::StyledPanel</enum>
-                                       </property>
-                                       <property name="text">
-                                           <string>Video</string>
-                                       </property>
-                                       <property name="margin">
-                                           <number>5</number>
-                                       </property>
-                                   </widget>
-                               </item>
-                               <item>
-                                   <spacer name="verticalSpacer">
-                                       <property name="orientation">
-                                           <enum>Qt::Vertical</enum>
-                                       </property>
-                                       <property name="sizeHint" stdset="0">
-                                           <size>
-                                               <width>20</width>
-                                               <height>40</height>
-                                           </size>
-                                       </property>
-                                   </spacer>
-                               </item>
-                           </layout>
-                       </widget>
+          <item row="2" column="2">
+           <layout class="QHBoxLayout" name="horizontalLayout_13">
+            <item>
+             <widget class="QLabel" name="ground_temperature_value">
+              <property name="font">
+               <font>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>0.0</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="ground_temperature_units">
+              <property name="font">
+               <font>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>°C</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="0" rowspan="3">
+           <widget class="QFrame" name="frame_10">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,1,0,0,0,10">
+             <item>
+              <widget class="QLabel" name="status_logging">
+               <property name="autoFillBackground">
+                <bool>true</bool>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="text">
+                <string>Logging</string>
+               </property>
+               <property name="margin">
+                <number>5</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="status_battery">
+               <property name="autoFillBackground">
+                <bool>true</bool>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="text">
+                <string>Battery</string>
+               </property>
+               <property name="margin">
+                <number>5</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="status_radio1">
+               <property name="autoFillBackground">
+                <bool>true</bool>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="text">
+                <string>Radio I</string>
+               </property>
+               <property name="margin">
+                <number>5</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="status_radio2">
+               <property name="autoFillBackground">
+                <bool>true</bool>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="text">
+                <string>Radio II</string>
+               </property>
+               <property name="margin">
+                <number>5</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="status_video">
+               <property name="autoFillBackground">
+                <bool>true</bool>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="text">
+                <string>Video</string>
+               </property>
+               <property name="margin">
+                <number>5</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -788,7 +788,7 @@
              </font>
             </property>
             <property name="text">
-                <string>REALTIME VIEW</string>
+             <string>REALTIME VIEW</string>
             </property>
            </widget>
           </item>
@@ -804,75 +804,95 @@
              <number>0</number>
             </property>
             <widget class="QWidget" name="Graphs">
-                <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                    </sizepolicy>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_4">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_4">
               <item>
-                  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,100">
-                      <property name="sizeConstraint">
-                          <enum>QLayout::SetDefaultConstraint</enum>
-                      </property>
-                      <item>
-                          <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,1">
-                              <property name="spacing">
-                                  <number>4</number>
-                              </property>
-                              <property name="sizeConstraint">
-                                  <enum>QLayout::SetFixedSize</enum>
-                              </property>
-                              <property name="rightMargin">
-                                  <number>0</number>
-                              </property>
-                              <item>
-                                  <spacer name="horizontalSpacer">
-                                      <property name="orientation">
-                                          <enum>Qt::Horizontal</enum>
-                                      </property>
-                                      <property name="sizeHint" stdset="0">
-                                          <size>
-                                              <width>16777215</width>
-                                              <height>20</height>
-                                          </size>
-                                      </property>
-                                  </spacer>
-                              </item>
-                              <item>
-                                  <widget class="QPushButton" name="pushButton_2">
-                                      <property name="maximumSize">
-                                          <size>
-                                              <width>16777215</width>
-                                              <height>16777215</height>
-                                          </size>
-                                      </property>
-                                      <property name="text">
-                                          <string>Clear labels</string>
-                                      </property>
-                                      <property name="flat">
-                                          <bool>false</bool>
-                                      </property>
-                                  </widget>
-                              </item>
-                              <item>
-                                  <widget class="QPushButton" name="graph_autoplay_button">
-                                      <property name="maximumSize">
-                                          <size>
-                                              <width>16777215</width>
-                                              <height>16777215</height>
-                                          </size>
-                                      </property>
-                                      <property name="text">
-                                          <string>AutoPlay</string>
-                                      </property>
-                                  </widget>
-                              </item>
-                          </layout>
-                      </item>
+               <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,100">
+                <property name="sizeConstraint">
+                 <enum>QLayout::SetDefaultConstraint</enum>
+                </property>
                 <item>
-                 <widget class="QCustomPlot" name="graph_widget" native="true"/>
+                 <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,1,1">
+                  <property name="spacing">
+                   <number>4</number>
+                  </property>
+                  <property name="sizeConstraint">
+                   <enum>QLayout::SetFixedSize</enum>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <spacer name="horizontalSpacer">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>16777215</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="graph_sync_button">
+                    <property name="text">
+                     <string>Synchronise axes</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="graph_clear_items_button">
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Clear labels</string>
+                    </property>
+                    <property name="flat">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="graph_autoplay_button">
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>AutoPlay</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QWidget" name="plot_container" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -939,9 +959,9 @@
                <pointsize>10</pointsize>
               </font>
              </property>
-                <property name="readOnly">
-                    <bool>true</bool>
-                </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
           </layout>
@@ -955,14 +975,6 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>QCustomPlot</class>
-   <extends>QWidget</extends>
-   <header>qcustomplot.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

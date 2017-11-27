@@ -72,10 +72,6 @@ void Application::connectSlotsAndSignals() {
     qRegisterMetaType<GraphFeature>("GraphFeature");
     qRegisterMetaType<HandlerStatus>("HandlerStatus");
 
-    QObject::connect(worker_,
-                     &Worker::dummySignal,
-                     &mainWidget_,
-                     &GSWidget::dummySlot);
 
     QObject::connect(worker_,
                      &Worker::telemetryReady,
