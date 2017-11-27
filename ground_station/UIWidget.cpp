@@ -55,8 +55,8 @@ void GSWidget::updateTime() {
 }
 
 void GSWidget::updateEvents(vector<RocketEvent> &events) {
-    if (events.size() >= 1) {
-        for (RocketEvent e : events) {
+    if (!events.empty()) {
+        for (RocketEvent &e : events) {
             int seconds = e.timestamp_ / TimeConstants::MSECS_IN_SEC;
             int minutes = seconds / TimeConstants::SECS_IN_MINUTE;
 
@@ -84,12 +84,12 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
             if (elapsed > UIConstants::GRAPH_DATA_INTERVAL_USECS) {
                 double elapsedSeconds = elapsed / 1'000'000.0;
 
-                for (int g_idx = 0; g_idx < plotVector_.size(); g_idx++) {
-                    QCPGraph *g = plotVector_[g_idx]->graph();
+                for (auto &g_idx : plotVector_) {
+                    QCPGraph *g = g_idx->graph();
                     g->keyAxis()->setRange(lastRemoteTime_ + elapsedSeconds,
                                            UIConstants::GRAPH_XRANGE_SECS,
                                            Qt::AlignRight);
-                    plotVector_[g_idx]->replot();
+                    g_idx->replot();
                 };
 
             }
@@ -150,9 +150,6 @@ void GSWidget::updateLinkStatus(HandlerStatus status) {
         case HandlerStatus::DOWN:
             statusColor = UIColors::RED;
             break;
-        default:
-            statusColor = UIColors::RED;
-            break;
     }
 
     QLabel *label = ui->status_radio1;
@@ -173,7 +170,7 @@ void GSWidget::graphWidgetSetup() {
     plotSetup(plot1_, QStringLiteral("Altitude [m]"), QColor(180, 0, 0));
     plotSetup(plot2_, QStringLiteral("Acceleration [G]"), QColor(0, 180, 0));
 
-    QVBoxLayout *layout = new QVBoxLayout(plotContainer);
+    auto *layout = new QVBoxLayout(plotContainer);
     layout->addWidget(plot1_);
     layout->addWidget(plot2_);
 
@@ -192,7 +189,7 @@ void GSWidget::plotSetup(QCustomPlot *plot, QString title, QColor color) {
 
     QFont titleFont = QFont("sans", 10, QFont::Bold);
 
-    QCPTextElement *titleText = new QCPTextElement(plot, title, titleFont);
+    auto *titleText = new QCPTextElement(plot, title, titleFont);
 
     auto axisRect = new QCPAxisRect(plot);
 
@@ -218,7 +215,6 @@ void GSWidget::plotSetup(QCustomPlot *plot, QString title, QColor color) {
 
     QList<QCPAxis *> allAxes;
     allAxes << axisRect->axes();
-
             foreach (QCPAxis *axis, allAxes) {
             axis->setLayer("axes");
             axis->grid()->setLayer("grid");
@@ -236,7 +232,7 @@ void GSWidget::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) {
     QString message = QString("(%1 , %2)").arg(dataKey).arg(dataValue);
 
 
-    QCPItemText *textLabel = new QCPItemText(plottable->parentPlot());
+    auto *textLabel = new QCPItemText(plottable->parentPlot());
     textLabel->setPositionAlignment(Qt::AlignTop | Qt::AlignHCenter);
     textLabel->position->setTypeY(QCPItemPosition::ptAxisRectRatio);
     textLabel->position->setCoords(dataKey, 0.0); // place position at center/top of axis rect
@@ -245,11 +241,11 @@ void GSWidget::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) {
     textLabel->setText(message);
 
     // add the arrow:
-    QCPItemLine *arrow = new QCPItemLine(plottable->parentPlot());
+    auto *arrow = new QCPItemLine(plottable->parentPlot());
     arrow->start->setParentAnchor(textLabel->bottom);
     arrow->end->setCoords(dataKey, dataValue);
 
-    userItems_.push_back(std::make_tuple<QCPAbstractItem *, QCPAbstractItem *>(textLabel, arrow));
+    userItems_.emplace_back(std::make_tuple(textLabel, arrow));
 
 
 #ifdef DEBUG
@@ -261,14 +257,25 @@ void GSWidget::mouseWheelOnPlot() {
     autoPlay_ = false;
     ui->graph_autoplay_button->setChecked(false);
 
-    plot1_->axisRect()->setRangeZoom(
-            (Qt::ShiftModifier & QGuiApplication::keyboardModifiers()) ? Qt::Vertical : Qt::Horizontal);
+    // Make all plots respond to wheel events
+    applyToAllPlots(
+            [](QCustomPlot *p) {
+                p->axisRect()->setRangeZoom(
+                        (Qt::ShiftModifier & QGuiApplication::keyboardModifiers()) ? Qt::Vertical : Qt::Horizontal);
+            }
+    );
 }
 
 void GSWidget::mousePressOnPlot() {
     if (!autoPlay_) {
-        plot1_->axisRect()->setRangeDrag(
-                (Qt::ShiftModifier & QGuiApplication::keyboardModifiers()) ? Qt::Vertical : Qt::Horizontal);
+
+        // Make all plots respond to mouse events
+        applyToAllPlots(
+                [](QCustomPlot *p) {
+                    p->axisRect()->setRangeDrag(
+                            (Qt::ShiftModifier & QGuiApplication::keyboardModifiers()) ? Qt::Vertical : Qt::Horizontal);
+                }
+        );
     }
 }
 
@@ -310,11 +317,12 @@ void GSWidget::updatePlotSync(bool checked) {
 }
 
 void GSWidget::clearAllGraphItems(bool checked) {
+    Q_UNUSED(checked);
     applyToAllPlots([](QCustomPlot *p) { p->clearItems(); });
 }
 
 void GSWidget::applyToAllPlots(const std::function<void(QCustomPlot *)> &f) {
-    for (auto plot : plotVector_) {
+    for (auto &plot : plotVector_) {
         f(plot);
     }
 }
@@ -322,7 +330,7 @@ void GSWidget::applyToAllPlots(const std::function<void(QCustomPlot *)> &f) {
 bool GSWidget::event(QEvent *event) {
     if (event->type() == QEvent::KeyPress) {
 
-        QKeyEvent *ke = static_cast<QKeyEvent *>(event);
+        auto *ke = dynamic_cast<QKeyEvent *>(event);
 
         if (ke->key() == Qt::Key_Space) {
             emit toggleLogging();
