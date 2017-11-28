@@ -13,7 +13,7 @@ qt5_add_resources(RESOURCES qt_resources.qrc)
 file(GLOB_RECURSE SOURCES "*.cpp")
 file(GLOB_RECURSE HEADERS "*.h")
 
-add_executable(ground_station ${SOURCES} ${HEADERS})
+add_executable(ground_station ${SOURCES} ${HEADERS} ${RESOURCES})
 add_library(ground_station_lib ${SOURCES} ${HEADERS})
 
 # Include QCustomPlot libtrary and include file

@@ -817,7 +817,7 @@
                  <enum>QLayout::SetDefaultConstraint</enum>
                 </property>
                 <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,0,1">
+                    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,1,0,1">
                   <property name="spacing">
                    <number>4</number>
                   </property>
@@ -828,18 +828,25 @@
                    <number>0</number>
                   </property>
                   <item>
-                   <spacer name="horizontalSpacer">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>16777215</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
+                      <widget class="QLabel" name="label_3">
+                          <property name="text">
+                              <string>Use SHIFT to change drag and zoom axis</string>
+                          </property>
+                      </widget>
                   </item>
+                        <item>
+                            <spacer name="horizontalSpacer">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>16777215</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
                   <item>
                    <widget class="QPushButton" name="graph_clear_items_button">
                        <property name="minimumSize">
@@ -857,17 +864,6 @@
                     <property name="text">
                      <string>Clear labels</string>
                     </property>
-                       <property name="icon">
-                           <iconset>
-                               <normaloff>UI/icons/remove.png</normaloff>UI/icons/remove.png
-                           </iconset>
-                       </property>
-                       <property name="iconSize">
-                           <size>
-                               <width>12</width>
-                               <height>12</height>
-                           </size>
-                       </property>
                     <property name="flat">
                      <bool>false</bool>
                     </property>
@@ -877,11 +873,6 @@
                       <widget class="QPushButton" name="graph_sync_button">
                           <property name="text">
                               <string>Synchronise axes</string>
-                          </property>
-                          <property name="icon">
-                              <iconset>
-                                  <normaloff>UI/icons/sync.png</normaloff>UI/icons/sync.png
-                              </iconset>
                           </property>
                           <property name="checkable">
                               <bool>true</bool>
@@ -901,11 +892,6 @@
                                 </property>
                                 <property name="text">
                                     <string>Auto Play</string>
-                                </property>
-                                <property name="icon">
-                                    <iconset>
-                                        <normaloff>UI/icons/play.png</normaloff>UI/icons/play.png
-                                    </iconset>
                                 </property>
                                 <property name="checkable">
                                     <bool>true</bool>

@@ -20,6 +20,10 @@ GSWidget::GSWidget(QWidget *parent) :
     graphWidgetSetup();
     connectComponents();
     clockTimer.start(std::lround((1.0 / 60.0) * 1000));
+
+    ui->graph_clear_items_button->setIcon(QIcon(":/UI/icons/remove.png"));
+    ui->graph_sync_button->setIcon(QIcon(":/UI/icons/sync.png"));
+    ui->graph_autoplay_button->setIcon(QIcon(":/UI/icons/play.png"));
 }
 
 GSWidget::~GSWidget() {
