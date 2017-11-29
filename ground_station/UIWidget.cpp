@@ -238,7 +238,7 @@ void GSWidget::graphWidgetSetup() {
  * @param color The color ot use to draw the plot
  */
 void GSWidget::plotSetup(QCustomPlot *plot, QString title, QColor color) {
-    plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems);
+    plot->setInteractions(interactionItemsOnly_);
     plot->plotLayout()->clear();
 
     // TODO: check if needed on RaspberryPi3
@@ -316,8 +316,7 @@ void GSWidget::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) {
 }
 
 void GSWidget::mouseWheelOnPlot() {
-    autoPlay_ = false;
-    ui->graph_autoplay_button->setChecked(false);
+    updateAutoPlay(false);
 
     // Make all plots respond to wheel events
     applyToAllPlots(
@@ -341,8 +340,15 @@ void GSWidget::mousePressOnPlot() {
     }
 }
 
-void GSWidget::updateAutoPlay(bool checked) {
-    autoPlay_ = checked;
+void GSWidget::updateAutoPlay(bool enable) {
+    autoPlay_ = enable;
+    ui->graph_autoplay_button->setChecked(enable);
+
+    applyToAllPlots(
+            [this, enable](QCustomPlot *p) {
+                p->setInteractions(enable ? interactionItemsOnly_ : interactionsAll_);
+            }
+    );
 }
 
 /**

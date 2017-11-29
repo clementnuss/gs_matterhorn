@@ -95,6 +95,9 @@ private:
     bool autoPlay_;
     double lastRemoteTime_;
     double replayPlaybackSpeed_;
+
+    const QFlags<QCP::Interaction> interactionItemsOnly_ = QCP::iSelectItems;
+    const QFlags<QCP::Interaction> interactionsAll_ = QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems;
 };
 
 #endif // GSWIDGET_H
