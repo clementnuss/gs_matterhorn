@@ -127,6 +127,7 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
                                            UIConstants::GRAPH_XRANGE_SECS,
                                            Qt::AlignRight);
                     g_idx->replot();
+
                 };
 
             }
