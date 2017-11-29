@@ -32,9 +32,7 @@ void TelemetryReplay::startup() {
         throw (std::runtime_error(path_.string() + " does not exist\n"));
     }
 
-    lastReadingIter_ = readings_.begin();
-    lastPlaybackTime_ = std::chrono::duration_cast<std::chrono::microseconds>(
-            std::chrono::system_clock::now().time_since_epoch()).count();
+    resetPlayback();
 }
 
 vector<RocketEvent> TelemetryReplay::pollEvents() {
@@ -42,7 +40,7 @@ vector<RocketEvent> TelemetryReplay::pollEvents() {
 }
 
 vector<TelemetryReading> TelemetryReplay::pollData() {
-    vector<TelemetryReading> vec;
+    vector<TelemetryReading> vec{};
     uint32_t adjustedTime =
             static_cast<uint32_t>(
                     std::chrono::duration_cast<std::chrono::microseconds>(
@@ -57,7 +55,7 @@ vector<TelemetryReading> TelemetryReplay::pollData() {
 
     while ((*lastReadingIter_).timestamp_ < adjustedTime) {
         if (lastReadingIter_ == readings_.end()) {
-            return vector<TelemetryReading>();
+            return vec;
         }
         vec.push_back(*lastReadingIter_++);
     }
@@ -112,6 +110,12 @@ void TelemetryReplay::parseFile(boost::filesystem::path p) {
 
 void TelemetryReplay::updatePlaybackSpeed(double newPlaybackSpeed) {
     playbackSpeed_ = newPlaybackSpeed;
+}
+
+void TelemetryReplay::resetPlayback() {
+    lastReadingIter_ = readings_.begin();
+    lastPlaybackTime_ = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 

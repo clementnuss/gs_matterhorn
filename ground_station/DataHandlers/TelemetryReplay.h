@@ -20,6 +20,8 @@ public:
 
     void updatePlaybackSpeed(double);
 
+    void resetPlayback();
+
 private:
     boost::filesystem::path path_;
     vector<TelemetryReading> readings_;

@@ -47,6 +47,8 @@ void GSWidget::connectComponents() {
     connect(ui->graph_sync_button, &QPushButton::clicked, this, &GSWidget::updatePlotSync);
 
     connect(ui->time_unfolding_increase, &QPushButton::clicked, this, &GSWidget::increaseSpeed);
+    connect(ui->time_unfolding_decrease, &QPushButton::clicked, this, &GSWidget::decreaseSpeed);
+    connect(ui->time_unfolding_reset, &QPushButton::clicked, this, &GSWidget::resetPlayback);
 
     // Connect components related to graphs
     applyToAllPlots(
@@ -117,7 +119,7 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
         if (autoPlay_) {
             auto elapsed = usecsBetween(lastGraphUpdate_, chrono::system_clock::now());
             if (elapsed > UIConstants::GRAPH_DATA_INTERVAL_USECS) {
-                double elapsedSeconds = elapsed / 1'000'000.0;
+                double elapsedSeconds = replayPlaybackSpeed_ * elapsed / 1'000'000.0;
 
                 for (auto &g_idx : plotVector_) {
                     QCPGraph *g = g_idx->graph();
@@ -397,11 +399,31 @@ void GSWidget::applyToAllPlots(const std::function<void(QCustomPlot *)> &f) {
 }
 
 void GSWidget::increaseSpeed() {
-    replayPlaybackSpeed_ *= 1.5;
+    replayPlaybackSpeed_ *= DataConstants::INCREASE_FACTOR;
     emit changePlaybackSpeed(replayPlaybackSpeed_);
     ui->time_unfolding_current_speed->setText(
             QString::number(replayPlaybackSpeed_, 'f', 2));
 }
+
+void GSWidget::decreaseSpeed() {
+    replayPlaybackSpeed_ *= DataConstants::DECREASE_FACTOR;
+    emit changePlaybackSpeed(replayPlaybackSpeed_);
+    ui->time_unfolding_current_speed->setText(
+            QString::number(replayPlaybackSpeed_, 'f', 2));
+}
+
+void GSWidget::resetPlayback() {
+    emit resetTelemetryReplayPlayback();
+
+    for (auto &g_idx : plotVector_) {
+        QCPGraph *g = g_idx->graph();
+        g->data()->clear();
+        lastGraphUpdate_ = chrono::system_clock::now();
+        lastRemoteTime_ = -1000;
+        g_idx->replot();
+    };
+}
+
 
 void GSWidget::setRealTimeMode() {
     ui->time_unfolding_mode->setText(QString("REAL-TIME"));

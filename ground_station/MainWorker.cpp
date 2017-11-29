@@ -18,15 +18,6 @@ Worker::Worker(TelemetryHandler *telemetryHandler) :
         telemetryHandler_{telemetryHandler},
         telemetryLogger{LogConstants::WORKER_TELEMETRY_LOG_PATH},
         eventLogger{LogConstants::WORKER_EVENTS_LOG_PATH},
-        lastDisplayableReading{0,
-                               0,
-                               {0, 0, 0},
-                               {0, 0, 0},
-                               {0, 0, 0},
-                               0,
-                               0,
-                               0,
-                               0},
         lastUIupdate{chrono::system_clock::now()},
         lastIteration{chrono::system_clock::now()},
         timeOfLastLinkCheck{chrono::system_clock::now()},
@@ -186,8 +177,12 @@ Worker::extractGraphData(vector<TelemetryReading> &data, QCPGraphData (*extracti
 }
 
 void Worker::updatePlaybackSpeed(double newSpeed) {
-    TelemetryReplay* telemReplay = dynamic_cast<TelemetryReplay*>(telemetryHandler_.get());
+    auto *telemReplay = dynamic_cast<TelemetryReplay *>(telemetryHandler_.get());
     telemReplay->updatePlaybackSpeed(newSpeed);
 }
 
+void Worker::resetPlayback() {
+    auto *telemReplay = dynamic_cast<TelemetryReplay *>(telemetryHandler_.get());
+    telemReplay->resetPlayback();
+}
 

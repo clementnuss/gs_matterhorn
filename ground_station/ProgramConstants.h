@@ -67,11 +67,9 @@ namespace SensorConstants {
 }
 
 namespace DataConstants {
-    static constexpr double DELETION_FACTOR = -0.05;
+    static constexpr double INCREASE_FACTOR = 1.5;
+    static constexpr double DECREASE_FACTOR = 1/INCREASE_FACTOR;
     static constexpr uint32_t READINGS_PER_SEC = 1'000'000 / UIConstants::GRAPH_DATA_INTERVAL_USECS;
-    static constexpr int MAX_DATA_VECTOR_SIZE =
-            static_cast<const int>((1.0 + DELETION_FACTOR) *
-                                   (UIConstants::GRAPH_XRANGE_SECS * READINGS_PER_SEC));
 }
 
 namespace CommunicationsConstants {
