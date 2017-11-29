@@ -37,7 +37,7 @@ Application::Application(int &argc, char **argv) : qApplication_{argc, argv}, ma
 }
 
 void Application::run() {
-    std::string path{R"(D:\EPFL\matterhorn\Eric Launch 18.11.2017\telemetry\2)"};
+    std::string path{R"(D:\EPFL\matterhorn\Eric Launch 18.11.2017\telemetry)"};
 
     TelemetryHandler *handler;
     try {

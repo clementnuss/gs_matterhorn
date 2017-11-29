@@ -80,6 +80,7 @@ private:
     Ui::GSWidget *ui;
     QCustomPlot *plot1_;
     QCustomPlot *plot2_;
+    QCPMarginGroup plotMargin_;
     std::vector<QCustomPlot *> plotVector_;
     QTimer clockTimer;
     chrono::system_clock::time_point lastGraphUpdate_;

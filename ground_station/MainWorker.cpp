@@ -9,6 +9,10 @@
 
 using namespace std;
 
+/**
+ *
+ * @param telemetryHandler
+ */
 Worker::Worker(TelemetryHandler *telemetryHandler) :
         loggingEnabled{false},
         telemetryHandler_{telemetryHandler},
