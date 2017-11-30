@@ -3,6 +3,8 @@
         <file alias="shaders/terrain.frag">3D/shaders/terrain.frag</file>
         <file alias="shaders/line.frag">3D/shaders/line.frag</file>
         <file alias="shaders/line.vert">3D/shaders/line.vert</file>
+        <file alias="shaders/highlightArea.frag">3D/shaders/highlightArea.frag</file>
+        <file alias="shaders/highlightArea.vert">3D/shaders/highlightArea.vert</file>
         <file alias="shaders/DShader.frag">3D/shaders/DShader.frag</file>
         <file alias="shaders/marker.vert">3D/shaders/marker.vert</file>
         <file alias="shaders/terrain.vert">3D/shaders/terrain.vert</file>

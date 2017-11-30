@@ -2,6 +2,7 @@
 #include <ProgramConstants.h>
 #include <3D/Utils.h>
 #include "Ground.h"
+#include "HighlightArea.h"
 
 /**
  * 1000x1000 units terrain surface. Correspond to meters
@@ -58,4 +59,7 @@ Ground::Ground(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent),
 
     this->addComponent(mesh);
     this->addComponent(material);
+
+    // Add highlighted surface
+    new HighlightArea(heightParam, this);
 }
