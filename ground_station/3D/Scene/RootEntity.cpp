@@ -51,6 +51,11 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
                 this);
     simTrace_->appendData(traceData);
 
+    // Initialise
+    splashDownTrace_ = new Line(this, QColor::fromRgb(255, 153, 0), true);
+    splashDownTrace_->appendData(traceData.last());
+    splashDownTrace_->appendData({traceData.last().x(), 0, traceData.last().z()});
+
     QVector3D gsPos{50, 50, 0};
 
     new GroundStation(gsPos, camera, this);
