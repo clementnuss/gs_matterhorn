@@ -6,7 +6,9 @@
 #include "IDataHandler.h"
 #include "DataStructures/datastructs.h"
 
-
+/**
+ * The TelemetryHandler is the base class for telemetry-producing instances
+ */
 class TelemetryHandler : public IDataHandler<TelemetryReading> {
 
 public:

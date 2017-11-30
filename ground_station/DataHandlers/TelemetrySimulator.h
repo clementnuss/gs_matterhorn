@@ -8,6 +8,10 @@
 
 using namespace std;
 
+/**
+ * Telemetry Simulator can be used in place of a TelemetryHandler to generate dummy telemetry data
+ * for testing purposes.
+ */
 class TelemetrySimulator : public TelemetryHandler {
 
 public:
@@ -27,7 +31,9 @@ private:
     void updateHandlerStatus();
 
     static constexpr double VARIABLE_RATE_TIME_MULTIPLIER = 2.0 * M_PI * 0.05;
+
     const TelemetryReading generateTelemetry();
+
     const vector<TelemetryReading> generateTelemetryVector();
 
     chrono::system_clock::time_point startTime_;

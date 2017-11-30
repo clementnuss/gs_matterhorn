@@ -4,11 +4,17 @@
 #include <iostream>
 #include <Utilities/TimeUtils.h>
 
+/**
+ * GSWidget is the main user interface class. It communicate through Qt SLOTS system with the main worker thread of the
+ * application in order to constantly display fresh data.
+ * @param parent
+ */
 GSWidget::GSWidget(QWidget *parent) :
         QWidget(parent),
         ui(new Ui::GSWidget),
         plot1_{new QCustomPlot(this)},
         plot2_{new QCustomPlot(this)},
+        plotMargin_{nullptr},
         plotVector_{plot1_, plot2_},
         clockTimer(this),
         lastGraphUpdate_{chrono::system_clock::now()},
@@ -31,6 +37,9 @@ GSWidget::~GSWidget() {
     delete ui;
 }
 
+/**
+ * Connects the UI components such as buttons and plots to appropriate UI slots
+ */
 void GSWidget::connectComponents() {
     connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
     connect(ui->graph_clear_items_button, &QPushButton::clicked, this, &GSWidget::clearAllGraphItems);
@@ -52,6 +61,11 @@ void GSWidget::connectComponents() {
     );
 }
 
+/**
+ * Qt SLOT for testing and debugging purposes
+ *
+ * @param b
+ */
 void GSWidget::dummySlot(bool b) {
     std::cout << "The dummy slot was called. Time was: "
               << QTime::currentTime().toString().toStdString()
@@ -59,10 +73,18 @@ void GSWidget::dummySlot(bool b) {
               << QTime::currentTime().msec() << std::endl;
 }
 
+/**
+ * Qt SLOT for updating the watch of the user interface
+ */
 void GSWidget::updateTime() {
     ui->ground_time->setText(QTime::currentTime().toString());
 }
 
+/**
+ * Qt SLOT to receive and display events related to the rocket and payload
+ *
+ * @param events A vector of events
+ */
 void GSWidget::updateEvents(vector<RocketEvent> &events) {
     if (!events.empty()) {
         for (RocketEvent &e : events) {
@@ -83,6 +105,12 @@ void GSWidget::updateEvents(vector<RocketEvent> &events) {
     }
 }
 
+/**
+ * Qt SLOT for adding QCPGraphData objects to a given plot
+ *
+ * @param d A vector containing all the data points
+ * @param feature A GraphFeature enumerated value to indicate to which plot to add the data points
+ */
 //TODO: only use qvectors or only use vectors
 void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 
@@ -99,6 +127,7 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
                                            UIConstants::GRAPH_XRANGE_SECS,
                                            Qt::AlignRight);
                     g_idx->replot();
+
                 };
 
             }
@@ -127,7 +156,11 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
     plotVector_[static_cast<int>(feature)]->replot();
 }
 
-
+/**
+ * Qt SLOT for receiving telemetry data and displaying it
+ *
+ * @param t The Telemetry object from which to extract data to update the display
+ */
 void GSWidget::updateTelemetry(TelemetryReading t) {
     ui->telemetry_altitude_value->setText(QString::number(t.altitude_, 'f', UIConstants::PRECISION));
     ui->telemetry_speed_value->setText(QString::number(t.air_speed_, 'f', UIConstants::PRECISION));
@@ -139,6 +172,11 @@ void GSWidget::updateTelemetry(TelemetryReading t) {
     ui->telemetry_roll_value->setText(QString::number(t.magnetometer_.z_, 'f', UIConstants::PRECISION));
 }
 
+/**
+ * Qt SLOT for updating the color indicator on the logging label
+ *
+ * @param enabled True if logging is enabled, false otherwise
+ */
 void GSWidget::updateLoggingStatus(bool enabled) {
     QLabel *label = ui->status_logging;
     QPalette palette = label->palette();
@@ -173,6 +211,9 @@ void GSWidget::updateGroundStatus(float temperature, float pressure) {
     ui->ground_temperature_value->setText(QString::number(pressure, 'f', UIConstants::PRECISION));
 }
 
+/**
+ * Setup the container widget which will hold and display all the QCustomPlot objects
+ */
 void GSWidget::graphWidgetSetup() {
     QWidget *plotContainer = ui->plot_container;
 
@@ -189,8 +230,15 @@ void GSWidget::graphWidgetSetup() {
 
 }
 
+/**
+ * Setup style and layout for a given QCustomPlot object
+ *
+ * @param plot The QCustomPlot object for which to setup
+ * @param title The title for the plot
+ * @param color The color ot use to draw the plot
+ */
 void GSWidget::plotSetup(QCustomPlot *plot, QString title, QColor color) {
-    plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems);
+    plot->setInteractions(interactionItemsOnly_);
     plot->plotLayout()->clear();
 
     // TODO: check if needed on RaspberryPi3
@@ -204,6 +252,7 @@ void GSWidget::plotSetup(QCustomPlot *plot, QString title, QColor color) {
 
     axisRect->setRangeDrag(Qt::Horizontal);
     axisRect->setupFullAxesBox(true);
+    axisRect->setMarginGroup(QCP::msLeft | QCP::msRight, &plotMargin_);
 
     plot->plotLayout()->addElement(0, 0, titleText);
     plot->plotLayout()->addElement(1, 0, axisRect);
@@ -212,9 +261,6 @@ void GSWidget::plotSetup(QCustomPlot *plot, QString title, QColor color) {
     font.setPointSize(12);
     axisRect->axis(QCPAxis::atLeft, 0)->setTickLabelFont(font);
     axisRect->axis(QCPAxis::atBottom, 0)->setTickLabelFont(font);
-//    This may be useful when implementing event, so as to display them with 2 digits precision on the graph.
-//    topAxisRect->axis(QCPAxis::atBottom, 0)->setNumberFormat("f");
-//    topAxisRect->axis(QCPAxis::atBottom, 0)->setNumberPrecision(UserIfaceConstants::PRECISION);
     axisRect->axis(QCPAxis::atLeft, 0)->setTickLabelFont(font);
     axisRect->axis(QCPAxis::atBottom, 0)->setTickLabelFont(font);
 
@@ -234,6 +280,13 @@ void GSWidget::plotSetup(QCustomPlot *plot, QString title, QColor color) {
     g1->setPen(pen);
 }
 
+/**
+ * Called whenever a plottable object has been clicked. Adds a text label with the value of the function at the
+ * clicked point as well as a line pointing to it.
+ *
+ * @param plottable A pointer to the plottable which was clicked
+ * @param dataIndex The index in the graph's data array corresponding to the point clicked
+ */
 void GSWidget::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) {
 
     double dataValue = plottable->interface1D()->dataMainValue(dataIndex);
@@ -263,8 +316,7 @@ void GSWidget::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) {
 }
 
 void GSWidget::mouseWheelOnPlot() {
-    autoPlay_ = false;
-    ui->graph_autoplay_button->setChecked(false);
+    updateAutoPlay(false);
 
     // Make all plots respond to wheel events
     applyToAllPlots(
@@ -288,8 +340,15 @@ void GSWidget::mousePressOnPlot() {
     }
 }
 
-void GSWidget::updateAutoPlay(bool checked) {
-    autoPlay_ = checked;
+void GSWidget::updateAutoPlay(bool enable) {
+    autoPlay_ = enable;
+    ui->graph_autoplay_button->setChecked(enable);
+
+    applyToAllPlots(
+            [this, enable](QCustomPlot *p) {
+                p->setInteractions(enable ? interactionItemsOnly_ : interactionsAll_);
+            }
+    );
 }
 
 /**
@@ -325,11 +384,21 @@ void GSWidget::updatePlotSync(bool checked) {
     }
 }
 
+/**
+ * When called, removes all the QAbstractItems subclasses that were previously added to any QCustomPlot object
+ * @param checked
+ */
 void GSWidget::clearAllGraphItems(bool checked) {
     Q_UNUSED(checked);
     applyToAllPlots([](QCustomPlot *p) { p->clearItems(); });
 }
 
+/**
+ * Applies a lambda function to all the QCustomPlots objects of the UI.
+ *
+ * @param f The lambda function which will be applied to all plots. Should take a pointer to a QCustomPlot object and
+ * return void.
+ */
 void GSWidget::applyToAllPlots(const std::function<void(QCustomPlot *)> &f) {
     for (auto &plot : plotVector_) {
         f(plot);
@@ -373,6 +442,11 @@ void GSWidget::setReplayMode() {
     ui->replay_controls->show();
 }
 
+/**
+ * Captures user events such as keypresses and mouse clicks on the user interface
+ * @param event
+ * @return
+ */
 bool GSWidget::event(QEvent *event) {
     if (event->type() == QEvent::KeyPress) {
 

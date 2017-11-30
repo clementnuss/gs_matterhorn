@@ -87,6 +87,7 @@ private:
     Ui::GSWidget *ui;
     QCustomPlot *plot1_;
     QCustomPlot *plot2_;
+    QCPMarginGroup plotMargin_;
     std::vector<QCustomPlot *> plotVector_;
     QTimer clockTimer;
     chrono::system_clock::time_point lastGraphUpdate_;
@@ -94,6 +95,9 @@ private:
     bool autoPlay_;
     double lastRemoteTime_;
     double replayPlaybackSpeed_;
+
+    const QFlags<QCP::Interaction> interactionItemsOnly_ = QCP::iSelectItems;
+    const QFlags<QCP::Interaction> interactionsAll_ = QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems;
 };
 
 #endif // GSWIDGET_H
