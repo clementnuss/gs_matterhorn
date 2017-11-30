@@ -17,7 +17,7 @@ void main()
     // Calculate y value based upon input coordinates and time
     vec3 pos = vertexPosition;
 
-    pos.y = 500 * length(texture2D(heightTexture, texCoord).rgb);
+    pos.y = 260 * length(texture2D(heightTexture, texCoord).rgb);
 
     gl_Position = mvp * vec4( pos, 1.0 );
 }

@@ -4,6 +4,7 @@
 #include <3D/Billboards/Tracker.h>
 #include <3D/ForwardRenderer/ForwardRenderer.h>
 #include <3D/TraceReader.h>
+#include <iostream>
 #include "RootEntity.h"
 
 RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
@@ -42,12 +43,15 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     simTrace_ = new Line(this, QColor::fromRgb(255, 0, 0), true);
     TraceReader traceReader{40};
     QVector <QVector3D> traceData = traceReader.read({"../../ground_station/data/simulated_trajectory.csv"});
+
+    std::cout << traceData.size();
+
     new Tracker(traceData.last(), view->camera(), QUrl(QStringLiteral("qrc:/3D/textures/caret_down.png")),
                 QStringLiteral("SIMTRACE"),
                 this);
     simTrace_->appendData(traceData);
 
-    QVector3D gsPos{5, 2, 0};
+    QVector3D gsPos{50, 50, 0};
 
     new GroundStation(gsPos, camera, this);
 

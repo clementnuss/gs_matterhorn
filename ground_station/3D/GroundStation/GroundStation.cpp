@@ -18,8 +18,8 @@ GroundStation::GroundStation(QVector3D position, Qt3DRender::QCamera *camera, Qt
     m.translate(position_);
     transform_->setMatrix(m);
 
-    this->addComponent(mesh);
-    this->addComponent(material);
+    //this->addComponent(mesh);
+    //this->addComponent(material);
     this->addComponent(transform_);
 
     new Tracker(QVector3D{0, 1, 0}, camera,

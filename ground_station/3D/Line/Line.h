@@ -28,11 +28,14 @@ public:
 public slots:
 
 private:
+    void enforceLineResolution();
+
     Qt3DRender::QGeometryRenderer *geometryRenderer_;
     Qt3DRender::QGeometry *geometry_;
     Qt3DRender::QAttribute *attribute_;
-    Qt3DRender::QBuffer *buffer_;
-    int count_;
+    Qt3DRender::QBuffer *drawBuffer_;
+    QVector<QVector3D> lineData_;
+    int drawBufferCount_;
 };
 
 

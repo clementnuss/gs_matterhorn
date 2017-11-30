@@ -11,6 +11,8 @@ namespace OpenGLConstants {
     static constexpr int VERSION_MAJOR = 2;
     static constexpr int VERSION_MINOR = 1;
     static constexpr int ANISOTROPY_MAX = 8;
+    static constexpr int MAX_LINE_RESOLUTION = 500;
+    static constexpr int MAX_LINE_DATAPOINTS = 100000;
 }
 
 namespace PrintConstants {

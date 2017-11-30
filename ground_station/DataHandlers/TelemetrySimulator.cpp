@@ -72,7 +72,7 @@ vector<XYZReading> TelemetrySimulator::pollLocations() {
     vector<XYZReading> generatedVector{};
 
     long long millisSinceLastPoll = msecsBetween(timeOfLastPolledGeoData, now);
-    if (millisSinceLastPoll > TimeConstants::MSECS_IN_SEC / 2) {
+    if (millisSinceLastPoll > TimeConstants::MSECS_IN_SEC / 10) {
         timeOfLastPolledGeoData = now;
 
         long long int msecs = msecsBetween(timeOfInitialization, chrono::system_clock::now());
@@ -82,7 +82,7 @@ vector<XYZReading> TelemetrySimulator::pollLocations() {
         XYZReading r;
 
         r.x_ = 0;
-        r.y_ = 5 * log(x);
+        r.y_ = 50 * sqrt(x);
         r.z_ = -x;
 
         generatedVector.push_back(r);
