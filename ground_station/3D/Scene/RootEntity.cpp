@@ -20,7 +20,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     camera->setFieldOfView(45.0);
     camera->setNearPlane(0.1);
     camera->setFarPlane(100000.0);
-    camera->setPosition(QVector3D{-500.0, 2000.0, -400.0});
+    camera->setPosition(QVector3D{-5000.0, 2000.0, -4000.0});
     camera->setUpVector(QVector3D{0.0, 1.0, 0.0});
     camera->setViewCenter(QVector3D{0.0, 2000.0, 0.0});
 
