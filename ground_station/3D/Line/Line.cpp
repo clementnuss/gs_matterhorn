@@ -3,12 +3,12 @@
 #include "Line.h"
 
 
-Line::Line(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent),
-                                      geometryRenderer_{new Qt3DRender::QGeometryRenderer(this)},
-                                      geometry_{new Qt3DRender::QGeometry(this)},
-                                      attribute_{new Qt3DRender::QAttribute(this)},
-                                      buffer_{new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, this)},
-                                      count_{0} {
+Line::Line(Qt3DCore::QNode *parent, QColor &&color, bool isStatic) : Qt3DCore::QEntity(parent),
+                                                                     geometryRenderer_{new Qt3DRender::QGeometryRenderer(this)},
+                                                                     geometry_{new Qt3DRender::QGeometry(this)},
+                                                                     attribute_{new Qt3DRender::QAttribute(this)},
+                                                                     buffer_{new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, this)},
+                                                                     count_{0} {
 
     // Build effect
     auto *shaderProgram = new Qt3DRender::QShaderProgram(this);
@@ -36,9 +36,11 @@ Line::Line(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent),
     effect->addTechnique(technique);
 
     auto *material = new Qt3DRender::QMaterial(this);
+    material->addParameter(new Qt3DRender::QParameter("lineColor", color, this));
     material->setEffect(effect);
 
     //Build GeometryRenderer
+    buffer_->setUsage(isStatic ? Qt3DRender::QBuffer::StaticDraw : Qt3DRender::QBuffer::DynamicDraw);
     attribute_->setName("vertexPosition");
     attribute_->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
     attribute_->setVertexBaseType(Qt3DRender::QAttribute::Float);

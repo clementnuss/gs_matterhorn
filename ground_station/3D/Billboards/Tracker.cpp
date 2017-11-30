@@ -20,5 +20,6 @@ Tracker::Tracker(QVector3D position, Qt3DRender::QCamera *camera,
 void Tracker::updatePosition(QVector3D newPosition) {
     QMatrix4x4 m{};
     m.translate(newPosition);
+    m.scale(100, 100, 100);
     transform_->setMatrix(m);
 }

@@ -21,6 +21,7 @@ private:
     Qt3DExtras::QFirstPersonCameraController *cameraController_;
     Tracker *rocketTracker_;
     Line *rocketTrace_;
+    Line *simTrace_;
 };
 
 #endif //GS_MATTERHORN_ROOTENTITY_H

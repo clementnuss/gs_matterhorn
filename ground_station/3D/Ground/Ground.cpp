@@ -3,6 +3,11 @@
 #include <3D/Utils.h>
 #include "Ground.h"
 
+/**
+ * 1000x1000 units terrain surface. Correspond to meters
+ *
+ * @param parent The QNode parent to which to attach this entity. Will usually be the scene root.
+ */
 Ground::Ground(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent),
                                           transform_{new Qt3DCore::QTransform(this)} {
     // Build effect
@@ -47,8 +52,8 @@ Ground::Ground(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent),
 
     // Set up mesh
     auto *mesh = new Qt3DExtras::QPlaneMesh(this);
-    mesh->setHeight(100);
-    mesh->setWidth(100);
+    mesh->setHeight(10000);
+    mesh->setWidth(10000);
     mesh->setMeshResolution(QSize{100, 100});
 
     this->addComponent(mesh);
