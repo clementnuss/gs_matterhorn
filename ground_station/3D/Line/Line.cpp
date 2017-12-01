@@ -4,28 +4,29 @@
 
 
 Line::Line(Qt3DCore::QNode *parent, QColor &&color, bool isStatic) : Qt3DCore::QEntity(parent),
-                                                                     geometryRenderer_{new Qt3DRender::QGeometryRenderer(this)},
-                                                                     geometry_{new Qt3DRender::QGeometry(this)},
-                                                                     attribute_{new Qt3DRender::QAttribute(this)},
+                                                                     geometryRenderer_{
+                                                                             new Qt3DRender::QGeometryRenderer()},
+                                                                     geometry_{new Qt3DRender::QGeometry()},
+                                                                     attribute_{new Qt3DRender::QAttribute()},
                                                                      drawBuffer_{new Qt3DRender::QBuffer(
-                                                                             Qt3DRender::QBuffer::VertexBuffer, this)},
+                                                                             Qt3DRender::QBuffer::VertexBuffer)},
                                                                      drawBufferCount_{0},
                                                                      lineData_{} {
 
     // Build effect
-    auto *shaderProgram = new Qt3DRender::QShaderProgram(this);
+    auto *shaderProgram = new Qt3DRender::QShaderProgram();
     shaderProgram->setVertexShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/line.vert"}));
     shaderProgram->setFragmentShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/line.frag"}));
 
-    auto *renderPass = new Qt3DRender::QRenderPass(this);
+    auto *renderPass = new Qt3DRender::QRenderPass();
 
     renderPass->setShaderProgram(shaderProgram);
 
-    auto *filterKey = new Qt3DRender::QFilterKey(this);
+    auto *filterKey = new Qt3DRender::QFilterKey();
     filterKey->setName("renderingStyle");
     filterKey->setValue("forward");
 
-    auto *technique = new Qt3DRender::QTechnique(this);
+    auto *technique = new Qt3DRender::QTechnique();
     technique->graphicsApiFilter()->setApi(Qt3DRender::QGraphicsApiFilter::OpenGL);
     technique->graphicsApiFilter()->setMajorVersion(OpenGLConstants::VERSION_MAJOR);
     technique->graphicsApiFilter()->setMinorVersion(OpenGLConstants::VERSION_MINOR);
@@ -34,11 +35,11 @@ Line::Line(Qt3DCore::QNode *parent, QColor &&color, bool isStatic) : Qt3DCore::Q
     technique->addFilterKey(filterKey);
     technique->addRenderPass(renderPass);
 
-    auto *effect = new Qt3DRender::QEffect(this);
+    auto *effect = new Qt3DRender::QEffect();
     effect->addTechnique(technique);
 
-    auto *material = new Qt3DRender::QMaterial(this);
-    material->addParameter(new Qt3DRender::QParameter("lineColor", color, this));
+    auto *material = new Qt3DRender::QMaterial();
+    material->addParameter(new Qt3DRender::QParameter("lineColor", color));
     material->setEffect(effect);
 
     //Build GeometryRenderer

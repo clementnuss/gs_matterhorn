@@ -8,18 +8,12 @@
 GroundStation::GroundStation(QVector3D position, Qt3DRender::QCamera *camera, Qt3DCore::QNode *parent)
         : Qt3DCore::QEntity(parent),
           position_{position},
-          transform_{new Qt3DCore::QTransform(this)} {
-
-
-    auto *mesh = new Qt3DExtras::QCuboidMesh(this);
-    auto *material = new Qt3DExtras::QPhongMaterial(this);
+          transform_{new Qt3DCore::QTransform()} {
 
     QMatrix4x4 m{};
     m.translate(position_);
     transform_->setMatrix(m);
 
-    //this->addComponent(mesh);
-    //this->addComponent(material);
     this->addComponent(transform_);
 
     new Tracker(QVector3D{0, 1, 0}, camera,

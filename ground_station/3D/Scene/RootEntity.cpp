@@ -23,7 +23,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     camera->setUpVector(QVector3D{0.0, 1.0, 0.0});
     camera->setViewCenter(QVector3D{0.0, 2000.0, 0.0});
 
-    auto *renderSettings = new Qt3DRender::QRenderSettings(this);
+    auto *renderSettings = new Qt3DRender::QRenderSettings();
     auto *forwardRenderer = new ForwardRenderer(view, renderSettings);
     renderSettings->setActiveFrameGraph(forwardRenderer);
 

@@ -9,7 +9,9 @@ uniform mat4 mvp;
 
 void main()
 {
+    // Flipped texture coordinates
     texCoord = vertexTexCoord;
+    texCoord.x = 1.0 - texCoord.x;
 
     gl_Position = mvp * vec4(vertexPosition, 1.0);
 }

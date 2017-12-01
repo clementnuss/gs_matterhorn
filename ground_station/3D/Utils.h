@@ -5,25 +5,27 @@
 #include <Qt3DCore>
 #include <Qt3DRender>
 #include <ProgramConstants.h>
+#include <iostream>
 
-static Qt3DRender::QTexture2D *loadTextureImage(const QUrl &textureUrl, Qt3DCore::QNode *owner) {
-    auto *texture2D = new Qt3DRender::QTexture2D(owner);
+static Qt3DRender::QTexture2D *loadTextureImage(const QUrl &textureUrl) {
+    auto *texture2D = new Qt3DRender::QTexture2D();
     auto *textureImage = new Qt3DRender::QTextureImage();
 
     textureImage->setSource(textureUrl);
 
     texture2D->setMinificationFilter(Qt3DRender::QTexture2D::LinearMipMapLinear);
     texture2D->setMagnificationFilter(Qt3DRender::QTexture2D::Linear);
-    texture2D->setWrapMode(Qt3DRender::QTextureWrapMode{Qt3DRender::QTextureWrapMode::ClampToEdge, owner});
+    texture2D->setWrapMode(Qt3DRender::QTextureWrapMode{Qt3DRender::QTextureWrapMode::ClampToEdge});
     texture2D->setGenerateMipMaps(true);
     texture2D->setMaximumAnisotropy(OpenGLConstants::ANISOTROPY_MAX);
+
     texture2D->addTextureImage(textureImage);
 
     return texture2D;
 }
 
-static Qt3DRender::QTechnique *buildTechnique(Qt3DCore::QNode *owner) {
-    Qt3DRender::QTechnique *technique = new Qt3DRender::QTechnique(owner);
+static Qt3DRender::QTechnique *buildTechnique() {
+    auto *technique = new Qt3DRender::QTechnique();
     technique->graphicsApiFilter()->setApi(Qt3DRender::QGraphicsApiFilter::OpenGL);
     technique->graphicsApiFilter()->setMajorVersion(OpenGLConstants::VERSION_MAJOR);
     technique->graphicsApiFilter()->setMinorVersion(OpenGLConstants::VERSION_MINOR);

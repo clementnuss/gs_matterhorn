@@ -6,49 +6,52 @@ const QVector3D Marker::basePosition_{0, 0, 0};
 
 Marker::Marker(QUrl textureUrl, QVector3D offset, Qt3DRender::QCamera *camera, Qt3DCore::QNode *parent)
         : Qt3DCore::QEntity(parent),
-          camera_{camera}, offset_{offset}, transform_{new Qt3DCore::QTransform(this)} {
+          camera_{camera}, offset_{offset}, transform_{new Qt3DCore::QTransform()} {
     // Build effect
-    auto *shaderProgram = new Qt3DRender::QShaderProgram(this);
+    auto *shaderProgram = new Qt3DRender::QShaderProgram();
     shaderProgram->setVertexShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/marker.vert"}));
     shaderProgram->setFragmentShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/DShader.frag"}));
 
-    auto *blendEquationArguments = new Qt3DRender::QBlendEquationArguments(this);
+    auto *blendEquationArguments = new Qt3DRender::QBlendEquationArguments();
     blendEquationArguments->setSourceAlpha(Qt3DRender::QBlendEquationArguments::One);
     blendEquationArguments->setDestinationAlpha(Qt3DRender::QBlendEquationArguments::OneMinusSourceAlpha);
     blendEquationArguments->setSourceRgb(Qt3DRender::QBlendEquationArguments::SourceAlpha);
     blendEquationArguments->setDestinationRgb(Qt3DRender::QBlendEquationArguments::OneMinusSourceAlpha);
 
-    auto *renderPass = new Qt3DRender::QRenderPass(this);
+    auto *renderPass = new Qt3DRender::QRenderPass();
     renderPass->setShaderProgram(shaderProgram);
     renderPass->addRenderState(blendEquationArguments);
 
-    auto *filterKey = new Qt3DRender::QFilterKey(this);
+    auto *filterKey = new Qt3DRender::QFilterKey();
     filterKey->setName("renderingStyle");
     filterKey->setValue("forward");
 
-    auto *technique = buildTechnique(this);
+    auto *technique = buildTechnique();
 
     technique->addFilterKey(filterKey);
     technique->addRenderPass(renderPass);
 
-    auto *effect = new Qt3DRender::QEffect(this);
+    auto *effect = new Qt3DRender::QEffect();
     effect->addTechnique(technique);
 
     // Set up material
-    auto *diffuseParam = new Qt3DRender::QParameter(this);
-    auto *diffuseTexture = loadTextureImage(textureUrl, this);
+    auto *diffuseParam = new Qt3DRender::QParameter();
+    auto *diffuseTexture = loadTextureImage(textureUrl);
     diffuseParam->setName(QStringLiteral("diffuseTexture"));
     diffuseParam->setValue(QVariant::fromValue(diffuseTexture));
 
-    auto *material = new Qt3DRender::QMaterial(this);
+    auto *material = new Qt3DRender::QMaterial();
     material->setEffect(effect);
     material->addParameter(diffuseParam);
 
     // Set up mesh
-    auto *mesh = new Qt3DExtras::QPlaneMesh(this);
-    mesh->setHeight(2);
-    mesh->setWidth(2);
+    auto *mesh = new Qt3DExtras::QPlaneMesh();
+    mesh->setHeight(diffuseTexture->height());
+    mesh->setWidth(diffuseTexture->width());
     mesh->setMeshResolution(QSize{2, 2});
+
+    std::cout << diffuseTexture->height() << std::endl;
+    std::cout << diffuseTexture->width() << std::endl;
 
     // Set up transform
     updateTransform();
