@@ -4,7 +4,8 @@
 
 const QVector3D Marker::basePosition_{0, 0, 0};
 
-Marker::Marker(QUrl textureUrl, QVector3D offset, Qt3DRender::QCamera *camera, Qt3DCore::QNode *parent)
+Marker::Marker(QUrl textureUrl, float width, float height, QVector3D offset, Qt3DRender::QCamera *camera,
+               Qt3DCore::QNode *parent)
         : Qt3DCore::QEntity(parent),
           camera_{camera}, offset_{offset}, transform_{new Qt3DCore::QTransform()} {
     // Build effect
@@ -46,12 +47,9 @@ Marker::Marker(QUrl textureUrl, QVector3D offset, Qt3DRender::QCamera *camera, Q
 
     // Set up mesh
     auto *mesh = new Qt3DExtras::QPlaneMesh();
-    mesh->setHeight(diffuseTexture->height());
-    mesh->setWidth(diffuseTexture->width());
+    mesh->setWidth(width);
+    mesh->setHeight(height);
     mesh->setMeshResolution(QSize{2, 2});
-
-    std::cout << diffuseTexture->height() << std::endl;
-    std::cout << diffuseTexture->width() << std::endl;
 
     // Set up transform
     updateTransform();

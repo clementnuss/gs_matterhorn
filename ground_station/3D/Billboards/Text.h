@@ -7,7 +7,7 @@
 #include <Qt3DRender>
 #include <Qt3DCore/QNode>
 
-class Text : public Qt3DCore::QEntity {
+class Text : public Qt3DExtras::QText2DEntity {
 Q_OBJECT
 public:
     explicit Text(QString text, QVector3D offset, Qt3DRender::QCamera *camera, Qt3DCore::QNode *parent);

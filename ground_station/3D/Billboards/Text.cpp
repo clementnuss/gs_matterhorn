@@ -5,10 +5,10 @@
 const QVector3D Text::basePosition_{0, 0, 0};
 
 Text::Text(QString text, QVector3D offset, Qt3DRender::QCamera *camera, Qt3DCore::QNode *parent) :
-        Qt3DCore::QEntity(parent),
+        Qt3DExtras::QText2DEntity(parent),
         camera_{camera},
         offset_{offset},
-        transform_{new Qt3DCore::QTransform(this)},
+        transform_{new Qt3DCore::QTransform()},
         font_{} {
 
     // Set up mesh
@@ -19,11 +19,10 @@ Text::Text(QString text, QVector3D offset, Qt3DRender::QCamera *camera, Qt3DCore
     qreal margin = textMetrics.width('_');
     rect.adjust(-margin, margin, margin, margin);
 
-    auto *textEntity = new Qt3DExtras::QText2DEntity(this);
-    textEntity->setText(text);
-    textEntity->setWidth(rect.width());
-    textEntity->setHeight(rect.height());
-    textEntity->setFont(font_);
+    setText(text);
+    setWidth(rect.width());
+    setHeight(rect.height());
+    setFont(font_);
 
 
     // Set up transform

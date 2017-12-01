@@ -37,12 +37,12 @@ Ground::Ground(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent),
 
     // Set up material
     auto *diffuseParam = new Qt3DRender::QParameter();
-    auto *diffuseTexture = loadTextureImage(QUrl{"qrc:3D/textures/default.jpg"});
+    auto *diffuseTexture = loadTextureImage(QUrl{"qrc:3D/textures/diffusemap_photo_1024.jpg"});
     diffuseParam->setName(QStringLiteral("diffuseTexture"));
     diffuseParam->setValue(QVariant::fromValue(diffuseTexture));
 
     auto *heightParam = new Qt3DRender::QParameter();
-    auto *heightTexture = loadTextureImage(QUrl{"qrc:3D/textures/default.jpg"});
+    auto *heightTexture = loadTextureImage(QUrl{"qrc:3D/textures/heightmap_1024.jpg"});
     heightParam->setName(QStringLiteral("heightTexture"));
     heightParam->setValue(QVariant::fromValue(heightTexture));
 

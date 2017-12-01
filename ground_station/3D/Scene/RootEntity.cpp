@@ -34,8 +34,10 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     new Ground(this);
     rocketTracker_ = new Tracker(QVector3D{0, 20, 0}, view->camera(),
-                                 QUrl(QStringLiteral("qrc:/3D/textures/caret_down.png")), QStringLiteral("ROCKET"),
+                                 QUrl(QStringLiteral("qrc:/3D/textures/caret_down.png")),
+                                 QUrl(QStringLiteral("qrc:/3D/textures/text/ground_station.png")),
                                  this);
+
     rocketTrace_ = new Line(this, QColor::fromRgb(255, 255, 255), false);
 
     // Initialise simulated rocket trace
@@ -44,7 +46,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     QVector <QVector3D> traceData = traceReader.read({"../../ground_station/data/simulated_trajectory.csv"});
 
     new Tracker(traceData.last(), view->camera(), QUrl(QStringLiteral("qrc:/3D/textures/caret_down.png")),
-                QStringLiteral("SIMTRACE"),
+                QUrl(QStringLiteral("qrc:/3D/textures/text/ground_station.png")),
                 this);
     simTrace_->appendData(traceData);
 
