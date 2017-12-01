@@ -8,7 +8,7 @@
 
 static Qt3DRender::QTexture2D *loadTextureImage(const QUrl &textureUrl, Qt3DCore::QNode *owner) {
     auto *texture2D = new Qt3DRender::QTexture2D(owner);
-    auto *textureImage = new Qt3DRender::QTextureImage(texture2D);
+    auto *textureImage = new Qt3DRender::QTextureImage();
 
     textureImage->setSource(textureUrl);
 

@@ -19,7 +19,7 @@ public slots:
 
 private:
     Marker *marker_;
-    Text *text_;
+    Marker *text_;
 
     Qt3DCore::QTransform *transform_;
     static const QVector3D textOffset_;
