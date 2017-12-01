@@ -4,14 +4,13 @@
 
 
 #include <3D/Billboards/Marker.h>
-#include <3D/Billboards/Text.h>
 
 
 class Tracker : public Qt3DCore::QEntity {
 Q_OBJECT
 public:
     explicit Tracker(QVector3D position, Qt3DRender::QCamera *camera,
-                     QUrl textureUrl, QUrl textUrl, Qt3DCore::QNode *parent);
+                     QUrl textureUrl, QUrl textUrl, QString text, Qt3DCore::QNode *parent);
 
 public slots:
 

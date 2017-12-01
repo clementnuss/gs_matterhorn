@@ -19,6 +19,7 @@ GroundStation::GroundStation(QVector3D position, Qt3DRender::QCamera *camera, Qt
     new Tracker(QVector3D{0, 1, 0}, camera,
                 QUrl(QStringLiteral("qrc:/3D/textures/double_down_arrow.png")),
                 QUrl(QStringLiteral("qrc:/3D/textures/text/ground_station.png")),
+                QStringLiteral("GROUND STATION"),
                 this);
 }
 
