@@ -4,6 +4,7 @@
 #include <3D/Billboards/Tracker.h>
 #include <3D/ForwardRenderer/ForwardRenderer.h>
 #include <3D/TraceReader.h>
+#include <3D/Text3D.h>
 #include "RootEntity.h"
 
 RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
@@ -62,6 +63,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     new GroundStation(gsPos, camera, this);
 
+    new Text3D("HELLO WORLD", {100, 100, 1}, camera, this);
 }
 
 void RootEntity::updateRocketTracker(const QVector<QVector3D> &positions) {
