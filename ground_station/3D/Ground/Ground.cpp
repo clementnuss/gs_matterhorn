@@ -2,7 +2,6 @@
 #include <ProgramConstants.h>
 #include <3D/Utils.h>
 #include "Ground.h"
-#include "HighlightArea.h"
 
 /**
  * 1000x1000 units terrain surface. Correspond to meters
@@ -10,7 +9,8 @@
  * @param parent The QNode parent to which to attach this entity. Will usually be the scene root.
  */
 Ground::Ground(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent),
-                                          transform_{new Qt3DCore::QTransform()} {
+                                          transform_{new Qt3DCore::QTransform()},
+                                          highlightedArea_{nullptr} {
     // Build effect
     auto *shaderProgram = new Qt3DRender::QShaderProgram();
     shaderProgram->setVertexShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/terrain.vert"}));
@@ -61,5 +61,10 @@ Ground::Ground(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent),
     this->addComponent(material);
 
     // Add highlighted surface
-    new HighlightArea(heightParam, this);
+    highlightedArea_ = new HighlightArea(heightParam, this);
+}
+
+
+void Ground::highlightArea(const QVector2D &areaCenter) {
+    highlightedArea_->updatePos(areaCenter);
 }

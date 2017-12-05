@@ -15,6 +15,14 @@ namespace OpenGLConstants {
     static constexpr int MAX_LINE_DATAPOINTS = 100000;
 }
 
+namespace PredictorConstants {
+    static constexpr float FAST_DESCENT_RATE = 25.0;
+    static constexpr float SLOW_DESCENT_RATE = 5.0;
+    static constexpr float PARACHUTE_DEPLOYMENT_ALTITUDE = 450.0;
+    static constexpr float WIND_DRAG_FACTOR = 1.0;
+    static constexpr int PREDICTION_TIME_INTERVAL = 1;
+}
+
 namespace PrintConstants {
     static constexpr int PRECISION = 4;
     static constexpr int FIELD_WIDTH = 12;

@@ -4,7 +4,7 @@
 #include <3D/Billboards/Tracker.h>
 #include <3D/ForwardRenderer/ForwardRenderer.h>
 #include <3D/TraceReader.h>
-#include <3D/Text3D.h>
+#include <3D/Objects/SplashDownPredictor.h>
 #include "RootEntity.h"
 
 RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
@@ -33,7 +33,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     cameraController_->setCamera(camera);
     cameraController_->setLinearSpeed(1000.0);
 
-    new Ground(this);
+    auto *ground = new Ground(this);
     rocketTracker_ = new Tracker(QVector3D{0, 20, 0}, view->camera(),
                                  QUrl(QStringLiteral("qrc:/3D/textures/caret_down.png")),
                                  QUrl(QStringLiteral("qrc:/3D/textures/text/rocket.png")),
@@ -55,7 +55,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     simTrace_->appendData(traceData);
 
     // Initialise
-    splashDownTrace_ = new Line(this, QColor::fromRgb(255, 153, 0), true);
+    splashDownTrace_ = new Line(this, QColor::fromRgb(255, 255, 255), true);
     splashDownTrace_->appendData(traceData.last());
     splashDownTrace_->appendData({traceData.last().x(), 0, traceData.last().z()});
 
@@ -63,7 +63,11 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     new GroundStation(gsPos, camera, this);
 
-    new Text3D("HELLO WORLD", {100, 100, 1}, camera, this);
+    SplashDownPredictor splashDownPredictor{this};
+    splashDownPredictor.updatePos(traceData.last());
+
+    ground->highlightArea(splashDownPredictor.getTouchdownCoordinates());
+
 }
 
 void RootEntity::updateRocketTracker(const QVector<QVector3D> &positions) {

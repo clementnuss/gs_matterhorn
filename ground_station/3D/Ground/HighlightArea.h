@@ -12,6 +12,8 @@ Q_OBJECT
 public:
     explicit HighlightArea(Qt3DRender::QParameter *heightParameter, Qt3DCore::QNode *parent);
 
+    void updatePos(const QVector2D &pos);
+
 public slots:
 
 private:

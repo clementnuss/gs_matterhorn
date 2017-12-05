@@ -53,3 +53,7 @@ HighlightArea::HighlightArea(Qt3DRender::QParameter *heightParameter, Qt3DCore::
     this->addComponent(material);
     this->addComponent(transform_);
 }
+
+void HighlightArea::updatePos(const QVector2D &pos) {
+    transform_->setTranslation(QVector3D{pos.x(), 50, pos.y()});
+}
