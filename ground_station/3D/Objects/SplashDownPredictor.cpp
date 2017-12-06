@@ -1,21 +1,40 @@
 
 #include <ProgramConstants.h>
+#include <DataStructures/datastructs.h>
+#include <FileReader.h>
+#include <Utilities/ReaderUtils.h>
 #include "SplashDownPredictor.h"
 
-SplashDownPredictor::SplashDownPredictor(Qt3DCore::QNode *parent) :
+SplashDownPredictor::SplashDownPredictor(std::string &path, Qt3DCore::QNode *parent) :
         windTable_{}, predictorPos_{0, 0, 0}, trajectoryEstimations_{}, descentSpeed_{0},
-        trajectoryLine_{new Line(parent, QColor::fromRgb(255, 153, 0))}, searchIndex_{0} {
+        trajectoryLine_{new Line(parent, QColor::fromRgb(255, 153, 0))}, searchIndex_{0}, predictionPath_{path} {
 
-    windTable_.push_back({3000, QVector2D{10, 0}});
-    windTable_.push_back({2500, QVector2D{5, 2}});
-    windTable_.push_back({2290, QVector2D{2, 5}});
-    windTable_.push_back({2000, QVector2D{0, 10}});
-    windTable_.push_back({1700, QVector2D{0, 10}});
-    windTable_.push_back({1300, QVector2D{0, 10}});
-    windTable_.push_back({1000, QVector2D{0, 5}});
-    windTable_.push_back({600, QVector2D{0, -5}});
-    windTable_.push_back({400, QVector2D{0, -10}});
+    loadPredictions();
 
+}
+
+void SplashDownPredictor::loadPredictions() {
+    FileReader<WindPrediction> predictionReader{predictionPath_, windPredictionFromString};
+
+    QVector<WindPrediction> predictions = predictionReader.readFile();
+
+    for (auto prediction : predictions) {
+        windTable_.push_back(
+                {
+                        static_cast<int>(prediction.altitude_),
+                        dataToWindVector(prediction.speed_, prediction.direction_)
+                }
+        );
+    }
+
+    // Sort the table by decreasing altitude
+    qSort(windTable_.begin(), windTable_.end(),
+          [](const QPair<int, QVector2D> &p1, const QPair<int, QVector2D> &p2) { return p1.first > p2.first; });
+
+    std::cout << ".." << std::endl;
+    for (auto pair : windTable_) {
+        std::cout << pair.first << " " << pair.second.x() << " " << pair.second.y() << std::endl;
+    }
 }
 
 QVector2D SplashDownPredictor::getTouchdownCoordinates() {
@@ -73,4 +92,19 @@ QVector2D SplashDownPredictor::windVectorForAltitude(float alt) {
         return windTable_[searchIndex_ - 1].second;
     }
 
+}
+
+/**
+ * Creates a QVector2D given a wind direction and wind speed
+ *
+ * @param windSpeed Wind speed in meters per second
+ * @param windDirection Wind direction in degrees relative to North, clockwise
+ * @return A QVector2D representing the wind speed on each OpenGL axis
+ */
+QVector2D SplashDownPredictor::dataToWindVector(const float windSpeed, const float windDirection) {
+
+    // OpenGL x axis is aligned with north. Direction angles are specified relative to north, going clockwise
+
+    float rads = -((M_PI / 180) * windDirection);
+    return {sin(rads) * windSpeed, cos(rads) * windSpeed};
 }

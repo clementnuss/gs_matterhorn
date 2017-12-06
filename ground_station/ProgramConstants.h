@@ -6,6 +6,9 @@
 #include "CRC/CRC.h"
 
 //#define DEBUG true
+namespace UnitsConstants {
+    static constexpr float KNOTS_TO_MS = 0.514444;
+}
 
 namespace OpenGLConstants {
     static constexpr int VERSION_MAJOR = 2;
@@ -21,6 +24,10 @@ namespace PredictorConstants {
     static constexpr float PARACHUTE_DEPLOYMENT_ALTITUDE = 450.0;
     static constexpr float WIND_DRAG_FACTOR = 1.0;
     static constexpr int PREDICTION_TIME_INTERVAL = 1;
+}
+
+namespace FileConstants {
+    static constexpr int WIND_PREDICTIONS_HEADER_LINES_COUNT = 4;
 }
 
 namespace PrintConstants {

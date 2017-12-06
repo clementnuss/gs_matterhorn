@@ -3,8 +3,10 @@
 #include <3D/GroundStation/GroundStation.h>
 #include <3D/Billboards/Tracker.h>
 #include <3D/ForwardRenderer/ForwardRenderer.h>
-#include <3D/TraceReader.h>
 #include <3D/Objects/SplashDownPredictor.h>
+#include <3D/Objects/OpenGL3DAxes.h>
+#include <Utilities/ReaderUtils.h>
+#include <FileReader.h>
 #include "RootEntity.h"
 
 RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
@@ -44,8 +46,11 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     // Initialise simulated rocket trace
     simTrace_ = new Line(this, QColor::fromRgb(255, 0, 0), true);
-    TraceReader traceReader{40};
-    QVector <QVector3D> traceData = traceReader.read({"../../ground_station/data/simulated_trajectory.csv"});
+
+    std::string tracePath{"../../ground_station/data/simulated_trajectory.csv"};
+    FileReader<QVector3D> traceReader{tracePath, posFromString};
+
+    QVector<QVector3D> traceData = traceReader.readFile();
 
     new Tracker(traceData.last(), view->camera(),
                 QUrl(QStringLiteral("qrc:/3D/textures/caret_down.png")),
@@ -63,10 +68,15 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     new GroundStation(gsPos, camera, this);
 
-    SplashDownPredictor splashDownPredictor{this};
+    std::string meteoPath{"../../ground_station/MeteoData/meteo_payerne_test.txt"};
+    SplashDownPredictor splashDownPredictor{meteoPath, this};
     splashDownPredictor.updatePos(traceData.last());
 
     ground->highlightArea(splashDownPredictor.getTouchdownCoordinates());
+
+
+    new OpenGL3DAxes(this);
+
 
 }
 

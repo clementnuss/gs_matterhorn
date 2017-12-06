@@ -10,22 +10,26 @@
 
 class SplashDownPredictor {
 public:
-    SplashDownPredictor(Qt3DCore::QNode *parent);
+    SplashDownPredictor(std::string &path, Qt3DCore::QNode *parent);
 
     void updatePos(const QVector3D &pos);
 
     QVector2D getTouchdownCoordinates();
 
 private:
+    void loadPredictions();
     void recomputePrediction();
 
     QVector2D windVectorForAltitude(float alt);
+
+    QVector2D dataToWindVector(const float windSpeed, const float windAngle);
 
     QVector<QPair<int, QVector2D>> windTable_;
     QVector3D predictorPos_;
     QVector<QVector3D> trajectoryEstimations_;
     float descentSpeed_;
     Line *trajectoryLine_;
+    std::string predictionPath_;
 
     int searchIndex_;
 };
