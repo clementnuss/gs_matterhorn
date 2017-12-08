@@ -5,19 +5,18 @@
 #include <Qt3DCore/QTransform>
 #include <Qt3DRender/QCamera>
 #include "Text3D.h"
-#include "Utils.h"
+#include "3D/Utils.h"
 
 
 const QVector3D Text3D::basePosition_{0, 0, 0};
 
 //TODO: Implement common class for billboards
 //TODO: change shader name to uniform color shader
-Text3D::Text3D(QString text, QVector3D scale, Qt3DRender::QCamera *camera, Qt3DCore::QNode *parent) : QEntity(parent),
-                                                                                                      transform_{
-                                                                                                              new Qt3DCore::QTransform()},
-                                                                                                      camera_{camera},
-                                                                                                      scale_{scale},
-                                                                                                      offset_{0, 0, 0} {
+Text3D::Text3D(QString text, Qt3DRender::QCamera *camera, QVector3D &offsetToParent, Qt3DCore::QNode *parent) :
+        QEntity(parent),
+        transform_{new Qt3DCore::QTransform()},
+        camera_{camera},
+        offset_{offsetToParent} {
     // Build effect
     auto *shaderProgram = new Qt3DRender::QShaderProgram();
     shaderProgram->setVertexShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/line.vert"}));
@@ -47,10 +46,10 @@ Text3D::Text3D(QString text, QVector3D scale, Qt3DRender::QCamera *camera, Qt3DC
 
     test->setFont({"Times", 18, QFont::Bold});
     test->setText(text);
-    test->setDepth(2);
+    test->setDepth(0.1);
 
     auto *transform = new Qt3DCore::QTransform();
-    transform->setScale3D(scale);
+    transform->setTranslation(offset_);
 
     this->addComponent(test);
     this->addComponent(transform_);
@@ -63,7 +62,6 @@ Text3D::Text3D(QString text, QVector3D scale, Qt3DRender::QCamera *camera, Qt3DC
 void Text3D::updateTransform() {
     QMatrix4x4 t{};
     // Make it face camera since default is like laying flat on ground
-    t.scale(scale_);
     t.translate(offset_);
     transform_->setMatrix(billboardMV(basePosition_, camera_->viewMatrix()) * t);
 }

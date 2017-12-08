@@ -10,7 +10,8 @@
 class Marker : public Qt3DCore::QEntity {
 Q_OBJECT
 public:
-    explicit Marker(QUrl textureUrl, float width, float height, QVector3D offset, Qt3DRender::QCamera *camera,
+    explicit Marker(Qt3DRender::QTexture2D *texture, float width, float height, QVector3D offset,
+                    Qt3DRender::QCamera *camera,
                     Qt3DCore::QNode *parent);
 
 public slots:

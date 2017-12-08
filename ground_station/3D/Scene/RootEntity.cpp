@@ -7,6 +7,8 @@
 #include <3D/Objects/OpenGL3DAxes.h>
 #include <Utilities/ReaderUtils.h>
 #include <FileReader.h>
+#include <3D/Utils.h>
+#include <3D/Objects/Ruler.h>
 #include "RootEntity.h"
 
 RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
@@ -35,12 +37,17 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     cameraController_->setCamera(camera);
     cameraController_->setLinearSpeed(1000.0);
 
+
+    Qt3DRender::QTexture2D *caretDownTexture = loadTextureImage(
+            QUrl{QStringLiteral("qrc:/3D/textures/caret_down.png")});
+    Qt3DRender::QTexture2D *angleLeftTexture = loadTextureImage(
+            QUrl{QStringLiteral("qrc:/3D/textures/angle-left.png")});
+    Qt3DRender::QTexture2D *dblArrowDownTexture = loadTextureImage(
+            QUrl{QStringLiteral("qrc:/3D/textures/double_down_arrow.png")});
+
     auto *ground = new Ground(this);
-    rocketTracker_ = new Tracker(QVector3D{0, 20, 0}, view->camera(),
-                                 QUrl(QStringLiteral("qrc:/3D/textures/caret_down.png")),
-                                 QUrl(QStringLiteral("qrc:/3D/textures/text/rocket.png")),
-                                 QStringLiteral("ROCKET"),
-                                 this);
+    rocketTracker_ = new Tracker(QVector3D{0, 20, 0}, view->camera(), caretDownTexture, QStringLiteral("ROCKET"), this,
+                                 OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_RIGHT);
 
     rocketTrace_ = new Line(this, QColor::fromRgb(255, 255, 255), false);
 
@@ -52,21 +59,14 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     QVector<QVector3D> traceData = traceReader.readFile();
 
-    new Tracker(traceData.last(), view->camera(),
-                QUrl(QStringLiteral("qrc:/3D/textures/caret_down.png")),
-                QUrl(QStringLiteral("qrc:/3D/textures/text/sim.png")),
-                QStringLiteral("SIM"),
-                this);
-    simTrace_->appendData(traceData);
 
-    // Initialise
-    splashDownTrace_ = new Line(this, QColor::fromRgb(255, 255, 255), true);
-    splashDownTrace_->appendData(traceData.last());
-    splashDownTrace_->appendData({traceData.last().x(), 0, traceData.last().z()});
+    new Tracker(traceData.last(), view->camera(), caretDownTexture, QStringLiteral("SIM"), this,
+                OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_RIGHT);
+    simTrace_->appendData(traceData);
 
     QVector3D gsPos{50, 50, 0};
 
-    new GroundStation(gsPos, camera, this);
+    new GroundStation(gsPos, dblArrowDownTexture, camera, this);
 
     std::string meteoPath{"../../ground_station/MeteoData/meteo_payerne_test.txt"};
     SplashDownPredictor splashDownPredictor{meteoPath, this};
@@ -76,7 +76,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
 
     new OpenGL3DAxes(this);
-
+    new Ruler(traceData.last(), view->camera(), angleLeftTexture, this);
 
 }
 

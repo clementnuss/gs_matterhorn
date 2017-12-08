@@ -5,7 +5,8 @@
 #include <3D/Billboards/Tracker.h>
 #include "GroundStation.h"
 
-GroundStation::GroundStation(QVector3D position, Qt3DRender::QCamera *camera, Qt3DCore::QNode *parent)
+GroundStation::GroundStation(QVector3D position, Qt3DRender::QTexture2D *texture, Qt3DRender::QCamera *camera,
+                             Qt3DCore::QNode *parent)
         : Qt3DCore::QEntity(parent),
           position_{position},
           transform_{new Qt3DCore::QTransform()} {
@@ -16,10 +17,7 @@ GroundStation::GroundStation(QVector3D position, Qt3DRender::QCamera *camera, Qt
 
     this->addComponent(transform_);
 
-    new Tracker(QVector3D{0, 100, 0}, camera,
-                QUrl(QStringLiteral("qrc:/3D/textures/double_down_arrow.png")),
-                QUrl(QStringLiteral("qrc:/3D/textures/text/ground_station.png")),
-                QStringLiteral("GROUND STATION"),
-                this);
+    new Tracker(QVector3D{0, 100, 0}, camera, texture, QStringLiteral("GROUND STATION"), this, {0, 0, 0},
+                OpenGLConstants::ABOVE_RIGHT);
 }
 

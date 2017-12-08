@@ -22,7 +22,6 @@ private:
     Tracker *rocketTracker_;
     Line *rocketTrace_;
     Line *simTrace_;
-    Line *splashDownTrace_;
 };
 
 #endif //GS_MATTERHORN_ROOTENTITY_H

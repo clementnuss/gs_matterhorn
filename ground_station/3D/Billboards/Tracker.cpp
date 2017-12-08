@@ -3,14 +3,18 @@
 #include <3D/Billboards/Marker.h>
 #include "Tracker.h"
 
-const QVector3D Tracker::textOffset_{1.5, 0, 0};
-const QVector3D Tracker::markerOffset_{0, 1, 0};
-
-Tracker::Tracker(QVector3D position, Qt3DRender::QCamera *camera,
-                 QUrl textureUrl, QUrl textUrl, QString text, Qt3DCore::QNode *parent)
+Tracker::Tracker(QVector3D position,
+                 Qt3DRender::QCamera *camera,
+                 Qt3DRender::QTexture2D *texture,
+                 QString text,
+                 Qt3DCore::QNode *parent,
+                 const QVector3D &markerOffset,
+                 const QVector3D &textOffset)
         : Qt3DCore::QEntity(parent),
           transform_{new Qt3DCore::QTransform()},
-          marker_{new Marker(textureUrl, 2, 2, markerOffset_, camera, this)},
+          markerOffset_{markerOffset},
+          textOffset_{textOffset},
+          marker_{nullptr},
           text_{nullptr} {
 
 
@@ -24,12 +28,12 @@ Tracker::Tracker(QVector3D position, Qt3DRender::QCamera *camera,
 
     std::cout << width << std::endl;
     std::cout << height << std::endl;
+    this->addComponent(transform_);
 
-    text_ = new Marker(textUrl, width, height, textOffset_ + QVector3D(width / 2.0, height / 2.0, 0), camera,
-                       this);
+    marker_ = new Marker(texture, 2, 2, markerOffset_, camera, this);
+    text_ = new Text3D(text, camera, textOffset_, this);
 
     updatePosition(position);
-    this->addComponent(transform_);
 }
 
 void Tracker::updatePosition(QVector3D newPosition) {
@@ -37,4 +41,8 @@ void Tracker::updatePosition(QVector3D newPosition) {
     m.translate(newPosition);
     m.scale(100, 100, 100);
     transform_->setMatrix(m);
+}
+
+QVector3D Tracker::getPosition() {
+    return transform_->translation();
 }

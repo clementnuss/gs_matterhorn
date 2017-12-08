@@ -4,7 +4,10 @@
 
 const QVector3D Marker::basePosition_{0, 0, 0};
 
-Marker::Marker(QUrl textureUrl, float width, float height, QVector3D offset, Qt3DRender::QCamera *camera,
+Marker::Marker(Qt3DRender::QTexture2D *texture,
+               float width, float height,
+               QVector3D offset,
+               Qt3DRender::QCamera *camera,
                Qt3DCore::QNode *parent)
         : Qt3DCore::QEntity(parent),
           camera_{camera}, offset_{offset}, transform_{new Qt3DCore::QTransform()} {
@@ -37,9 +40,8 @@ Marker::Marker(QUrl textureUrl, float width, float height, QVector3D offset, Qt3
 
     // Set up material
     auto *diffuseParam = new Qt3DRender::QParameter();
-    auto *diffuseTexture = loadTextureImage(textureUrl);
     diffuseParam->setName(QStringLiteral("diffuseTexture"));
-    diffuseParam->setValue(QVariant::fromValue(diffuseTexture));
+    diffuseParam->setValue(QVariant::fromValue(texture));
 
     auto *material = new Qt3DRender::QMaterial();
     material->setEffect(effect);
@@ -51,12 +53,14 @@ Marker::Marker(QUrl textureUrl, float width, float height, QVector3D offset, Qt3
     mesh->setHeight(height);
     mesh->setMeshResolution(QSize{2, 2});
 
-    // Set up transform
-    updateTransform();
+    transform_->setTranslation(offset_);
 
     this->addComponent(mesh);
     this->addComponent(material);
     this->addComponent(transform_);
+
+    // Set up transform
+    updateTransform();
 
     connect(camera, &Qt3DRender::QCamera::viewMatrixChanged,
             this, &Marker::updateTransform);

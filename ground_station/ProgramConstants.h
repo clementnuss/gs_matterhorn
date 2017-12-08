@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include "CRC/CRC.h"
+#include <QVector3D>
 
 //#define DEBUG true
 namespace UnitsConstants {
@@ -16,6 +17,13 @@ namespace OpenGLConstants {
     static constexpr int ANISOTROPY_MAX = 8;
     static constexpr int MAX_LINE_RESOLUTION = 500;
     static constexpr int MAX_LINE_DATAPOINTS = 100000;
+    static constexpr int RULER_SPACING = 500;
+    static constexpr int RULER_MAX_HEIGHT = 5000;
+    static const QVector3D ABOVE = QVector3D(0, 1, 0);
+    static const QVector3D RIGHT_1 = QVector3D(1, 0, 0);
+    static const QVector3D RIGHT_2 = QVector3D(2, 0, 0);
+    static const QVector3D RIGHT_4 = QVector3D(4, 0, 0);
+    static const QVector3D ABOVE_RIGHT = QVector3D(2, 1, 0);
 }
 
 namespace PredictorConstants {
