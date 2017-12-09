@@ -36,6 +36,18 @@ Tracker::Tracker(QVector3D position,
     updatePosition(position);
 }
 
+void Tracker::setVisible() {
+    this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
+    marker_->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
+    text_->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
+}
+
+void Tracker::setInvisible() {
+    this->removeComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
+    marker_->removeComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
+    text_->removeComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
+}
+
 void Tracker::updatePosition(QVector3D newPosition) {
     QMatrix4x4 m{};
     m.translate(newPosition);

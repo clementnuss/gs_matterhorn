@@ -1,7 +1,6 @@
 
 #include <ProgramConstants.h>
 #include <3D/Billboards/Tracker.h>
-#include <iostream>
 #include <3D/ForwardRenderer/LayerManager.h>
 #include "Ruler.h"
 
@@ -35,13 +34,11 @@ void Ruler::updatePosition(const QVector3D &newPos) {
 
 void Ruler::redraw() {
 
-    ticksVector_.clear();
-
     for (auto *tracker : tickLabels_) {
         if (tracker->getPosition().y() < measurePos_.y()) {
-            std::cout << "yes" << std::endl;
+            tracker->setVisible();
         } else {
-            std::cout << "no" << std::endl;
+            tracker->setInvisible();
         }
     }
 
