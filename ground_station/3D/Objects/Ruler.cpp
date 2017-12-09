@@ -1,5 +1,6 @@
 
 #include <ProgramConstants.h>
+#include <Qt3DCore/QTransform>
 #include <3D/Billboards/Tracker.h>
 #include <3D/ForwardRenderer/LayerManager.h>
 #include "Ruler.h"
@@ -18,7 +19,6 @@ Ruler::Ruler(QVector3D &measurePos, Qt3DRender::QCamera *camera, Qt3DRender::QTe
     transform_->setTranslation({measurePos_.x(), 0, measurePos_.z()});
 
     this->addComponent(transform_);
-    this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 
     initLabels(camera, tickTexture);
     redraw();
@@ -33,12 +33,14 @@ void Ruler::updatePosition(const QVector3D &newPos) {
 
 
 void Ruler::redraw() {
+    rulerAxis_->setData({{0, measurePos_.y(), 0},
+                         {0, 0,               0}});
 
     for (auto *tracker : tickLabels_) {
         if (tracker->getPosition().y() < measurePos_.y()) {
-            tracker->setVisible();
+            tracker->removeComponent(LayerManager::getInstance().getLayer(LayerType::INVISIBLE));
         } else {
-            tracker->setInvisible();
+            tracker->addComponent(LayerManager::getInstance().getLayer(LayerType::INVISIBLE));
         }
     }
 
@@ -50,8 +52,8 @@ void Ruler::initLabels(Qt3DRender::QCamera *camera, Qt3DRender::QTexture2D *tick
          i <= OpenGLConstants::RULER_MAX_HEIGHT;
          i += OpenGLConstants::RULER_SPACING) {
         tickLabels_.push_back(
-                new Tracker({0, i, 0}, camera, tickTexture, QString::number(i),
-                            this, OpenGLConstants::RIGHT_1, OpenGLConstants::RIGHT_4)
+                new Tracker({0, i, 0}, camera, tickTexture, QString::number(i) + QStringLiteral(" m"),
+                            this, OpenGLConstants::RIGHT_TICK, OpenGLConstants::RIGHT_LABEL)
         );
     }
 }

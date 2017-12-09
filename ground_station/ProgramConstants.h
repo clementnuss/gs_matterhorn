@@ -25,6 +25,8 @@ namespace OpenGLConstants {
     static const QVector3D RIGHT_2 = QVector3D(2, 0, 0);
     static const QVector3D RIGHT_4 = QVector3D(4, 0, 0);
     static const QVector3D ABOVE_RIGHT = QVector3D(2, 1, 0);
+    static const QVector3D RIGHT_LABEL = QVector3D(3, -0.5f, 0);
+    static const QVector3D RIGHT_TICK = QVector3D(0.5, 0, 0);
 }
 
 namespace PredictorConstants {

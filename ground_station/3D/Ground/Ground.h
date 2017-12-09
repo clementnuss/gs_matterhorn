@@ -2,10 +2,6 @@
 #ifndef GS_MATTERHORN_GROUND_H
 #define GS_MATTERHORN_GROUND_H
 
-
-#include <QObject>
-#include <Qt3DExtras>
-#include <Qt3DRender>
 #include <Qt3DCore/QNode>
 #include "HighlightArea.h"
 

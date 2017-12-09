@@ -1,4 +1,5 @@
 
+#include <QtGui/QColor>
 #include "OpenGL3DAxes.h"
 
 OpenGL3DAxes::OpenGL3DAxes(Qt3DCore::QNode *parent) :

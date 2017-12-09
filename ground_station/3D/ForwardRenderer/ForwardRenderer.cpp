@@ -26,9 +26,19 @@ ForwardRenderer::ForwardRenderer(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *
     clearBuffer->setBuffers(Qt3DRender::QClearBuffers::ColorDepthBuffer);
     clearBuffer->setClearColor(QColor{"steelblue"});
 
-    //ForwardRenderer::VISIBLE_LAYER->setParent(this);
-    //ForwardRenderer::INVISIBLE_LAYER->setParent(this);
 
-    auto *layerFilter = new Qt3DRender::QLayerFilter(clearBuffer);
-    layerFilter->addLayer(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
+    auto *visibleLayerFilter = new Qt3DRender::QLayerFilter(clearBuffer);
+    visibleLayerFilter->setFilterMode(Qt3DRender::QLayerFilter::DiscardAnyMatchingLayers);
+    visibleLayerFilter->addLayer(LayerManager::getInstance().getLayer(LayerType::INVISIBLE));
+
+    /*
+    auto *billboards1LayerFilter = new Qt3DRender::QLayerFilter(visibleLayerFilter);
+    billboards1LayerFilter->setFilterMode(Qt3DRender::QLayerFilter::AcceptAllMatchingLayers);
+    billboards1LayerFilter->addLayer(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
+    billboards1LayerFilter->addLayer(LayerManager::getInstance().getLayer(LayerType::BILLBOARDS_1));
+
+    auto *billboards2LayerFilter = new Qt3DRender::QLayerFilter(visibleLayerFilter);
+    billboards1LayerFilter->setFilterMode(Qt3DRender::QLayerFilter::AcceptAllMatchingLayers);
+    billboards1LayerFilter->addLayer(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
+    billboards1LayerFilter->addLayer(LayerManager::getInstance().getLayer(LayerType::BILLBOARDS_2));*/
 }

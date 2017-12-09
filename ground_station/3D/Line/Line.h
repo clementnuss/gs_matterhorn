@@ -2,10 +2,15 @@
 #ifndef GS_MATTERHORN_LINE_H
 #define GS_MATTERHORN_LINE_H
 
-#include <QObject>
-#include <Qt3DExtras>
-#include <Qt3DRender>
+
 #include <Qt3DCore/QNode>
+#include <Qt3DCore/QEntity>
+#include <Qt3DRender/QGeometryRenderer>
+#include <Qt3DRender/QGeometry>
+#include <Qt3DRender/QAttribute>
+#include <Qt3DRender/QBuffer>
+#include <QVector3D>
+#include <QColor>
 
 
 struct VBOData {

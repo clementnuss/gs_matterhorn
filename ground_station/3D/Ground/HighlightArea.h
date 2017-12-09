@@ -2,10 +2,12 @@
 #ifndef GS_MATTERHORN_HIGHTLIGHTAREA_H
 #define GS_MATTERHORN_HIGHTLIGHTAREA_H
 
-#include <QObject>
-#include <Qt3DExtras>
-#include <Qt3DRender>
-#include <Qt3DCore>
+
+#include <QtGui/QVector2D>
+#include <Qt3DCore/QNode>
+#include <Qt3DCore/QEntity>
+#include <Qt3DRender/QParameter>
+#include <Qt3DCore/QTransform>
 
 class HighlightArea : public Qt3DCore::QEntity {
 Q_OBJECT

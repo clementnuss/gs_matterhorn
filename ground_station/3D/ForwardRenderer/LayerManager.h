@@ -5,7 +5,7 @@
 #include <Qt3DRender/QLayer>
 
 enum class LayerType {
-    VISIBLE, INVISIBLE
+    VISIBLE, INVISIBLE, BILLBOARDS_1, BILLBOARDS_2
 };
 
 
@@ -23,12 +23,14 @@ public:
 
 private:
     LayerManager() : layerMap_{
-            {LayerType::VISIBLE,   new Qt3DRender::QLayer()},
-            {LayerType::INVISIBLE, new Qt3DRender::QLayer()}
+            {LayerType::VISIBLE,      new Qt3DRender::QLayer()},
+            {LayerType::INVISIBLE,    new Qt3DRender::QLayer()},
+            {LayerType::BILLBOARDS_1, new Qt3DRender::QLayer()},
+            {LayerType::BILLBOARDS_2, new Qt3DRender::QLayer()}
     } {
 
         for (auto pair : layerMap_) {
-            //pair.second->setRecursive(true); //TODO: activate once on Qt 5.10
+            pair.second->setRecursive(true);
         }
     }
 

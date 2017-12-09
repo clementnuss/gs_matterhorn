@@ -4,6 +4,7 @@
 
 
 #include <QtGui/QVector3D>
+#include <QtGui/QVector2D>
 #include <QtCore/QVector>
 #include <Qt3DCore/QNode>
 #include <3D/Line/Line.h>

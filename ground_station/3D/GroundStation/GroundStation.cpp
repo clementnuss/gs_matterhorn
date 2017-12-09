@@ -1,5 +1,6 @@
 #include <QtGui/QFont>
 #include <QtGui/QFontMetrics>
+#include <Qt3DCore/QTransform>
 #include <3D/Utils.h>
 #include <3D/Billboards/Marker.h>
 #include <3D/Billboards/Tracker.h>

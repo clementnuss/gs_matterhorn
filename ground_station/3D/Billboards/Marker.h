@@ -2,10 +2,10 @@
 #ifndef GS_MATTERHORN_MARKER_H
 #define GS_MATTERHORN_MARKER_H
 
-#include <QObject>
-#include <Qt3DExtras>
-#include <Qt3DRender>
+#include <Qt3DRender/QTexture>
 #include <Qt3DCore/QNode>
+#include <Qt3DCore/QEntity>
+#include <Qt3DRender/QCamera>
 
 class Marker : public Qt3DCore::QEntity {
 Q_OBJECT

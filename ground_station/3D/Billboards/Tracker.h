@@ -2,9 +2,10 @@
 #ifndef GS_MATTERHORN_TRACKER_H
 #define GS_MATTERHORN_TRACKER_H
 
-
+#include <Qt3DRender/QTexture>
 #include <3D/Billboards/Marker.h>
 #include <3D/Billboards/Text3D.h>
+#include <Qt3DRender/QCamera>
 
 
 class Tracker : public Qt3DCore::QEntity {
@@ -15,9 +16,6 @@ public:
 
 public slots:
 
-    void setVisible();
-
-    void setInvisible();
     void updatePosition(QVector3D pos);
 
     QVector3D getPosition();

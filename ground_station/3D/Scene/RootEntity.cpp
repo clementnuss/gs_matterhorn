@@ -17,7 +17,8 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         cameraController_{new Qt3DExtras::QFirstPersonCameraController(this)},
         rocketTracker_{nullptr},
         rocketTrace_{nullptr},
-        simTrace_{nullptr} {
+        simTrace_{nullptr},
+        rocketRuler_{nullptr} {
 
 
     Qt3DRender::QCamera *camera = view->camera();
@@ -77,11 +78,13 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
 
     new OpenGL3DAxes(this);
-    new Ruler(traceData.last(), view->camera(), angleLeftTexture, this);
+    QVector3D initialPos{0, 0, 0};
+    rocketRuler_ = new Ruler(initialPos, view->camera(), angleLeftTexture, this);
 
 }
 
 void RootEntity::updateRocketTracker(const QVector<QVector3D> &positions) {
     rocketTracker_->updatePosition(positions.last());
+    rocketRuler_->updatePosition(positions.last());
     rocketTrace_->appendData(positions);
 }

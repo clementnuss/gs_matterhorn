@@ -1,6 +1,12 @@
 #include <ProgramConstants.h>
 #include <3D/Utils.h>
 #include <3D/ForwardRenderer/LayerManager.h>
+#include <Qt3DRender/QBlendEquationArguments>
+#include <Qt3DRender/QEffect>
+#include <Qt3DRender/QMaterial>
+#include <Qt3DRender/QParameter>
+#include <Qt3DCore/QTransform>
+#include <Qt3DExtras/QPlaneMesh>
 #include "Marker.h"
 
 const QVector3D Marker::basePosition_{0, 0, 0};
@@ -59,7 +65,7 @@ Marker::Marker(Qt3DRender::QTexture2D *texture,
     this->addComponent(mesh);
     this->addComponent(material);
     this->addComponent(transform_);
-    this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
+    this->addComponent(LayerManager::getInstance().getLayer(LayerType::BILLBOARDS_1));
 
     // Set up transform
     updateTransform();

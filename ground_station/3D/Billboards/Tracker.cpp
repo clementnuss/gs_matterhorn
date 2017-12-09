@@ -1,7 +1,8 @@
 #include <QtGui/QFont>
 #include <3D/Utils.h>
 #include <3D/Billboards/Marker.h>
-#include <3D/ForwardRenderer/LayerManager.h>
+#include <QtGui/QFontMetricsF>
+#include <Qt3DCore/QTransform>
 #include "Tracker.h"
 
 Tracker::Tracker(QVector3D position,
@@ -28,24 +29,11 @@ Tracker::Tracker(QVector3D position,
     float height = static_cast<float>(rect.height()) / 10.0f;
 
     this->addComponent(transform_);
-    this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 
     marker_ = new Marker(texture, 2, 2, markerOffset_, camera, this);
     text_ = new Text3D(text, camera, textOffset_, this);
 
     updatePosition(position);
-}
-
-void Tracker::setVisible() {
-    this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
-    marker_->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
-    text_->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
-}
-
-void Tracker::setInvisible() {
-    this->removeComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
-    marker_->removeComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
-    text_->removeComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 }
 
 void Tracker::updatePosition(QVector3D newPosition) {

@@ -1,8 +1,9 @@
 #include "UIWidget.h"
 #include "ui_gswidget.h"
 #include "UI/Colors.h"
-#include <iostream>
+#include <Qt3DInput/QInputAspect>
 #include <cassert>
+#include <iostream>
 
 GSWidget::GSWidget(QWidget *parent) :
         QWidget(parent),

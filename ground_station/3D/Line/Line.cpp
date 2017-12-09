@@ -1,6 +1,14 @@
 #include <iostream>
 #include <ProgramConstants.h>
 #include <3D/ForwardRenderer/LayerManager.h>
+#include <Qt3DRender/QShaderProgram>
+#include <Qt3DRender/QRenderPass>
+#include <Qt3DRender/QTechnique>
+#include <Qt3DRender/QGraphicsApiFilter>
+#include <Qt3DRender/QEffect>
+#include <Qt3DRender/QMaterial>
+#include <Qt3DRender/QParameter>
+#include <QUrl>
 #include "Line.h"
 
 

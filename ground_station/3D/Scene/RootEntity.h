@@ -2,13 +2,12 @@
 #ifndef GS_MATTERHORN_ROOTENTITY_H
 #define GS_MATTERHORN_ROOTENTITY_H
 
-
-#include <QObject>
-#include <Qt3DExtras>
-#include <Qt3DRender>
+#include <Qt3DExtras/Qt3DWindow>
+#include <Qt3DExtras/QFirstPersonCameraController>
 #include <Qt3DCore/QNode>
 #include <3D/Line/Line.h>
 #include "3D/Billboards/Tracker.h"
+#include "3D/Objects/Ruler.h"
 
 class RootEntity : public Qt3DCore::QEntity {
 Q_OBJECT
@@ -22,6 +21,7 @@ private:
     Tracker *rocketTracker_;
     Line *rocketTrace_;
     Line *simTrace_;
+    Ruler *rocketRuler_;
 };
 
 #endif //GS_MATTERHORN_ROOTENTITY_H

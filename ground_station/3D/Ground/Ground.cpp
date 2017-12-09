@@ -1,7 +1,9 @@
 
 #include <ProgramConstants.h>
 #include <3D/Utils.h>
-#include <3D/ForwardRenderer/LayerManager.h>
+#include <Qt3DRender/QEffect>
+#include <Qt3DRender/QMaterial>
+#include <Qt3DExtras/QPlaneMesh>
 #include "Ground.h"
 
 /**
@@ -60,7 +62,6 @@ Ground::Ground(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent),
 
     this->addComponent(mesh);
     this->addComponent(material);
-    this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 
     // Add highlighted surface
     highlightedArea_ = new HighlightArea(heightParam, this);

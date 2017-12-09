@@ -1,6 +1,15 @@
 #include "HighlightArea.h"
 #include <ProgramConstants.h>
-#include <3D/ForwardRenderer/LayerManager.h>
+#include <Qt3DRender/QShaderProgram>
+#include <QUrl>
+#include <Qt3DRender/QBlendEquationArguments>
+#include <Qt3DRender/QRenderPass>
+#include <Qt3DRender/QTechnique>
+#include <Qt3DRender/QGraphicsApiFilter>
+#include <Qt3DRender/QEffect>
+#include <Qt3DRender/QMaterial>
+#include <Qt3DExtras/QPlaneMesh>
+
 
 HighlightArea::HighlightArea(Qt3DRender::QParameter *heightParameter, Qt3DCore::QNode *parent) :
         Qt3DCore::QEntity(parent), transform_{new Qt3DCore::QTransform()} {
@@ -53,7 +62,6 @@ HighlightArea::HighlightArea(Qt3DRender::QParameter *heightParameter, Qt3DCore::
     this->addComponent(mesh);
     this->addComponent(material);
     this->addComponent(transform_);
-    this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 }
 
 void HighlightArea::updatePos(const QVector2D &pos) {

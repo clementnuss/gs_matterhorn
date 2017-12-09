@@ -2,6 +2,8 @@
 #ifndef GS_MATTERHORN_GROUNDSTATION_H
 #define GS_MATTERHORN_GROUNDSTATION_H
 
+#include <Qt3DRender/QTexture>
+#include <Qt3DRender/QCamera>
 
 class GroundStation : public Qt3DCore::QEntity {
 Q_OBJECT

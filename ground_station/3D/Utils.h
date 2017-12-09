@@ -2,10 +2,12 @@
 #ifndef GS_MATTERHORN_UTILS_H
 #define GS_MATTERHORN_UTILS_H
 
-#include <Qt3DCore>
-#include <Qt3DRender>
 #include <ProgramConstants.h>
-#include <iostream>
+#include <Qt3DRender/QTextureImage>
+#include <Qt3DRender/QTexture>
+#include <Qt3DRender/QTechnique>
+#include <Qt3DRender/QGraphicsApiFilter>
+#include <QtGui/QMatrix4x4>
 
 static Qt3DRender::QTexture2D *loadTextureImage(const QUrl &textureUrl) {
     auto *texture2D = new Qt3DRender::QTexture2D();
