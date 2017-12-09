@@ -9,6 +9,7 @@
 #include <FileReader.h>
 #include <3D/Utils.h>
 #include <3D/Objects/Ruler.h>
+#include <3D/ForwardRenderer/LayerManager.h>
 #include "RootEntity.h"
 
 RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
@@ -33,6 +34,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     renderSettings->setActiveFrameGraph(forwardRenderer);
 
     this->addComponent(renderSettings);
+    this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 
     cameraController_->setCamera(camera);
     cameraController_->setLinearSpeed(1000.0);
@@ -58,7 +60,6 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     FileReader<QVector3D> traceReader{tracePath, posFromString};
 
     QVector<QVector3D> traceData = traceReader.readFile();
-
 
     new Tracker(traceData.last(), view->camera(), caretDownTexture, QStringLiteral("SIM"), this,
                 OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_RIGHT);

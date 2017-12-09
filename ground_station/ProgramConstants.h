@@ -5,6 +5,7 @@
 #include <string>
 #include "CRC/CRC.h"
 #include <QVector3D>
+#include <Qt3DRender/QLayer>
 
 //#define DEBUG true
 namespace UnitsConstants {

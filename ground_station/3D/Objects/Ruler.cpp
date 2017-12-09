@@ -2,6 +2,7 @@
 #include <ProgramConstants.h>
 #include <3D/Billboards/Tracker.h>
 #include <iostream>
+#include <3D/ForwardRenderer/LayerManager.h>
 #include "Ruler.h"
 
 Ruler::Ruler(QVector3D &measurePos, Qt3DRender::QCamera *camera, Qt3DRender::QTexture2D *tickTexture,
@@ -18,6 +19,7 @@ Ruler::Ruler(QVector3D &measurePos, Qt3DRender::QCamera *camera, Qt3DRender::QTe
     transform_->setTranslation({measurePos_.x(), 0, measurePos_.z()});
 
     this->addComponent(transform_);
+    this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 
     initLabels(camera, tickTexture);
     redraw();

@@ -1,6 +1,7 @@
 #include <QtGui/QFont>
 #include <3D/Utils.h>
 #include <3D/Billboards/Marker.h>
+#include <3D/ForwardRenderer/LayerManager.h>
 #include "Tracker.h"
 
 Tracker::Tracker(QVector3D position,
@@ -26,9 +27,8 @@ Tracker::Tracker(QVector3D position,
     float width = static_cast<float>(rect.width()) / 10.0f;
     float height = static_cast<float>(rect.height()) / 10.0f;
 
-    std::cout << width << std::endl;
-    std::cout << height << std::endl;
     this->addComponent(transform_);
+    this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 
     marker_ = new Marker(texture, 2, 2, markerOffset_, camera, this);
     text_ = new Text3D(text, camera, textOffset_, this);

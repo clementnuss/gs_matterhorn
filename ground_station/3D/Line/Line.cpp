@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ProgramConstants.h>
+#include <3D/ForwardRenderer/LayerManager.h>
 #include "Line.h"
 
 
@@ -61,6 +62,7 @@ Line::Line(Qt3DCore::QNode *parent, QColor &&color, bool isStatic) : Qt3DCore::Q
 
     this->addComponent(geometryRenderer_);
     this->addComponent(material);
+    this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 }
 
 

@@ -1,5 +1,6 @@
 #include "HighlightArea.h"
 #include <ProgramConstants.h>
+#include <3D/ForwardRenderer/LayerManager.h>
 
 HighlightArea::HighlightArea(Qt3DRender::QParameter *heightParameter, Qt3DCore::QNode *parent) :
         Qt3DCore::QEntity(parent), transform_{new Qt3DCore::QTransform()} {
@@ -52,6 +53,7 @@ HighlightArea::HighlightArea(Qt3DRender::QParameter *heightParameter, Qt3DCore::
     this->addComponent(mesh);
     this->addComponent(material);
     this->addComponent(transform_);
+    this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 }
 
 void HighlightArea::updatePos(const QVector2D &pos) {

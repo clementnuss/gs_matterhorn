@@ -3,6 +3,7 @@
 #include <3D/Utils.h>
 #include <3D/Billboards/Marker.h>
 #include <3D/Billboards/Tracker.h>
+#include <3D/ForwardRenderer/LayerManager.h>
 #include "GroundStation.h"
 
 GroundStation::GroundStation(QVector3D position, Qt3DRender::QTexture2D *texture, Qt3DRender::QCamera *camera,
@@ -16,6 +17,7 @@ GroundStation::GroundStation(QVector3D position, Qt3DRender::QTexture2D *texture
     transform_->setMatrix(m);
 
     this->addComponent(transform_);
+    this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 
     new Tracker(QVector3D{0, 100, 0}, camera, texture, QStringLiteral("GROUND STATION"), this, {0, 0, 0},
                 OpenGLConstants::ABOVE_RIGHT);

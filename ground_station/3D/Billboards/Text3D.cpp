@@ -4,6 +4,7 @@
 #include <Qt3DExtras/QPhongMaterial>
 #include <Qt3DCore/QTransform>
 #include <Qt3DRender/QCamera>
+#include <3D/ForwardRenderer/LayerManager.h>
 #include "Text3D.h"
 #include "3D/Utils.h"
 
@@ -54,6 +55,7 @@ Text3D::Text3D(QString text, Qt3DRender::QCamera *camera, QVector3D &offsetToPar
     this->addComponent(test);
     this->addComponent(transform_);
     this->addComponent(material);
+    this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 
     connect(camera, &Qt3DRender::QCamera::viewMatrixChanged,
             this, &Text3D::updateTransform);
