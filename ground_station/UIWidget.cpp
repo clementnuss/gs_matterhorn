@@ -4,6 +4,7 @@
 #include <Qt3DInput/QInputAspect>
 #include <cassert>
 #include <iostream>
+#include <Utilities/TimeUtils.h>
 
 /**
  * GSWidget is the main user interface class. It communicate through Qt SLOTS system with the main worker thread of the
@@ -15,32 +16,51 @@ GSWidget::GSWidget(QWidget *parent) :
         ui(new Ui::GSWidget),
         clockTimer(this),
         currentTrace_{nullptr},
-        rootEntity3D_{nullptr}
+        rootEntity3D_{nullptr},
         plot1_{new QCustomPlot(this)},
         plot2_{new QCustomPlot(this)},
         plotMargin_{nullptr},
         plotVector_{plot1_, plot2_},
-        clockTimer(this),
         lastGraphUpdate_{chrono::system_clock::now()},
         userItems_{std::vector<std::tuple<QCPAbstractItem *, QCPAbstractItem *>>()},
         lastRemoteTime_{-1000},
         autoPlay_{true},
+        replayMode_{false},
         replayPlaybackSpeed_{1},
         playbackReversed_{false} {
-ui->setupUi(this);
 
-graphWidgetSetup();
-connectComponents();
-clockTimer.start(std::lround((1.0 / 60.0) * 1000));
+    ui->setupUi(this);
 
-ui->graph_clear_items_button->setIcon(QIcon(":/UI/icons/remove.png"));
-ui->graph_sync_button->setIcon(QIcon(":/UI/icons/sync.png"));
-ui->graph_autoplay_button->setIcon(QIcon(":/UI/icons/play.png"));
+    graphWidgetSetup();
+    connectComponents();
+    clockTimer.start(std::lround((1.0 / 60.0) * 1000));
+
+    ui->graph_clear_items_button->setIcon(QIcon(":/UI/icons/remove.png"));
+    ui->graph_sync_button->setIcon(QIcon(":/UI/icons/sync.png"));
+    ui->graph_autoplay_button->setIcon(QIcon(":/UI/icons/play.png"));
+
+
+    Qt3DExtras::Qt3DWindow *view = new Qt3DExtras::Qt3DWindow();
+    QWidget *container = QWidget::createWindowContainer(view);
+    container->setMinimumSize(QSize(200, 100));
+
+    Qt3DInput::QInputAspect *input = new Qt3DInput::QInputAspect;
+
+    view->registerAspect(input);
+
+
+    rootEntity3D_ = new RootEntity(view, nullptr);
+    view->setRootEntity(rootEntity3D_);
+
+
+    ui->stackedWidget->removeWidget(ui->stackedWidget->widget(1));
+    ui->stackedWidget->addWidget(container);
+
 }
 
-GSWidget::~GSWidget()
-{
+GSWidget::~GSWidget() {
     delete ui;
+    delete currentTrace_;
 }
 
 /**
@@ -505,8 +525,3 @@ bool GSWidget::event(QEvent *event) {
     return QWidget::event(event);
 }
 
-
-GSWidget::~GSWidget() {
-    delete ui;
-    delete currentTrace_;
-}

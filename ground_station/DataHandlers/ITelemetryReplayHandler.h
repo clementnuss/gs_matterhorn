@@ -4,7 +4,7 @@
 
 #include "TelemetryHandler.h"
 
-class TelemetryReplayHandler {
+class ITelemetryReplayHandler {
 
 public:
 

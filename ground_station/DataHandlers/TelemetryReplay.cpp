@@ -175,3 +175,7 @@ void TelemetryReplay::setPlaybackReversed(bool reversed) {
     playbackReversed_ = reversed;
 }
 
+vector<XYZReading> TelemetryReplay::pollLocations() {
+    return vector<XYZReading>();
+}
+

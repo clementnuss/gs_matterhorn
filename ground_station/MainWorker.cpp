@@ -66,13 +66,15 @@ void Worker::mainRoutine() {
 
     vector<RocketEvent> rocketEvents = telemetryHandler_->pollEvents();
     vector<TelemetryReading> telemReadings = telemetryHandler_->pollData();
-   vector<XYZReading> geoData = telemetryHandler->pollLocations();
+    vector <XYZReading> geoData = telemetryHandler_->pollLocations();
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
 
     if (loggingEnabled) {
-        telemetryLogger.registerData(vector<reference_wrapper<ILoggable>>(begin(telemReadings), end(telemReadings)));
-        eventLogger.registerData(vector<reference_wrapper<ILoggable>>(begin(rocketEvents), end(rocketEvents)));
+        telemetryLogger.registerData(
+                std::vector<std::reference_wrapper<ILoggable>>(begin(telemReadings), end(telemReadings)));
+        eventLogger.registerData(
+                std::vector<std::reference_wrapper<ILoggable>>(begin(rocketEvents), end(rocketEvents)));
     }
 
     if (!telemReadings.empty()) {
@@ -82,12 +84,11 @@ void Worker::mainRoutine() {
 
         QVector<QCPGraphData> altitudeDataBuffer = extractGraphData(telemReadings, altitudeFromReading);
         QVector<QCPGraphData> accelDataBuffer = extractGraphData(telemReadings, accelerationFromReading);
-
         emit graphDataReady(altitudeDataBuffer, GraphFeature::FEATURE1);
         emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
     } else {
         if (replayMode_) {
-            auto *telemReplay = dynamic_cast<TelemetryReplayHandler *>(telemetryHandler_.get());
+            auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler_.get());
             if (!telemReplay->endOfPlayback()) {
                 QVector<QCPGraphData> empty;
                 emit graphDataReady(empty, GraphFeature::Count);
@@ -120,7 +121,7 @@ void Worker::mainRoutine() {
 void Worker::updateLoggingStatus() {
 
     loggingEnabled = !loggingEnabled;
-    emit loggingStatusReady(loggingEnabled);
+    // emit loggingStatusReady(loggingEnabled);
     cout << "Logging is now " << (loggingEnabled ? "enabled" : "disabled") << endl;
 }
 
@@ -196,19 +197,19 @@ Worker::extractGraphData(vector<TelemetryReading> &data, QCPGraphData (*extracti
 
 void Worker::updatePlaybackSpeed(double newSpeed) {
     assert(replayMode_);
-    auto *telemReplay = dynamic_cast<TelemetryReplayHandler *>(telemetryHandler_.get());
+    auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler_.get());
     telemReplay->updatePlaybackSpeed(newSpeed);
 }
 
 void Worker::resetPlayback() {
     assert(replayMode_);
-    auto *telemReplay = dynamic_cast<TelemetryReplayHandler *>(telemetryHandler_.get());
+    auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler_.get());
     telemReplay->resetPlayback();
 }
 
 void Worker::reversePlayback(bool reversed) {
     assert(replayMode_);
-    auto *telemReplay = dynamic_cast<TelemetryReplayHandler *>(telemetryHandler_.get());
+    auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler_.get());
     telemReplay->setPlaybackReversed(reversed);
 }
 

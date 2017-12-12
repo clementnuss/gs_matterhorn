@@ -7,7 +7,7 @@
 
 #include <boost/circular_buffer.hpp>
 
-class StateEstimator : public TelemetryReplayHandler, public TelemetryHandler {
+class StateEstimator : public ITelemetryReplayHandler, public TelemetryHandler {
 
 public:
 
@@ -18,6 +18,8 @@ public:
     vector<RocketEvent> pollEvents() override;
 
     vector<TelemetryReading> pollData() override;
+
+    vector<XYZReading> pollLocations() override;
 
     void updatePlaybackSpeed(double) override;
 
@@ -47,7 +49,7 @@ private:
     vector<RocketEvent> pendingDetectedRocketEvents_;
 
     unique_ptr<TelemetryHandler> handler_;
-    unique_ptr<TelemetryReplayHandler> replayHandler_;
+    unique_ptr<ITelemetryReplayHandler> replayHandler_;
 
     bool isReplayHandler();
 

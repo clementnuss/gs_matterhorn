@@ -4,9 +4,9 @@ StateEstimator::StateEstimator(TelemetryHandler *underlyingHandler) :
         handler_{underlyingHandler},
         readingsBuffer_{MOVING_AVERAGE_POINTS},
         pendingDetectedRocketEvents_{} {
-    auto replayHandler = dynamic_cast<TelemetryReplayHandler *>(handler_.get());
+    auto replayHandler = dynamic_cast<ITelemetryReplayHandler *>(handler_.get());
     if (replayHandler != nullptr) {
-        replayHandler_ = unique_ptr<TelemetryReplayHandler>(replayHandler);
+        replayHandler_ = unique_ptr<ITelemetryReplayHandler>(replayHandler);
     }
 }
 
@@ -121,4 +121,8 @@ void StateEstimator::computeState(const TelemetryReading &r) {
         case TOUCHDOWN:
             break;
     }
+}
+
+vector<XYZReading> StateEstimator::pollLocations() {
+    return vector<XYZReading>();
 }

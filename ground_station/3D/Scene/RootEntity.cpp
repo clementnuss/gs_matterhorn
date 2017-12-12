@@ -80,7 +80,6 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     new OpenGL3DAxes(this);
     QVector3D initialPos{0, 0, 0};
     rocketRuler_ = new Ruler(initialPos, view->camera(), angleLeftTexture, this);
-
 }
 
 void RootEntity::updateRocketTracker(const QVector<QVector3D> &positions) {

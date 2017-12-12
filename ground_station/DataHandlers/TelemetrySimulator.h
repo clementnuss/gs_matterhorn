@@ -38,6 +38,7 @@ private:
     const vector<TelemetryReading> generateTelemetryVector();
 
     HandlerStatus simulatorStatus;
+    uint32_t sequenceNumber_;
     chrono::system_clock::time_point timeOfLastPolledData;
     chrono::system_clock::time_point timeOfLastPolledGeoData;
     chrono::system_clock::time_point timeOfInitialization;

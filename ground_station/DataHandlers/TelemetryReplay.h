@@ -5,9 +5,9 @@
 #include <boost/filesystem.hpp>
 #include <chrono>
 #include "TelemetryHandler.h"
-#include "TelemetryReplayHandler.h"
+#include "ITelemetryReplayHandler.h"
 
-class TelemetryReplay : public TelemetryHandler, public TelemetryReplayHandler {
+class TelemetryReplay : public TelemetryHandler, public ITelemetryReplayHandler {
 
 public:
 
@@ -18,6 +18,8 @@ public:
     vector<RocketEvent> pollEvents() override;
 
     vector<TelemetryReading> pollData() override;
+
+    vector<XYZReading> pollLocations() override;
 
     void updatePlaybackSpeed(double) override;
 

@@ -1,8 +1,6 @@
 #include <DataStructures/datastructs.h>
-#include <vector>
 #include <cassert>
 #include <iostream>
-#include <chrono>
 #include <Utilities/TimeUtils.h>
 #include <QtGui/QtGui>
 #include "TelemetrySimulator.h"
@@ -16,6 +14,7 @@ TelemetrySimulator::TelemetrySimulator() : timeOfLastPolledData{chrono::system_c
                                            timeOfLastPolledGeoData{chrono::system_clock::now()},
                                            timeOfInitialization{chrono::system_clock::now()},
                                            variableRate{true},
+                                           sequenceNumber_{0},
                                            simulatorStatus{HandlerStatus::NOMINAL} {
 }
 
@@ -117,7 +116,6 @@ const TelemetryReading TelemetrySimulator::generateTelemetry() {
     double keysec = msecs / 1000.0;
 
     double rnd = qrand();
-
     return TelemetryReading{
             msecs,
             10000 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 1000.0 * sin(keysec / 0.8),
@@ -137,7 +135,9 @@ const TelemetryReading TelemetrySimulator::generateTelemetry() {
                     100 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 10.0 * sin(keysec / 0.4)
             },
             50 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 5.0 * sin(keysec / 0.7),
-            90.0 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 1 * sin(keysec / 0.7)
+            90.0 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 1 * sin(keysec / 0.7),
+            14 + 30 * sin(keysec),
+            sequenceNumber_++
     };
 }
 

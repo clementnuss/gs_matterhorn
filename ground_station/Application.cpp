@@ -42,9 +42,11 @@ void Application::run() {
 
     TelemetryHandler *handler;
     try {
-        handler = new StateEstimator(new TelemetryReplay(path));
+        //handler = new StateEstimator(new TelemetryReplay(path));
+        handler = new TelemetrySimulator();
         handler->startup();
-        mainWidget_.setReplayMode();
+        //mainWidget_.setReplayMode();
+        mainWidget_.setRealTimeMode();
     } catch (std::runtime_error &e) {
         std::cerr << "Error when starting the telemetry handler:\n" << e.what();
         return; // This prevents the worker from being instantiated
@@ -52,7 +54,7 @@ void Application::run() {
 
     worker_ = new Worker(handler);
     worker_->moveToThread(&workerThread_);
-    worker_->setReplayMode(true);
+    worker_->setReplayMode(false);
     connectSlotsAndSignals();
 
     // Initialize UI status fields
@@ -68,7 +70,6 @@ int Application::exec() {
 }
 
 void Application::connectSlotsAndSignals() {
-
 
     QObject::connect(worker_,
                      &Worker::telemetryReady,
