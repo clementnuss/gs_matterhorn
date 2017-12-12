@@ -4,8 +4,42 @@
 #include <map>
 #include <string>
 #include "CRC/CRC.h"
+#include <QVector3D>
+#include <Qt3DRender/QLayer>
 
 #define DEBUG false
+namespace UnitsConstants {
+    static constexpr float KNOTS_TO_MS = 0.514444;
+}
+
+namespace OpenGLConstants {
+    static constexpr int VERSION_MAJOR = 2;
+    static constexpr int VERSION_MINOR = 1;
+    static constexpr int ANISOTROPY_MAX = 8;
+    static constexpr int MAX_LINE_RESOLUTION = 500;
+    static constexpr int MAX_LINE_DATAPOINTS = 100000;
+    static constexpr int RULER_SPACING = 500;
+    static constexpr int RULER_MAX_HEIGHT = 5000;
+    static const QVector3D ABOVE = QVector3D(0, 1, 0);
+    static const QVector3D RIGHT_1 = QVector3D(1, 0, 0);
+    static const QVector3D RIGHT_2 = QVector3D(2, 0, 0);
+    static const QVector3D RIGHT_4 = QVector3D(4, 0, 0);
+    static const QVector3D ABOVE_RIGHT = QVector3D(2, 1, 0);
+    static const QVector3D RIGHT_LABEL = QVector3D(3, -0.5f, 0);
+    static const QVector3D RIGHT_TICK = QVector3D(0.5, 0, 0);
+}
+
+namespace PredictorConstants {
+    static constexpr float FAST_DESCENT_RATE = 25.0;
+    static constexpr float SLOW_DESCENT_RATE = 5.0;
+    static constexpr float PARACHUTE_DEPLOYMENT_ALTITUDE = 450.0;
+    static constexpr float WIND_DRAG_FACTOR = 1.0;
+    static constexpr int PREDICTION_TIME_INTERVAL = 1;
+}
+
+namespace FileConstants {
+    static constexpr int WIND_PREDICTIONS_HEADER_LINES_COUNT = 4;
+}
 
 namespace PrintConstants {
     static constexpr int PRECISION = 4;

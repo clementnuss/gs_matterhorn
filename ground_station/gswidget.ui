@@ -879,13 +879,13 @@
           <item>
            <widget class="QStackedWidget" name="stackedWidget">
             <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
+                <enum>QFrame::StyledPanel</enum>
             </property>
             <property name="frameShadow">
              <enum>QFrame::Plain</enum>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+                <number>1</number>
             </property>
             <widget class="QWidget" name="Graphs">
              <property name="sizePolicy">
@@ -1118,7 +1118,7 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="Map"/>
+               <widget class="QWidget" name="Map"/>
            </widget>
           </item>
          </layout>

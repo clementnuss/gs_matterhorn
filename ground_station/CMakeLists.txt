@@ -3,6 +3,7 @@ project(ground_station LANGUAGES CXX)
 
 find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport
         3DCore 3DExtras 3DRender 3DInput REQUIRED)
+
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)

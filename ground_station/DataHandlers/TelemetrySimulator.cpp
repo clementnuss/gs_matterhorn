@@ -1,18 +1,21 @@
 #include <DataStructures/datastructs.h>
 #include <vector>
-#include <QtCore/QTime>
 #include <cassert>
 #include <iostream>
 #include <chrono>
 #include <Utilities/TimeUtils.h>
+#include <QtGui/QtGui>
 #include "TelemetrySimulator.h"
 
 using namespace std;
 using namespace SimulatorConstants;
 
-TelemetrySimulator::TelemetrySimulator() : startTime_{chrono::system_clock::now()},
-                                           sequenceNumber_{0},
-                                           timeOfLastPolledData{chrono::system_clock::now()}, variableRate{true},
+//TODO: make telemetry handler factory to provide either simulator or real one
+
+TelemetrySimulator::TelemetrySimulator() : timeOfLastPolledData{chrono::system_clock::now()},
+                                           timeOfLastPolledGeoData{chrono::system_clock::now()},
+                                           timeOfInitialization{chrono::system_clock::now()},
+                                           variableRate{true},
                                            simulatorStatus{HandlerStatus::NOMINAL} {
 }
 
@@ -63,6 +66,31 @@ vector<RocketEvent> TelemetrySimulator::pollEvents() {
     return v;
 }
 
+vector<XYZReading> TelemetrySimulator::pollLocations() {
+
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+    vector<XYZReading> generatedVector{};
+
+    long long millisSinceLastPoll = msecsBetween(timeOfLastPolledGeoData, now);
+    if (millisSinceLastPoll > TimeConstants::MSECS_IN_SEC / 10) {
+        timeOfLastPolledGeoData = now;
+
+        long long int msecs = msecsBetween(timeOfInitialization, chrono::system_clock::now());
+
+        double x = 2 * static_cast<double>(msecs) / 10;
+
+        XYZReading r;
+
+        r.x_ = 0;
+        r.y_ = 50 * sqrt(x);
+        r.z_ = -x;
+
+        generatedVector.push_back(r);
+    }
+
+    return generatedVector;
+}
+
 void TelemetrySimulator::setVariableRate(bool enable) {
     variableRate = enable;
 }
@@ -75,6 +103,7 @@ const vector<TelemetryReading> TelemetrySimulator::generateTelemetryVector() {
     auto vlength = static_cast<size_t>(
             qrand() / static_cast<double>(RAND_MAX) * MAX_RANDOM_VECTOR_LENGTH + 1);
     vector<TelemetryReading> v;
+
     for (size_t i = 0; i < vlength; i++) {
         v.push_back(generateTelemetry());
     }
@@ -84,13 +113,13 @@ const vector<TelemetryReading> TelemetrySimulator::generateTelemetryVector() {
 
 const TelemetryReading TelemetrySimulator::generateTelemetry() {
 
-    auto key = static_cast<uint32_t>(usecsBetween(startTime_, chrono::system_clock::now()));
-    double keysec = key / 1'000'000.0;
+    long long int msecs = msecsBetween(timeOfInitialization, chrono::system_clock::now());
+    double keysec = msecs / 1000.0;
 
     double rnd = qrand();
 
     return TelemetryReading{
-            key,
+            msecs,
             10000 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 1000.0 * sin(keysec / 0.8),
             XYZReading{
                     900 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 90.0 * sin(keysec / 0.38),
@@ -108,19 +137,18 @@ const TelemetryReading TelemetrySimulator::generateTelemetry() {
                     100 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 10.0 * sin(keysec / 0.4)
             },
             50 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 5.0 * sin(keysec / 0.7),
-            90.0 * sin(key) + rnd / static_cast<double>(RAND_MAX) * 1 * sin(keysec / 0.7),
-            14 + 30 * sin(key),
-            sequenceNumber_++};
+            90.0 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 1 * sin(keysec / 0.7)
+    };
 }
 
 RocketEvent TelemetrySimulator::generateEvent() {
 
     // Select an event randomly
     auto code = static_cast<int>(round((EVENT_CODES.size() - 1) * qrand() / static_cast<double>(RAND_MAX)));
+    long long int msecs = msecsBetween(timeOfInitialization, chrono::system_clock::now());
 
     assert(EVENT_CODES.find(code) != EVENT_CODES.end());
-    return RocketEvent {static_cast<uint32_t>(usecsBetween(startTime_, chrono::system_clock::now())), code,
-                        EVENT_CODES.at(code)};
+    return RocketEvent {static_cast<uint32_t>(msecs), code, EVENT_CODES.at(code)};
 }
 
 

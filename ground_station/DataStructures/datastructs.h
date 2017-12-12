@@ -182,4 +182,10 @@ struct TelemetryReading : TimedData, ILoggable, IDeserializable {
 
 };
 
+struct WindPrediction {
+    float altitude_;
+    float speed_;
+    float direction_;
+};
+
 #endif // DATASTRUCTS_H

@@ -68,17 +68,17 @@ int Application::exec() {
 }
 
 void Application::connectSlotsAndSignals() {
-    qRegisterMetaType<TelemetryReading>("TelemetryReading");
-    qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>&");
-    qRegisterMetaType<vector<RocketEvent>>("vector<RocketEvent>&");
-    qRegisterMetaType<GraphFeature>("GraphFeature");
-    qRegisterMetaType<HandlerStatus>("HandlerStatus");
 
 
     QObject::connect(worker_,
                      &Worker::telemetryReady,
                      &mainWidget_,
                      &GSWidget::updateTelemetry);
+
+    QObject::connect(worker_,
+                     &Worker::points3DReady,
+                     &mainWidget_,
+                     &GSWidget::register3DPoints);
 
     QObject::connect(worker_,
                      &Worker::loggingStatusReady,

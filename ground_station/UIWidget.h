@@ -5,7 +5,9 @@
 #include <DataStructures/datastructs.h>
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
-#include <qcustomplot.h>
+#include <Qt3DCore/QEntity>
+#include <3D/Line/Line.h>
+#include <3D/Scene/RootEntity.h>
 #include "MainWorker.h"
 #include "ProgramConstants.h"
 
@@ -14,8 +16,9 @@ namespace Ui {
 }
 
 
-class GSWidget : public QWidget {
-Q_OBJECT
+class GSWidget : public QWidget
+{
+    Q_OBJECT
 
 public:
     GSWidget(QWidget *, std::string);
@@ -68,6 +71,9 @@ public slots:
 
     void reversePlayback();
 
+    // 3D visualisation slots
+    void register3DPoints(const QVector<QVector3D> &);
+
 signals:
 
     void toggleLogging();
@@ -101,6 +107,8 @@ private:
     bool playbackReversed_;
     double lastRemoteTime_;
     double replayPlaybackSpeed_;
+    Line *currentTrace_;
+    RootEntity *rootEntity3D_;
 
     const QFlags<QCP::Interaction> interactionItemsOnly_ = QCP::iSelectItems;
     const QFlags<QCP::Interaction> interactionsAll_ = QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems;

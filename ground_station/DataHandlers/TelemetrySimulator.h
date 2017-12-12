@@ -3,7 +3,6 @@
 #define GS_MATTERHORN_TELEMETRYSIMULATOR_H
 
 #include "TelemetryHandler.h"
-#include <QTime>
 #include <chrono>
 
 using namespace std;
@@ -23,6 +22,8 @@ public:
 
     vector<TelemetryReading> pollData() override;
 
+    vector<XYZReading> pollLocations() override;
+
     void setVariableRate(bool);
 private:
 
@@ -36,10 +37,10 @@ private:
 
     const vector<TelemetryReading> generateTelemetryVector();
 
-    chrono::system_clock::time_point startTime_;
-    uint32_t sequenceNumber_;
     HandlerStatus simulatorStatus;
     chrono::system_clock::time_point timeOfLastPolledData;
+    chrono::system_clock::time_point timeOfLastPolledGeoData;
+    chrono::system_clock::time_point timeOfInitialization;
     bool variableRate;
 };
 

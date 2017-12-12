@@ -14,6 +14,7 @@ add_library(qcustomplot_lib SHARED ${CMAKE_BINARY_DIR}/qcustomplot-src/qcustompl
 find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport REQUIRED)
 target_link_libraries(qcustomplot_lib Qt5::Widgets Qt5::PrintSupport)
 
+
 install(TARGETS qcustomplot_lib
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib

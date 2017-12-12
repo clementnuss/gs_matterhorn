@@ -10,7 +10,10 @@
 #include <FileLogger.h>
 #include <serial/serial.h>
 
-
+/**
+ * A telemetry handler which receives data by the mean of a serial port connected to
+ * a transciever
+ */
 class RadioReceiver : public TelemetryHandler {
 
     static constexpr uint32_t BUFFER_SIZE = 4096;
@@ -29,6 +32,10 @@ public:
 
 private:
 
+    /**
+     * Reads all the bytes available on the serial port's buffer and forwards it to
+     * the Decoder
+     */
     void readSerialPort();
 
     void openSerialPort();

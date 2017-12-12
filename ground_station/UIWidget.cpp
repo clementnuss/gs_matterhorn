@@ -1,9 +1,9 @@
 #include "UIWidget.h"
 #include "ui_gswidget.h"
 #include "UI/Colors.h"
+#include <Qt3DInput/QInputAspect>
+#include <cassert>
 #include <iostream>
-#include <Utilities/TimeUtils.h>
-#include <assert.h>
 
 /**
  * GSWidget is the main user interface class. It communicate through Qt SLOTS system with the main worker thread of the
@@ -13,6 +13,9 @@
 GSWidget::GSWidget(QWidget *parent) :
         QWidget(parent),
         ui(new Ui::GSWidget),
+        clockTimer(this),
+        currentTrace_{nullptr},
+        rootEntity3D_{nullptr}
         plot1_{new QCustomPlot(this)},
         plot2_{new QCustomPlot(this)},
         plotMargin_{nullptr},
@@ -24,18 +27,19 @@ GSWidget::GSWidget(QWidget *parent) :
         autoPlay_{true},
         replayPlaybackSpeed_{1},
         playbackReversed_{false} {
-    ui->setupUi(this);
+ui->setupUi(this);
 
-    graphWidgetSetup();
-    connectComponents();
-    clockTimer.start(std::lround((1.0 / 60.0) * 1000));
+graphWidgetSetup();
+connectComponents();
+clockTimer.start(std::lround((1.0 / 60.0) * 1000));
 
-    ui->graph_clear_items_button->setIcon(QIcon(":/UI/icons/remove.png"));
-    ui->graph_sync_button->setIcon(QIcon(":/UI/icons/sync.png"));
-    ui->graph_autoplay_button->setIcon(QIcon(":/UI/icons/play.png"));
+ui->graph_clear_items_button->setIcon(QIcon(":/UI/icons/remove.png"));
+ui->graph_sync_button->setIcon(QIcon(":/UI/icons/sync.png"));
+ui->graph_autoplay_button->setIcon(QIcon(":/UI/icons/play.png"));
 }
 
-GSWidget::~GSWidget() {
+GSWidget::~GSWidget()
+{
     delete ui;
 }
 
@@ -235,6 +239,10 @@ void GSWidget::updateGroundStatus(float temperature, float pressure) {
     ui->ground_temperature_value->setText(QString::number(pressure, 'f', UIConstants::PRECISION));
 }
 
+void GSWidget::register3DPoints(const QVector<QVector3D> &positions) {
+    rootEntity3D_->updateRocketTracker(positions);
+}
+
 /**
  * Setup the container widget which will hold and display all the QCustomPlot objects
  */
@@ -266,7 +274,7 @@ void GSWidget::plotSetup(QCustomPlot *plot, QString title, QColor color) {
     plot->plotLayout()->clear();
 
     // TODO: check if needed on RaspberryPi3
-    //plot->setOpenGl(true);
+    //customPlot->setOpenGl(true);
 
     QFont titleFont = QFont("sans", 10, QFont::Bold);
 
@@ -488,8 +496,17 @@ bool GSWidget::event(QEvent *event) {
         if (ke->key() == Qt::Key_Space) {
             emit toggleLogging();
             return true;
+        } else if (ke->key() == Qt::Key_Control) {
+            ui->stackedWidget->setCurrentIndex((ui->stackedWidget->currentIndex() + 1) % ui->stackedWidget->count());
+            return true;
         }
 
     }
     return QWidget::event(event);
+}
+
+
+GSWidget::~GSWidget() {
+    delete ui;
+    delete currentTrace_;
 }

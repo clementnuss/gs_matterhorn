@@ -66,6 +66,7 @@ void Worker::mainRoutine() {
 
     vector<RocketEvent> rocketEvents = telemetryHandler_->pollEvents();
     vector<TelemetryReading> telemReadings = telemetryHandler_->pollData();
+   vector<XYZReading> geoData = telemetryHandler->pollLocations();
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
 
@@ -95,6 +96,14 @@ void Worker::mainRoutine() {
             QVector<QCPGraphData> empty;
             emit graphDataReady(empty, GraphFeature::Count);
         }
+    }
+
+    if (!geoData.empty()) {
+        QVector<QVector3D> v{};
+        for (auto geoPoint : geoData) {
+            v.append(QVector3D{geoPoint.x_, geoPoint.y_, geoPoint.z_});
+        }
+        emit points3DReady(v);
     }
 
     if (!rocketEvents.empty()) {
