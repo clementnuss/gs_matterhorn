@@ -44,8 +44,6 @@ static WindPrediction windPredictionFromString(const std::string &str) {
                  boost::algorithm::token_compress_mode_type::token_compress_on);
 
     if (values.size() != 11) {
-        std::cout << "\tInvalid reading, only " << values.size() << " values on the line:" << std::endl;
-        std::cout << "\t" << s << std::endl;
         return prediction;
     }
     try {

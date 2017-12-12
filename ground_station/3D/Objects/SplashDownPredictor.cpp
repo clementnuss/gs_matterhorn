@@ -30,11 +30,6 @@ void SplashDownPredictor::loadPredictions() {
     // Sort the table by decreasing altitude
     qSort(windTable_.begin(), windTable_.end(),
           [](const QPair<int, QVector2D> &p1, const QPair<int, QVector2D> &p2) { return p1.first > p2.first; });
-
-    std::cout << ".." << std::endl;
-    for (auto pair : windTable_) {
-        std::cout << pair.first << " " << pair.second.x() << " " << pair.second.y() << std::endl;
-    }
 }
 
 QVector2D SplashDownPredictor::getTouchdownCoordinates() {

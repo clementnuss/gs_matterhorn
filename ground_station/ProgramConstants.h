@@ -21,6 +21,7 @@ namespace OpenGLConstants {
     static constexpr int RULER_SPACING = 500;
     static constexpr int RULER_MAX_HEIGHT = 5000;
     static const QVector3D ABOVE = QVector3D(0, 1, 0);
+    static const QVector3D ABOVE_CENTER_LABEL = QVector3D(-4, 2.5, 0);
     static const QVector3D RIGHT_1 = QVector3D(1, 0, 0);
     static const QVector3D RIGHT_2 = QVector3D(2, 0, 0);
     static const QVector3D RIGHT_4 = QVector3D(4, 0, 0);

@@ -37,6 +37,8 @@ public slots:
 
     void dummySlot(bool);
 
+    void dummyAnimation();
+
     void graphClicked(QCPAbstractPlottable *, int);
 
     void updateTime();
@@ -109,6 +111,8 @@ private:
     double replayPlaybackSpeed_;
     Line *currentTrace_;
     RootEntity *rootEntity3D_;
+    QTime animationTriggerTime_;
+    QVector<QVector3D> traceData_;
 
     const QFlags<QCP::Interaction> interactionItemsOnly_ = QCP::iSelectItems;
     const QFlags<QCP::Interaction> interactionsAll_ = QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems;

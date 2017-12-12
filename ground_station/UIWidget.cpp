@@ -1,10 +1,10 @@
 #include "UIWidget.h"
 #include "ui_gswidget.h"
 #include "UI/Colors.h"
+#include "FileReader.h"
 #include <Qt3DInput/QInputAspect>
-#include <cassert>
-#include <iostream>
 #include <Utilities/TimeUtils.h>
+#include <Utilities/ReaderUtils.h>
 
 /**
  * GSWidget is the main user interface class. It communicate through Qt SLOTS system with the main worker thread of the
@@ -24,10 +24,12 @@ GSWidget::GSWidget(QWidget *parent) :
         lastGraphUpdate_{chrono::system_clock::now()},
         userItems_{std::vector<std::tuple<QCPAbstractItem *, QCPAbstractItem *>>()},
         lastRemoteTime_{-1000},
+        animationTriggerTime_{},
         autoPlay_{true},
         replayMode_{false},
         replayPlaybackSpeed_{1},
-        playbackReversed_{false} {
+        playbackReversed_{false},
+        traceData_{} {
 
     ui->setupUi(this);
 
@@ -38,6 +40,11 @@ GSWidget::GSWidget(QWidget *parent) :
     ui->graph_clear_items_button->setIcon(QIcon(":/UI/icons/remove.png"));
     ui->graph_sync_button->setIcon(QIcon(":/UI/icons/sync.png"));
     ui->graph_autoplay_button->setIcon(QIcon(":/UI/icons/play.png"));
+
+    std::string tracePath{"../../ground_station/data/simulated_trajectory.csv"};
+    FileReader<QVector3D> traceReader{tracePath, posFromString};
+
+    traceData_ = traceReader.readFile();
 
 
     Qt3DExtras::Qt3DWindow *view = new Qt3DExtras::Qt3DWindow();
@@ -98,6 +105,18 @@ void GSWidget::dummySlot(bool b) {
               << QTime::currentTime().toString().toStdString()
               << "." << std::setw(3) << std::setfill('0')
               << QTime::currentTime().msec() << std::endl;
+}
+
+void GSWidget::dummyAnimation() {
+    static int i = 0;
+
+    int secsFromTrigger = QTime::currentTime().msecsTo(animationTriggerTime_);
+
+    QVector3D bias{secsFromTrigger * 0.01, 0, secsFromTrigger * 0.02};
+
+    if (i < traceData_.size()) {
+        this->register3DPoints({bias + traceData_[i++]});
+    }
 }
 
 /**
@@ -510,7 +529,7 @@ void GSWidget::reversePlayback() {
  */
 bool GSWidget::event(QEvent *event) {
     if (event->type() == QEvent::KeyPress) {
-
+        std::cout << "Event" << std::endl;
         auto *ke = dynamic_cast<QKeyEvent *>(event);
 
         if (ke->key() == Qt::Key_Space) {
@@ -519,6 +538,17 @@ bool GSWidget::event(QEvent *event) {
         } else if (ke->key() == Qt::Key_Control) {
             ui->stackedWidget->setCurrentIndex((ui->stackedWidget->currentIndex() + 1) % ui->stackedWidget->count());
             return true;
+        } else if (ke->key() == Qt::Key_S) {
+
+            static bool triggered{false};
+
+            if (!triggered) {
+                triggered = true;
+                QTimer *launchTimer = new QTimer();
+                launchTimer->start(std::lround((1.0 / 240.0) * 1000));
+                animationTriggerTime_ = QTime::currentTime();
+                connect(launchTimer, SIGNAL(timeout()), this, SLOT(dummyAnimation()));
+            }
         }
 
     }

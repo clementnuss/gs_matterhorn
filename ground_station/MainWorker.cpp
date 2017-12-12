@@ -104,7 +104,7 @@ void Worker::mainRoutine() {
         for (auto geoPoint : geoData) {
             v.append(QVector3D{geoPoint.x_, geoPoint.y_, geoPoint.z_});
         }
-        emit points3DReady(v);
+        //emit points3DReady(v);
     }
 
     if (!rocketEvents.empty()) {

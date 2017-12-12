@@ -25,6 +25,7 @@ public:
     vector<XYZReading> pollLocations() override;
 
     void setVariableRate(bool);
+
 private:
 
     RocketEvent generateEvent();
@@ -41,6 +42,7 @@ private:
     uint32_t sequenceNumber_;
     chrono::system_clock::time_point timeOfLastPolledData;
     chrono::system_clock::time_point timeOfLastPolledGeoData;
+    bool geoDataTriggered_;
     chrono::system_clock::time_point timeOfInitialization;
     bool variableRate;
 };

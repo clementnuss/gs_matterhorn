@@ -22,13 +22,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
 
     Qt3DRender::QCamera *camera = view->camera();
-    camera->setProjectionType(Qt3DRender::QCameraLens::PerspectiveProjection);
-    camera->setFieldOfView(45.0);
-    camera->setNearPlane(0.1);
-    camera->setFarPlane(100000.0);
-    camera->setPosition(QVector3D{-5000.0, 2000.0, -4000.0});
-    camera->setUpVector(QVector3D{0.0, 1.0, 0.0});
-    camera->setViewCenter(QVector3D{0.0, 2000.0, 0.0});
+
 
     auto *renderSettings = new Qt3DRender::QRenderSettings();
     auto *forwardRenderer = new ForwardRenderer(view, renderSettings);
@@ -50,9 +44,11 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     auto *ground = new Ground(this);
     rocketTracker_ = new Tracker(QVector3D{0, 20, 0}, view->camera(), caretDownTexture, QStringLiteral("ROCKET"), this,
-                                 OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_RIGHT);
+                                 OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_CENTER_LABEL);
 
     rocketTrace_ = new Line(this, QColor::fromRgb(255, 255, 255), false);
+    rocketTrace_->setData({{0, 0, 0},
+                           {0, 0, 0}});
 
     // Initialise simulated rocket trace
     simTrace_ = new Line(this, QColor::fromRgb(255, 0, 0), true);
@@ -66,7 +62,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
                 OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_RIGHT);
     simTrace_->appendData(traceData);
 
-    QVector3D gsPos{50, 50, 0};
+    QVector3D gsPos{3000, 50, -700};
 
     new GroundStation(gsPos, dblArrowDownTexture, camera, this);
 
@@ -80,6 +76,15 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     new OpenGL3DAxes(this);
     QVector3D initialPos{0, 0, 0};
     rocketRuler_ = new Ruler(initialPos, view->camera(), angleLeftTexture, this);
+
+
+    camera->setProjectionType(Qt3DRender::QCameraLens::PerspectiveProjection);
+    camera->setFieldOfView(45.0);
+    camera->setNearPlane(0.1);
+    camera->setFarPlane(100000.0);
+    camera->setPosition(QVector3D{-5000.0, 2000.0, -3000.0});
+    camera->setUpVector(QVector3D{0.0, 1.0, 0.0});
+    camera->setViewCenter(QVector3D{0.0, 2000.0, 0.0});
 }
 
 void RootEntity::updateRocketTracker(const QVector<QVector3D> &positions) {

@@ -14,6 +14,7 @@ TelemetrySimulator::TelemetrySimulator() : timeOfLastPolledData{chrono::system_c
                                            timeOfLastPolledGeoData{chrono::system_clock::now()},
                                            timeOfInitialization{chrono::system_clock::now()},
                                            variableRate{true},
+                                           geoDataTriggered_{false},
                                            sequenceNumber_{0},
                                            simulatorStatus{HandlerStatus::NOMINAL} {
 }
