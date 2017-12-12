@@ -121,7 +121,7 @@ void Worker::mainRoutine() {
 void Worker::updateLoggingStatus() {
 
     loggingEnabled = !loggingEnabled;
-    // emit loggingStatusReady(loggingEnabled);
+    emit loggingStatusReady(loggingEnabled);
     cout << "Logging is now " << (loggingEnabled ? "enabled" : "disabled") << endl;
 }
 

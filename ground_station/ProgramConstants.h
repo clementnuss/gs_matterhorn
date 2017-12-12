@@ -105,12 +105,24 @@ namespace SensorConstants {
 
 namespace DataConstants {
     static constexpr double INCREASE_FACTOR = 1.5;
-    static constexpr double DECREASE_FACTOR = 1/INCREASE_FACTOR;
+    static constexpr double DECREASE_FACTOR = 1 / INCREASE_FACTOR;
     static constexpr uint32_t READINGS_PER_SEC = 1'000'000 / UIConstants::GRAPH_DATA_INTERVAL_USECS;
 }
 
 namespace CommunicationsConstants {
-    // See https://users.ece.cmu.edu/~koopman/crc/index.html for good polynomials
+
+    /**
+     * CRC 16 bits:
+     * 0xd175 in implicit +1 notation
+     * 0xA2EB in explicit +1 notation
+     *
+     * Hamming Distance of 4 up to 32751 bits dataword
+     *
+     * Chosen according to the guidelines of Philip Koopman from Carnegie Mellon University
+     * which performed tests on a wide range of polynomials.
+     *
+     * See https://users.ece.cmu.edu/~koopman/crc/index.html
+     */
     static constexpr CRC::Parameters<crcpp_uint16, 16> CRC_16_GENERATOR_POLY = {0xA2EB, 0xFFFF, 0xFFFF, false, false};
 
     static constexpr int MSECS_BETWEEN_LINK_CHECKS = 0;
