@@ -51,6 +51,9 @@ RadioReceiver::RadioReceiver(string portAddress)
     recvBuffer_ = new uint8_t[BUFFER_SIZE];
 }
 
+/**
+ *
+ */
 void RadioReceiver::startup() {
     openSerialPort();
     thread_ = boost::thread{boost::bind(&RadioReceiver::readSerialPort, this)};
