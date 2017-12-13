@@ -14,6 +14,10 @@ typedef union {
     uint32_t uint32;
 } float_cast;
 
+/**
+ * Offers static function which are able to interpret vectors of bytes and transform then into
+ * IDeserializable objects
+ */
 class Factories {
 
 public:
