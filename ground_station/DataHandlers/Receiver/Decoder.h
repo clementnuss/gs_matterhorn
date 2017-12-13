@@ -36,18 +36,47 @@ private:
 
     void accumulateHeader(uint8_t);
 
+    /**
+     * Triggers a jump to the next state if the next byte received corresponds to the control flag,
+     * resets the state of the decoder and log otherwise
+     */
     void seekControlFlag(uint8_t);
 
+    /**
+     * Stores incoming bytes to the byte buffer until the number of bytes received corresponds
+     * to the length of the payload as indicated by the payload type flag of the datagram
+     */
     void accumulatePayload(uint8_t);
 
+    /**
+     * Stores incoming bytes to the byte buffer until the number of bytes received corresponds
+     * to the length of the checksum
+     */
     void accumulateChecksum(uint8_t);
 
+    /**
+     * Verifies that the payload corresponds to its checksum.
+     *
+     * @return True if the checksums match, false and log otherwise
+     */
     bool validatePayload();
 
+    /**
+     * Triggers the jump to the next state
+     */
     void jumpToNextState();
 
     void assertBufferSmallerThan(size_t);
 
+    /**
+     * State machine states table.
+     *
+     * Each state is associated with a function which knows how to handle the bytes received.
+     * Once the function is satisfied with the data that has been received, it triggers the
+     * jump to the next state
+     *
+     * @return A mapping from a state to the next state and the corresponfing decoding function
+     */
     static std::map<DecodingState, std::pair<DecodingState, void (Decoder::*)(uint8_t)>> createStatesMap() {
         return std::map<DecodingState, std::pair<DecodingState, void (Decoder::*)(uint8_t)>>{
                 {DecodingState::SEEKING_FRAMESTART,   {DecodingState::PARSING_HEADER,       &Decoder::accumulateHeader}},
