@@ -8,32 +8,74 @@
 #include <chrono>
 #include <FileLogger.h>
 
+/**
+ * The Decoder class is in charge of interpreting bytes received trough the radio module.
+ * It gathers bytes and treats them as specified by the datagram
+ */
 class Decoder {
 
 public:
 
     Decoder();
 
+    /**
+     * Register an incoming byte as input to the decoder
+     *
+     * @return True if the input resulted in an overall interpretable datagram whose contents are ready to be
+     * retrieved from the decoder
+     */
     bool processByte(std::uint8_t);
 
+    /**
+     *
+     * @return True if the decoder successfully decoded a datagram which is available for retrieval
+     */
     bool datagramReady();
 
+    /**
+     *
+     * @return The decoded datagram and resets the machine
+     */
     Datagram retrieveDatagram();
 
+    /**
+     *
+     * @return The current state the machine is in. Mainly used for testing purposes
+     */
     DecodingState currentState() const;
 
 
 private:
     static const DecodingState INITIAL_STATE = DecodingState::SEEKING_FRAMESTART;
 
+    /**
+     * Extract from the header bytes information about the datagram such as the type of its payload and the
+     * sequence number
+     *
+     * @return True if the extraction was successful, false and log otherwise
+     */
     bool processHeader(std::vector<uint8_t>);
 
+    /**
+     * Transforms the bytes stored in the byte buffer into an IDeserializable object
+     */
     void processTelemetryPayload(std::vector<uint8_t>);
 
+    /**
+     * Empties all the buffers and resets the state of the machine to its initial state
+     */
     void resetMachine();
 
+    /**
+     * Detects a consecutive sequence of preamble bytes of length specified by the datagram specifications
+     * and trigger a jump to the next state once the sequence has been found
+     */
     void seekHeader(uint8_t);
 
+    /**
+     * Stores incoming bytes to the byte buffer until the number of bytes received corresponds
+     * to the length of the header
+     */
     void accumulateHeader(uint8_t);
 
     /**

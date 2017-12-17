@@ -131,6 +131,7 @@ void Decoder::seekControlFlag(uint8_t byte) {
     if (byte == CONTROL_FLAG) {
         jumpToNextState();
     } else {
+        //TODO: log
         resetMachine();
     }
 }
