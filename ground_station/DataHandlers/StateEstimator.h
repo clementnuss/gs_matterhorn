@@ -29,6 +29,8 @@ public:
 
     bool endOfPlayback() override;
 
+    bool isReplayHandler() override;
+
 private:
 
     enum State {
@@ -51,11 +53,10 @@ private:
     unique_ptr<TelemetryHandler> handler_;
     unique_ptr<ITelemetryReplayHandler> replayHandler_;
 
-    bool isReplayHandler();
-
     TelemetryReading computeMA(const TelemetryReading &);
 
     void computeState(const TelemetryReading &);
+
 };
 
 

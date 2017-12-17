@@ -22,6 +22,8 @@ public:
 
     vector<TelemetryReading> pollData() override;
 
+    bool isReplayHandler() override;
+
     vector<XYZReading> pollLocations() override;
 
     void setVariableRate(bool);

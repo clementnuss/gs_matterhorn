@@ -98,9 +98,9 @@ namespace SensorConstants {
 
     // Values can be found here:
     // http://www.meteosuisse.admin.ch/home/meteo/valeurs-de-mesures/valeurs-de-mesures-aux-stations.html?param=airpressure-qfe
-    static float currentLocationReferenceHPa = 968.1f;
+    static float currentLocationReferenceHPa = 964.9f;
     static float currentLocationHeight = 456.0f;
-    static float currentLocationTemperature = 8.2f;
+    static float currentLocationTemperature = 1.6f;
 }
 
 namespace DataConstants {

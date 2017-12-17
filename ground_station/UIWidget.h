@@ -73,6 +73,8 @@ public slots:
 
     void reversePlayback();
 
+    void selectFile();
+
     // 3D visualisation slots
     void register3DPoints(const QVector<QVector3D> &);
 
