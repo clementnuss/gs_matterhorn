@@ -11,7 +11,7 @@ class TelemetryReplay : public TelemetryHandler, public ITelemetryReplayHandler 
 
 public:
 
-    explicit TelemetryReplay(std::string &);
+    explicit TelemetryReplay(const string &);
 
     void startup() override;
 

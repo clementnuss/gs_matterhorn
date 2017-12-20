@@ -7,60 +7,22 @@
 #include "Application.h"
 
 Application::Application(int &argc, char **argv) : qApplication_{argc, argv}, mainWidget_{nullptr}, workerThread_{} {
+}
 
-    /*
-     // Declare the supported options.
-    po::options_description desc("Allowed options");
-    desc.add_options()
-            ("help,h", "produce help message")
-            ("serial_device,s", po::value<string>(), "System name of the serial port (e.g. COM1 or /dev/tty0");
+void Application::simpleTest() {
+    std::this_thread::sleep_for(chrono::milliseconds(3000));
+    std::string path{R"(C:\Users\clement\Documents\gs_matterhorn\data\Greg)"};
+    cout << "Doing some TelemHandler tests" << endl;
+    worker_->defineCurrentRunningMode(SoftwareMode::REPLAY, path);
+    std::this_thread::sleep_for(chrono::milliseconds(10000));
 
-    po::variables_map variablesMap;
-    po::store(po::parse_command_line(argc, argv, desc), variablesMap);
-    po::notify(variablesMap);
-
-    if (variablesMap.count("help")) {
-        cout << desc << "\n";
-        return 1;
-    }
-
-    if (variablesMap.count("serial_device")) {
-        cout << "Selected serial port: "
-             << variablesMap["serial_device"].as<string>() << ".\n";
-    } else {
-        cout << "No Serial device specified, exiting..\n";
-        return -1;
-    }
-
-    char *empty_argv[1] = {const_cast<char *>("")};
-     */
+    worker_->defineCurrentRunningMode(SoftwareMode::REAL_TIME, "helloThere");
 
 }
 
 void Application::run() {
-    std::string path{R"(D:\EPFL\matterhorn\Launches\Greg)"};
-
-    bool replayTelemetry = false;
-    TelemetryHandler *handler;
-    try {
-        handler = new StateEstimator(new TelemetryReplay(path));
-//        handler = new RadioReceiver("");
-        handler->startup();
-    } catch (std::runtime_error &e) {
-        std::cerr << "Error when starting the telemetry handler:\n" << e.what();
-        mainWidget_.setRealTimeMode();
-        return; // This prevents the worker from being instantiated
-    }
-
-    worker_ = new Worker(handler);
+    worker_ = new Worker(&mainWidget_);
     worker_->moveToThread(&workerThread_);
-    if (handler->isReplayHandler()) {
-        mainWidget_.setReplayMode();
-        worker_->setReplayMode(true);
-    } else {
-        mainWidget_.setRealTimeMode();
-        worker_->setReplayMode(false);
-    }
 
     connectSlotsAndSignals();
 
@@ -72,6 +34,8 @@ int Application::exec() {
     workerThread_.start();
 
     mainWidget_.show();
+
+    boost::thread give_me_a_name{boost::bind(&Application::simpleTest, this)};
 
     qApplication_.exec();
 }

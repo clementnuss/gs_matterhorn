@@ -16,12 +16,10 @@ namespace Ui {
 }
 
 
-class GSWidget : public QWidget
-{
-    Q_OBJECT
+class GSWidget : public QWidget {
+Q_OBJECT
 
 public:
-    GSWidget(QWidget *, std::string);
 
     bool event(QEvent *) override;
 
@@ -48,6 +46,8 @@ public slots:
     void updateGraphData(QVector<QCPGraphData> &, GraphFeature);
 
     void clearAllGraphItems(bool);
+
+    void clearGraphData();
 
     void updateTelemetry(TelemetryReading);
 

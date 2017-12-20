@@ -6,6 +6,8 @@
 #include "MainWorker.h"
 #include "Utilities/GraphUtils.h"
 #include "Utilities/TimeUtils.h"
+#include "UIWidget.h"
+
 
 using namespace std;
 
@@ -13,9 +15,9 @@ using namespace std;
  *
  * @param telemetryHandler
  */
-Worker::Worker(TelemetryHandler *telemetryHandler) :
-        loggingEnabled{false},
-        telemetryHandler_{telemetryHandler},
+Worker::Worker(GSWidget *mainWidget) :
+        loggingEnabled_{false},
+        mainWidget_{mainWidget},
         telemetryLogger{LogConstants::WORKER_TELEMETRY_LOG_PATH},
         eventLogger{LogConstants::WORKER_EVENTS_LOG_PATH},
         lastUIupdate{chrono::system_clock::now()},
@@ -23,7 +25,21 @@ Worker::Worker(TelemetryHandler *telemetryHandler) :
         timeOfLastLinkCheck{chrono::system_clock::now()},
         timeOfLastReceivedTelemetry{chrono::system_clock::now()},
         millisBetweenLastTwoPackets{0},
-        replayMode_{false} {
+        replayMode_{false},
+        updateHandler_{false},
+        telemetryHandler_{} {
+
+    mainWidget_->setRealTimeMode();
+    TelemetryHandler *handler;
+    try {
+        handler = new RadioReceiver("");
+        handler->startup();
+    } catch (std::runtime_error &e) {
+        std::cerr << "Error when starting the initial radio receiver handler:\n" << e.what();
+    }
+
+    telemetryHandler_ = unique_ptr<TelemetryHandler>{handler};
+
 }
 
 Worker::~Worker() {
@@ -35,7 +51,7 @@ Worker::~Worker() {
  * the different status color markers.
  */
 void Worker::emitAllStatuses() {
-    emit loggingStatusReady(loggingEnabled);
+    emit loggingStatusReady(loggingEnabled_);
 }
 
 /**
@@ -43,8 +59,36 @@ void Worker::emitAllStatuses() {
  */
 void Worker::run() {
 
-    while (!QThread::currentThread()->isInterruptionRequested()) {
+    MAIN_ROUTINE:
+    while (!(QThread::currentThread()->isInterruptionRequested() | updateHandler_.load())) {
         mainRoutine();
+    }
+
+    if (updateHandler_.load()) {
+        loggingEnabled_ = false;
+        replayMode_ = false;
+        millisBetweenLastTwoPackets = 0;
+        lastUIupdate = chrono::system_clock::now();
+        lastIteration = chrono::system_clock::now();
+        timeOfLastLinkCheck = chrono::system_clock::now();
+        timeOfLastReceivedTelemetry = chrono::system_clock::now();
+
+
+        telemetryHandler_.swap(newHandler_);
+        newHandler_ = nullptr;
+        mainWidget_->clearGraphData();
+        displayMostRecentTelemetry(TelemetryReading{});
+/*
+
+        if (telemetryHandler_->isReplayHandler()) {
+            mainWidget_->setReplayMode();
+        } else {
+            mainWidget_->setRealTimeMode();
+        }
+*/
+
+        updateHandler_.store(false);
+        goto MAIN_ROUTINE;
     }
 
     std::cout << "The worker has finished" << std::endl;
@@ -66,11 +110,11 @@ void Worker::mainRoutine() {
 
     vector<RocketEvent> rocketEvents = telemetryHandler_->pollEvents();
     vector<TelemetryReading> telemReadings = telemetryHandler_->pollData();
-    vector <XYZReading> geoData = telemetryHandler_->pollLocations();
+    vector<XYZReading> geoData = telemetryHandler_->pollLocations();
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
 
-    if (loggingEnabled) {
+    if (loggingEnabled_) {
         telemetryLogger.registerData(
                 std::vector<std::reference_wrapper<ILoggable>>(begin(telemReadings), end(telemReadings)));
         eventLogger.registerData(
@@ -80,7 +124,7 @@ void Worker::mainRoutine() {
     if (!telemReadings.empty()) {
         millisBetweenLastTwoPackets = msecsBetween(timeOfLastReceivedTelemetry, now);
         timeOfLastReceivedTelemetry = now;
-        displayMostRecentTelemetry(telemReadings[telemReadings.size() - 1]);
+        displayMostRecentTelemetry(*--telemReadings.end());
 
         QVector<QCPGraphData> altitudeDataBuffer = extractGraphData(telemReadings, altitudeFromReading);
         QVector<QCPGraphData> accelDataBuffer = extractGraphData(telemReadings, accelerationFromReading);
@@ -102,7 +146,9 @@ void Worker::mainRoutine() {
     if (!geoData.empty()) {
         QVector<QVector3D> v{};
         for (auto geoPoint : geoData) {
-            v.append(QVector3D{geoPoint.x_, geoPoint.y_, geoPoint.z_});
+            v.append(QVector3D{static_cast<float>(geoPoint.x_),
+                               static_cast<float>(geoPoint.y_),
+                               static_cast<float>(geoPoint.z_)});
         }
         //emit points3DReady(v);
     }
@@ -120,9 +166,9 @@ void Worker::mainRoutine() {
  */
 void Worker::updateLoggingStatus() {
 
-    loggingEnabled = !loggingEnabled;
-    emit loggingStatusReady(loggingEnabled);
-    cout << "Logging is now " << (loggingEnabled ? "enabled" : "disabled") << endl;
+    loggingEnabled_ = !loggingEnabled_;
+    emit loggingStatusReady(loggingEnabled_);
+    cout << "Logging is now " << (loggingEnabled_ ? "enabled" : "disabled") << endl;
 }
 
 /**
@@ -215,4 +261,34 @@ void Worker::reversePlayback(bool reversed) {
 
 void Worker::setReplayMode(bool b) {
     replayMode_ = b;
+}
+
+void Worker::defineCurrentRunningMode(const SoftwareMode &mode, const std::string &parameters) {
+
+    TelemetryHandler *handler = nullptr;
+
+    //TODO: determine wether a non working handler should be used or not
+    switch (mode) {
+        case REAL_TIME: {
+            try {
+                handler = new RadioReceiver(parameters);
+                handler->startup();
+            } catch (std::runtime_error &e) {
+                std::cerr << "Error when starting RadioReceiver handler:\n" << e.what();
+            }
+            break;
+        }
+        case REPLAY:
+            try {
+                handler = new TelemetryReplay(parameters);
+                handler->startup();
+            } catch (std::runtime_error &e) {
+                std::cerr << "Error when starting replay handler:\n" << e.what();
+            }
+            break;
+    }
+    if (handler != nullptr) {
+        newHandler_ = unique_ptr<TelemetryHandler>{handler};
+        updateHandler_.store(true);
+    }
 }

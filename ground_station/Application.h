@@ -24,6 +24,8 @@ private:
     Worker *worker_;
 
     void connectSlotsAndSignals();
+
+    void simpleTest();
 };
 
 

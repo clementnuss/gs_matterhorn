@@ -10,7 +10,7 @@ using namespace boost::filesystem;
  * Constructor for the TelemetryReplay class
  * @param path location of the file/directory to read.
  */
-TelemetryReplay::TelemetryReplay(std::string &path) :
+TelemetryReplay::TelemetryReplay(const string &path) :
         path_{path}, readings_{}, lastPlaybackTime_{}, endReadingsIter_{}, frontReadingsIter_{}, playbackSpeed_{1},
         playbackReversed_{}, lastTimeStamp_{0} {}
 

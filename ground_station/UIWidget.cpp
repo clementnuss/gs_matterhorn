@@ -466,6 +466,14 @@ void GSWidget::clearAllGraphItems(bool checked) {
     applyToAllPlots([](QCustomPlot *p) { p->clearItems(); });
 }
 
+
+void GSWidget::clearGraphData() {
+    for (auto &plot : plotVector_) {
+        plot;
+    }
+}
+
+
 /**
  * Applies a lambda function to all the QCustomPlots objects of the UI.
  *
