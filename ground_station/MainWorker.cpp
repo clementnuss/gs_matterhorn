@@ -15,9 +15,9 @@ using namespace std;
  *
  * @param telemetryHandler
  */
-Worker::Worker(GSWidget *mainWidget) :
+Worker::Worker(GSMainwindow *gsMainwindow) :
         loggingEnabled_{false},
-        mainWidget_{mainWidget},
+        mainWidget_{gsMainwindow},
         telemetryLogger{LogConstants::WORKER_TELEMETRY_LOG_PATH},
         eventLogger{LogConstants::WORKER_EVENTS_LOG_PATH},
         lastUIupdate{chrono::system_clock::now()},
@@ -76,9 +76,9 @@ void Worker::run() {
             displayMostRecentTelemetry(TelemetryReading{});
 /*
         if (telemetryHandler_->isReplayHandler()) {
-            mainWidget_->setReplayMode();
+            gsMainWindow_->setReplayMode();
         } else {
-            mainWidget_->setRealTimeMode();
+            gsMainWindow_->setRealTimeMode();
         }
 */
             updateHandler_.store(false);
@@ -86,10 +86,11 @@ void Worker::run() {
             mainRoutine();
         }
 
-        std::cout << "The worker has finished" << std::endl;
-        telemetryLogger.close();
-        eventLogger.close();
     }
+
+    std::cout << "The worker has finished" << std::endl;
+    telemetryLogger.close();
+    eventLogger.close();
 }
 
 /**

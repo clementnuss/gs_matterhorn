@@ -6,7 +6,7 @@
 #include <DataHandlers/StateEstimator.h>
 #include "Application.h"
 
-Application::Application(int &argc, char **argv) : qApplication_{argc, argv}, mainWidget_{nullptr}, workerThread_{} {
+Application::Application(int &argc, char **argv) : qApplication_{argc, argv}, gsMainWindow_{}, workerThread_{} {
 }
 
 void Application::simpleTest() {
@@ -21,19 +21,20 @@ void Application::simpleTest() {
 }
 
 void Application::run() {
-    worker_ = new Worker(&mainWidget_);
+    worker_ = new Worker(&gsMainWindow_);
     worker_->moveToThread(&workerThread_);
 
     connectSlotsAndSignals();
 
     // Initialize UI status fields
     worker_->emitAllStatuses();
+
 }
 
 int Application::exec() {
     workerThread_.start();
 
-    mainWidget_.show();
+    gsMainWindow_.show();
 
     qApplication_.exec();
 }
@@ -48,56 +49,56 @@ void Application::connectSlotsAndSignals() {
 
     QObject::connect(worker_,
                      &Worker::telemetryReady,
-                     &mainWidget_,
-                     &GSWidget::updateTelemetry);
+                     &gsMainWindow_,
+                     &GSMainwindow::updateTelemetry);
 
     QObject::connect(worker_,
                      &Worker::points3DReady,
-                     &mainWidget_,
-                     &GSWidget::register3DPoints);
+                     &gsMainWindow_,
+                     &GSMainwindow::register3DPoints);
 
     QObject::connect(worker_,
                      &Worker::loggingStatusReady,
-                     &mainWidget_,
-                     &GSWidget::updateLoggingStatus);
+                     &gsMainWindow_,
+                     &GSMainwindow::updateLoggingStatus);
 
     QObject::connect(worker_,
                      &Worker::linkStatusReady,
-                     &mainWidget_,
-                     &GSWidget::updateLinkStatus);
+                     &gsMainWindow_,
+                     &GSMainwindow::updateLinkStatus);
 
     QObject::connect(worker_,
                      &Worker::newEventsReady,
-                     &mainWidget_,
-                     &GSWidget::updateEvents);
+                     &gsMainWindow_,
+                     &GSMainwindow::updateEvents);
 
     QObject::connect(worker_,
                      &Worker::graphDataReady,
-                     &mainWidget_,
-                     &GSWidget::updateGraphData);
+                     &gsMainWindow_,
+                     &GSMainwindow::updateGraphData);
 
     QObject::connect(&workerThread_,
                      &QThread::started,
                      worker_,
                      &Worker::run);
 
-    QObject::connect(&mainWidget_,
-                     &GSWidget::toggleLogging,
+    QObject::connect(&gsMainWindow_,
+                     &GSMainwindow::toggleLogging,
                      worker_,
                      &Worker::updateLoggingStatus);
 
-    QObject::connect(&mainWidget_,
-                     &GSWidget::changePlaybackSpeed,
+    QObject::connect(&gsMainWindow_,
+                     &GSMainwindow::changePlaybackSpeed,
                      worker_,
                      &Worker::updatePlaybackSpeed);
 
-    QObject::connect(&mainWidget_,
-                     &GSWidget::resetTelemetryReplayPlayback,
+    QObject::connect(&gsMainWindow_,
+                     &GSMainwindow::resetTelemetryReplayPlayback,
                      worker_,
                      &Worker::resetPlayback);
 
-    QObject::connect(&mainWidget_,
-                     &GSWidget::reverseTelemetryReplayPlayback,
+    QObject::connect(&gsMainWindow_,
+                     &GSMainwindow::reverseTelemetryReplayPlayback,
                      worker_,
                      &Worker::reversePlayback);
 

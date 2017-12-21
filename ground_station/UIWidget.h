@@ -8,24 +8,25 @@
 #include <Qt3DCore/QEntity>
 #include <3D/Line/Line.h>
 #include <3D/Scene/RootEntity.h>
+#include <ground_station_autogen/include/ui_gswidget.h>
 #include "MainWorker.h"
 #include "ProgramConstants.h"
 
 namespace Ui {
-    class GSWidget;
+    class GSMainwindow;
 }
 
 
-class GSWidget : public QWidget {
+class GSMainwindow : public QMainWindow {
 Q_OBJECT
 
 public:
 
     bool event(QEvent *) override;
 
-    explicit GSWidget(QWidget *parent = nullptr);
+    explicit GSMainwindow();
 
-    ~GSWidget() override;
+    ~GSMainwindow() override;
 
     void setReplayMode();
 
@@ -98,7 +99,7 @@ private:
 
     void applyToAllPlots(const std::function<void(QCustomPlot *)> &);
 
-    Ui::GSWidget *ui;
+    Ui::GS_mainWindow *ui;
     QCustomPlot *plot1_;
     QCustomPlot *plot2_;
     QCPMarginGroup plotMargin_;

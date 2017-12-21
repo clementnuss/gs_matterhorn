@@ -9,7 +9,7 @@
 #include "GraphFeature.h"
 #include "FileLogger.h"
 
-class GSWidget;
+class GSMainwindow;
 using namespace std;
 
 enum SoftwareMode {
@@ -20,7 +20,7 @@ class Worker : public QObject {
 Q_OBJECT
 
 public:
-    explicit Worker(GSWidget *);
+    explicit Worker(GSMainwindow *);
 
     ~Worker() override;
 
@@ -74,7 +74,7 @@ private:
     void displayMostRecentTelemetry(TelemetryReading);
 
 
-    unique_ptr<GSWidget> mainWidget_;
+    unique_ptr<GSMainwindow> mainWidget_;
     unique_ptr<TelemetryHandler> telemetryHandler_;
     unique_ptr<TelemetryHandler> newHandler_;
     FileLogger telemetryLogger;

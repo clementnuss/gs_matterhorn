@@ -19,7 +19,7 @@ public:
 
 private:
     QApplication qApplication_;
-    GSWidget mainWidget_;
+    GSMainwindow gsMainWindow_;
     QThread workerThread_;
     Worker *worker_;
 
