@@ -5,6 +5,8 @@
 #include <Qt3DInput/QInputAspect>
 #include <Utilities/TimeUtils.h>
 #include <Utilities/ReaderUtils.h>
+#include <QtWidgets/QFileDialog>
+#include <QtCore/QTime>
 
 /**
  * GSMainwindow is the main user interface class. It communicate through Qt SLOTS system with the
@@ -81,7 +83,8 @@ void GSMainwindow::connectComponents() {
     connect(ui->time_unfolding_decrease, &QPushButton::clicked, this, &GSMainwindow::decreaseSpeed);
     connect(ui->time_unfolding_reset, &QPushButton::clicked, this, &GSMainwindow::resetPlayback);
     connect(ui->time_unfolding_reverse_time, &QPushButton::clicked, this, &GSMainwindow::reversePlayback);
-    connect(ui->time_unfolding_select_files, &QPushButton::clicked, this, &GSMainwindow::selectFile);
+    connect(ui->actionREPLAY_select_file, &QAction::triggered, this, &GSMainwindow::changeToReplayModeAction);
+    connect(ui->actionREAL_TIME, &QAction::triggered, this, &GSMainwindow::changeToRealTimeModeAction);
 
     // Connect components related to graphs
     applyToAllPlots(
@@ -464,11 +467,24 @@ void GSMainwindow::clearAllGraphItems(bool checked) {
     applyToAllPlots([](QCustomPlot *p) { p->clearItems(); });
 }
 
+void GSMainwindow::resetUIState() {
 
-void GSMainwindow::clearGraphData() {
-    for (auto &plot : plotVector_) {
-        plot;
-    }
+    playbackReversed_ = false;
+    lastGraphUpdate_ = chrono::system_clock::now();
+    lastRemoteTime_ = -1000;
+    autoPlay_ = true;
+    replayPlaybackSpeed_ = 1;
+    ui->time_unfolding_current_speed->setText(
+            QString::number(replayPlaybackSpeed_, 'f', 2));
+
+    ui->event_log->clear();
+    updateTelemetry(TelemetryReading{});
+
+    for (auto &g_idx : plotVector_) {
+        QCPGraph *g = g_idx->graph();
+        g->data()->clear();
+        g_idx->replot();
+    };
 }
 
 
@@ -559,7 +575,7 @@ bool GSMainwindow::event(QEvent *event) {
 
             if (!triggered) {
                 triggered = true;
-                QTimer *launchTimer = new QTimer();
+                auto *launchTimer = new QTimer();
                 launchTimer->start(std::lround((1.0 / 240.0) * 1000));
                 animationTriggerTime_ = QTime::currentTime();
                 connect(launchTimer, SIGNAL(timeout()), this, SLOT(dummyAnimation()));
@@ -570,8 +586,16 @@ bool GSMainwindow::event(QEvent *event) {
     return QWidget::event(event);
 }
 
-void GSMainwindow::selectFile() {
-/*    QString fileName = QFileDialog::getOpenFileName(this,
-                                            tr("Open Files"), "./", tr("Telemetry data (*)"));
-    cout << fileName.toStdString() << endl;*/
+void GSMainwindow::changeToReplayModeAction() {
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Open Files"), "./", tr("Telemetry data (*)"));
+    cout << fileName.toStdString() << endl;
+
+    emit defineReplayMode(fileName);
+    setReplayMode();
+}
+
+void GSMainwindow::changeToRealTimeModeAction() {
+    emit defineRealtimeMode(QString{""});
+    setRealTimeMode();
 }

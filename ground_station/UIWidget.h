@@ -22,6 +22,8 @@ Q_OBJECT
 
 public:
 
+    Ui::GS_mainWindow *ui;
+
     bool event(QEvent *) override;
 
     explicit GSMainwindow();
@@ -48,7 +50,7 @@ public slots:
 
     void clearAllGraphItems(bool);
 
-    void clearGraphData();
+    void resetUIState();
 
     void updateTelemetry(TelemetryReading);
 
@@ -74,7 +76,6 @@ public slots:
 
     void reversePlayback();
 
-    void selectFile();
 
     // 3D visualisation slots
     void register3DPoints(const QVector<QVector3D> &);
@@ -89,6 +90,10 @@ signals:
 
     void reverseTelemetryReplayPlayback(bool);
 
+    void defineReplayMode(const QString &);
+
+    void defineRealtimeMode(const QString &);
+
 private:
 
     void graphWidgetSetup();
@@ -99,7 +104,6 @@ private:
 
     void applyToAllPlots(const std::function<void(QCustomPlot *)> &);
 
-    Ui::GS_mainWindow *ui;
     QCustomPlot *plot1_;
     QCustomPlot *plot2_;
     QCPMarginGroup plotMargin_;
@@ -119,6 +123,9 @@ private:
 
     const QFlags<QCP::Interaction> interactionItemsOnly_ = QCP::iSelectItems;
     const QFlags<QCP::Interaction> interactionsAll_ = QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems;
+
+    void changeToReplayModeAction();
+    void changeToRealTimeModeAction();
 };
 
 #endif // GSWIDGET_H

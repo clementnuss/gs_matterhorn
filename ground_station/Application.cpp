@@ -13,10 +13,10 @@ void Application::simpleTest() {
     std::this_thread::sleep_for(chrono::milliseconds(3000));
     std::string path{R"(C:\Users\clement\Documents\gs_matterhorn\data\Greg)"};
     cout << "Doing some TelemHandler tests" << endl;
-    worker_->defineCurrentRunningMode(SoftwareMode::REPLAY, path);
+//    worker_->defineReplayMode(path);
     std::this_thread::sleep_for(chrono::milliseconds(10000));
 
-    worker_->defineCurrentRunningMode(SoftwareMode::REAL_TIME, "helloThere");
+    worker_->defineReplayMode("helloThere");
 
 }
 
@@ -102,7 +102,20 @@ void Application::connectSlotsAndSignals() {
                      worker_,
                      &Worker::reversePlayback);
 
-}
+    QObject::connect(&gsMainWindow_,
+                     &GSMainwindow::defineReplayMode,
+                     worker_,
+                     &Worker::defineReplayMode);
+
+    QObject::connect(&gsMainWindow_,
+                     &GSMainwindow::defineRealtimeMode,
+                     worker_,
+                     &Worker::defineRealtimeMode);
+
+    QObject::connect(worker_,
+                     &Worker::resetUIState,
+                     &gsMainWindow_,
+                     &GSMainwindow::resetUIState);}
 
 
 Application::~Application() {

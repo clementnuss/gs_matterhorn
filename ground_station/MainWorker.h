@@ -12,10 +12,6 @@
 class GSMainwindow;
 using namespace std;
 
-enum SoftwareMode {
-    REAL_TIME, REPLAY
-};
-
 class Worker : public QObject {
 Q_OBJECT
 
@@ -26,7 +22,9 @@ public:
 
     void mainRoutine();
 
-    void defineCurrentRunningMode(const SoftwareMode &mode, const std::string &);
+    void defineReplayMode(const QString &);
+
+    void defineRealtimeMode(const QString &parameters);
 
 
 public slots:
@@ -42,8 +40,6 @@ public slots:
     void resetPlayback();
 
     void reversePlayback(bool);
-
-    void setReplayMode(bool);
 
 signals:
 
@@ -61,7 +57,7 @@ signals:
 
     void groundStatusReady(float, float);
 
-    void dummySignal();
+    void resetUIState();
 
 
 private:
@@ -74,7 +70,6 @@ private:
     void displayMostRecentTelemetry(TelemetryReading);
 
 
-    unique_ptr<GSMainwindow> mainWidget_;
     unique_ptr<TelemetryHandler> telemetryHandler_;
     unique_ptr<TelemetryHandler> newHandler_;
     FileLogger telemetryLogger;

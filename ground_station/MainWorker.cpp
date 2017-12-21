@@ -17,7 +17,6 @@ using namespace std;
  */
 Worker::Worker(GSMainwindow *gsMainwindow) :
         loggingEnabled_{false},
-        mainWidget_{gsMainwindow},
         telemetryLogger{LogConstants::WORKER_TELEMETRY_LOG_PATH},
         eventLogger{LogConstants::WORKER_EVENTS_LOG_PATH},
         lastUIupdate{chrono::system_clock::now()},
@@ -29,7 +28,7 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
         updateHandler_{false},
         telemetryHandler_{} {
 
-    mainWidget_->setRealTimeMode();
+    gsMainwindow->setRealTimeMode();
     TelemetryHandler *handler;
     try {
         handler = new RadioReceiver("");
@@ -72,15 +71,11 @@ void Worker::run() {
 
             telemetryHandler_.swap(newHandler_);
             newHandler_ = nullptr;
-            mainWidget_->clearGraphData();
-            displayMostRecentTelemetry(TelemetryReading{});
-/*
-        if (telemetryHandler_->isReplayHandler()) {
-            gsMainWindow_->setReplayMode();
-        } else {
-            gsMainWindow_->setRealTimeMode();
-        }
-*/
+            if (telemetryHandler_->isReplayHandler()) {
+                replayMode_ = true;
+            }
+            emit resetUIState();
+
             updateHandler_.store(false);
         } else {
             mainRoutine();
@@ -256,36 +251,30 @@ void Worker::reversePlayback(bool reversed) {
     telemReplay->setPlaybackReversed(reversed);
 }
 
-void Worker::setReplayMode(bool b) {
-    replayMode_ = b;
+//TODO: determine wether a non working handler should be used or not
+
+
+void Worker::defineReplayMode(const QString &parameters) {
+    TelemetryHandler *handler = nullptr;
+    try {
+        handler = new TelemetryReplay(parameters.toStdString());
+        handler->startup();
+    } catch (std::runtime_error &e) {
+        std::cerr << "Error when starting replay handler:\n" << e.what();
+    }
+    newHandler_ = unique_ptr<TelemetryHandler>{handler};
+    updateHandler_.store(true);
 }
 
-void Worker::defineCurrentRunningMode(const SoftwareMode &mode, const std::string &parameters) {
 
+void Worker::defineRealtimeMode(const QString &parameters) {
     TelemetryHandler *handler = nullptr;
-
-    //TODO: determine wether a non working handler should be used or not
-    switch (mode) {
-        case REAL_TIME: {
-            try {
-                handler = new RadioReceiver(parameters);
-                handler->startup();
-            } catch (std::runtime_error &e) {
-                std::cerr << "Error when starting RadioReceiver handler:\n" << e.what();
-            }
-            break;
-        }
-        case REPLAY:
-            try {
-                handler = new TelemetryReplay(parameters);
-                handler->startup();
-            } catch (std::runtime_error &e) {
-                std::cerr << "Error when starting replay handler:\n" << e.what();
-            }
-            break;
+    try {
+        handler = new RadioReceiver(parameters.toStdString());
+        handler->startup();
+    } catch (std::runtime_error &e) {
+        std::cerr << "Error when starting RadioReceiver handler:\n" << e.what();
     }
-    if (handler != nullptr) {
-        newHandler_ = unique_ptr<TelemetryHandler>{handler};
-        updateHandler_.store(true);
-    }
+    newHandler_ = unique_ptr<TelemetryHandler>{handler};
+    updateHandler_.store(true);
 }

@@ -27,9 +27,9 @@
      <colorrole role="Window">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>70</red>
-        <green>195</green>
-        <blue>240</blue>
+        <red>243</red>
+        <green>243</green>
+        <blue>243</blue>
        </color>
       </brush>
      </colorrole>
@@ -1239,7 +1239,25 @@
      <height>26</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuMODE">
+    <property name="title">
+     <string>MODE</string>
+    </property>
+    <addaction name="actionREAL_TIME"/>
+    <addaction name="actionREPLAY_select_file"/>
+   </widget>
+   <addaction name="menuMODE"/>
   </widget>
+  <action name="actionREAL_TIME">
+   <property name="text">
+    <string>REAL-TIME</string>
+   </property>
+  </action>
+  <action name="actionREPLAY_select_file">
+   <property name="text">
+    <string>REPLAY (select file)</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
