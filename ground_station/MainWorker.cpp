@@ -59,41 +59,37 @@ void Worker::emitAllStatuses() {
  */
 void Worker::run() {
 
-    MAIN_ROUTINE:
-    while (!(QThread::currentThread()->isInterruptionRequested() | updateHandler_.load())) {
-        mainRoutine();
-    }
-
-    if (updateHandler_.load()) {
-        loggingEnabled_ = false;
-        replayMode_ = false;
-        millisBetweenLastTwoPackets = 0;
-        lastUIupdate = chrono::system_clock::now();
-        lastIteration = chrono::system_clock::now();
-        timeOfLastLinkCheck = chrono::system_clock::now();
-        timeOfLastReceivedTelemetry = chrono::system_clock::now();
+    while (!(QThread::currentThread()->isInterruptionRequested())) {
+        if (updateHandler_.load()) {
+            loggingEnabled_ = false;
+            replayMode_ = false;
+            millisBetweenLastTwoPackets = 0;
+            lastUIupdate = chrono::system_clock::now();
+            lastIteration = chrono::system_clock::now();
+            timeOfLastLinkCheck = chrono::system_clock::now();
+            timeOfLastReceivedTelemetry = chrono::system_clock::now();
 
 
-        telemetryHandler_.swap(newHandler_);
-        newHandler_ = nullptr;
-        mainWidget_->clearGraphData();
-        displayMostRecentTelemetry(TelemetryReading{});
+            telemetryHandler_.swap(newHandler_);
+            newHandler_ = nullptr;
+            mainWidget_->clearGraphData();
+            displayMostRecentTelemetry(TelemetryReading{});
 /*
-
         if (telemetryHandler_->isReplayHandler()) {
             mainWidget_->setReplayMode();
         } else {
             mainWidget_->setRealTimeMode();
         }
 */
+            updateHandler_.store(false);
+        } else {
+            mainRoutine();
+        }
 
-        updateHandler_.store(false);
-        goto MAIN_ROUTINE;
+        std::cout << "The worker has finished" << std::endl;
+        telemetryLogger.close();
+        eventLogger.close();
     }
-
-    std::cout << "The worker has finished" << std::endl;
-    telemetryLogger.close();
-    eventLogger.close();
 }
 
 /**

@@ -35,8 +35,6 @@ int Application::exec() {
 
     mainWidget_.show();
 
-    boost::thread give_me_a_name{boost::bind(&Application::simpleTest, this)};
-
     qApplication_.exec();
 }
 
