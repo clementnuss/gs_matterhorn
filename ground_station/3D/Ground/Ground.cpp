@@ -60,11 +60,13 @@ Ground::Ground(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent),
     mesh->setWidth(10000);
     mesh->setMeshResolution(QSize{100, 100});
 
+    transform_->setRotationY(90);
+    this->addComponent(transform_);
     this->addComponent(mesh);
     this->addComponent(material);
 
     // Add highlighted surface
-    highlightedArea_ = new HighlightArea(heightParam, this);
+    highlightedArea_ = new HighlightArea(heightParam, parent);
 }
 
 

@@ -12,7 +12,7 @@ void main()
     // Flipped texture coordinates
     vec2 texCoord = (modelMatrix * vec4(vertexPosition,1.0)).xz;
     texCoord += vec2(5000,5000);
-    texCoord /= 10000;
+    texCoord /= 10000; // Size of ground terrain patch
     texCoord.x = 1.0 - texCoord.x;
 
     //texCoord = texCoord / 2.0;

@@ -100,6 +100,6 @@ QVector2D SplashDownPredictor::dataToWindVector(const float windSpeed, const flo
 
     // OpenGL x axis is aligned with north. Direction angles are specified relative to north, going clockwise
 
-    float rads = -((M_PI / 180) * windDirection);
-    return {sin(rads) * windSpeed, cos(rads) * windSpeed};
+    float rads = static_cast<float>(-((M_PI / 180) * windDirection));
+    return {cos(rads) * windSpeed, sin(rads) * windSpeed};
 }
