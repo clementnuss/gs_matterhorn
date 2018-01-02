@@ -34,6 +34,8 @@ namespace CameraConstants {
     static constexpr float ZOOMIN_LIMIT = 100.0f;
     static constexpr float PAN_STEP = 45.0f;
     static constexpr float TILT_STEP = 10.0f;
+    static constexpr float TILT_MIN = 25.0f;
+    static constexpr float TILT_MAX = 165.0f;
     static constexpr float ANIMATION_DURATION = 400.0f;
 }
 

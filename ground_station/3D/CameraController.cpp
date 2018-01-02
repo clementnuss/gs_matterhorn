@@ -5,17 +5,32 @@
 
 CameraController::CameraController(Qt3DCore::QNode *parent)
         : Qt3DExtras::QAbstractCameraController(parent),
-          arrowPressed_{false}, desiredPan_{0}, desiredTilt_{90}, desiredViewCenter_{0, 0, 0}, animators_{} {
-}
+          keyboardHandler_{new Qt3DInput::QKeyboardHandler(this)}, arrowPressed_{false}, desiredPan_{0},
+          desiredTilt_{90}, desiredViewCenter_{0, 0, 0}, animators_{} {
 
+
+    connect(keyboardHandler_, &Qt3DInput::QKeyboardHandler::pressed, this, &CameraController::handleKeyPress);
+    keyboardHandler_->setSourceDevice(keyboardDevice());
+    keyboardHandler_->setFocus(true);
+}
 
 CameraController::~CameraController() {
 }
 
+void CameraController::handleKeyPress(Qt3DInput::QKeyEvent *event) {
+    std::cout << " Something happened " << std::endl;
+}
 
 inline float clampInputs(float input1, float input2) {
     float axisValue = input1 + input2;
     return (axisValue < -1) ? -1 : (axisValue > 1) ? 1 : axisValue;
+}
+
+inline float clampTilt(float tilt) {
+    return tilt < CameraConstants::TILT_MIN ?
+           CameraConstants::TILT_MIN :
+           tilt > CameraConstants::TILT_MAX ?
+           CameraConstants::TILT_MAX : tilt;
 }
 
 inline float zoomDistance(QVector3D firstPoint, QVector3D secondPoint) {
@@ -33,6 +48,7 @@ void CameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::I
 
     if (cam == nullptr)
         return;
+
 
     // Mouse input
     if (state.rightMouseButtonActive) {
@@ -93,8 +109,6 @@ void CameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::I
             QVector3D x = cam->viewVector().normalized();
             float tilt = toDegrees(std::acos(QVector3D::dotProduct(x, CameraConstants::UP_VECTOR)));
 
-            std::cout << tilt << std::endl;
-
             if (state.txAxisValue != 0.0 || state.tyAxisValue != 0.0) {
                 arrowPressed_ = true;
             }
@@ -102,26 +116,26 @@ void CameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::I
             if (state.txAxisValue > 0.0) {
                 animators_.push_back(std::make_shared<FloatInterpolator>(
                         cam->transform()->rotationY(),
-                        cam->transform()->rotationY() + CameraConstants::PAN_STEP,
+                        cam->transform()->rotationY() - CameraConstants::PAN_STEP,
                         &desiredPan_)
                 );
 
             } else if (state.txAxisValue < 0.0) {
                 animators_.push_back(std::make_shared<FloatInterpolator>(
                         cam->transform()->rotationY(),
-                        cam->transform()->rotationY() - CameraConstants::PAN_STEP,
+                        cam->transform()->rotationY() + CameraConstants::PAN_STEP,
                         &desiredPan_)
                 );
             } else if (state.tyAxisValue > 0.0) {
                 animators_.push_back(std::make_shared<FloatInterpolator>(
                         tilt,
-                        tilt + CameraConstants::TILT_STEP,
+                        clampTilt(tilt + CameraConstants::TILT_STEP),
                         &desiredTilt_)
                 );
             } else if (state.tyAxisValue < 0.0) {
                 animators_.push_back(std::make_shared<FloatInterpolator>(
                         tilt,
-                        tilt - CameraConstants::TILT_STEP,
+                        clampTilt(tilt - CameraConstants::TILT_STEP),
                         &desiredTilt_)
                 );
             }
@@ -164,6 +178,4 @@ void CameraController::moveToDesiredAttitude() {
     if (desiredViewCenter_ != camera()->viewCenter()) {
 
     }
-
-    std::cout << camera()->transform()->rotationY() << std::endl;
 }

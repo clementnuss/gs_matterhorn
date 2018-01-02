@@ -8,6 +8,8 @@
 #include <ProgramConstants.h>
 #include <iostream>
 #include <memory>
+#include <Qt3DInput/QKeyboardHandler>
+#include <Qt3DInput/QKeyboardDevice>
 #include "3DVisualisationConstants.h"
 
 static float
@@ -74,14 +76,18 @@ private:
 };
 
 
-
-
 class CameraController : public Qt3DExtras::QAbstractCameraController {
+
+Q_OBJECT
 
 public:
     explicit CameraController(Qt3DCore::QNode *parent = nullptr);
 
     ~CameraController() override;
+
+public slots:
+
+    void handleKeyPress(Qt3DInput::QKeyEvent *event);
 
 private:
     void moveCamera(const Qt3DExtras::QAbstractCameraController::InputState &state, float dt) override;
@@ -90,13 +96,13 @@ private:
 
     void moveToDesiredAttitude();
 
+    Qt3DInput::QKeyboardHandler *keyboardHandler_;
     bool arrowPressed_;
     float desiredPan_;
     float desiredTilt_;
     QVector3D desiredViewCenter_;
     std::vector<std::shared_ptr<Interpolator>> animators_;
 };
-
 
 
 #endif //GS_MATTERHORN_CAMERACONTROLLER_H
