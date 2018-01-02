@@ -44,10 +44,11 @@ void Application::run() {
     TelemetryHandler *handler;
     try {
         handler = new StateEstimator(new TelemetryReplay(path));
-//        handler = new TelemetrySimulator();
+//        handler = new RadioReceiver("");
         handler->startup();
     } catch (std::runtime_error &e) {
         std::cerr << "Error when starting the telemetry handler:\n" << e.what();
+        mainWidget_.setRealTimeMode();
         return; // This prevents the worker from being instantiated
     }
 
@@ -76,6 +77,12 @@ int Application::exec() {
 }
 
 void Application::connectSlotsAndSignals() {
+    qRegisterMetaType<TelemetryReading>("TelemetryReading");
+    qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>&");
+    qRegisterMetaType<vector<RocketEvent>>("vector<RocketEvent>&");
+    qRegisterMetaType<GraphFeature>("GraphFeature");
+    qRegisterMetaType<HandlerStatus>("HandlerStatus");
+
 
     QObject::connect(worker_,
                      &Worker::telemetryReady,

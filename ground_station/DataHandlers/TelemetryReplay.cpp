@@ -119,6 +119,7 @@ void TelemetryReplay::parseFile(boost::filesystem::path p) {
         if (values.size() != 15) {
             cout << "\tInvalid reading, only " << values.size() << " values on the line:" << endl;
             cout << "\t" << reading << endl;
+            continue;
         }
         try {
 
@@ -174,6 +175,10 @@ bool TelemetryReplay::endOfPlayback() {
 
 void TelemetryReplay::setPlaybackReversed(bool reversed) {
     playbackReversed_ = reversed;
+}
+
+bool TelemetryReplay::isReplayHandler() {
+    return true;
 }
 
 vector<XYZReading> TelemetryReplay::pollLocations() {
