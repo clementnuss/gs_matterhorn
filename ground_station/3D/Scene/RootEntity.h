@@ -3,9 +3,10 @@
 #define GS_MATTERHORN_ROOTENTITY_H
 
 #include <Qt3DExtras/Qt3DWindow>
-#include <Qt3DExtras/QFirstPersonCameraController>
+#include <Qt3DExtras/QOrbitCameraController>
 #include <Qt3DCore/QNode>
 #include <3D/Line/Line.h>
+#include <3D/CameraController.h>
 #include "3D/Billboards/Tracker.h"
 #include "3D/Objects/Ruler.h"
 
@@ -17,7 +18,7 @@ public:
     void updateRocketTracker(const QVector<QVector3D> &positions);
 
 private:
-    Qt3DExtras::QFirstPersonCameraController *cameraController_;
+    CameraController *cameraController_;
     Qt3DRender::QCamera *camera_;
     Tracker *rocketTracker_;
     Line *rocketTrace_;

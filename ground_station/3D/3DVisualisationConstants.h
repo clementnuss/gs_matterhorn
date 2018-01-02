@@ -2,6 +2,7 @@
 #ifndef GS_MATTERHORN_3DVISUALISATIONCONSTANTS_H
 #define GS_MATTERHORN_3DVISUALISATIONCONSTANTS_H
 
+#include <QVector3D>
 
 namespace OpenGLConstants {
     static constexpr int VERSION_MAJOR = 2;
@@ -25,6 +26,13 @@ namespace TextureConstants {
     static const QString CARET_LEFT = QStringLiteral("qrc:/3D/textures/angle-left.png");
     static const QString CARET_DOWN = QStringLiteral("qrc:/3D/textures/caret_down.png");
     static const QString DOUBLE_DOWN_ARROW = QStringLiteral("qrc:/3D/textures/double_down_arrow.png");
+}
+
+
+namespace CameraConstants {
+    static constexpr float ZOOMIN_LIMIT = 100.0f;
+    static constexpr float PAN_STEP = 45.0f;
+    static constexpr float TILT_STEP = 10.0f;
 }
 
 

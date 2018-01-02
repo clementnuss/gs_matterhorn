@@ -14,7 +14,7 @@
 
 RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         Qt3DCore::QEntity(parent),
-        cameraController_{new Qt3DExtras::QFirstPersonCameraController(this)},
+        cameraController_{new CameraController(this)},
         camera_{view->camera()},
         rocketTracker_{nullptr},
         rocketTrace_{nullptr},
@@ -29,7 +29,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 
     cameraController_->setCamera(camera_);
-    cameraController_->setLinearSpeed(1000.0);
+    cameraController_->setLinearSpeed(3000.0);
 
     auto *ground = new Ground(this);
     rocketTracker_ = new Tracker(QVector3D{0, 20, 0}, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
@@ -66,7 +66,6 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     new OpenGL3DAxes(this);
     QVector3D initialPos{0, 0, 0};
     rocketRuler_ = new Ruler(initialPos, camera_, TextureConstants::CARET_LEFT, this);
-
 
     camera_->setProjectionType(Qt3DRender::QCameraLens::PerspectiveProjection);
     camera_->setFieldOfView(45.0);
