@@ -18,6 +18,7 @@ public:
 
 private:
     Qt3DExtras::QFirstPersonCameraController *cameraController_;
+    Qt3DRender::QCamera *camera_;
     Tracker *rocketTracker_;
     Line *rocketTrace_;
     Line *simTrace_;

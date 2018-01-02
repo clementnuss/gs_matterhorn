@@ -15,14 +15,11 @@
 RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         Qt3DCore::QEntity(parent),
         cameraController_{new Qt3DExtras::QFirstPersonCameraController(this)},
+        camera_{view->camera()},
         rocketTracker_{nullptr},
         rocketTrace_{nullptr},
         simTrace_{nullptr},
         rocketRuler_{nullptr} {
-
-
-    Qt3DRender::QCamera *camera = view->camera();
-
 
     auto *renderSettings = new Qt3DRender::QRenderSettings();
     auto *forwardRenderer = new ForwardRenderer(view, renderSettings);
@@ -31,7 +28,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     this->addComponent(renderSettings);
     this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 
-    cameraController_->setCamera(camera);
+    cameraController_->setCamera(camera_);
     cameraController_->setLinearSpeed(1000.0);
 
 
@@ -43,7 +40,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
             QUrl{QStringLiteral("qrc:/3D/textures/double_down_arrow.png")});
 
     auto *ground = new Ground(this);
-    rocketTracker_ = new Tracker(QVector3D{0, 20, 0}, view->camera(), caretDownTexture, QStringLiteral("ROCKET"), this,
+    rocketTracker_ = new Tracker(QVector3D{0, 20, 0}, camera_, caretDownTexture, QStringLiteral("ROCKET"), this,
                                  OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_CENTER_LABEL);
 
     rocketTrace_ = new Line(this, QColor::fromRgb(255, 255, 255), false);
@@ -64,7 +61,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     QVector3D gsPos{3000, 50, -700};
 
-    new GroundStation(gsPos, dblArrowDownTexture, camera, this);
+    new GroundStation(gsPos, dblArrowDownTexture, camera_, this);
 
     std::string meteoPath{"../../ground_station/MeteoData/meteo_payerne_test.txt"};
     SplashDownPredictor splashDownPredictor{meteoPath, this};
@@ -75,16 +72,16 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     new OpenGL3DAxes(this);
     QVector3D initialPos{0, 0, 0};
-    rocketRuler_ = new Ruler(initialPos, view->camera(), angleLeftTexture, this);
+    rocketRuler_ = new Ruler(initialPos, camera_, angleLeftTexture, this);
 
 
-    camera->setProjectionType(Qt3DRender::QCameraLens::PerspectiveProjection);
-    camera->setFieldOfView(45.0);
-    camera->setNearPlane(0.1);
-    camera->setFarPlane(100000.0);
-    camera->setPosition(QVector3D{-5000.0, 2000.0, -3000.0});
-    camera->setUpVector(QVector3D{0.0, 1.0, 0.0});
-    camera->setViewCenter(QVector3D{0.0, 2000.0, 0.0});
+    camera_->setProjectionType(Qt3DRender::QCameraLens::PerspectiveProjection);
+    camera_->setFieldOfView(45.0);
+    camera_->setNearPlane(0.1);
+    camera_->setFarPlane(100000.0);
+    camera_->setPosition(QVector3D{-5000.0, 2000.0, -3000.0});
+    camera_->setUpVector(QVector3D{0.0, 1.0, 0.0});
+    camera_->setViewCenter(QVector3D{0.0, 2000.0, 0.0});
 }
 
 void RootEntity::updateRocketTracker(const QVector<QVector3D> &positions) {

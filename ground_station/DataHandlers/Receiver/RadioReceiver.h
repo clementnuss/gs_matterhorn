@@ -30,6 +30,8 @@ public:
 
     vector<RocketEvent> pollEvents() override;
 
+    vector<XYZReading> pollLocations() override;
+
     bool isReplayHandler() override;
 
 private:
