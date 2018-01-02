@@ -11,7 +11,7 @@ class Ruler : public Qt3DCore::QEntity {
 Q_OBJECT
 
 public:
-    Ruler(QVector3D &measurePos, Qt3DRender::QCamera *camera, Qt3DRender::QTexture2D *tickTexture,
+    Ruler(QVector3D &measurePos, Qt3DRender::QCamera *camera, const QString &tickTexture,
           Qt3DCore::QNode *parent);
 
     void updatePosition(const QVector3D &newPos);
@@ -19,7 +19,7 @@ public:
 private:
     void redraw();
 
-    void initLabels(Qt3DRender::QCamera *camera, Qt3DRender::QTexture2D *tickTexture);
+    void initLabels(Qt3DRender::QCamera *camera, const QString &tickTexture);
 
     Qt3DCore::QTransform *transform_;
     QVector3D measurePos_;

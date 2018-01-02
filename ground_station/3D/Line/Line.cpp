@@ -9,6 +9,7 @@
 #include <Qt3DRender/QMaterial>
 #include <Qt3DRender/QParameter>
 #include <QUrl>
+#include <3D/3DVisualisationConstants.h>
 #include "Line.h"
 
 

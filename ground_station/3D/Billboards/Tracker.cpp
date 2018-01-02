@@ -7,7 +7,7 @@
 
 Tracker::Tracker(QVector3D position,
                  Qt3DRender::QCamera *camera,
-                 Qt3DRender::QTexture2D *texture,
+                 const QString &texture,
                  QString text,
                  Qt3DCore::QNode *parent,
                  const QVector3D &markerOffset,

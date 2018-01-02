@@ -1,6 +1,7 @@
 #include <ProgramConstants.h>
 #include <3D/Utils.h>
 #include <3D/ForwardRenderer/LayerManager.h>
+#include <3D/TextureManagerSingleton.h>
 #include <Qt3DRender/QBlendEquationArguments>
 #include <Qt3DRender/QEffect>
 #include <Qt3DRender/QMaterial>
@@ -11,7 +12,7 @@
 
 const QVector3D Marker::basePosition_{0, 0, 0};
 
-Marker::Marker(Qt3DRender::QTexture2D *texture,
+Marker::Marker(const QString &texture,
                float width, float height,
                QVector3D offset,
                Qt3DRender::QCamera *camera,
@@ -48,7 +49,7 @@ Marker::Marker(Qt3DRender::QTexture2D *texture,
     // Set up material
     auto *diffuseParam = new Qt3DRender::QParameter();
     diffuseParam->setName(QStringLiteral("diffuseTexture"));
-    diffuseParam->setValue(QVariant::fromValue(texture));
+    diffuseParam->setValue(QVariant::fromValue(TextureManagerSingleton::getInstance().getTexture(texture)));
 
     auto *material = new Qt3DRender::QMaterial();
     material->setEffect(effect);

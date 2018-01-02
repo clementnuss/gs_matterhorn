@@ -7,7 +7,7 @@
 #include <3D/ForwardRenderer/LayerManager.h>
 #include "GroundStation.h"
 
-GroundStation::GroundStation(QVector3D position, Qt3DRender::QTexture2D *texture, Qt3DRender::QCamera *camera,
+GroundStation::GroundStation(QVector3D position, const QString &texture, Qt3DRender::QCamera *camera,
                              Qt3DCore::QNode *parent)
         : Qt3DCore::QEntity(parent),
           position_{position},

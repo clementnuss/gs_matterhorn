@@ -11,7 +11,7 @@
 class Tracker : public Qt3DCore::QEntity {
 Q_OBJECT
 public:
-    explicit Tracker(QVector3D position, Qt3DRender::QCamera *camera, Qt3DRender::QTexture2D *texture, QString text,
+    explicit Tracker(QVector3D position, Qt3DRender::QCamera *camera, const QString &texture, QString text,
                      Qt3DCore::QNode *parent, const QVector3D &markerOffset, const QVector3D &textOffset);
 
 public slots:

@@ -9,6 +9,7 @@
 #include <Qt3DRender/QEffect>
 #include <Qt3DRender/QMaterial>
 #include <Qt3DExtras/QPlaneMesh>
+#include <3D/3DVisualisationConstants.h>
 
 
 HighlightArea::HighlightArea(Qt3DRender::QParameter *heightParameter, Qt3DCore::QNode *parent) :

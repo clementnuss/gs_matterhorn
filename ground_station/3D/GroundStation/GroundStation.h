@@ -8,7 +8,7 @@
 class GroundStation : public Qt3DCore::QEntity {
 Q_OBJECT
 public:
-    explicit GroundStation(QVector3D position, Qt3DRender::QTexture2D *texture, Qt3DRender::QCamera *camera,
+    explicit GroundStation(QVector3D position, const QString &texture, Qt3DRender::QCamera *camera,
                            Qt3DCore::QNode *parent);
 
 public slots:

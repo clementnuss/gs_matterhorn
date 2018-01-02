@@ -8,6 +8,7 @@
 #include <Qt3DRender/QTechnique>
 #include <Qt3DRender/QGraphicsApiFilter>
 #include <QtGui/QMatrix4x4>
+#include "3DVisualisationConstants.h"
 
 static Qt3DRender::QTexture2D *loadTextureImage(const QUrl &textureUrl) {
     auto *texture2D = new Qt3DRender::QTexture2D();

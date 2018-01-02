@@ -31,16 +31,9 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     cameraController_->setCamera(camera_);
     cameraController_->setLinearSpeed(1000.0);
 
-
-    Qt3DRender::QTexture2D *caretDownTexture = loadTextureImage(
-            QUrl{QStringLiteral("qrc:/3D/textures/caret_down.png")});
-    Qt3DRender::QTexture2D *angleLeftTexture = loadTextureImage(
-            QUrl{QStringLiteral("qrc:/3D/textures/angle-left.png")});
-    Qt3DRender::QTexture2D *dblArrowDownTexture = loadTextureImage(
-            QUrl{QStringLiteral("qrc:/3D/textures/double_down_arrow.png")});
-
     auto *ground = new Ground(this);
-    rocketTracker_ = new Tracker(QVector3D{0, 20, 0}, camera_, caretDownTexture, QStringLiteral("ROCKET"), this,
+    rocketTracker_ = new Tracker(QVector3D{0, 20, 0}, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
+                                 this,
                                  OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_CENTER_LABEL);
 
     rocketTrace_ = new Line(this, QColor::fromRgb(255, 255, 255), false);
@@ -55,13 +48,13 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     QVector<QVector3D> traceData = traceReader.readFile();
 
-    new Tracker(traceData.last(), view->camera(), caretDownTexture, QStringLiteral("SIM"), this,
+    new Tracker(traceData.last(), view->camera(), TextureConstants::CARET_DOWN, QStringLiteral("SIM"), this,
                 OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_RIGHT);
     simTrace_->appendData(traceData);
 
     QVector3D gsPos{3000, 50, -700};
 
-    new GroundStation(gsPos, dblArrowDownTexture, camera_, this);
+    new GroundStation(gsPos, TextureConstants::DOUBLE_DOWN_ARROW, camera_, this);
 
     std::string meteoPath{"../../ground_station/MeteoData/meteo_payerne_test.txt"};
     SplashDownPredictor splashDownPredictor{meteoPath, this};
@@ -72,7 +65,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     new OpenGL3DAxes(this);
     QVector3D initialPos{0, 0, 0};
-    rocketRuler_ = new Ruler(initialPos, camera_, angleLeftTexture, this);
+    rocketRuler_ = new Ruler(initialPos, camera_, TextureConstants::CARET_LEFT, this);
 
 
     camera_->setProjectionType(Qt3DRender::QCameraLens::PerspectiveProjection);
