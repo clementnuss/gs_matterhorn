@@ -74,6 +74,8 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     camera_->setPosition(QVector3D{-5000.0, 2000.0, -3000.0});
     camera_->setUpVector(QVector3D{0.0, 1.0, 0.0});
     camera_->setViewCenter(QVector3D{0.0, 2000.0, 0.0});
+
+    cameraController_->registerObservable(rocketTracker_->getTransform());
 }
 
 void RootEntity::updateRocketTracker(const QVector<QVector3D> &positions) {

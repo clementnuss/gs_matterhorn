@@ -46,3 +46,7 @@ void Tracker::updatePosition(QVector3D newPosition) {
 QVector3D Tracker::getPosition() {
     return transform_->translation();
 }
+
+Qt3DCore::QTransform *Tracker::getTransform() {
+    return transform_;
+}

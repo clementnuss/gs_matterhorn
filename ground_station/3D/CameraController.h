@@ -10,24 +10,34 @@
 #include <memory>
 #include <Qt3DInput/QKeyboardHandler>
 #include <Qt3DInput/QKeyboardDevice>
+#include <Qt3DCore/QTransform>
 #include "3DVisualisationConstants.h"
 
-static float
-linearInterpolation(const std::chrono::system_clock::time_point &initialTime, const float &v1, const float &v2) {
-    float t = msecsBetween(initialTime, std::chrono::system_clock::now()) / CameraConstants::ANIMATION_DURATION;
-    return (t * v2) + ((1.0f - t) * v1);
+
+static float easeInOutCubic(float t) {
+    return t < .5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1; // From https://gist.github.com/gre/1650294
+}
+
+static float normalizedTime(const std::chrono::system_clock::time_point &initialTime) {
+    return msecsBetween(initialTime, std::chrono::system_clock::now()) / CameraConstants::ANIMATION_DURATION;
 }
 
 static float
-easeInOutCubic(const std::chrono::system_clock::time_point &initialTime, const float &v1, const float &v2) {
-    float t = msecsBetween(initialTime, std::chrono::system_clock::now()) / CameraConstants::ANIMATION_DURATION;
-    t = t < .5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1; // From https://gist.github.com/gre/1650294
+floatInterpolate(const std::chrono::system_clock::time_point &initialTime, const float &v1, const float &v2) {
+    float t = easeInOutCubic(normalizedTime(initialTime));
+    return (t * v2) + ((1.0f - t) * v1);
+}
+
+static QVector3D
+qVector3DInterpolate(const std::chrono::system_clock::time_point &initialTime, const QVector3D &v1,
+                     const QVector3D &v2) {
+    float t = easeInOutCubic(normalizedTime(initialTime));
     return (t * v2) + ((1.0f - t) * v1);
 }
 
 class Interpolator {
 public:
-    Interpolator() : animationStartTime_{std::chrono::system_clock::now()} {}
+    Interpolator(std::function<void()> f) : animationStartTime_{std::chrono::system_clock::now()}, action{f} {}
 
     virtual void updateTarget() = 0;
 
@@ -38,17 +48,19 @@ public:
 
 protected:
     std::chrono::system_clock::time_point animationStartTime_;
+    std::function<void()> action;
 };
 
 class FloatInterpolator : public Interpolator {
 public:
-    FloatInterpolator(const float v1, const float v2, float *target) : Interpolator(),
-                                                                       v1_{v1},
-                                                                       v2_{v2},
-                                                                       target_{target} {}
+    FloatInterpolator(const float v1, const float v2, float *target, std::function<void()> f) : Interpolator(f),
+                                                                                                v1_{v1},
+                                                                                                v2_{v2},
+                                                                                                target_{target} {}
 
     void updateTarget() override {
-        *target_ = easeInOutCubic(animationStartTime_, v1_, v2_);
+        *target_ = floatInterpolate(animationStartTime_, v1_, v2_);
+        action();
     }
 
 private:
@@ -60,13 +72,14 @@ private:
 
 class QVector3DInterpolator : public Interpolator {
 public:
-    QVector3DInterpolator(const QVector3D &v1, const QVector3D &v2, QVector3D *target) : Interpolator(),
-                                                                                         v1_{v1},
-                                                                                         v2_{v2},
-                                                                                         target_{target} {}
+    QVector3DInterpolator(const QVector3D &v1, const QVector3D &v2, QVector3D *target, std::function<void()> f)
+            : Interpolator(f),
+              v1_{v1},
+              v2_{v2},
+              target_{target} {}
 
     void updateTarget() override {
-        //*target_ = linearInterpolation(animationStartTime_, v1_, v2_);
+        *target_ = qVector3DInterpolate(animationStartTime_, v1_, v2_);
     }
 
 private:
@@ -85,6 +98,12 @@ public:
 
     ~CameraController() override;
 
+    void registerObservable(Qt3DCore::QTransform *);
+
+    void unregisterObservable(Qt3DCore::QTransform *);
+
+    void switchObservable();
+
 public slots:
 
     void handleKeyPress(Qt3DInput::QKeyEvent *event);
@@ -94,14 +113,15 @@ private:
 
     void updateAnimators();
 
-    void moveToDesiredAttitude();
-
     Qt3DInput::QKeyboardHandler *keyboardHandler_;
     bool arrowPressed_;
     float desiredPan_;
     float desiredTilt_;
     QVector3D desiredViewCenter_;
+    QVector3D desiredPos_;
     std::vector<std::shared_ptr<Interpolator>> animators_;
+    std::list<Qt3DCore::QTransform *> observables_;
+    std::list<Qt3DCore::QTransform *>::const_iterator observableIt_;
 };
 
 

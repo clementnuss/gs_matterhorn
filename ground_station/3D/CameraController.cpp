@@ -5,10 +5,15 @@
 
 CameraController::CameraController(Qt3DCore::QNode *parent)
         : Qt3DExtras::QAbstractCameraController(parent),
-          keyboardHandler_{new Qt3DInput::QKeyboardHandler(this)}, arrowPressed_{false}, desiredPan_{0},
-          desiredTilt_{90}, desiredViewCenter_{0, 0, 0}, animators_{} {
-
-
+          keyboardHandler_{new Qt3DInput::QKeyboardHandler(this)},
+          arrowPressed_{false},
+          desiredPan_{0},
+          desiredTilt_{90},
+          desiredViewCenter_{0, 0, 0},
+          desiredPos_{0, 0, 0},
+          animators_{},
+          observables_{},
+          observableIt_{observables_.begin()} {
     connect(keyboardHandler_, &Qt3DInput::QKeyboardHandler::pressed, this, &CameraController::handleKeyPress);
     keyboardHandler_->setSourceDevice(keyboardDevice());
     keyboardHandler_->setFocus(true);
@@ -17,8 +22,60 @@ CameraController::CameraController(Qt3DCore::QNode *parent)
 CameraController::~CameraController() {
 }
 
+void CameraController::registerObservable(Qt3DCore::QTransform *o) {
+    observables_.emplace_back(o);
+}
+
+void CameraController::unregisterObservable(Qt3DCore::QTransform *o) {
+    observables_.remove(o);
+}
+
+void CameraController::switchObservable() {
+
+    if (observables_.empty())
+        return;
+
+    if (++observableIt_ == observables_.end()) {
+        observableIt_ = observables_.begin();
+    }
+
+    QVector3D observablePos = (*observableIt_)->translation();
+    QVector3D obsToCam = camera()->transform()->translation() - observablePos;
+    obsToCam = CameraConstants::ZOOMIN_DEFAULT * obsToCam.normalized();
+
+    animators_.push_back(std::make_shared<QVector3DInterpolator>(
+            camera()->transform()->translation(),
+            observablePos + obsToCam,
+            &desiredPos_,
+            [this]() {
+                if (desiredViewCenter_ != camera()->viewCenter())
+                    camera()->setViewCenter(desiredViewCenter_);
+            }
+    ));
+
+    animators_.push_back(std::make_shared<QVector3DInterpolator>(
+            camera()->viewCenter(),
+            observablePos,
+            &desiredViewCenter_,
+            [this]() {
+                if (desiredPos_ != camera()->transform()->translation())
+                    camera()->translateWorld(desiredPos_ - camera()->transform()->translation());
+            }
+    ));
+
+}
+
 void CameraController::handleKeyPress(Qt3DInput::QKeyEvent *event) {
-    std::cout << " Something happened " << std::endl;
+
+    std::cout << "Qt3D captured: " << event->key() << "\n";
+
+    switch (event->key()) {
+        case Qt::Key_Space:
+            switchObservable();
+            break;
+        default:
+            break;
+    }
 }
 
 inline float clampInputs(float input1, float input2) {
@@ -45,9 +102,17 @@ void CameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::I
 
     Qt3DRender::QCamera *cam = camera();
 
+    if (observableIt_ != observables_.end()) {
+        std::cout << (*observableIt_)->translation().x() << " " << (*observableIt_)->translation().x() << " "
+                  << (*observableIt_)->translation().z() << " "
+                  << std::endl;
+    }
 
-    if (cam == nullptr)
+
+    if (cam == nullptr) {
         return;
+    }
+
 
 
     // Mouse input
@@ -64,7 +129,7 @@ void CameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::I
         } else {
             // Translate
             cam->translate(QVector3D(clampInputs(state.rxAxisValue, state.txAxisValue) * linearSpeed(),
-                                           clampInputs(state.ryAxisValue, state.tyAxisValue) * linearSpeed(),
+                                     clampInputs(state.ryAxisValue, state.tyAxisValue) * linearSpeed(),
                                      0) * dt);
         }
         return;
@@ -91,14 +156,9 @@ void CameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::I
             cam->translate(QVector3D(0, 0, state.tyAxisValue * linearSpeed() * dt),
                            cam->DontTranslateViewCenter);
         } else {
-            cam->translate(QVector3D(0, 0, -0.5), cam->DontTranslateViewCenter);
+            cam->translate(QVector3D(0, 0, -0.5f), cam->DontTranslateViewCenter);
         }
     } else {
-        // Translate
-        /*theCamera->translate(QVector3D(
-                clampInputs(state.leftMouseButtonActive ? state.rxAxisValue : 0, state.txAxisValue) * linearSpeed(),
-                clampInputs(state.leftMouseButtonActive ? state.ryAxisValue : 0, state.tyAxisValue) * linearSpeed(),
-                state.tzAxisValue * linearSpeed()) * dt);*/
 
         if (state.txAxisValue == 0.0 && state.tyAxisValue == 0.0 && arrowPressed_) {
             arrowPressed_ = false;
@@ -117,27 +177,52 @@ void CameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::I
                 animators_.push_back(std::make_shared<FloatInterpolator>(
                         cam->transform()->rotationY(),
                         cam->transform()->rotationY() - CameraConstants::PAN_STEP,
-                        &desiredPan_)
+                        &desiredPan_,
+                        [this]() {
+                            float currentPan = camera()->transform()->rotationY();
+                            if (desiredPan_ != currentPan)
+                                camera()->panAboutViewCenter(currentPan - desiredPan_, CameraConstants::UP_VECTOR);
+                        })
                 );
 
             } else if (state.txAxisValue < 0.0) {
                 animators_.push_back(std::make_shared<FloatInterpolator>(
                         cam->transform()->rotationY(),
                         cam->transform()->rotationY() + CameraConstants::PAN_STEP,
-                        &desiredPan_)
-                );
+                        &desiredPan_,
+                        [this]() {
+                            float currentPan = camera()->transform()->rotationY();
+                            if (desiredPan_ != currentPan)
+                                camera()->panAboutViewCenter(currentPan - desiredPan_, CameraConstants::UP_VECTOR);
+                        }));
+
             } else if (state.tyAxisValue > 0.0) {
                 animators_.push_back(std::make_shared<FloatInterpolator>(
                         tilt,
                         clampTilt(tilt + CameraConstants::TILT_STEP),
-                        &desiredTilt_)
-                );
+                        &desiredTilt_,
+                        [this]() {
+                            float currentTilt = toDegrees(
+                                    std::acos(QVector3D::dotProduct(camera()->viewVector().normalized(),
+                                                                    CameraConstants::UP_VECTOR)));
+
+                            if (desiredTilt_ != currentTilt)
+                                camera()->tiltAboutViewCenter(desiredTilt_ - currentTilt);
+                        }));
+
             } else if (state.tyAxisValue < 0.0) {
                 animators_.push_back(std::make_shared<FloatInterpolator>(
                         tilt,
                         clampTilt(tilt - CameraConstants::TILT_STEP),
-                        &desiredTilt_)
-                );
+                        &desiredTilt_,
+                        [this]() {
+                            float currentTilt = toDegrees(
+                                    std::acos(QVector3D::dotProduct(camera()->viewVector().normalized(),
+                                                                    CameraConstants::UP_VECTOR)));
+
+                            if (desiredTilt_ != currentTilt)
+                                camera()->tiltAboutViewCenter(desiredTilt_ - currentTilt);
+                        }));
             }
         }
     }
@@ -148,34 +233,12 @@ void CameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::I
 
 void CameraController::updateAnimators() {
 
-    bool updateOccured = !animators_.empty();
-
-    for (auto animator : animators_) {
+    for (const auto &animator : animators_)
         animator->updateTarget();
-    }
 
     // Remove animators which have finished
     animators_.erase(std::remove_if(
             animators_.begin(),
             animators_.end(),
             [](std::shared_ptr<Interpolator> i) { return i->animationIsFinished(); }), animators_.end());
-
-    if (updateOccured)
-        moveToDesiredAttitude();
-}
-
-void CameraController::moveToDesiredAttitude() {
-    float currentPan = camera()->transform()->rotationY();
-    float currentTilt = toDegrees(
-            std::acos(QVector3D::dotProduct(camera()->viewVector().normalized(), CameraConstants::UP_VECTOR)));
-
-    if (desiredPan_ != currentPan) {
-        camera()->panAboutViewCenter(currentPan - desiredPan_, CameraConstants::UP_VECTOR);
-    }
-    if (desiredTilt_ != currentTilt) {
-        camera()->tiltAboutViewCenter(desiredTilt_ - currentTilt);
-    }
-    if (desiredViewCenter_ != camera()->viewCenter()) {
-
-    }
 }

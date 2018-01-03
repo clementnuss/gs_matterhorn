@@ -32,6 +32,7 @@ namespace TextureConstants {
 namespace CameraConstants {
     static const QVector3D UP_VECTOR = QVector3D(0, 1, 0);
     static constexpr float ZOOMIN_LIMIT = 100.0f;
+    static constexpr float ZOOMIN_DEFAULT = 1000.0f;
     static constexpr float PAN_STEP = 45.0f;
     static constexpr float TILT_STEP = 10.0f;
     static constexpr float TILT_MIN = 25.0f;

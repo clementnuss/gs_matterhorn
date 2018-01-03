@@ -20,6 +20,8 @@ public slots:
 
     QVector3D getPosition();
 
+    Qt3DCore::QTransform *getTransform();
+
 private:
     Marker *marker_;
     Text3D *text_;
