@@ -31,12 +31,13 @@ namespace TextureConstants {
 
 namespace CameraConstants {
     static const QVector3D UP_VECTOR = QVector3D(0, 1, 0);
-    static constexpr float ZOOMIN_LIMIT = 100.0f;
-    static constexpr float ZOOMIN_DEFAULT = 1000.0f;
-    static constexpr float PAN_STEP = 45.0f;
-    static constexpr float TILT_STEP = 10.0f;
-    static constexpr float TILT_MIN = 25.0f;
-    static constexpr float TILT_MAX = 165.0f;
+    static constexpr float VIEWING_DISTANCE_MIN = 400.0f;
+    static constexpr float VIEWING_DISTANCE_MAX = 10000.0f;
+    static constexpr float VIEWING_DISTANCE_DEFAULT = 1000.0f;
+    static constexpr float AZIMUTH_STEP = 0.785398f; // 45 degrees
+    static constexpr float POLAR_STEP = 0.261799f; // 15 degrees
+    static constexpr float POLAR_MIN = 0.261799f;
+    static constexpr float POLAR_MAX = 2.87979f;
     static constexpr float ANIMATION_DURATION = 400.0f;
 }
 

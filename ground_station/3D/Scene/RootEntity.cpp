@@ -29,7 +29,8 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 
     cameraController_->setCamera(camera_);
-    cameraController_->setLinearSpeed(3000.0);
+    cameraController_->setLinearSpeed(100.0);
+    cameraController_->setLookSpeed(3.0f);
 
     auto *ground = new Ground(this);
     rocketTracker_ = new Tracker(QVector3D{0, 20, 0}, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),

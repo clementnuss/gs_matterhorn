@@ -37,7 +37,7 @@ qVector3DInterpolate(const std::chrono::system_clock::time_point &initialTime, c
 
 class Interpolator {
 public:
-    Interpolator(std::function<void()> f) : animationStartTime_{std::chrono::system_clock::now()}, action{f} {}
+    Interpolator() : animationStartTime_{std::chrono::system_clock::now()} {}
 
     virtual void updateTarget() = 0;
 
@@ -48,19 +48,17 @@ public:
 
 protected:
     std::chrono::system_clock::time_point animationStartTime_;
-    std::function<void()> action;
 };
 
 class FloatInterpolator : public Interpolator {
 public:
-    FloatInterpolator(const float v1, const float v2, float *target, std::function<void()> f) : Interpolator(f),
-                                                                                                v1_{v1},
-                                                                                                v2_{v2},
-                                                                                                target_{target} {}
+    FloatInterpolator(const float v1, const float v2, float *target) :
+            v1_{v1},
+            v2_{v2},
+            target_{target} {}
 
     void updateTarget() override {
         *target_ = floatInterpolate(animationStartTime_, v1_, v2_);
-        action();
     }
 
 private:
@@ -72,11 +70,11 @@ private:
 
 class QVector3DInterpolator : public Interpolator {
 public:
-    QVector3DInterpolator(const QVector3D &v1, const QVector3D &v2, QVector3D *target, std::function<void()> f)
-            : Interpolator(f),
-              v1_{v1},
-              v2_{v2},
-              target_{target} {}
+    QVector3DInterpolator(const QVector3D &v1, const QVector3D &v2, QVector3D *target)
+            :
+            v1_{v1},
+            v2_{v2},
+            target_{target} {}
 
     void updateTarget() override {
         *target_ = qVector3DInterpolate(animationStartTime_, v1_, v2_);
@@ -111,12 +109,19 @@ public slots:
 private:
     void moveCamera(const Qt3DExtras::QAbstractCameraController::InputState &state, float dt) override;
 
+    void placeCamera();
+
     void updateAnimators();
 
     Qt3DInput::QKeyboardHandler *keyboardHandler_;
     bool arrowPressed_;
     float desiredPan_;
     float desiredTilt_;
+    float azimuthalAngle_;
+    float polarAngle_;
+    float viewingDistance_;
+    QVector3D viewCenter_;
+    QVector3D viewCenterOffset_;
     QVector3D desiredViewCenter_;
     QVector3D desiredPos_;
     std::vector<std::shared_ptr<Interpolator>> animators_;

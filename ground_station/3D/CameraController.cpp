@@ -9,6 +9,11 @@ CameraController::CameraController(Qt3DCore::QNode *parent)
           arrowPressed_{false},
           desiredPan_{0},
           desiredTilt_{90},
+          azimuthalAngle_{0},
+          polarAngle_{M_PI / 2.0f},
+          viewCenter_{0, 0, 0},
+          viewCenterOffset_{0, 0, 0},
+          viewingDistance_{5000.0f},
           desiredViewCenter_{0, 0, 0},
           desiredPos_{0, 0, 0},
           animators_{},
@@ -41,27 +46,17 @@ void CameraController::switchObservable() {
 
     QVector3D observablePos = (*observableIt_)->translation();
     QVector3D obsToCam = camera()->transform()->translation() - observablePos;
-    obsToCam = CameraConstants::ZOOMIN_DEFAULT * obsToCam.normalized();
+    obsToCam = CameraConstants::VIEWING_DISTANCE_DEFAULT * obsToCam.normalized();
 
     animators_.push_back(std::make_shared<QVector3DInterpolator>(
             camera()->transform()->translation(),
             observablePos + obsToCam,
-            &desiredPos_,
-            [this]() {
-                if (desiredViewCenter_ != camera()->viewCenter())
-                    camera()->setViewCenter(desiredViewCenter_);
-            }
-    ));
+            &desiredPos_));
 
     animators_.push_back(std::make_shared<QVector3DInterpolator>(
             camera()->viewCenter(),
             observablePos,
-            &desiredViewCenter_,
-            [this]() {
-                if (desiredPos_ != camera()->transform()->translation())
-                    camera()->translateWorld(desiredPos_ - camera()->transform()->translation());
-            }
-    ));
+            &desiredViewCenter_));
 
 }
 
@@ -78,16 +73,18 @@ void CameraController::handleKeyPress(Qt3DInput::QKeyEvent *event) {
     }
 }
 
-inline float clampInputs(float input1, float input2) {
-    float axisValue = input1 + input2;
-    return (axisValue < -1) ? -1 : (axisValue > 1) ? 1 : axisValue;
+inline float clampViewingDistance(float vd) {
+    return vd < CameraConstants::VIEWING_DISTANCE_MIN ?
+           CameraConstants::VIEWING_DISTANCE_MIN :
+           vd > CameraConstants::VIEWING_DISTANCE_MAX ?
+           CameraConstants::VIEWING_DISTANCE_MAX : vd;
 }
 
-inline float clampTilt(float tilt) {
-    return tilt < CameraConstants::TILT_MIN ?
-           CameraConstants::TILT_MIN :
-           tilt > CameraConstants::TILT_MAX ?
-           CameraConstants::TILT_MAX : tilt;
+inline float clampPolarAngle(float tilt) {
+    return tilt < CameraConstants::POLAR_MIN ?
+           CameraConstants::POLAR_MIN :
+           tilt > CameraConstants::POLAR_MAX ?
+           CameraConstants::POLAR_MAX : tilt;
 }
 
 inline float zoomDistance(QVector3D firstPoint, QVector3D secondPoint) {
@@ -99,6 +96,7 @@ inline float toDegrees(double x) {
 }
 
 void CameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::InputState &state, float dt) {
+
 
     Qt3DRender::QCamera *cam = camera();
 
@@ -114,120 +112,81 @@ void CameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::I
     }
 
 
-
     // Mouse input
     if (state.rightMouseButtonActive) {
         if (state.leftMouseButtonActive) {
-            if (zoomDistance(camera()->position(), cam->viewCenter()) >
-                CameraConstants::ZOOMIN_LIMIT * CameraConstants::ZOOMIN_LIMIT) {
-                // Dolly up to limit
-                cam->translate(QVector3D(0, 0, (state.ryAxisValue * linearSpeed()) * dt),
-                               cam->DontTranslateViewCenter);
-            } else {
-                cam->translate(QVector3D(0, 0, -0.5), cam->DontTranslateViewCenter);
-            }
+            viewingDistance_ = clampViewingDistance(viewingDistance_ + state.ryAxisValue * 300 * linearSpeed() * dt);
         } else {
             // Translate
-            cam->translate(QVector3D(clampInputs(state.rxAxisValue, state.txAxisValue) * linearSpeed(),
-                                     clampInputs(state.ryAxisValue, state.tyAxisValue) * linearSpeed(),
-                                     0) * dt);
+            QVector3D rightVector = QVector3D::crossProduct(
+                    cam->viewVector().normalized(),
+                    cam->upVector().normalized()
+            ).normalized();
+
+            QVector3D upVector = QVector3D::crossProduct(
+                    rightVector.normalized(),
+                    cam->viewVector().normalized()
+            ).normalized();
+
+            viewCenterOffset_ +=
+                    rightVector * state.rxAxisValue * linearSpeed() + upVector * state.ryAxisValue * linearSpeed();
         }
-        return;
     } else if (state.leftMouseButtonActive) {
         // Orbit
-        cam->panAboutViewCenter((state.rxAxisValue * lookSpeed()) * dt, CameraConstants::UP_VECTOR);
-        cam->tiltAboutViewCenter((state.ryAxisValue * lookSpeed()) * dt);
-
-        QVector3D x = cam->viewVector().normalized();
-        float tilt = toDegrees(std::acos(QVector3D::dotProduct(x, CameraConstants::UP_VECTOR)));
-        desiredTilt_ = tilt;
-        desiredPan_ = cam->transform()->rotationY();
+        azimuthalAngle_ += state.rxAxisValue * lookSpeed() * dt;
+        polarAngle_ = clampPolarAngle(polarAngle_ + state.ryAxisValue * lookSpeed() * dt);
     }
 
-    // Keyboard Input
-    if (state.altKeyActive) {
-        // Orbit
-        cam->panAboutViewCenter((state.txAxisValue * lookSpeed()) * dt, CameraConstants::UP_VECTOR);
-        cam->tiltAboutViewCenter((state.tyAxisValue * lookSpeed()) * dt);
-    } else if (state.shiftKeyActive) {
-        if (zoomDistance(camera()->position(), cam->viewCenter()) >
-            CameraConstants::ZOOMIN_LIMIT * CameraConstants::ZOOMIN_LIMIT) {
-            // Dolly
-            cam->translate(QVector3D(0, 0, state.tyAxisValue * linearSpeed() * dt),
-                           cam->DontTranslateViewCenter);
-        } else {
-            cam->translate(QVector3D(0, 0, -0.5f), cam->DontTranslateViewCenter);
-        }
-    } else {
+    if (state.txAxisValue == 0.0 && state.tyAxisValue == 0.0 && arrowPressed_) {
+        arrowPressed_ = false;
+    }
 
-        if (state.txAxisValue == 0.0 && state.tyAxisValue == 0.0 && arrowPressed_) {
-            arrowPressed_ = false;
+    if (!arrowPressed_) {
+
+        if (state.txAxisValue != 0.0 || state.tyAxisValue != 0.0) {
+            arrowPressed_ = true;
         }
 
-        if (!arrowPressed_) {
+        if (state.txAxisValue > 0.0) {
+            animators_.push_back(std::make_shared<FloatInterpolator>(
+                    azimuthalAngle_,
+                    azimuthalAngle_ + CameraConstants::AZIMUTH_STEP,
+                    &azimuthalAngle_)
+            );
+        } else if (state.txAxisValue < 0.0) {
+            animators_.push_back(std::make_shared<FloatInterpolator>(
+                    azimuthalAngle_,
+                    azimuthalAngle_ - CameraConstants::AZIMUTH_STEP,
+                    &azimuthalAngle_)
+            );
+        } else if (state.tyAxisValue > 0.0) {
+            animators_.push_back(std::make_shared<FloatInterpolator>(
+                    polarAngle_,
+                    clampPolarAngle(polarAngle_ + CameraConstants::POLAR_STEP),
+                    &polarAngle_)
+            );
 
-            QVector3D x = cam->viewVector().normalized();
-            float tilt = toDegrees(std::acos(QVector3D::dotProduct(x, CameraConstants::UP_VECTOR)));
-
-            if (state.txAxisValue != 0.0 || state.tyAxisValue != 0.0) {
-                arrowPressed_ = true;
-            }
-
-            if (state.txAxisValue > 0.0) {
-                animators_.push_back(std::make_shared<FloatInterpolator>(
-                        cam->transform()->rotationY(),
-                        cam->transform()->rotationY() - CameraConstants::PAN_STEP,
-                        &desiredPan_,
-                        [this]() {
-                            float currentPan = camera()->transform()->rotationY();
-                            if (desiredPan_ != currentPan)
-                                camera()->panAboutViewCenter(currentPan - desiredPan_, CameraConstants::UP_VECTOR);
-                        })
-                );
-
-            } else if (state.txAxisValue < 0.0) {
-                animators_.push_back(std::make_shared<FloatInterpolator>(
-                        cam->transform()->rotationY(),
-                        cam->transform()->rotationY() + CameraConstants::PAN_STEP,
-                        &desiredPan_,
-                        [this]() {
-                            float currentPan = camera()->transform()->rotationY();
-                            if (desiredPan_ != currentPan)
-                                camera()->panAboutViewCenter(currentPan - desiredPan_, CameraConstants::UP_VECTOR);
-                        }));
-
-            } else if (state.tyAxisValue > 0.0) {
-                animators_.push_back(std::make_shared<FloatInterpolator>(
-                        tilt,
-                        clampTilt(tilt + CameraConstants::TILT_STEP),
-                        &desiredTilt_,
-                        [this]() {
-                            float currentTilt = toDegrees(
-                                    std::acos(QVector3D::dotProduct(camera()->viewVector().normalized(),
-                                                                    CameraConstants::UP_VECTOR)));
-
-                            if (desiredTilt_ != currentTilt)
-                                camera()->tiltAboutViewCenter(desiredTilt_ - currentTilt);
-                        }));
-
-            } else if (state.tyAxisValue < 0.0) {
-                animators_.push_back(std::make_shared<FloatInterpolator>(
-                        tilt,
-                        clampTilt(tilt - CameraConstants::TILT_STEP),
-                        &desiredTilt_,
-                        [this]() {
-                            float currentTilt = toDegrees(
-                                    std::acos(QVector3D::dotProduct(camera()->viewVector().normalized(),
-                                                                    CameraConstants::UP_VECTOR)));
-
-                            if (desiredTilt_ != currentTilt)
-                                camera()->tiltAboutViewCenter(desiredTilt_ - currentTilt);
-                        }));
-            }
+        } else if (state.tyAxisValue < 0.0) {
+            animators_.push_back(std::make_shared<FloatInterpolator>(
+                    polarAngle_,
+                    clampPolarAngle(polarAngle_ - CameraConstants::POLAR_STEP),
+                    &polarAngle_)
+            );
         }
     }
 
     updateAnimators();
+    placeCamera();
+}
+
+void CameraController::placeCamera() {
+
+    float x = viewingDistance_ * std::sin(polarAngle_) * std::cos(azimuthalAngle_);
+    float z = viewingDistance_ * std::sin(polarAngle_) * std::sin(azimuthalAngle_);
+    float y = viewingDistance_ * std::cos(polarAngle_);
+
+    camera()->setPosition(viewCenter_ + viewCenterOffset_ + QVector3D{x, y, z});
+    camera()->setViewCenter(viewCenter_ + viewCenterOffset_);
 }
 
 
