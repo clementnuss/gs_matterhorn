@@ -6,9 +6,10 @@
 #include <3D/Billboards/Marker.h>
 #include <3D/Billboards/Text3D.h>
 #include <Qt3DRender/QCamera>
+#include <3D/Interfaces/IObservable.h>
 
 
-class Tracker : public Qt3DCore::QEntity {
+class Tracker : public Qt3DCore::QEntity, public IObservable {
 Q_OBJECT
 public:
     explicit Tracker(QVector3D position, Qt3DRender::QCamera *camera, const QString &texture, QString text,

@@ -53,9 +53,9 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
                 OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_RIGHT);
     simTrace_->appendData(traceData);
 
-    QVector3D gsPos{3000, 50, -700};
+    QVector3D gsPos{3000, 150, -700};
 
-    new GroundStation(gsPos, TextureConstants::DOUBLE_DOWN_ARROW, camera_, this);
+    GroundStation *gs = new GroundStation(gsPos, TextureConstants::DOUBLE_DOWN_ARROW, camera_, this);
 
     std::string meteoPath{"../../ground_station/MeteoData/meteo_payerne_test.txt"};
     SplashDownPredictor splashDownPredictor{meteoPath, this};
@@ -76,7 +76,8 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     camera_->setUpVector(QVector3D{0.0, 1.0, 0.0});
     camera_->setViewCenter(QVector3D{0.0, 2000.0, 0.0});
 
-    cameraController_->registerObservable(rocketTracker_->getTransform());
+    cameraController_->registerObservable(rocketTracker_);
+    cameraController_->registerObservable(gs);
 }
 
 void RootEntity::updateRocketTracker(const QVector<QVector3D> &positions) {

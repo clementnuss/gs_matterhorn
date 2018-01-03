@@ -24,3 +24,7 @@ GroundStation::GroundStation(QVector3D position, const QString &texture, Qt3DRen
                 OpenGLConstants::RIGHT_LABEL);
 }
 
+Qt3DCore::QTransform *GroundStation::getTransform() {
+    return transform_;
+}
+

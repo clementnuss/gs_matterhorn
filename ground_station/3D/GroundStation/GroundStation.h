@@ -2,15 +2,17 @@
 #ifndef GS_MATTERHORN_GROUNDSTATION_H
 #define GS_MATTERHORN_GROUNDSTATION_H
 
+#include <3D/Interfaces/IObservable.h>
 #include <Qt3DRender/QTexture>
 #include <Qt3DRender/QCamera>
 
-class GroundStation : public Qt3DCore::QEntity {
+class GroundStation : public Qt3DCore::QEntity, public IObservable {
 Q_OBJECT
 public:
     explicit GroundStation(QVector3D position, const QString &texture, Qt3DRender::QCamera *camera,
                            Qt3DCore::QNode *parent);
 
+    Qt3DCore::QTransform *getTransform() override;
 public slots:
 
 private:

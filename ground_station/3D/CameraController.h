@@ -11,6 +11,7 @@
 #include <Qt3DInput/QKeyboardHandler>
 #include <Qt3DInput/QKeyboardDevice>
 #include <Qt3DCore/QTransform>
+#include <3D/Interfaces/IObservable.h>
 #include "3DVisualisationConstants.h"
 
 
@@ -58,7 +59,7 @@ public:
             target_{target} {}
 
     void updateTarget() override {
-        *target_ = floatInterpolate(animationStartTime_, v1_, v2_);
+        *target_ += CameraConstants::INTERPOLATION_STRENGTH * (v2_ - (*target_));
     }
 
 private:
@@ -77,7 +78,7 @@ public:
             target_{target} {}
 
     void updateTarget() override {
-        *target_ = qVector3DInterpolate(animationStartTime_, v1_, v2_);
+        *target_ += CameraConstants::INTERPOLATION_STRENGTH * (v2_ - (*target_));
     }
 
 private:
@@ -96,9 +97,9 @@ public:
 
     ~CameraController() override;
 
-    void registerObservable(Qt3DCore::QTransform *);
+    void registerObservable(IObservable *);
 
-    void unregisterObservable(Qt3DCore::QTransform *);
+    void unregisterObservable(IObservable *);
 
     void switchObservable();
 
@@ -115,18 +116,14 @@ private:
 
     Qt3DInput::QKeyboardHandler *keyboardHandler_;
     bool arrowPressed_;
-    float desiredPan_;
-    float desiredTilt_;
     float azimuthalAngle_;
     float polarAngle_;
     float viewingDistance_;
     QVector3D viewCenter_;
     QVector3D viewCenterOffset_;
-    QVector3D desiredViewCenter_;
-    QVector3D desiredPos_;
     std::vector<std::shared_ptr<Interpolator>> animators_;
-    std::list<Qt3DCore::QTransform *> observables_;
-    std::list<Qt3DCore::QTransform *>::const_iterator observableIt_;
+    std::list<IObservable *> observables_;
+    std::list<IObservable *>::const_iterator observableIt_;
 };
 
 

@@ -24,7 +24,7 @@ ForwardRenderer::ForwardRenderer(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *
 
     auto *clearBuffer = new Qt3DRender::QClearBuffers(cameraSelector);
     clearBuffer->setBuffers(Qt3DRender::QClearBuffers::ColorDepthBuffer);
-    clearBuffer->setClearColor(QColor{"steelblue"});
+    clearBuffer->setClearColor(QColor{"#383838"});
 
 
     auto *visibleLayerFilter = new Qt3DRender::QLayerFilter(clearBuffer);
