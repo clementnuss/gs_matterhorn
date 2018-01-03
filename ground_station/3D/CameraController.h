@@ -15,27 +15,6 @@
 #include "3DVisualisationConstants.h"
 
 
-static float easeInOutCubic(float t) {
-    return t < .5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1; // From https://gist.github.com/gre/1650294
-}
-
-static float normalizedTime(const std::chrono::system_clock::time_point &initialTime) {
-    return msecsBetween(initialTime, std::chrono::system_clock::now()) / CameraConstants::ANIMATION_DURATION;
-}
-
-static float
-floatInterpolate(const std::chrono::system_clock::time_point &initialTime, const float &v1, const float &v2) {
-    float t = easeInOutCubic(normalizedTime(initialTime));
-    return (t * v2) + ((1.0f - t) * v1);
-}
-
-static QVector3D
-qVector3DInterpolate(const std::chrono::system_clock::time_point &initialTime, const QVector3D &v1,
-                     const QVector3D &v2) {
-    float t = easeInOutCubic(normalizedTime(initialTime));
-    return (t * v2) + ((1.0f - t) * v1);
-}
-
 class Interpolator {
 public:
     Interpolator() : animationStartTime_{std::chrono::system_clock::now()} {}
@@ -53,37 +32,32 @@ protected:
 
 class FloatInterpolator : public Interpolator {
 public:
-    FloatInterpolator(const float v1, const float v2, float *target) :
-            v1_{v1},
-            v2_{v2},
+    FloatInterpolator(const float objectiveValue, float *target) :
+            objectiveValue_{objectiveValue},
             target_{target} {}
 
     void updateTarget() override {
-        *target_ += CameraConstants::INTERPOLATION_STRENGTH * (v2_ - (*target_));
+        *target_ += CameraConstants::INTERPOLATION_STRENGTH * (objectiveValue_ - (*target_));
     }
 
 private:
-    float v1_;
-    float v2_;
+    float objectiveValue_;
     float *target_;
 };
 
 
 class QVector3DInterpolator : public Interpolator {
 public:
-    QVector3DInterpolator(const QVector3D &v1, const QVector3D &v2, QVector3D *target)
-            :
-            v1_{v1},
-            v2_{v2},
+    QVector3DInterpolator(const QVector3D &objectiveValue, QVector3D *target) :
+            objectiveValue_{objectiveValue},
             target_{target} {}
 
     void updateTarget() override {
-        *target_ += CameraConstants::INTERPOLATION_STRENGTH * (v2_ - (*target_));
+        *target_ += CameraConstants::INTERPOLATION_STRENGTH * (objectiveValue_ - (*target_));
     }
 
 private:
-    QVector3D v1_;
-    QVector3D v2_;
+    QVector3D objectiveValue_;
     QVector3D *target_;
 };
 

@@ -1,5 +1,6 @@
 
 #include "CameraController.h"
+#include "Utils.h"
 #include <Qt3DRender/QCamera>
 #include <Qt3DExtras/Qt3DExtras>
 
@@ -31,34 +32,6 @@ void CameraController::unregisterObservable(IObservable *o) {
     observables_.remove(o);
 }
 
-
-inline float clampViewingDistance(float vd) {
-    return vd < CameraConstants::VIEWING_DISTANCE_MIN ?
-           CameraConstants::VIEWING_DISTANCE_MIN :
-           vd > CameraConstants::VIEWING_DISTANCE_MAX ?
-           CameraConstants::VIEWING_DISTANCE_MAX : vd;
-}
-
-inline float clampPolarAngle(float tilt) {
-    return tilt < CameraConstants::POLAR_MIN ?
-           CameraConstants::POLAR_MIN :
-           tilt > CameraConstants::POLAR_MAX ?
-           CameraConstants::POLAR_MAX : tilt;
-}
-
-static const float pi = static_cast<float>(M_PI);
-static const float twoPi = 2.0f * pi;
-
-inline float wrapAngle(float angle) {
-    return angle - twoPi * std::floor(angle / twoPi);
-}
-
-
-inline float angularDistance(float theta1, float theta2) {
-    return std::fmod((theta2 - theta1 + pi), twoPi) - pi;
-}
-
-
 void CameraController::switchObservable() {
 
     if (observables_.empty())
@@ -79,28 +52,28 @@ void CameraController::switchObservable() {
     float newAzimuthalAngle = std::atan2(obsToCam.z(), obsToCam.x());
 
     azimuthalAngle_ = wrapAngle(azimuthalAngle_);
+    newAzimuthalAngle = wrapAngle(newAzimuthalAngle);
+
+    std::cout << "azimuth: " << azimuthalAngle_ << " new azimuth: " << newAzimuthalAngle << "angular dist "
+              << angularDistance(azimuthalAngle_, newAzimuthalAngle) << std::endl;
 
     // Adjust polar angle
     animators_.push_back(std::make_shared<FloatInterpolator>(
-            polarAngle_,
             newPolarAngle,
             &polarAngle_));
 
     // Adjust azimuthal angle
     animators_.push_back(std::make_shared<FloatInterpolator>(
-            azimuthalAngle_,
             azimuthalAngle_ + angularDistance(azimuthalAngle_, newAzimuthalAngle),
             &azimuthalAngle_));
 
     // Reset viewing distance
     animators_.push_back(std::make_shared<FloatInterpolator>(
-            viewingDistance_,
             CameraConstants::VIEWING_DISTANCE_DEFAULT,
             &viewingDistance_));
 
     // Reset offset
     animators_.push_back(std::make_shared<QVector3DInterpolator>(
-            viewCenterOffset_,
             QVector3D{0, 0, 0},
             &viewCenterOffset_));
 
@@ -167,26 +140,22 @@ void CameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::I
 
         if (state.txAxisValue > 0.0) {
             animators_.push_back(std::make_shared<FloatInterpolator>(
-                    azimuthalAngle_,
                     azimuthalAngle_ - CameraConstants::AZIMUTH_STEP,
                     &azimuthalAngle_)
             );
         } else if (state.txAxisValue < 0.0) {
             animators_.push_back(std::make_shared<FloatInterpolator>(
-                    azimuthalAngle_,
                     azimuthalAngle_ + CameraConstants::AZIMUTH_STEP,
                     &azimuthalAngle_)
             );
         } else if (state.tyAxisValue > 0.0) {
             animators_.push_back(std::make_shared<FloatInterpolator>(
-                    polarAngle_,
                     clampPolarAngle(polarAngle_ - CameraConstants::POLAR_STEP),
                     &polarAngle_)
             );
 
         } else if (state.tyAxisValue < 0.0) {
             animators_.push_back(std::make_shared<FloatInterpolator>(
-                    polarAngle_,
                     clampPolarAngle(polarAngle_ + CameraConstants::POLAR_STEP),
                     &polarAngle_)
             );
@@ -207,7 +176,6 @@ void CameraController::placeCamera() {
         viewCenter_ += ((*observableIt_)->getTransform()->translation() - viewCenter_) * 0.1;
     }
 
-    std::cout << "azimuth: " << azimuthalAngle_ << "polar: " << polarAngle_ << std::endl;
 
     float x = viewingDistance_ * std::sin(polarAngle_) * std::cos(azimuthalAngle_);
     float z = viewingDistance_ * std::sin(polarAngle_) * std::sin(azimuthalAngle_);

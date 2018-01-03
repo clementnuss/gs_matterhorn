@@ -8,7 +8,42 @@
 #include <Qt3DRender/QTechnique>
 #include <Qt3DRender/QGraphicsApiFilter>
 #include <QtGui/QMatrix4x4>
+#include <math.h>
 #include "3DVisualisationConstants.h"
+
+static const float pi = static_cast<float>(M_PI);
+static const float twoPi = 2.0f * pi;
+
+static inline float clampViewingDistance(float vd) {
+    return vd < CameraConstants::VIEWING_DISTANCE_MIN ?
+           CameraConstants::VIEWING_DISTANCE_MIN :
+           vd > CameraConstants::VIEWING_DISTANCE_MAX ?
+           CameraConstants::VIEWING_DISTANCE_MAX : vd;
+}
+
+static inline float clampPolarAngle(float tilt) {
+    return tilt < CameraConstants::POLAR_MIN ?
+           CameraConstants::POLAR_MIN :
+           tilt > CameraConstants::POLAR_MAX ?
+           CameraConstants::POLAR_MAX : tilt;
+}
+
+static inline float flooredDiv(float x, float y) {
+    return std::floor(x / y);
+}
+
+static inline float flooredMod(float x, float y) {
+    return x - y * flooredDiv(x, y);
+}
+
+static inline float wrapAngle(float angle) {
+    return angle - twoPi * std::floor(angle / twoPi);
+}
+
+
+static inline float angularDistance(float theta1, float theta2) {
+    return flooredMod((theta2 - theta1 + pi), twoPi) - pi;
+}
 
 static Qt3DRender::QTexture2D *loadTextureImage(const QUrl &textureUrl) {
     auto *texture2D = new Qt3DRender::QTexture2D();
