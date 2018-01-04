@@ -850,11 +850,11 @@
                 <property name="frameShadow">
                  <enum>QFrame::Raised</enum>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="0,0,0,0,0,0,8">
+                <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="0,0,0,0,0,0">
                  <item>
-                  <widget class="QToolButton" name="time_unfolding_select_files">
+                  <widget class="QToolButton" name="time_unfolding_reset">
                    <property name="text">
-                    <string>Select data</string>
+                    <string>Restart</string>
                    </property>
                   </widget>
                  </item>
@@ -868,13 +868,6 @@
                    </property>
                    <property name="text">
                     <string>Reverse time</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QToolButton" name="time_unfolding_reset">
-                   <property name="text">
-                    <string>Restart</string>
                    </property>
                   </widget>
                  </item>

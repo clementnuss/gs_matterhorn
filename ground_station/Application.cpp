@@ -9,17 +9,6 @@
 Application::Application(int &argc, char **argv) : qApplication_{argc, argv}, gsMainWindow_{}, workerThread_{} {
 }
 
-void Application::simpleTest() {
-    std::this_thread::sleep_for(chrono::milliseconds(3000));
-    std::string path{R"(C:\Users\clement\Documents\gs_matterhorn\data\Greg)"};
-    cout << "Doing some TelemHandler tests" << endl;
-//    worker_->defineReplayMode(path);
-    std::this_thread::sleep_for(chrono::milliseconds(10000));
-
-    worker_->defineReplayMode("helloThere");
-
-}
-
 void Application::run() {
     worker_ = new Worker(&gsMainWindow_);
     worker_->moveToThread(&workerThread_);
