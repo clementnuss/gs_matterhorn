@@ -51,9 +51,6 @@ Text3D::Text3D(QString text, Qt3DRender::QCamera *camera, QVector3D &offsetToPar
     test->setText(text);
     test->setDepth(0.1);
 
-    auto *transform = new Qt3DCore::QTransform();
-    transform->setTranslation(offset_);
-
     this->addComponent(test);
     this->addComponent(transform_);
     this->addComponent(material);
