@@ -9,6 +9,10 @@ Q_OBJECT
 private slots:
 
     void testsAreCorrectlySetup();
+
+    void toUpper_data();
+
+    void toUpper();
 };
 
 
