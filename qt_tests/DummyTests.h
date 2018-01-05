@@ -13,6 +13,10 @@ private slots:
     void toUpper_data();
 
     void toUpper();
+
+    void testGui_data();
+
+    void testGui();
 };
 
 
