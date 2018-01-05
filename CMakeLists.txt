@@ -18,6 +18,6 @@ add_subdirectory(lib/serial)
 add_subdirectory(ground_station)
 include_directories(ground_station/)
 add_subdirectory(gs_tests)
-
+add_subdirectory(qt_tests)
 
 
