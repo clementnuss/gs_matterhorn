@@ -11,11 +11,10 @@ Compass::Compass(Qt3DCore::QNode *parent, Qt3DRender::QCamera *cam) :
         mesh_{new Qt3DRender::QMesh()},
         transform_{new Qt3DCore::QTransform()} {
 
-    transform_->setScale(100);
+    transform_->setScale(0.03);
 
-    mesh_->setSource(QUrl{"qrc:/models/basic_compass.obj"});
+    mesh_->setSource(QUrl{"qrc:3D/models/basic_compass.obj"});
     auto *material = new Qt3DExtras::QPhongMaterial();
-
 
     this->addComponent(mesh_);
     this->addComponent(material);
@@ -25,7 +24,7 @@ Compass::Compass(Qt3DCore::QNode *parent, Qt3DRender::QCamera *cam) :
 
 void Compass::update() {
 
-    /* QVector3D rightVector = QVector3D::crossProduct(
+    QVector3D rightVector = QVector3D::crossProduct(
              camera_->viewVector().normalized(),
              camera_->upVector().normalized()
      ).normalized();
@@ -40,6 +39,6 @@ void Compass::update() {
      pos += camera_->viewVector().normalized() * 1;
      pos += 0.4 * rightVector;
      pos += 0.3 * upVector;
-     transform_->setTranslation(pos);*/
+    transform_->setTranslation(pos);
 
 }
