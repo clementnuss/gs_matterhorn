@@ -5,15 +5,15 @@
 #include <Qt3DInput/QInputAspect>
 #include <Utilities/TimeUtils.h>
 #include <Utilities/ReaderUtils.h>
+#include <QtWidgets/QFileDialog>
+#include <QtCore/QTime>
 
 /**
- * GSWidget is the main user interface class. It communicate through Qt SLOTS system with the main worker thread of the
- * application in order to constantly display fresh data.
- * @param parent
+ * GSMainwindow is the main user interface class. It communicate through Qt SLOTS system with the
+ * main worker thread of the application in order to constantly display fresh data.
  */
-GSWidget::GSWidget(QWidget *parent) :
-        QWidget(parent),
-        ui(new Ui::GSWidget),
+GSMainwindow::GSMainwindow() :
+        ui(new Ui::GS_mainWindow),
         clockTimer(this),
         currentTrace_{nullptr},
         rootEntity3D_{nullptr},
@@ -47,11 +47,11 @@ GSWidget::GSWidget(QWidget *parent) :
     traceData_ = traceReader.readFile();
 
 
-    Qt3DExtras::Qt3DWindow *view = new Qt3DExtras::Qt3DWindow();
+    auto *view = new Qt3DExtras::Qt3DWindow();
     QWidget *container = QWidget::createWindowContainer(view);
     container->setMinimumSize(QSize(200, 100));
 
-    Qt3DInput::QInputAspect *input = new Qt3DInput::QInputAspect;
+    auto *input = new Qt3DInput::QInputAspect;
 
     view->registerAspect(input);
 
@@ -65,7 +65,7 @@ GSWidget::GSWidget(QWidget *parent) :
 
 }
 
-GSWidget::~GSWidget() {
+GSMainwindow::~GSMainwindow() {
     delete ui;
     delete currentTrace_;
 }
@@ -73,17 +73,18 @@ GSWidget::~GSWidget() {
 /**
  * Connects the UI components such as buttons and plots to appropriate UI slots
  */
-void GSWidget::connectComponents() {
+void GSMainwindow::connectComponents() {
     connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
-    connect(ui->graph_clear_items_button, &QPushButton::clicked, this, &GSWidget::clearAllGraphItems);
-    connect(ui->graph_autoplay_button, &QPushButton::clicked, this, &GSWidget::updateAutoPlay);
-    connect(ui->graph_sync_button, &QPushButton::clicked, this, &GSWidget::updatePlotSync);
+    connect(ui->graph_clear_items_button, &QPushButton::clicked, this, &GSMainwindow::clearAllGraphItems);
+    connect(ui->graph_autoplay_button, &QPushButton::clicked, this, &GSMainwindow::updateAutoPlay);
+    connect(ui->graph_sync_button, &QPushButton::clicked, this, &GSMainwindow::updatePlotSync);
 
-    connect(ui->time_unfolding_increase, &QPushButton::clicked, this, &GSWidget::increaseSpeed);
-    connect(ui->time_unfolding_decrease, &QPushButton::clicked, this, &GSWidget::decreaseSpeed);
-    connect(ui->time_unfolding_reset, &QPushButton::clicked, this, &GSWidget::resetPlayback);
-    connect(ui->time_unfolding_reverse_time, &QPushButton::clicked, this, &GSWidget::reversePlayback);
-    connect(ui->time_unfolding_select_files, &QPushButton::clicked, this, &GSWidget::selectFile);
+    connect(ui->time_unfolding_increase, &QPushButton::clicked, this, &GSMainwindow::increaseSpeed);
+    connect(ui->time_unfolding_decrease, &QPushButton::clicked, this, &GSMainwindow::decreaseSpeed);
+    connect(ui->time_unfolding_reset, &QPushButton::clicked, this, &GSMainwindow::resetPlayback);
+    connect(ui->time_unfolding_reverse_time, &QPushButton::clicked, this, &GSMainwindow::reversePlayback);
+    connect(ui->actionREPLAY_select_file, &QAction::triggered, this, &GSMainwindow::changeToReplayModeAction);
+    connect(ui->actionREAL_TIME, &QAction::triggered, this, &GSMainwindow::changeToRealTimeModeAction);
 
     // Connect components related to graphs
     applyToAllPlots(
@@ -101,14 +102,14 @@ void GSWidget::connectComponents() {
  *
  * @param b
  */
-void GSWidget::dummySlot(bool b) {
+void GSMainwindow::dummySlot(bool b) {
     std::cout << "The dummy slot was called. Time was: "
               << QTime::currentTime().toString().toStdString()
               << "." << std::setw(3) << std::setfill('0')
               << QTime::currentTime().msec() << std::endl;
 }
 
-void GSWidget::dummyAnimation() {
+void GSMainwindow::dummyAnimation() {
     static int i = 0;
 
     int secsFromTrigger = QTime::currentTime().msecsTo(animationTriggerTime_);
@@ -123,7 +124,7 @@ void GSWidget::dummyAnimation() {
 /**
  * Qt SLOT for updating the watch of the user interface
  */
-void GSWidget::updateTime() {
+void GSMainwindow::updateTime() {
     ui->ground_time->setText(QTime::currentTime().toString());
 }
 
@@ -132,7 +133,7 @@ void GSWidget::updateTime() {
  *
  * @param events A vector of events
  */
-void GSWidget::updateEvents(vector<RocketEvent> &events) {
+void GSMainwindow::updateEvents(vector<RocketEvent> &events) {
     if (!events.empty()) {
         for (RocketEvent &e : events) {
             int seconds = e.timestamp_ / TimeConstants::MSECS_IN_SEC;
@@ -159,7 +160,7 @@ void GSWidget::updateEvents(vector<RocketEvent> &events) {
  * @param feature A GraphFeature enumerated value to indicate to which plot to add the data points
  */
 //TODO: only use qvectors or only use vectors
-void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
+void GSMainwindow::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 
     if (d.isEmpty()) {
 
@@ -230,7 +231,7 @@ void GSWidget::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
  *
  * @param t The Telemetry object from which to extract data to update the display
  */
-void GSWidget::updateTelemetry(TelemetryReading t) {
+void GSMainwindow::updateTelemetry(TelemetryReading t) {
     ui->telemetry_altitude_value->setText(QString::number(t.altitude_, 'f', UIConstants::PRECISION));
     ui->telemetry_speed_value->setText(QString::number(t.air_speed_, 'f', UIConstants::PRECISION));
     ui->telemetry_acceleration_value->setText(QString::number(t.acceleration_.norm(), 'f', UIConstants::PRECISION));
@@ -246,14 +247,14 @@ void GSWidget::updateTelemetry(TelemetryReading t) {
  *
  * @param enabled True if logging is enabled, false otherwise
  */
-void GSWidget::updateLoggingStatus(bool enabled) {
+void GSMainwindow::updateLoggingStatus(bool enabled) {
     QLabel *label = ui->status_logging;
     QPalette palette = label->palette();
     palette.setColor(label->backgroundRole(), enabled ? UIColors::GREEN : UIColors::RED);
     label->setPalette(palette);
 }
 
-void GSWidget::updateLinkStatus(HandlerStatus status) {
+void GSMainwindow::updateLinkStatus(HandlerStatus status) {
     QColor statusColor;
 
     switch (status) {
@@ -275,19 +276,19 @@ void GSWidget::updateLinkStatus(HandlerStatus status) {
 
 }
 
-void GSWidget::updateGroundStatus(float temperature, float pressure) {
+void GSMainwindow::updateGroundStatus(float temperature, float pressure) {
     ui->ground_temperature_value->setText(QString::number(temperature, 'f', UIConstants::PRECISION));
     ui->ground_temperature_value->setText(QString::number(pressure, 'f', UIConstants::PRECISION));
 }
 
-void GSWidget::register3DPoints(const QVector<QVector3D> &positions) {
+void GSMainwindow::register3DPoints(const QVector<QVector3D> &positions) {
     rootEntity3D_->updateRocketTracker(positions);
 }
 
 /**
  * Setup the container widget which will hold and display all the QCustomPlot objects
  */
-void GSWidget::graphWidgetSetup() {
+void GSMainwindow::graphWidgetSetup() {
     QWidget *plotContainer = ui->plot_container;
 
     plotSetup(plot1_, QStringLiteral("Altitude [m]"), QColor(180, 0, 0));
@@ -310,7 +311,7 @@ void GSWidget::graphWidgetSetup() {
  * @param title The title for the plot
  * @param color The color ot use to draw the plot
  */
-void GSWidget::plotSetup(QCustomPlot *plot, QString title, QColor color) {
+void GSMainwindow::plotSetup(QCustomPlot *plot, QString title, QColor color) {
     plot->setInteractions(interactionItemsOnly_);
     plot->plotLayout()->clear();
 
@@ -360,7 +361,7 @@ void GSWidget::plotSetup(QCustomPlot *plot, QString title, QColor color) {
  * @param plottable A pointer to the plottable which was clicked
  * @param dataIndex The index in the graph's data array corresponding to the point clicked
  */
-void GSWidget::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) {
+void GSMainwindow::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) {
 
     double dataValue = plottable->interface1D()->dataMainValue(dataIndex);
     double dataKey = plottable->interface1D()->dataMainKey(dataIndex);
@@ -388,7 +389,7 @@ void GSWidget::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) {
 #endif
 }
 
-void GSWidget::mouseWheelOnPlot() {
+void GSMainwindow::mouseWheelOnPlot() {
     updateAutoPlay(false);
 
     // Make all plots respond to wheel events
@@ -400,7 +401,7 @@ void GSWidget::mouseWheelOnPlot() {
     );
 }
 
-void GSWidget::mousePressOnPlot() {
+void GSMainwindow::mousePressOnPlot() {
     if (!autoPlay_) {
 
         // Make all plots respond to mouse events
@@ -413,7 +414,7 @@ void GSWidget::mousePressOnPlot() {
     }
 }
 
-void GSWidget::updateAutoPlay(bool enable) {
+void GSMainwindow::updateAutoPlay(bool enable) {
     autoPlay_ = enable;
     ui->graph_autoplay_button->setChecked(enable);
 
@@ -430,7 +431,7 @@ void GSWidget::updateAutoPlay(bool enable) {
  *
  * @param checked the boolean value indicating synchronisation
  */
-void GSWidget::updatePlotSync(bool checked) {
+void GSMainwindow::updatePlotSync(bool checked) {
     if (checked) {
         for (int i = 0; i < plotVector_.size(); i++) {
             for (int j = 0; j < plotVector_.size(); j++) {
@@ -461,10 +462,31 @@ void GSWidget::updatePlotSync(bool checked) {
  * When called, removes all the QAbstractItems subclasses that were previously added to any QCustomPlot object
  * @param checked
  */
-void GSWidget::clearAllGraphItems(bool checked) {
+void GSMainwindow::clearAllGraphItems(bool checked) {
     Q_UNUSED(checked);
     applyToAllPlots([](QCustomPlot *p) { p->clearItems(); });
 }
+
+void GSMainwindow::resetUIState() {
+
+    playbackReversed_ = false;
+    lastGraphUpdate_ = chrono::system_clock::now();
+    lastRemoteTime_ = -1000;
+    autoPlay_ = true;
+    replayPlaybackSpeed_ = 1;
+    ui->time_unfolding_current_speed->setText(
+            QString::number(replayPlaybackSpeed_, 'f', 2));
+
+    ui->event_log->clear();
+    updateTelemetry(TelemetryReading{});
+
+    for (auto &g_idx : plotVector_) {
+        QCPGraph *g = g_idx->graph();
+        g->data()->clear();
+        g_idx->replot();
+    };
+}
+
 
 /**
  * Applies a lambda function to all the QCustomPlots objects of the UI.
@@ -472,20 +494,20 @@ void GSWidget::clearAllGraphItems(bool checked) {
  * @param f The lambda function which will be applied to all plots. Should take a pointer to a QCustomPlot object and
  * return void.
  */
-void GSWidget::applyToAllPlots(const std::function<void(QCustomPlot *)> &f) {
+void GSMainwindow::applyToAllPlots(const std::function<void(QCustomPlot *)> &f) {
     for (auto &plot : plotVector_) {
         f(plot);
     }
 }
 
-void GSWidget::increaseSpeed() {
+void GSMainwindow::increaseSpeed() {
     replayPlaybackSpeed_ *= DataConstants::INCREASE_FACTOR;
     emit changePlaybackSpeed(replayPlaybackSpeed_);
     ui->time_unfolding_current_speed->setText(
             QString::number(replayPlaybackSpeed_, 'f', 2));
 }
 
-void GSWidget::decreaseSpeed() {
+void GSMainwindow::decreaseSpeed() {
     assert(replayMode_);
     replayPlaybackSpeed_ *= DataConstants::DECREASE_FACTOR;
     emit changePlaybackSpeed(replayPlaybackSpeed_);
@@ -493,7 +515,7 @@ void GSWidget::decreaseSpeed() {
             QString::number(replayPlaybackSpeed_, 'f', 2));
 }
 
-void GSWidget::resetPlayback() {
+void GSMainwindow::resetPlayback() {
     assert(replayMode_);
     emit resetTelemetryReplayPlayback();
     playbackReversed_ = false;
@@ -514,19 +536,19 @@ void GSWidget::resetPlayback() {
 }
 
 
-void GSWidget::setRealTimeMode() {
+void GSMainwindow::setRealTimeMode() {
     replayMode_ = false;
     ui->time_unfolding_mode->setText(QString("REAL-TIME"));
     ui->replay_controls->hide();
 }
 
-void GSWidget::setReplayMode() {
+void GSMainwindow::setReplayMode() {
     replayMode_ = true;
     ui->time_unfolding_mode->setText(QString("REPLAY"));
     ui->replay_controls->show();
 }
 
-void GSWidget::reversePlayback() {
+void GSMainwindow::reversePlayback() {
     playbackReversed_ = !playbackReversed_;
     emit reverseTelemetryReplayPlayback(playbackReversed_);
 }
@@ -536,7 +558,7 @@ void GSWidget::reversePlayback() {
  * @param event
  * @return
  */
-bool GSWidget::event(QEvent *event) {
+bool GSMainwindow::event(QEvent *event) {
     if (event->type() == QEvent::KeyPress) {
         std::cout << "Event" << std::endl;
         auto *ke = dynamic_cast<QKeyEvent *>(event);
@@ -553,7 +575,7 @@ bool GSWidget::event(QEvent *event) {
 
             if (!triggered) {
                 triggered = true;
-                QTimer *launchTimer = new QTimer();
+                auto *launchTimer = new QTimer();
                 launchTimer->start(std::lround((1.0 / 240.0) * 1000));
                 animationTriggerTime_ = QTime::currentTime();
                 connect(launchTimer, SIGNAL(timeout()), this, SLOT(dummyAnimation()));
@@ -564,8 +586,16 @@ bool GSWidget::event(QEvent *event) {
     return QWidget::event(event);
 }
 
-void GSWidget::selectFile() {
-/*    QString fileName = QFileDialog::getOpenFileName(this,
-                                            tr("Open Files"), "./", tr("Telemetry data (*)"));
-    cout << fileName.toStdString() << endl;*/
+void GSMainwindow::changeToReplayModeAction() {
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Open Files"), "./", tr("Telemetry data (*)"));
+    cout << fileName.toStdString() << endl;
+
+    emit defineReplayMode(fileName);
+    setReplayMode();
+}
+
+void GSMainwindow::changeToRealTimeModeAction() {
+    emit defineRealtimeMode(QString{""});
+    setRealTimeMode();
 }

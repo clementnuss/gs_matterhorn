@@ -34,6 +34,8 @@ public:
 
     bool isReplayHandler() override;
 
+    std::vector<XYZReading> pollLocations() override;
+
 private:
 
     /**

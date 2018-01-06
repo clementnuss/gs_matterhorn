@@ -10,29 +10,32 @@ using namespace boost::filesystem;
  * Constructor for the TelemetryReplay class
  * @param path location of the file/directory to read.
  */
-TelemetryReplay::TelemetryReplay(std::string &path) :
+TelemetryReplay::TelemetryReplay(const string &path) :
         path_{path}, readings_{}, lastPlaybackTime_{}, endReadingsIter_{}, frontReadingsIter_{}, playbackSpeed_{1},
         playbackReversed_{}, lastTimeStamp_{0} {}
 
 void TelemetryReplay::startup() {
     if (exists(path_)) {
-        if (is_regular_file((path_))) {
-            parseFile(path_);
-        } else if (is_directory((path_))) {
-            vector<path> directoryEntries;
-            copy(directory_iterator(path_), directory_iterator(), std::back_inserter(directoryEntries));
-            sort(directoryEntries.begin(), directoryEntries.end());
-
-            for (path &f: directoryEntries) {
-                if (is_regular_file(f)) {
-                    parseFile(f);
-                }
-            }
-        } else {
-            throw (std::runtime_error(path_.string() + " exists, but is not a regular file or directory\n"));
+        if (is_directory(path_.parent_path())) {
+            path_ = path_.parent_path();
         }
-    } else {
-        throw (std::runtime_error(path_.string() + " does not exist\n"));
+        vector<path> directoryEntries;
+        copy(directory_iterator(path_), directory_iterator(), std::back_inserter(directoryEntries));
+        sort(directoryEntries.begin(), directoryEntries.end());
+
+        for (path &f: directoryEntries) {
+            if (is_regular_file(f)) {
+                parseFile(f);
+            }
+        }
+    }
+
+    if (readings_.empty()) {
+        //Add a blank reading to prevent the UI from crashing
+        TelemetryReading r{};
+        readings_.push_back(r);
+        resetPlayback();
+        throw (std::runtime_error("No reading has been found in the path: \n" + path_.string()));
     }
 
     resetPlayback();

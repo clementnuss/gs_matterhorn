@@ -23,17 +23,18 @@ RadioReceiver::RadioReceiver(string portAddress)
         auto iter = devices_found.begin();
         while (iter != devices_found.end()) {
             serial::PortInfo device = *iter++;
-            printf("(%s, %s, %s)\n", device.port.c_str(), device.description.c_str(),
-                   device.hardware_id.c_str());
+            printf("(%s, %s, %s)\n",
+                   device.port.c_str(), device.description.c_str(), device.hardware_id.c_str());
+        }
+
+        if (device_.empty()) {
+            device_ = devices_found.front().port;
+            std::cout << "The first port of the list will be used, with address: " << device_ << std::endl;
         }
     } else {
-        throw (::std::runtime_error("No Serial port available!\n"));
+        std::cerr << "No Serial port available!" << std::endl;
     }
 
-    if (device_.empty()) {
-        device_ = devices_found.front().port;
-        std::cout << "The first port of the list will be used, with address: " << device_ << std::endl;
-    }
 
     serialPort_.setBaudrate(CommunicationsConstants::TELEMETRY_BAUD_RATE);
     serialPort_.setFlowcontrol(serial::flowcontrol_none);
@@ -48,7 +49,6 @@ RadioReceiver::RadioReceiver(string portAddress)
      *
      */
     serialPort_.setTimeout(1, 5, 0, 5, 0);
-
     recvBuffer_ = new uint8_t[BUFFER_SIZE];
 }
 
@@ -65,8 +65,11 @@ void RadioReceiver::openSerialPort() {
     try {
         serialPort_.open();
     } catch (serial::SerialException &e) {
-        std::cerr << "Unable to open the serial port" << std::endl << e.what() << std::endl;
-        throw (std::runtime_error("Unable to open COM port for device " + device_ + "\n"));
+        throw (std::runtime_error("Unable to open COM port for device " + device_ + "\n" + e.what()));
+    } catch (std::invalid_argument &e) {
+        throw (std::runtime_error("Unable to open COM port, invalid argument\n"));
+    } catch (serial::IOException &e) {
+        throw (std::runtime_error("Unable to open COM port, invalid argument\n"));
     }
 //    serialPort_.flush();
 }
@@ -80,6 +83,11 @@ vector<TelemetryReading> RadioReceiver::pollData() {
 vector<RocketEvent> RadioReceiver::pollEvents() {
     std::vector<RocketEvent> eventBuffer{};
     return eventBuffer;
+}
+
+
+vector<XYZReading> RadioReceiver::pollLocations() {
+    return vector<XYZReading>();
 }
 
 void RadioReceiver::readSerialPort() {
@@ -145,8 +153,3 @@ RadioReceiver::~RadioReceiver() {
 bool RadioReceiver::isReplayHandler() {
     return false;
 }
-
-vector<XYZReading> RadioReceiver::pollLocations() {
-    return vector<XYZReading>();
-}
-

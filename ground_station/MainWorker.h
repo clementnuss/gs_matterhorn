@@ -9,17 +9,23 @@
 #include "GraphFeature.h"
 #include "FileLogger.h"
 
+class GSMainwindow;
 using namespace std;
 
 class Worker : public QObject {
 Q_OBJECT
 
 public:
-    explicit Worker(TelemetryHandler *);
+    explicit Worker(GSMainwindow *);
 
     ~Worker() override;
 
     void mainRoutine();
+
+    void defineReplayMode(const QString &);
+
+    void defineRealtimeMode(const QString &parameters);
+
 
 public slots:
 
@@ -34,8 +40,6 @@ public slots:
     void resetPlayback();
 
     void reversePlayback(bool);
-
-    void setReplayMode(bool);
 
 signals:
 
@@ -53,17 +57,21 @@ signals:
 
     void groundStatusReady(float, float);
 
-    void dummySignal();
+    void resetUIState();
+
 
 private:
-    bool loggingEnabled;
+    bool loggingEnabled_;
     bool replayMode_;
+    std::atomic<bool> updateHandler_;
 
     void checkLinkStatuses();
 
     void displayMostRecentTelemetry(TelemetryReading);
 
+
     unique_ptr<TelemetryHandler> telemetryHandler_;
+    unique_ptr<TelemetryHandler> newHandler_;
     FileLogger telemetryLogger;
     FileLogger eventLogger;
     chrono::system_clock::time_point lastUIupdate;
