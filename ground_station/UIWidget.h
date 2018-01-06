@@ -8,26 +8,27 @@
 #include <Qt3DCore/QEntity>
 #include <3D/Line/Line.h>
 #include <3D/Scene/RootEntity.h>
+#include <ground_station_autogen/include/ui_gswidget.h>
 #include "MainWorker.h"
 #include "ProgramConstants.h"
 
 namespace Ui {
-    class GSWidget;
+    class GSMainwindow;
 }
 
 
-class GSWidget : public QWidget
-{
-    Q_OBJECT
+class GSMainwindow : public QMainWindow {
+Q_OBJECT
 
 public:
-    GSWidget(QWidget *, std::string);
+
+    Ui::GS_mainWindow *ui;
 
     bool event(QEvent *) override;
 
-    explicit GSWidget(QWidget *parent = nullptr);
+    explicit GSMainwindow();
 
-    ~GSWidget() override;
+    ~GSMainwindow() override;
 
     void setReplayMode();
 
@@ -48,6 +49,8 @@ public slots:
     void updateGraphData(QVector<QCPGraphData> &, GraphFeature);
 
     void clearAllGraphItems(bool);
+
+    void resetUIState();
 
     void updateTelemetry(TelemetryReading);
 
@@ -73,7 +76,6 @@ public slots:
 
     void reversePlayback();
 
-    void selectFile();
 
     // 3D visualisation slots
     void register3DPoints(const QVector<QVector3D> &);
@@ -88,6 +90,10 @@ signals:
 
     void reverseTelemetryReplayPlayback(bool);
 
+    void defineReplayMode(const QString &);
+
+    void defineRealtimeMode(const QString &);
+
 private:
 
     void graphWidgetSetup();
@@ -98,7 +104,6 @@ private:
 
     void applyToAllPlots(const std::function<void(QCustomPlot *)> &);
 
-    Ui::GSWidget *ui;
     QCustomPlot *plot1_;
     QCustomPlot *plot2_;
     QCPMarginGroup plotMargin_;
@@ -118,6 +123,9 @@ private:
 
     const QFlags<QCP::Interaction> interactionItemsOnly_ = QCP::iSelectItems;
     const QFlags<QCP::Interaction> interactionsAll_ = QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems;
+
+    void changeToReplayModeAction();
+    void changeToRealTimeModeAction();
 };
 
 #endif // GSWIDGET_H
