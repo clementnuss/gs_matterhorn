@@ -10,6 +10,7 @@
 #include <3D/Utils.h>
 #include <3D/Objects/Ruler.h>
 #include <3D/ForwardRenderer/LayerManager.h>
+#include <3D/Objects/Compass.h>
 #include "RootEntity.h"
 
 RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
@@ -78,6 +79,9 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     cameraController_->registerObservable(rocketTracker_);
     cameraController_->registerObservable(gs);
+
+    Compass *compass = new Compass(this, camera_);
+    connect(camera_, &Qt3DRender::QCamera::viewMatrixChanged, compass, &Compass::update);
 }
 
 void RootEntity::updateRocketTracker(const QVector<QVector3D> &positions) {
