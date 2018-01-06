@@ -6,6 +6,7 @@
 #include <Qt3DCore/QEntity>
 #include <Qt3DCore/QTransform>
 #include <Qt3DRender/QCamera>
+#include <Qt3DRender/QMesh>
 
 class Compass : public Qt3DCore::QEntity {
 Q_OBJECT;
@@ -19,6 +20,7 @@ public slots:
 
 private:
     Qt3DRender::QCamera *camera_;
+    Qt3DRender::QMesh *mesh_;
     Qt3DCore::QTransform *transform_;
 };
 

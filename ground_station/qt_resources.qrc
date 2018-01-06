@@ -23,5 +23,7 @@
         <file>3D/textures/text/ground_station.png</file>
         <file>3D/textures/text/rocket.png</file>
         <file>3D/textures/text/sim.png</file>
+        <file>3D/models/basic_compass.obj</file>
+        <file>3D/models/basic_compass.mtl</file>
     </qresource>
 </RCC>
