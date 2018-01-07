@@ -2,7 +2,7 @@
 #ifndef GS_MATTERHORN_TELEMETRYSIMULATOR_H
 #define GS_MATTERHORN_TELEMETRYSIMULATOR_H
 
-#include "TelemetryHandler.h"
+#include "DataHandlers/TelemetryHandler.h"
 #include <chrono>
 
 using namespace std;

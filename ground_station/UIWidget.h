@@ -38,8 +38,6 @@ public slots:
 
     void dummySlot(bool);
 
-    void dummyAnimation();
-
     void graphClicked(QCPAbstractPlottable *, int);
 
     void updateTime();
@@ -76,9 +74,16 @@ public slots:
 
     void reversePlayback();
 
-
     // 3D visualisation slots
     void register3DPoints(const QVector<QVector3D> &);
+
+    void registerEvent(const RocketEvent &);
+
+#if TEST3D
+
+    void dummyAnimation();
+
+#endif
 
 signals:
 

@@ -1,12 +1,8 @@
 #include "UIWidget.h"
-#include "ui_gswidget.h"
 #include "UI/Colors.h"
 #include "FileReader.h"
 #include <Qt3DInput/QInputAspect>
-#include <Utilities/TimeUtils.h>
 #include <Utilities/ReaderUtils.h>
-#include <QtWidgets/QFileDialog>
-#include <QtCore/QTime>
 
 /**
  * GSMainwindow is the main user interface class. It communicate through Qt SLOTS system with the
@@ -78,7 +74,6 @@ void GSMainwindow::connectComponents() {
     connect(ui->graph_clear_items_button, &QPushButton::clicked, this, &GSMainwindow::clearAllGraphItems);
     connect(ui->graph_autoplay_button, &QPushButton::clicked, this, &GSMainwindow::updateAutoPlay);
     connect(ui->graph_sync_button, &QPushButton::clicked, this, &GSMainwindow::updatePlotSync);
-
     connect(ui->time_unfolding_increase, &QPushButton::clicked, this, &GSMainwindow::increaseSpeed);
     connect(ui->time_unfolding_decrease, &QPushButton::clicked, this, &GSMainwindow::decreaseSpeed);
     connect(ui->time_unfolding_reset, &QPushButton::clicked, this, &GSMainwindow::resetPlayback);
@@ -109,17 +104,6 @@ void GSMainwindow::dummySlot(bool b) {
               << QTime::currentTime().msec() << std::endl;
 }
 
-void GSMainwindow::dummyAnimation() {
-    static int i = 0;
-
-    int secsFromTrigger = QTime::currentTime().msecsTo(animationTriggerTime_);
-
-    QVector3D bias{secsFromTrigger * 0.01, 0, secsFromTrigger * 0.02};
-
-    if (i < traceData_.size()) {
-        this->register3DPoints({bias + traceData_[i++]});
-    }
-}
 
 /**
  * Qt SLOT for updating the watch of the user interface
@@ -283,6 +267,10 @@ void GSMainwindow::updateGroundStatus(float temperature, float pressure) {
 
 void GSMainwindow::register3DPoints(const QVector<QVector3D> &positions) {
     rootEntity3D_->updateRocketTracker(positions);
+}
+
+void GSMainwindow::registerEvent(const RocketEvent &event) {
+    rootEntity3D_->registerEvent(event);
 }
 
 /**
@@ -569,7 +557,9 @@ bool GSMainwindow::event(QEvent *event) {
         } else if (ke->key() == Qt::Key_Control) {
             ui->stackedWidget->setCurrentIndex((ui->stackedWidget->currentIndex() + 1) % ui->stackedWidget->count());
             return true;
-        } else if (ke->key() == Qt::Key_S) {
+        }
+#if TEST3D
+        else if (ke->key() == Qt::Key_S) {
 
             static bool triggered{false};
 
@@ -578,9 +568,12 @@ bool GSMainwindow::event(QEvent *event) {
                 auto *launchTimer = new QTimer();
                 launchTimer->start(std::lround((1.0 / 240.0) * 1000));
                 animationTriggerTime_ = QTime::currentTime();
-                connect(launchTimer, SIGNAL(timeout()), this, SLOT(dummyAnimation()));
+                connect(launchTimer, &QTimer::timeout, this, &GSMainwindow::dummyAnimation);
             }
+        } else if (ke->key() == Qt::Key_E) {
+            this->registerEvent(RocketEvent(0, 0, ""));
         }
+#endif
 
     }
     return QWidget::event(event);
@@ -599,3 +592,20 @@ void GSMainwindow::changeToRealTimeModeAction() {
     emit defineRealtimeMode(QString{""});
     setRealTimeMode();
 }
+
+
+#if TEST3D
+
+void GSMainwindow::dummyAnimation() {
+    static int i = 0;
+
+    int secsFromTrigger = QTime::currentTime().msecsTo(animationTriggerTime_);
+
+    QVector3D bias{secsFromTrigger * 0.01, 0, secsFromTrigger * 0.02};
+
+    if (i < traceData_.size()) {
+        this->register3DPoints({bias + traceData_[i++]});
+    }
+}
+
+#endif

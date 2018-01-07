@@ -3,7 +3,7 @@
 #define GS_MATTERHORN_STATEESTIMATOR_H
 
 #include "TelemetryHandler.h"
-#include "TelemetryReplay.h"
+#include "DataHandlers/Replay/TelemetryReplay.h"
 
 #include <boost/circular_buffer.hpp>
 

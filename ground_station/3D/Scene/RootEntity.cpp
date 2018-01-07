@@ -20,7 +20,8 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         rocketTracker_{nullptr},
         rocketTrace_{nullptr},
         simTrace_{nullptr},
-        rocketRuler_{nullptr} {
+        rocketRuler_{nullptr},
+        registeredEvents_{} {
 
     auto *renderSettings = new Qt3DRender::QRenderSettings();
     auto *forwardRenderer = new ForwardRenderer(view, renderSettings);
@@ -50,8 +51,6 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     QVector<QVector3D> traceData = traceReader.readFile();
 
-    new Tracker(traceData.last(), view->camera(), TextureConstants::CARET_DOWN, QStringLiteral("SIM"), this,
-                OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_RIGHT);
     simTrace_->appendData(traceData);
 
     QVector3D gsPos{3000, 150, -700};
@@ -88,4 +87,21 @@ void RootEntity::updateRocketTracker(const QVector<QVector3D> &positions) {
     rocketTracker_->updatePosition(positions.last());
     rocketRuler_->updatePosition(positions.last());
     rocketTrace_->appendData(positions);
+}
+
+void RootEntity::registerEvent(const RocketEvent &event) {
+
+    if (EVENT_CODES.find(event.code) == EVENT_CODES.end()) {
+        std::cout << "This event code is invalid: " << event.code << std::endl;
+        return;
+    }
+
+    registeredEvents_.emplace_back(std::make_pair(event.timestamp_, new Tracker(
+            rocketTracker_->getPosition(),
+            camera_,
+            TextureConstants::CARET_RIGHT,
+            QString::fromStdString(EVENT_CODES.at(event.code)),
+            this,
+            OpenGLConstants::LEFT_TICK, OpenGLConstants::LEFT_LABEL
+    )));
 }

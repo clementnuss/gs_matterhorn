@@ -8,6 +8,8 @@
 #include <Qt3DRender/QLayer>
 
 #define DEBUG false
+#define TEST3D true
+
 namespace UnitsConstants {
     static constexpr float KNOTS_TO_MS = 0.514444;
 }
@@ -114,10 +116,13 @@ namespace CommunicationsConstants {
 }
 
 static const std::map<int, std::string> EVENT_CODES = {
-        {0, "Dummy event 1"},
-        {1, "Dummy event 2"},
-        {2, "Dummy event 3"},
-        {3, "Dummy event 4"}
+        {0,  "liftoff"},
+        {10, "max acceleration"},
+        {20, "max speed"},
+        {30, "apogee"},
+        {40, "drogue parachute deployment"},
+        {50, "main parachute deployment"},
+        {60, "touchdown"}
 };
 
 #endif //GS_MATTERHORN_PROGRAMCONSTANTS_H

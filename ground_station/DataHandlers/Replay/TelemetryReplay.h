@@ -4,7 +4,7 @@
 
 #include <boost/filesystem.hpp>
 #include <chrono>
-#include "TelemetryHandler.h"
+#include "DataHandlers/TelemetryHandler.h"
 #include "ITelemetryReplayHandler.h"
 
 class TelemetryReplay : public TelemetryHandler, public ITelemetryReplayHandler {

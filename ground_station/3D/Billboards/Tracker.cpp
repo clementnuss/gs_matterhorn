@@ -1,7 +1,6 @@
 #include <QtGui/QFont>
 #include <3D/Utils.h>
 #include <3D/Billboards/Marker.h>
-#include <QtGui/QFontMetricsF>
 #include <Qt3DCore/QTransform>
 #include "Tracker.h"
 
@@ -18,15 +17,6 @@ Tracker::Tracker(QVector3D position,
           textOffset_{textOffset},
           marker_{nullptr},
           text_{nullptr} {
-
-
-    auto textMetrics = QFontMetricsF(QFont{"Input Bold Condensed"});
-    QRectF rect = textMetrics.boundingRect(text);
-    qreal margin = textMetrics.width('_');
-    rect.adjust(-margin, margin, margin, margin);
-
-    float width = static_cast<float>(rect.width()) / 10.0f;
-    float height = static_cast<float>(rect.height()) / 10.0f;
 
     this->addComponent(transform_);
 
