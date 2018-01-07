@@ -8,6 +8,7 @@
 #include <QtCore/QVector>
 #include <Qt3DCore/QNode>
 #include <3D/Line/Line.h>
+#include "DataStructures/WindData.h"
 
 class SplashDownPredictor {
 public:
@@ -18,19 +19,13 @@ public:
     QVector2D getTouchdownCoordinates();
 
 private:
-    void loadPredictions();
     void recomputePrediction();
 
-    QVector2D windVectorForAltitude(float alt);
-
-    QVector2D dataToWindVector(const float windSpeed, const float windAngle);
-
-    QVector<QPair<int, QVector2D>> windTable_;
     QVector3D predictorPos_;
     QVector<QVector3D> trajectoryEstimations_;
     float descentSpeed_;
     Line *trajectoryLine_;
-    std::string predictionPath_;
+    WindData windData_;
 
     int searchIndex_;
 };

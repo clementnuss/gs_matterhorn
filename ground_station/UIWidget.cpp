@@ -40,7 +40,7 @@ GSMainwindow::GSMainwindow() :
     std::string tracePath{"../../ground_station/data/simulated_trajectory.csv"};
     FileReader<QVector3D> traceReader{tracePath, posFromString};
 
-    traceData_ = traceReader.readFile();
+    traceData_ = QVector<QVector3D>::fromStdVector(traceReader.readFile());
 
 
     auto *view = new Qt3DExtras::Qt3DWindow();
@@ -601,7 +601,7 @@ void GSMainwindow::dummyAnimation() {
 
     int secsFromTrigger = QTime::currentTime().msecsTo(animationTriggerTime_);
 
-    QVector3D bias{secsFromTrigger * 0.01, 0, secsFromTrigger * 0.02};
+    QVector3D bias{static_cast<float>(secsFromTrigger * 0.01), 0, static_cast<float>(secsFromTrigger * 0.02)};
 
     if (i < traceData_.size()) {
         this->register3DPoints({bias + traceData_[i++]});

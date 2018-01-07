@@ -48,7 +48,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     std::string tracePath{"../../ground_station/data/simulated_trajectory.csv"};
     FileReader<QVector3D> traceReader{tracePath, posFromString};
 
-    QVector<QVector3D> traceData = traceReader.readFile();
+    QVector<QVector3D> traceData = QVector<QVector3D>::fromStdVector(traceReader.readFile());
 
     simTrace_->appendData(traceData);
 
@@ -78,7 +78,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     cameraController_->registerObservable(rocketTracker_);
     cameraController_->registerObservable(gs);
 
-    Compass *compass = new Compass(this, camera_);
+    auto *compass = new Compass(this, camera_);
     connect(camera_, &Qt3DRender::QCamera::viewMatrixChanged, compass, &Compass::update);
 }
 

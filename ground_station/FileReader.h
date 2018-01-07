@@ -12,7 +12,7 @@ template<class U>
 class FileReader {
 
 public:
-    explicit FileReader(std::string &path, U (*lineReaderFunc)(const std::string &)) :
+    explicit FileReader(const std::string &path, U (*lineReaderFunc)(const std::string &)) :
             filePath_{path}, inputStream_{nullptr}, lineReaderFunc_{lineReaderFunc} {
 
         if (boost::filesystem::exists(filePath_)) {
@@ -32,8 +32,8 @@ public:
         delete inputStream_;
     };
 
-    virtual QVector<U> readFile() {
-        QVector<U> v{};
+    virtual std::vector<U> readFile() {
+        std::vector<U> v{};
         std::string receptacle{};
         while (getline(*inputStream_, receptacle)) {
             v.push_back(lineReaderFunc_(receptacle));
