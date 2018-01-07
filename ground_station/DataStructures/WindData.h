@@ -16,7 +16,7 @@ class WindData {
 public:
     static WindData fromFile(const std::string &predictionsPath);
 
-    QVector2D operator[](const float &altitude);
+    QVector2D operator[](const float &altitude) const;
 
 private:
     explicit WindData(std::vector<WindPrediction> &&preds);

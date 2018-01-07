@@ -17,7 +17,7 @@ WindData::WindData(std::vector<WindPrediction> &&preds) {
     }
 }
 
-QVector2D WindData::operator[](const float &altitude) {
+QVector2D WindData::operator[](const float &altitude) const {
     return (windTable_.find(altitude) != windTable_.end()) ? windTable_(altitude) : QVector2D{0, 0};
 }
 

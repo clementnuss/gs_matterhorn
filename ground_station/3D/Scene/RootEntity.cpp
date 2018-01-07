@@ -62,7 +62,6 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     ground->highlightArea(splashDownPredictor.getTouchdownCoordinates());
 
-
     new OpenGL3DAxes(this);
     QVector3D initialPos{0, 0, 0};
     rocketRuler_ = new Ruler(initialPos, camera_, TextureConstants::CARET_LEFT, this);

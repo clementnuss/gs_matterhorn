@@ -7,51 +7,26 @@
 
 
 SplashDownPredictor::SplashDownPredictor(std::string &path, Qt3DCore::QNode *parent) :
-        predictorPos_{0, 0, 0},
-        trajectoryEstimations_{},
-        descentSpeed_{0},
+        predictionStrategy_{std::make_unique<NaivePredictionStrategy>()},
+        status_{},
+        trajectory_{},
         trajectoryLine_{new Line(parent, QColor::fromRgb(255, 153, 0))},
-        searchIndex_{0},
         windData_{WindData::fromFile(path)} {
-
+    status_.position = {0, 0, 0};
+    status_.speed = {0, 0, 0};
+    status_.acceleration = {0, 0, 0};
 }
 
-QVector2D SplashDownPredictor::getTouchdownCoordinates() {
-    QVector3D &lastPoint = trajectoryEstimations_.last();
-    return QVector2D{lastPoint.x(), lastPoint.z()};
+QVector2D SplashDownPredictor::getTouchdownCoordinates() const {
+    return {trajectory_.last().x(), trajectory_.last().z()};
 }
 
 void SplashDownPredictor::updatePos(const QVector3D &pos) {
-    predictorPos_ = pos;
+    status_.position = pos;
     this->recomputePrediction();
 }
 
 void SplashDownPredictor::recomputePrediction() {
-    // One datapoint per second.
-    // Each second, update estimatedPosition by corresponding descent rate and wind speed
-
-    trajectoryEstimations_.clear();
-    QVector3D estimatedPosition = predictorPos_;
-    searchIndex_ = 0;
-
-    float currentAltitude = predictorPos_.y();
-
-    while (currentAltitude > 0) {
-        float rate = (currentAltitude < PredictorConstants::PARACHUTE_DEPLOYMENT_ALTITUDE) ?
-                     PredictorConstants::SLOW_DESCENT_RATE :
-                     PredictorConstants::FAST_DESCENT_RATE;
-
-        QVector2D windVector = windData_[currentAltitude];
-
-        estimatedPosition += QVector3D{
-                PredictorConstants::PREDICTION_TIME_INTERVAL * windVector.x(),
-                -PredictorConstants::PREDICTION_TIME_INTERVAL * rate,
-                PredictorConstants::PREDICTION_TIME_INTERVAL * windVector.y()};
-
-        currentAltitude = estimatedPosition.y();
-
-        trajectoryEstimations_.push_back(estimatedPosition);
-    }
-
-    this->trajectoryLine_->setData(trajectoryEstimations_);
+    trajectory_ = predictionStrategy_.get()->predictTrajectory(status_, windData_);
+    this->trajectoryLine_->setData(trajectory_);
 }
