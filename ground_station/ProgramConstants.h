@@ -116,13 +116,13 @@ namespace CommunicationsConstants {
 }
 
 static const std::map<int, std::string> EVENT_CODES = {
-        {0,  "liftoff"},
-        {10, "max acceleration"},
-        {20, "max speed"},
-        {30, "apogee"},
-        {40, "drogue parachute deployment"},
-        {50, "main parachute deployment"},
-        {60, "touchdown"}
+        {0,  "Liftoff"},
+        {10, "Max G"},
+        {20, "Max V"},
+        {30, "Apogee"},
+        {40, "Drogue deploy"},
+        {50, "Main deploy"},
+        {60, "Touchdown"}
 };
 
 #endif //GS_MATTERHORN_PROGRAMCONSTANTS_H

@@ -36,8 +36,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     auto *ground = new Ground(this);
     rocketTracker_ = new Tracker(QVector3D{0, 20, 0}, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
-                                 this,
-                                 OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_CENTER_LABEL);
+                                 TextType::BOLD, this, OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_CENTER_LABEL);
 
     rocketTrace_ = new Line(this, QColor::fromRgb(255, 255, 255), false);
     rocketTrace_->setData({{0, 0, 0},
@@ -96,12 +95,11 @@ void RootEntity::registerEvent(const RocketEvent &event) {
         return;
     }
 
-    registeredEvents_.emplace_back(std::make_pair(event.timestamp_, new Tracker(
-            rocketTracker_->getPosition(),
-            camera_,
-            TextureConstants::CARET_RIGHT,
-            QString::fromStdString(EVENT_CODES.at(event.code)),
-            this,
-            OpenGLConstants::LEFT_TICK, OpenGLConstants::LEFT_LABEL
-    )));
+    registeredEvents_.emplace_back(std::make_pair(event.timestamp_, new Tracker(rocketTracker_->getPosition(), camera_,
+                                                                                TextureConstants::DOWNWARD_DIAGONAL,
+                                                                                QString::fromStdString(
+                                                                                        EVENT_CODES.at(event.code)),
+                                                                                TextType::LEGEND, this,
+                                                                                OpenGLConstants::LEFT_LEGEND_ICON_OFFSET,
+                                                                                OpenGLConstants::LEFT_LEGEND_TEXT_OFFSET)));
 }
