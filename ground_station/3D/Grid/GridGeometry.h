@@ -6,13 +6,14 @@
 #include <Qt3DRender/QBuffer>
 #include <Qt3DRender/QAttribute>
 #include <Qt3DRender/QGeometry>
+#include "DiscreteElevationModel.h"
 
 
 class GridGeometry : public Qt3DRender::QGeometry {
 Q_OBJECT
 
 public:
-    explicit GridGeometry(Qt3DCore::QNode *parent = nullptr);
+    explicit GridGeometry(Qt3DCore::QNode *parent, const DiscreteElevationModel *const model);
 
 private:
     Qt3DRender::QAttribute *positionAttribute_;

@@ -23,8 +23,8 @@ target_link_libraries(ground_station qcustomplot_lib)
 target_link_libraries(ground_station_lib qcustomplot_lib)
 
 #Include Boost
-target_link_libraries(ground_station Boost::boost Boost::system Boost::thread Boost::filesystem)
-target_link_libraries(ground_station_lib Boost::boost Boost::system Boost::thread Boost::filesystem)
+target_link_libraries(ground_station Boost::boost Boost::system Boost::thread Boost::filesystem Boost::iostreams)
+target_link_libraries(ground_station_lib Boost::boost Boost::system Boost::thread Boost::filesystem Boost::iostreams)
 
 # Include serial library
 include_directories(${CMAKE_BINARY_DIR}/serial-src/include/)

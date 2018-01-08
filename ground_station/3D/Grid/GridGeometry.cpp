@@ -3,7 +3,7 @@
 #include <3D/3DVisualisationConstants.h>
 #include "GridGeometry.h"
 
-QByteArray createPlaneVertexData(float w, float h, bool mirrored) {
+QByteArray createPlaneVertexData(float w, float h, bool mirrored, const DiscreteElevationModel *const model) {
     Q_ASSERT(w > 0.0f);
     Q_ASSERT(h > 0.0f);
     Q_ASSERT(GridConstants::GRID_RESOLUTION >= 2);
@@ -36,9 +36,11 @@ QByteArray createPlaneVertexData(float w, float h, bool mirrored) {
             const float x = x0 + static_cast<float>(i) * dx;
             const float u = static_cast<float>(i) * du;
 
+            GeoPoint p{0, 0};
+
             // position
             *fptr++ = x;
-            *fptr++ = 0.0;
+            *fptr++ = 0.0f; //model->elevationAt(0, 0);
             *fptr++ = z;
 
             // texture coordinates
@@ -92,19 +94,20 @@ QByteArray createPlaneIndexData() {
 }
 
 
-GridGeometry::GridGeometry(Qt3DCore::QNode *parent) : Qt3DRender::QGeometry(parent),
-                                                      positionAttribute_(new Qt3DRender::QAttribute()),
-                                                      normalAttribute_(new Qt3DRender::QAttribute()),
-                                                      texCoordAttribute_(new Qt3DRender::QAttribute()),
-                                                      tangentAttribute_(new Qt3DRender::QAttribute()),
-                                                      indexAttribute_(new Qt3DRender::QAttribute()),
-                                                      vertexBuffer_(new Qt3DRender::QBuffer()),
-                                                      indexBuffer_(new Qt3DRender::QBuffer()) {
+GridGeometry::GridGeometry(Qt3DCore::QNode *parent, const DiscreteElevationModel *const model) : Qt3DRender::QGeometry(
+        parent),
+                                                                                                 positionAttribute_(new Qt3DRender::QAttribute()),
+                                                                                                 normalAttribute_(new Qt3DRender::QAttribute()),
+                                                                                                 texCoordAttribute_(new Qt3DRender::QAttribute()),
+                                                                                                 tangentAttribute_(new Qt3DRender::QAttribute()),
+                                                                                                 indexAttribute_(new Qt3DRender::QAttribute()),
+                                                                                                 vertexBuffer_(new Qt3DRender::QBuffer()),
+                                                                                                 indexBuffer_(new Qt3DRender::QBuffer()) {
     const int nVerts = GridConstants::GRID_RESOLUTION * GridConstants::GRID_RESOLUTION;
     const int stride = (3 + 2 + 3 + 4) * sizeof(float);
     const int faces = 2 * (GridConstants::GRID_RESOLUTION - 1) * (GridConstants::GRID_RESOLUTION - 1);
 
-    vertexBuffer_->setData(createPlaneVertexData(10000, 10000, false));
+    vertexBuffer_->setData(createPlaneVertexData(10000, 10000, false, model));
     indexBuffer_->setData(createPlaneIndexData());
 
     positionAttribute_->setName(Qt3DRender::QAttribute::defaultPositionAttributeName());
