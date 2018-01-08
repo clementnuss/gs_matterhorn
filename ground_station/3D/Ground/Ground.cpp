@@ -4,6 +4,7 @@
 #include <Qt3DRender/QEffect>
 #include <Qt3DRender/QMaterial>
 #include <Qt3DExtras/QPlaneMesh>
+#include <3D/Grid/GridMesh.h>
 #include "Ground.h"
 
 /**
@@ -55,10 +56,10 @@ Ground::Ground(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent),
     material->addParameter(heightParam);
 
     // Set up mesh
-    auto *mesh = new Qt3DExtras::QPlaneMesh();
-    mesh->setHeight(10000);
-    mesh->setWidth(10000);
-    mesh->setMeshResolution(QSize{100, 100});
+    auto *mesh = new GridMesh();
+    //mesh->setHeight(10000);
+    //mesh->setWidth(10000);
+    //mesh->setMeshResolution(QSize{100, 100});
 
     transform_->setRotationY(90);
     this->addComponent(transform_);
