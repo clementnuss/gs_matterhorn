@@ -1,15 +1,19 @@
 
 #include <Qt3DRender/FunctorType>
 #include <3D/3DVisualisationConstants.h>
+#include <3D/Utils.h>
 #include "GridGeometry.h"
 
-QByteArray createPlaneVertexData(float w, float h, bool mirrored, const DiscreteElevationModel *const model) {
-    Q_ASSERT(w > 0.0f);
-    Q_ASSERT(h > 0.0f);
-    Q_ASSERT(GridConstants::GRID_RESOLUTION >= 2);
-    Q_ASSERT(GridConstants::GRID_RESOLUTION >= 2);
+static inline double metersAndRefToAngle(float meters, double reference, double arcLength) {
+    return reference + (meters / (arcLength * GridConstants::SECONDS_PER_DEGREE));
+}
 
-    const int nVerts = GridConstants::GRID_RESOLUTION * GridConstants::GRID_RESOLUTION;
+QByteArray GridGeometry::createPlaneVertexData() {
+    Q_ASSERT(sideLength_ > 0.0f);
+    Q_ASSERT(gridResolution_ >= 2);
+
+    const int nVerts = gridResolution_ * gridResolution_;
+    float vertSpacing = sideLength_ / (gridResolution_ - 1);
 
     // Populate a buffer with the interleaved per-vertex data with
     // vec3 pos, vec2 texCoord, vec3 normal, vec4 tangent
@@ -19,33 +23,36 @@ QByteArray createPlaneVertexData(float w, float h, bool mirrored, const Discrete
     bufferBytes.resize(stride * nVerts);
     float *fptr = reinterpret_cast<float *>(bufferBytes.data());
 
-    const float x0 = -w / 2.0f;
-    const float z0 = -h / 2.0f;
-    const float dx = w / (GridConstants::GRID_RESOLUTION - 1);
-    const float dz = h / (GridConstants::GRID_RESOLUTION - 1);
-    const float du = 1.0 / (GridConstants::GRID_RESOLUTION - 1);
-    const float dv = 1.0 / (GridConstants::GRID_RESOLUTION - 1);
+    const float x0 = 0.0f;
+    const float z0 = 0.0f;
+    const float dx = vertSpacing;
+    const float dz = vertSpacing;
+    const float du = 1.0 / (gridResolution_ - 1);
+    const float dv = 1.0 / (gridResolution_ - 1);
 
     // Iterate over z
-    for (int j = 0; j < GridConstants::GRID_RESOLUTION; ++j) {
+    for (int j = 0; j < gridResolution_; ++j) {
         const float z = z0 + static_cast<float>(j) * dz;
-        const float v = static_cast<float>(j) * dv;
+        const float u = static_cast<float>(j) * du;
 
         // Iterate over x
-        for (int i = 0; i < GridConstants::GRID_RESOLUTION; ++i) {
-            const float x = x0 + static_cast<float>(i) * dx;
-            const float u = static_cast<float>(i) * du;
+        for (int i = 0; i < gridResolution_; ++i) {
+            const float x = x0 - static_cast<float>(i) * dx;
+            const float v = static_cast<float>(i) * dv;
 
-            GeoPoint p{0, 0};
 
             // position
             *fptr++ = x;
-            *fptr++ = 0.0f; //model->elevationAt(0, 0);
+            *fptr++ = model_->elevationAt(
+                    {
+                            metersAndRefToAngle(z, topLeftLatLon_.longitude, arcWestEastDistance_),
+                            metersAndRefToAngle(x, topLeftLatLon_.latitude, GridConstants::ARC_NORTH_SOUTH_DISTANCE)
+                    });
             *fptr++ = z;
 
             // texture coordinates
             *fptr++ = u;
-            *fptr++ = mirrored ? 1.0f - v : v;
+            *fptr++ = 1.0 - v;
 
             // normal
             *fptr++ = 0.0f;
@@ -63,9 +70,9 @@ QByteArray createPlaneVertexData(float w, float h, bool mirrored, const Discrete
     return bufferBytes;
 }
 
-QByteArray createPlaneIndexData() {
+QByteArray GridGeometry::createPlaneIndexData() {
     // Create the index data. 2 triangles per rectangular face
-    const int faces = 2 * (GridConstants::GRID_RESOLUTION - 1) * (GridConstants::GRID_RESOLUTION - 1);
+    const int faces = 2 * (gridResolution_ - 1) * (gridResolution_ - 1);
     const int indices = 3 * faces;
     Q_ASSERT(indices < std::numeric_limits<quint16>::max());
     QByteArray indexBytes;
@@ -73,20 +80,20 @@ QByteArray createPlaneIndexData() {
     quint16 *indexPtr = reinterpret_cast<quint16 *>(indexBytes.data());
 
     // Iterate over z
-    for (int j = 0; j < GridConstants::GRID_RESOLUTION - 1; ++j) {
-        const int rowStartIndex = j * GridConstants::GRID_RESOLUTION;
-        const int nextRowStartIndex = (j + 1) * GridConstants::GRID_RESOLUTION;
+    for (int j = 0; j < gridResolution_ - 1; ++j) {
+        const int rowStartIndex = j * gridResolution_;
+        const int nextRowStartIndex = (j + 1) * gridResolution_;
 
         // Iterate over x
         for (int i = 0; i < GridConstants::GRID_RESOLUTION - 1; ++i) {
             // Split quad into two triangles
             *indexPtr++ = rowStartIndex + i;
-            *indexPtr++ = nextRowStartIndex + i;
             *indexPtr++ = rowStartIndex + i + 1;
+            *indexPtr++ = nextRowStartIndex + i;
 
             *indexPtr++ = nextRowStartIndex + i;
-            *indexPtr++ = nextRowStartIndex + i + 1;
             *indexPtr++ = rowStartIndex + i + 1;
+            *indexPtr++ = nextRowStartIndex + i + 1;
         }
     }
 
@@ -94,20 +101,30 @@ QByteArray createPlaneIndexData() {
 }
 
 
-GridGeometry::GridGeometry(Qt3DCore::QNode *parent, const DiscreteElevationModel *const model) : Qt3DRender::QGeometry(
-        parent),
-                                                                                                 positionAttribute_(new Qt3DRender::QAttribute()),
-                                                                                                 normalAttribute_(new Qt3DRender::QAttribute()),
-                                                                                                 texCoordAttribute_(new Qt3DRender::QAttribute()),
-                                                                                                 tangentAttribute_(new Qt3DRender::QAttribute()),
-                                                                                                 indexAttribute_(new Qt3DRender::QAttribute()),
-                                                                                                 vertexBuffer_(new Qt3DRender::QBuffer()),
-                                                                                                 indexBuffer_(new Qt3DRender::QBuffer()) {
+GridGeometry::GridGeometry(Qt3DCore::QNode *parent,
+                           const ContinuousElevationModel *const model,
+                           const LatLon &topLeftGeoPoint,
+                           int sideLength,
+                           int resolution) :
+        Qt3DRender::QGeometry(parent),
+        model_{model},
+        sideLength_{sideLength},
+        gridResolution_{resolution},
+        topLeftLatLon_{topLeftGeoPoint},
+        arcWestEastDistance_{GridConstants::ARC_NORTH_SOUTH_DISTANCE * std::cos(toRadians(topLeftGeoPoint.latitude))},
+        positionAttribute_(new Qt3DRender::QAttribute()),
+        normalAttribute_(new Qt3DRender::QAttribute()),
+        texCoordAttribute_(new Qt3DRender::QAttribute()),
+        tangentAttribute_(new Qt3DRender::QAttribute()),
+        indexAttribute_(new Qt3DRender::QAttribute()),
+        vertexBuffer_(new Qt3DRender::QBuffer()),
+        indexBuffer_(new Qt3DRender::QBuffer()) {
+
     const int nVerts = GridConstants::GRID_RESOLUTION * GridConstants::GRID_RESOLUTION;
     const int stride = (3 + 2 + 3 + 4) * sizeof(float);
     const int faces = 2 * (GridConstants::GRID_RESOLUTION - 1) * (GridConstants::GRID_RESOLUTION - 1);
 
-    vertexBuffer_->setData(createPlaneVertexData(10000, 10000, false, model));
+    vertexBuffer_->setData(createPlaneVertexData());
     indexBuffer_->setData(createPlaneIndexData());
 
     positionAttribute_->setName(Qt3DRender::QAttribute::defaultPositionAttributeName());

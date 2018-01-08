@@ -3,6 +3,7 @@
 #define GS_MATTERHORN_3DVISUALISATIONCONSTANTS_H
 
 #include <QVector3D>
+#include <cmath>
 #include <QString>
 
 namespace OpenGLConstants {
@@ -50,6 +51,10 @@ namespace CameraConstants {
 }
 
 namespace GridConstants {
+    static constexpr int EARTH_RADIUS = 6371000;
+    static constexpr int MINUTES_PER_DEGREE = 60;
+    static constexpr int SECONDS_PER_DEGREE = 3600;
+    static constexpr double ARC_NORTH_SOUTH_DISTANCE = (2.0 * M_PI * EARTH_RADIUS) / (360 * SECONDS_PER_DEGREE);
     static constexpr int GRID_RESOLUTION = 100;
 }
 
