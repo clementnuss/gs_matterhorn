@@ -3,6 +3,7 @@
 #define GS_MATTERHORN_3DVISUALISATIONCONSTANTS_H
 
 #include <QVector3D>
+#include <QString>
 
 namespace OpenGLConstants {
     static constexpr int VERSION_MAJOR = 2;
@@ -46,6 +47,10 @@ namespace CameraConstants {
     static constexpr float POLAR_MIN = 0.261799f;
     static constexpr float POLAR_MAX = 2.87979f;
     static constexpr float ANIMATION_DURATION = 400.0f;
+}
+
+namespace GridConstants {
+    static constexpr int GRID_RESOLUTION = 100;
 }
 
 
