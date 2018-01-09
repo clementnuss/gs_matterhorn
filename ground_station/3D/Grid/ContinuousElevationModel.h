@@ -12,7 +12,7 @@ public:
 
     double elevationAt(const LatLon &latLon) const;
 
-    double elevationSample(const int x, const int y) const;
+    float elevationSample(const int latitudeIndex, const int longitudeIndex) const;
 
 private:
     DiscreteElevationModel *discreteModel_;

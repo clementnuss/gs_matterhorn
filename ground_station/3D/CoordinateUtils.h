@@ -35,8 +35,8 @@ static GeoPoint latLonToGeoPoint(const LatLon &latLon) {
     latitude.minutes = static_cast<int>(std::floor(minutesLat));
     longitude.minutes = static_cast<int>(std::floor(minutesLon));
 
-    latitude.seconds = static_cast<int>(std::floor(minutesLat - latitude.minutes));
-    longitude.seconds = static_cast<int>(std::floor(minutesLon - longitude.minutes));
+    latitude.seconds = static_cast<int>(std::floor(60 * (minutesLat - latitude.minutes)));
+    longitude.seconds = static_cast<int>(std::floor(60 * (minutesLon - longitude.minutes)));
 
     return {latitude, longitude};
 }

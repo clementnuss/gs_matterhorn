@@ -14,6 +14,10 @@
 static const float pi = static_cast<float>(M_PI);
 static const float twoPi = 2.0f * pi;
 
+static inline double toRadians(double degs) {
+    return degs * (M_PI / 180.0);
+}
+
 static inline float clampViewingDistance(float vd) {
     return vd < CameraConstants::VIEWING_DISTANCE_MIN ?
            CameraConstants::VIEWING_DISTANCE_MIN :

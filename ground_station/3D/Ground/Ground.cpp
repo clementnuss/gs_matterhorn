@@ -56,14 +56,16 @@ Ground::Ground(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent),
     material->addParameter(heightParam);
 
     // Set up mesh
-    GeoPoint gp{0, 0};
+    GeoPoint gp{{46, 0, 0}, {6, 0, 0}};
     std::string s{"../../ground_station/data/N46E006.hgt"};
-    auto *mesh = new GridMesh(nullptr, new DiscreteElevationModel(s, gp));
+    auto *mesh = new GridMesh(nullptr, new ContinuousElevationModel(new DiscreteElevationModel(s, gp)),
+                              {46.567201, 6.501007},
+                              10000, 100);
     //mesh->setHeight(10000);
     //mesh->setWidth(10000);
     //mesh->setMeshResolution(QSize{100, 100});
 
-    transform_->setRotationY(90);
+    //transform_->setRotationY(90);
     this->addComponent(transform_);
     this->addComponent(mesh);
     this->addComponent(material);
