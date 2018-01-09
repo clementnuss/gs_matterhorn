@@ -58,7 +58,6 @@ float DiscreteElevationModel::elevationAt(int latitudeIndex, int longitudeIndex)
 
     int i = yL * (GridConstants::SAMPLES_PER_DEGREE + 1) + xL;
     uint16_t d = (hgtData_[i] >> 8 | hgtData_[i] << 8);  // Swap byte order
-    std::cout << d << std::endl;
     return d;
 }
 

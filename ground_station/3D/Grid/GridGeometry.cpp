@@ -3,10 +3,7 @@
 #include <3D/3DVisualisationConstants.h>
 #include <3D/Utils.h>
 #include "GridGeometry.h"
-
-static inline double metersAndRefToAngle(float meters, double reference, double arcLength) {
-    return reference + (meters / (arcLength * GridConstants::SAMPLES_PER_DEGREE));
-}
+#include "3D/Scene/WorldReference.h"
 
 QByteArray GridGeometry::createPlaneVertexData() {
     Q_ASSERT(sideLength_ > 0.0f);
@@ -120,9 +117,9 @@ GridGeometry::GridGeometry(Qt3DCore::QNode *parent,
         vertexBuffer_(new Qt3DRender::QBuffer()),
         indexBuffer_(new Qt3DRender::QBuffer()) {
 
-    const int nVerts = GridConstants::GRID_RESOLUTION * GridConstants::GRID_RESOLUTION;
+    const int nVerts = gridResolution_ * gridResolution_;
     const int stride = (3 + 2 + 3 + 4) * sizeof(float);
-    const int faces = 2 * (GridConstants::GRID_RESOLUTION - 1) * (GridConstants::GRID_RESOLUTION - 1);
+    const int faces = 2 * (gridResolution_ - 1) * (gridResolution_ - 1);
 
     vertexBuffer_->setData(createPlaneVertexData());
     indexBuffer_->setData(createPlaneIndexData());

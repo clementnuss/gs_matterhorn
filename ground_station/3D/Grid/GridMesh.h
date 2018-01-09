@@ -3,6 +3,8 @@
 #define GS_MATTERHORN_GRIDMESH_H
 
 #include <Qt3DExtras/qt3dextras_global.h>
+#include <Qt3DCore/QTransform>
+
 #include <Qt3DRender/qgeometryrenderer.h>
 #include <QtCore/QSize>
 #include "ContinuousElevationModel.h"
@@ -13,8 +15,8 @@ Q_OBJECT
 
 public:
     explicit GridMesh(Qt3DCore::QNode *parent, const ContinuousElevationModel *const model,
-                      const LatLon &topLeftGeoPoint,
-                      int sideLength, int resolution);
+                      const LatLon &topLeftGeoPoint, int sideLength, int resolution);
+
 };
 
 

@@ -12,6 +12,7 @@
 #include <3D/ForwardRenderer/LayerManager.h>
 #include <3D/Objects/Compass.h>
 #include "RootEntity.h"
+#include "WorldReference.h"
 
 RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         Qt3DCore::QEntity(parent),
@@ -34,7 +35,15 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     cameraController_->setLinearSpeed(100.0);
     cameraController_->setLookSpeed(3.0f);
 
-    auto *ground = new Ground(this);
+
+    WorldReference worldRef{LatLon{46.567201, 6.501007}};
+    auto *ground = new Ground(this, {0, 0}, worldRef.origin());
+
+    LatLon nextOrigin = worldRef.latLonFromPointAndDistance(worldRef.origin(), 0, 10000);
+
+    std::cout << "Next origin is: " << nextOrigin.latitude << " " << nextOrigin.longitude << std::endl;
+
+    auto *ground2 = new Ground(this, {0, 10000}, nextOrigin);
     rocketTracker_ = new Tracker(QVector3D{0, 20, 0}, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
                                  TextType::BOLD, this, OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_CENTER_LABEL);
 
@@ -52,7 +61,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     simTrace_->appendData(traceData);
 
-    QVector3D gsPos{3000, 150, -700};
+    QVector3D gsPos{-2000, 550, 4300};
 
     GroundStation *gs = new GroundStation(gsPos, TextureConstants::DOUBLE_DOWN_ARROW, camera_, this);
 
