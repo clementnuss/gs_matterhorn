@@ -14,6 +14,12 @@
 #include "RootEntity.h"
 #include "WorldReference.h"
 
+static void addToEach(QVector<QVector3D> &v, QVector3D v3d) {
+    for (size_t i = 0; i < v.size(); i++) {
+        v[i] += v3d;
+    }
+}
+
 RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         Qt3DCore::QEntity(parent),
         cameraController_{new CameraController(this)},
@@ -37,19 +43,32 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
 
     WorldReference worldRef{LatLon{46.567201, 6.501007}};
-    auto *ground = new Ground(this, {0, 0}, worldRef.origin());
+
 
     LatLon nextOrigin = worldRef.latLonFromPointAndDistance(worldRef.origin(), 0, 10000);
 
-    std::cout << "Next origin is: " << nextOrigin.latitude << " " << nextOrigin.longitude << std::endl;
+    // rocket trace at 46.518473, 6.566322
+    // GS pos at 46.518701, 6.562413
+    GeoPoint gp{{46, 0, 0},
+                {6,  0, 0}};
+    std::string s{"../../ground_station/data/N46E006.hgt"};
 
-    auto *ground2 = new Ground(this, {0, 10000}, nextOrigin);
-    rocketTracker_ = new Tracker(QVector3D{0, 20, 0}, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
+    DiscreteElevationModel discreteModel{s, gp};
+    ContinuousElevationModel continuousModel{&discreteModel};
+
+    LatLon gsLatLon = {46.518701, 6.562413};
+    LatLon launchSiteLatLon = {46.518473, 6.566322};
+    launchSitePos_ = worldRef.worldPosAt(launchSiteLatLon, &continuousModel);
+    auto *gs = new GroundStation(worldRef.worldPosAt(gsLatLon, &continuousModel), TextureConstants::DOUBLE_DOWN_ARROW,
+                                 camera_, this);
+    auto *ground = new Ground(this, {0, 0}, worldRef.origin(), &continuousModel);
+    auto *ground2 = new Ground(this, {0, 10000}, nextOrigin, &continuousModel);
+    rocketTracker_ = new Tracker(launchSitePos_, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
                                  TextType::BOLD, this, OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_CENTER_LABEL);
 
     rocketTrace_ = new Line(this, QColor::fromRgb(255, 255, 255), false);
-    rocketTrace_->setData({{0, 0, 0},
-                           {0, 0, 0}});
+    rocketTrace_->setData({launchSitePos_,
+                           launchSitePos_});
 
     // Initialise simulated rocket trace
     simTrace_ = new Line(this, QColor::fromRgb(255, 0, 0), true);
@@ -58,12 +77,9 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     FileReader<QVector3D> traceReader{tracePath, posFromString};
 
     QVector<QVector3D> traceData = QVector<QVector3D>::fromStdVector(traceReader.readFile());
-
+    addToEach(traceData, launchSitePos_);
     simTrace_->appendData(traceData);
 
-    QVector3D gsPos{-2000, 550, 4300};
-
-    GroundStation *gs = new GroundStation(gsPos, TextureConstants::DOUBLE_DOWN_ARROW, camera_, this);
 
     std::string meteoPath{"../../ground_station/MeteoData/meteo_payerne_test.txt"};
     SplashDownPredictor splashDownPredictor{meteoPath, this};
@@ -79,10 +95,10 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     camera_->setFieldOfView(45.0);
     camera_->setNearPlane(0.1);
     camera_->setFarPlane(100000.0);
-    camera_->setPosition(QVector3D{-5000.0, 2000.0, -3000.0});
+    camera_->setPosition(launchSitePos_ + QVector3D{-5000.0, 2000.0, 3000.0});
     camera_->setUpVector(QVector3D{0.0, 1.0, 0.0});
-    camera_->setViewCenter(QVector3D{0.0, 2000.0, 0.0});
 
+    cameraController_->setCameraViewCenter(launchSitePos_);
     cameraController_->registerObservable(rocketTracker_);
     cameraController_->registerObservable(gs);
 
@@ -90,7 +106,10 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     connect(camera_, &Qt3DRender::QCamera::viewMatrixChanged, compass, &Compass::update);
 }
 
-void RootEntity::updateRocketTracker(const QVector<QVector3D> &positions) {
+void RootEntity::updateRocketTracker(QVector<QVector3D> &positions) {
+
+    addToEach(positions, launchSitePos_);
+
     rocketTracker_->updatePosition(positions.last());
     rocketRuler_->updatePosition(positions.last());
     rocketTrace_->appendData(positions);

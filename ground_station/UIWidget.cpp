@@ -265,7 +265,7 @@ void GSMainwindow::updateGroundStatus(float temperature, float pressure) {
     ui->ground_temperature_value->setText(QString::number(pressure, 'f', UIConstants::PRECISION));
 }
 
-void GSMainwindow::register3DPoints(const QVector<QVector3D> &positions) {
+void GSMainwindow::register3DPoints(QVector<QVector3D> &positions) {
     rootEntity3D_->updateRocketTracker(positions);
 }
 
@@ -604,7 +604,8 @@ void GSMainwindow::dummyAnimation() {
     QVector3D bias{static_cast<float>(secsFromTrigger * 0.01), 0, static_cast<float>(secsFromTrigger * 0.02)};
 
     if (i < traceData_.size()) {
-        this->register3DPoints({bias + traceData_[i++]});
+        QVector <QVector3D> p{bias + traceData_[i++]};
+        this->register3DPoints(p);
     }
 }
 

@@ -12,11 +12,12 @@
  *
  * @param parent The QNode parent to which to attach this entity. Will usually be the scene root.
  */
-Ground::Ground(Qt3DCore::QNode *parent, const QVector2D &offset, const LatLon &topLeftLatLon) : Qt3DCore::QEntity(
+Ground::Ground(Qt3DCore::QNode *parent, const QVector2D &offset, const LatLon &topLeftLatLon,
+               const ContinuousElevationModel *model) : Qt3DCore::QEntity(
         parent),
-                                                                                                transform_{
+                                                        transform_{
                                                                                                         new Qt3DCore::QTransform()},
-                                                                                                highlightedArea_{
+                                                        highlightedArea_{
                                                                                                         nullptr} {
     // Build effect
     auto *shaderProgram = new Qt3DRender::QShaderProgram();
@@ -59,10 +60,7 @@ Ground::Ground(Qt3DCore::QNode *parent, const QVector2D &offset, const LatLon &t
     material->addParameter(heightParam);
 
     // Set up mesh
-    GeoPoint gp{{46, 0, 0}, {6, 0, 0}};
-    std::string s{"../../ground_station/data/N46E006.hgt"};
-    auto *mesh = new GridMesh(nullptr, new ContinuousElevationModel(new DiscreteElevationModel(s, gp)),
-                              topLeftLatLon, 10000, 101);
+    auto *mesh = new GridMesh(nullptr, model, topLeftLatLon, 10000, 101);
 
     transform_->setTranslation(QVector3D{offset.x(), 0.0, offset.y()});
     this->addComponent(transform_);

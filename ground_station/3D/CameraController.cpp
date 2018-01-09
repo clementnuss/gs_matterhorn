@@ -197,3 +197,9 @@ void CameraController::updateAnimators() {
             animators_.end(),
             [](std::shared_ptr<Interpolator> i) { return i->animationIsFinished(); }), animators_.end());
 }
+
+
+void CameraController::setCameraViewCenter(const QVector3D &newViewCenter) {
+    viewCenter_ = newViewCenter;
+
+}

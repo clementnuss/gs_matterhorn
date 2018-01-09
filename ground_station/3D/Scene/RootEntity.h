@@ -16,13 +16,14 @@ Q_OBJECT
 public:
     explicit RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent = nullptr);
 
-    void updateRocketTracker(const QVector<QVector3D> &positions);
+    void updateRocketTracker(QVector<QVector3D> &positions);
 
     void registerEvent(const RocketEvent &);
 
 private:
     CameraController *cameraController_;
     Qt3DRender::QCamera *camera_;
+    QVector3D launchSitePos_;
     Tracker *rocketTracker_;
     Line *rocketTrace_;
     Line *simTrace_;

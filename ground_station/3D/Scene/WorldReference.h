@@ -20,13 +20,18 @@ public:
         return origin_;
     }
 
+    QVector3D worldPosAt(const LatLon &point, const ContinuousElevationModel *model) {
+        QVector2D v = translationFromOrigin(point);
+        return {v.x(), static_cast<float>(model->elevationAt(point)), v.y()};
+    }
+
     QVector2D translationFromOrigin(const LatLon &point) {
         double latitudeTranslation = (point.latitude - origin_.latitude) * GridConstants::SECONDS_PER_DEGREE *
                                      GridConstants::ARC_NORTH_SOUTH_DISTANCE;
         double longitudeTranslation =
                 (point.longitude - origin_.longitude) * GridConstants::SECONDS_PER_DEGREE * arcWestEastDistance_;
 
-        return {static_cast<float>(longitudeTranslation), static_cast<float>(latitudeTranslation)};
+        return {static_cast<float>(latitudeTranslation), static_cast<float>(longitudeTranslation)};
     }
 
     LatLon latLonFromPointAndDistance(const LatLon &point, int metersAlongLatitude, int metersAlongLongitude) {
