@@ -10,7 +10,7 @@ class ContinuousElevationModel {
 public:
     explicit ContinuousElevationModel(DiscreteElevationModel *);
 
-    double elevationAt(const LatLon &latLon) const;
+    float elevationAt(const LatLon &latLon) const;
 
     float elevationSample(const int latitudeIndex, const int longitudeIndex) const;
 

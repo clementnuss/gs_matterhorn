@@ -3,7 +3,6 @@
 #include <3D/3DVisualisationConstants.h>
 #include <3D/Utils.h>
 #include "GridGeometry.h"
-#include "3D/Scene/WorldReference.h"
 
 QByteArray GridGeometry::createPlaneVertexData() {
     Q_ASSERT(sideLength_ > 0.0f);
@@ -24,8 +23,8 @@ QByteArray GridGeometry::createPlaneVertexData() {
     const float z0 = 0.0f;
     const float dx = vertSpacing;
     const float dz = vertSpacing;
-    const float du = 1.0 / (gridResolution_ - 1);
-    const float dv = 1.0 / (gridResolution_ - 1);
+    const float du = 1.0f / (gridResolution_ - 1);
+    const float dv = 1.0f / (gridResolution_ - 1);
 
     // Iterate over z
     for (int j = 0; j < gridResolution_; ++j) {
@@ -42,14 +41,14 @@ QByteArray GridGeometry::createPlaneVertexData() {
             *fptr++ = x;
             *fptr++ = model_->elevationAt(
                     {
-                            metersAndRefToAngle(x, topLeftLatLon_.latitude, GridConstants::ARC_NORTH_SOUTH_DISTANCE),
-                            metersAndRefToAngle(z, topLeftLatLon_.longitude, arcWestEastDistance_)
+                            worldRef_->latitudeFromDistance(x, topLeftLatLon_.latitude),
+                            worldRef_->longitudeFromDistance(z, topLeftLatLon_.longitude)
                     });
             *fptr++ = z;
 
             // texture coordinates
             *fptr++ = u;
-            *fptr++ = 1.0 - v;
+            *fptr++ = 1.0f - v;
 
             // normal
             *fptr++ = 0.0f;
@@ -98,17 +97,16 @@ QByteArray GridGeometry::createPlaneIndexData() {
 }
 
 
-GridGeometry::GridGeometry(Qt3DCore::QNode *parent,
-                           const ContinuousElevationModel *const model,
-                           const LatLon &topLeftGeoPoint,
-                           int sideLength,
-                           int resolution) :
+GridGeometry::GridGeometry(Qt3DCore::QNode *parent, const ContinuousElevationModel *const model,
+                           const WorldReference *const worldRef, const LatLon &topLeftGeoPoint, int sideLength,
+                           int resolution)
+        :
         Qt3DRender::QGeometry(parent),
         model_{model},
+        worldRef_{worldRef},
         sideLength_{sideLength},
         gridResolution_{resolution},
         topLeftLatLon_{topLeftGeoPoint},
-        arcWestEastDistance_{GridConstants::ARC_NORTH_SOUTH_DISTANCE * std::cos(toRadians(topLeftGeoPoint.latitude))},
         positionAttribute_(new Qt3DRender::QAttribute()),
         normalAttribute_(new Qt3DRender::QAttribute()),
         texCoordAttribute_(new Qt3DRender::QAttribute()),

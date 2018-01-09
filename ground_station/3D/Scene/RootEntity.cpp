@@ -7,12 +7,10 @@
 #include <3D/Objects/OpenGL3DAxes.h>
 #include <Utilities/ReaderUtils.h>
 #include <FileReader.h>
-#include <3D/Utils.h>
 #include <3D/Objects/Ruler.h>
 #include <3D/ForwardRenderer/LayerManager.h>
 #include <3D/Objects/Compass.h>
 #include "RootEntity.h"
-#include "WorldReference.h"
 
 static void addToEach(QVector<QVector3D> &v, QVector3D v3d) {
     for (size_t i = 0; i < v.size(); i++) {
@@ -61,8 +59,8 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     launchSitePos_ = worldRef.worldPosAt(launchSiteLatLon, &continuousModel);
     auto *gs = new GroundStation(worldRef.worldPosAt(gsLatLon, &continuousModel), TextureConstants::DOUBLE_DOWN_ARROW,
                                  camera_, this);
-    auto *ground = new Ground(this, {0, 0}, worldRef.origin(), &continuousModel);
-    auto *ground2 = new Ground(this, {0, 10000}, nextOrigin, &continuousModel);
+    auto *ground = new Ground(this, {0, 0}, worldRef.origin(), &continuousModel, &worldRef);
+    auto *ground2 = new Ground(this, {0, 10000}, nextOrigin, &continuousModel, &worldRef);
     rocketTracker_ = new Tracker(launchSitePos_, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
                                  TextType::BOLD, this, OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_CENTER_LABEL);
 

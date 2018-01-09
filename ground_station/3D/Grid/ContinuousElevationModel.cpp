@@ -7,7 +7,7 @@ ContinuousElevationModel::ContinuousElevationModel(DiscreteElevationModel *discr
         discreteModel} {
 }
 
-double ContinuousElevationModel::elevationAt(const LatLon &latLon) const {
+float ContinuousElevationModel::elevationAt(const LatLon &latLon) const {
 
     GeoPoint geoPoint = latLonToGeoPoint(latLon);
 
@@ -24,7 +24,7 @@ double ContinuousElevationModel::elevationAt(const LatLon &latLon) const {
 
     double elevation = bilerp(eleSW, eleSE, eleNW, eleNE, lonSW - lonSWi, latSW - latSWi);
 
-    return elevation;
+    return static_cast<float>(elevation);
 }
 
 float ContinuousElevationModel::elevationSample(const int latitudeIndex, const int longitudeIndex) const {

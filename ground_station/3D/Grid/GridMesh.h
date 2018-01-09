@@ -4,7 +4,7 @@
 
 #include <Qt3DExtras/qt3dextras_global.h>
 #include <Qt3DCore/QTransform>
-
+#include "3D/Scene/WorldReference.h"
 #include <Qt3DRender/qgeometryrenderer.h>
 #include <QtCore/QSize>
 #include "ContinuousElevationModel.h"
@@ -15,6 +15,7 @@ Q_OBJECT
 
 public:
     explicit GridMesh(Qt3DCore::QNode *parent, const ContinuousElevationModel *const model,
+                      const WorldReference *const worldRef,
                       const LatLon &topLeftGeoPoint, int sideLength, int resolution);
 
 };

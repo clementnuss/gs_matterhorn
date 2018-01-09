@@ -5,10 +5,7 @@
 #include <QtGui/QVector2D>
 #include <3D/CoordinateUtils.h>
 #include <3D/Utils.h>
-
-static inline double metersAndRefToAngle(float meters, double reference, double arcLength) {
-    return reference + (meters / (arcLength * GridConstants::SAMPLES_PER_DEGREE));
-}
+#include <3D/Grid/ContinuousElevationModel.h>
 
 class WorldReference {
 public:
@@ -20,25 +17,41 @@ public:
         return origin_;
     }
 
-    QVector3D worldPosAt(const LatLon &point, const ContinuousElevationModel *model) {
+    double latitudeFromDistance(float meters, double reference) const {
+        return reference + (meters / (GridConstants::ARC_NORTH_SOUTH_DISTANCE * GridConstants::SAMPLES_PER_DEGREE));
+    }
+
+    double longitudeFromDistance(float meters, double reference) const {
+        return reference + (meters / (arcWestEastDistance_ * GridConstants::SAMPLES_PER_DEGREE));
+    }
+
+    QVector3D worldPosAt(const LatLon &point, const ContinuousElevationModel *model) const {
         QVector2D v = translationFromOrigin(point);
-        return {v.x(), static_cast<float>(model->elevationAt(point)), v.y()};
-    }
-
-    QVector2D translationFromOrigin(const LatLon &point) {
-        double latitudeTranslation = (point.latitude - origin_.latitude) * GridConstants::SECONDS_PER_DEGREE *
-                                     GridConstants::ARC_NORTH_SOUTH_DISTANCE;
-        double longitudeTranslation =
-                (point.longitude - origin_.longitude) * GridConstants::SECONDS_PER_DEGREE * arcWestEastDistance_;
-
-        return {static_cast<float>(latitudeTranslation), static_cast<float>(longitudeTranslation)};
-    }
-
-    LatLon latLonFromPointAndDistance(const LatLon &point, int metersAlongLatitude, int metersAlongLongitude) {
         return {
-                static_cast<float>(metersAndRefToAngle(metersAlongLatitude, point.latitude,
-                                                       GridConstants::ARC_NORTH_SOUTH_DISTANCE)),
-                static_cast<float>(metersAndRefToAngle(metersAlongLongitude, point.longitude, arcWestEastDistance_))
+                v.x(),
+                static_cast<float>(model->elevationAt(point)),
+                v.y()
+        };
+    }
+
+    QVector2D translationFromOrigin(const LatLon &point) const {
+        double latitudeTranslation = (point.latitude - origin_.latitude)
+                                     * GridConstants::SECONDS_PER_DEGREE
+                                     * GridConstants::ARC_NORTH_SOUTH_DISTANCE;
+        double longitudeTranslation = (point.longitude - origin_.longitude)
+                                      * GridConstants::SECONDS_PER_DEGREE
+                                      * arcWestEastDistance_;
+
+        return {
+                static_cast<float>(latitudeTranslation),
+                static_cast<float>(longitudeTranslation)
+        };
+    }
+
+    LatLon latLonFromPointAndDistance(const LatLon &point, int metersAlongLatitude, int metersAlongLongitude) const {
+        return {
+                latitudeFromDistance(metersAlongLatitude, point.latitude),
+                longitudeFromDistance(metersAlongLongitude, point.longitude)
         };
     }
 

@@ -12,13 +12,15 @@
  *
  * @param parent The QNode parent to which to attach this entity. Will usually be the scene root.
  */
-Ground::Ground(Qt3DCore::QNode *parent, const QVector2D &offset, const LatLon &topLeftLatLon,
-               const ContinuousElevationModel *model) : Qt3DCore::QEntity(
-        parent),
-                                                        transform_{
-                                                                                                        new Qt3DCore::QTransform()},
-                                                        highlightedArea_{
-                                                                                                        nullptr} {
+Ground::Ground(Qt3DCore::QNode *parent,
+               const QVector2D &offset,
+               const LatLon &topLeftLatLon,
+               const ContinuousElevationModel *model,
+               const WorldReference *const worldRef) :
+        Qt3DCore::QEntity(parent),
+        transform_{new Qt3DCore::QTransform()},
+        highlightedArea_{nullptr} {
+
     // Build effect
     auto *shaderProgram = new Qt3DRender::QShaderProgram();
     shaderProgram->setVertexShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/terrain.vert"}));
@@ -60,7 +62,7 @@ Ground::Ground(Qt3DCore::QNode *parent, const QVector2D &offset, const LatLon &t
     material->addParameter(heightParam);
 
     // Set up mesh
-    auto *mesh = new GridMesh(nullptr, model, topLeftLatLon, 10000, 101);
+    auto *mesh = new GridMesh(nullptr, model, worldRef, topLeftLatLon, 10000, 101);
 
     transform_->setTranslation(QVector3D{offset.x(), 0.0, offset.y()});
     this->addComponent(transform_);

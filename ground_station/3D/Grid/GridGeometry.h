@@ -6,6 +6,7 @@
 #include <Qt3DRender/QBuffer>
 #include <Qt3DRender/QAttribute>
 #include <Qt3DRender/QGeometry>
+#include <3D/Scene/WorldReference.h>
 #include "DiscreteElevationModel.h"
 #include "ContinuousElevationModel.h"
 
@@ -14,9 +15,12 @@ class GridGeometry : public Qt3DRender::QGeometry {
 Q_OBJECT
 
 public:
-    explicit GridGeometry(Qt3DCore::QNode *parent, const ContinuousElevationModel *const model,
+    explicit GridGeometry(Qt3DCore::QNode *parent,
+                          const ContinuousElevationModel *const model,
+                          const WorldReference *const worldRef,
                           const LatLon &topLeftGeoPoint,
-                          int sideLength, int resolution);
+                          int sideLength,
+                          int resolution);
 
 private:
 
@@ -26,9 +30,9 @@ private:
 
     int gridResolution_;
     int sideLength_;
-    double arcWestEastDistance_;
     LatLon topLeftLatLon_;
     const ContinuousElevationModel *const model_;
+    const WorldReference *const worldRef_;
 
     Qt3DRender::QAttribute *positionAttribute_;
     Qt3DRender::QAttribute *normalAttribute_;
