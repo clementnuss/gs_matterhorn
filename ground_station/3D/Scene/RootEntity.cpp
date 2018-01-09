@@ -32,7 +32,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 
     cameraController_->setCamera(camera_);
-    cameraController_->setLinearSpeed(100.0);
+    cameraController_->setLinearSpeed(200.0);
     cameraController_->setLookSpeed(3.0f);
 
 

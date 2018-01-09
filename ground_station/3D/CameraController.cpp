@@ -119,7 +119,7 @@ void CameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::I
                     cam->viewVector().normalized()
             ).normalized();
 
-            viewCenterOffset_ +=
+            viewCenterOffset_ -=
                     rightVector * state.rxAxisValue * linearSpeed() + upVector * state.ryAxisValue * linearSpeed();
         }
     } else if (state.leftMouseButtonActive) {
