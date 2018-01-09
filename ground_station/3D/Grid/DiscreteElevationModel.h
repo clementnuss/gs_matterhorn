@@ -15,15 +15,16 @@ public:
 
     static int geoAngleToIndex(const GeoAngle &geoAngle);
 
-    float elevationAt(int x, int y) const;
+    float elevationAt(int latitudeIndex, int longitudeIndex) const;
 
-    bool contains(int x, int y) const;
+    bool contains(int latitudeIndex, int longitudeIndex) const;
 
 private:
 
     static constexpr int MODEL_RESOLUTION = 3600;
     static constexpr int BYTES_PER_MEASURE = 2;
-    const int16_t *hgtData_;
+    const uint16_t *hgtData_;
+    boost::iostreams::mapped_file_source hgtFile_;
     Interval2D extent_;
 };
 

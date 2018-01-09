@@ -5,7 +5,7 @@
 #include "GridGeometry.h"
 
 static inline double metersAndRefToAngle(float meters, double reference, double arcLength) {
-    return reference + (meters / (arcLength * GridConstants::SECONDS_PER_DEGREE));
+    return reference + (meters / (arcLength * GridConstants::SAMPLES_PER_DEGREE));
 }
 
 QByteArray GridGeometry::createPlaneVertexData() {
@@ -45,8 +45,8 @@ QByteArray GridGeometry::createPlaneVertexData() {
             *fptr++ = x;
             *fptr++ = model_->elevationAt(
                     {
-                            metersAndRefToAngle(z, topLeftLatLon_.longitude, arcWestEastDistance_),
-                            metersAndRefToAngle(x, topLeftLatLon_.latitude, GridConstants::ARC_NORTH_SOUTH_DISTANCE)
+                            metersAndRefToAngle(x, topLeftLatLon_.latitude, GridConstants::ARC_NORTH_SOUTH_DISTANCE),
+                            metersAndRefToAngle(z, topLeftLatLon_.longitude, arcWestEastDistance_)
                     });
             *fptr++ = z;
 

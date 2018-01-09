@@ -9,36 +9,38 @@ class Interval2D {
 public:
 
     explicit Interval2D() :
-            xInterval_{boost::icl::construct<boost::icl::discrete_interval<int>>(0, 0)},
-            yInterval_{boost::icl::construct<boost::icl::discrete_interval<int>>(0, 0)} {};
+            longitudeInterval_{boost::icl::construct<boost::icl::discrete_interval<int>>(0, 0)},
+            latitudeInterval_{boost::icl::construct<boost::icl::discrete_interval<int>>(0, 0)} {};
 
-    explicit Interval2D(const boost::icl::discrete_interval<int> &xInterval,
-                        const boost::icl::discrete_interval<int> &yInterval) :
-            xInterval_{xInterval}, yInterval_{yInterval} {};
+    explicit Interval2D(const boost::icl::discrete_interval<int> &latitudeInterval,
+                        const boost::icl::discrete_interval<int> &longitudeInterval) :
+            longitudeInterval_{longitudeInterval}, latitudeInterval_{latitudeInterval} {};
 
-    bool contains(const int x, const int y) const {
-        return boost::icl::contains(xInterval_, x) && boost::icl::contains(yInterval_, y);
+    bool contains(const int latitudeIndex, const int longitudeIndex) const {
+        return boost::icl::contains(latitudeInterval_, latitudeIndex)
+               &&
+               boost::icl::contains(longitudeInterval_, longitudeIndex);
     }
 
-    int fromX() const {
-        return xInterval_.lower();
+    int startLongitude() const {
+        return longitudeInterval_.lower();
     }
 
-    int toX() const {
-        return xInterval_.upper();
+    int endLongitude() const {
+        return longitudeInterval_.upper();
     }
 
-    int fromY() const {
-        return yInterval_.lower();
+    int startLatitude() const {
+        return latitudeInterval_.lower();
     }
 
-    int toY() const {
-        return yInterval_.upper();
+    int endLatitude() const {
+        return latitudeInterval_.upper();
     }
 
 private:
-    boost::icl::discrete_interval<int> xInterval_;
-    boost::icl::discrete_interval<int> yInterval_;
+    boost::icl::discrete_interval<int> longitudeInterval_;
+    boost::icl::discrete_interval<int> latitudeInterval_;
 };
 
 #endif //GS_MATTERHORN_INTERVAL2D_H
