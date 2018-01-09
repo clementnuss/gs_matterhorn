@@ -6,19 +6,23 @@
 #include <3D/CoordinateUtils.h>
 #include <3D/Utils.h>
 #include <3D/Grid/ContinuousElevationModel.h>
+#include <cmath>
 
 class WorldReference {
 public:
     explicit WorldReference(const LatLon &origin) :
             origin_{origin},
-            arcWestEastDistance_{GridConstants::ARC_NORTH_SOUTH_DISTANCE * std::cos(toRadians(origin.latitude))} {}
+            arcNorthSouthDistance_{
+                    (2.0 * M_PI * GridConstants::EARTH_RADIUS) / (360 * GridConstants::SAMPLES_PER_DEGREE)},
+            arcWestEastDistance_{arcNorthSouthDistance_ * std::cos(toRadians(origin.latitude))} {
+    }
 
     LatLon origin() {
         return origin_;
     }
 
     double latitudeFromDistance(float meters, double reference) const {
-        return reference + (meters / (GridConstants::ARC_NORTH_SOUTH_DISTANCE * GridConstants::SAMPLES_PER_DEGREE));
+        return reference + (meters / (arcNorthSouthDistance_ * GridConstants::SAMPLES_PER_DEGREE));
     }
 
     double longitudeFromDistance(float meters, double reference) const {
@@ -37,7 +41,7 @@ public:
     QVector2D translationFromOrigin(const LatLon &point) const {
         double latitudeTranslation = (point.latitude - origin_.latitude)
                                      * GridConstants::SECONDS_PER_DEGREE
-                                     * GridConstants::ARC_NORTH_SOUTH_DISTANCE;
+                                     * arcNorthSouthDistance_;
         double longitudeTranslation = (point.longitude - origin_.longitude)
                                       * GridConstants::SECONDS_PER_DEGREE
                                       * arcWestEastDistance_;
@@ -57,6 +61,7 @@ public:
 
 private:
     const LatLon origin_;
+    double arcNorthSouthDistance_;
     double arcWestEastDistance_;
 };
 
