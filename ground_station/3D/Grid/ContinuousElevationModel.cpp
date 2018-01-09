@@ -5,25 +5,24 @@
 
 ContinuousElevationModel::ContinuousElevationModel(DiscreteElevationModel *discreteModel) : discreteModel_{
         discreteModel} {
-
 }
 
 double ContinuousElevationModel::elevationAt(const LatLon &latLon) const {
 
     GeoPoint geoPoint = latLonToGeoPoint(latLon);
 
-    int lonSW = DiscreteElevationModel::geoAngleToIndex(geoPoint.longitude);
-    int latSW = DiscreteElevationModel::geoAngleToIndex(geoPoint.latitude);
-    double eleSW = elevationSample(latSW, lonSW);
-    double eleNW = elevationSample(latSW + 1, lonSW);
-    double eleSE = elevationSample(latSW, lonSW + 1);
-    double eleNE = elevationSample(latSW + 1, lonSW + 1);
+    double lonSW = DiscreteElevationModel::geoAngleToIndex(geoPoint.longitude);
+    double latSW = DiscreteElevationModel::geoAngleToIndex(geoPoint.latitude);
 
-    std::cout << "Elevation are: " << eleSW << " " << eleNW << " " << eleSE << " " << eleNE << std::endl;
+    int lonSWi = static_cast<int>(std::floor(lonSW));
+    int latSWi = static_cast<int>(std::floor(latSW));
 
-    double elevation = eleSW; //TODO: use bilerp(eleSW, eleSE, eleNW, eleNE, latLon.longitude - lonSW, latLon.latitude - latSW);
+    double eleSW = elevationSample(latSWi, lonSWi);
+    double eleNW = elevationSample(latSWi + 1, lonSWi);
+    double eleSE = elevationSample(latSWi, lonSWi + 1);
+    double eleNE = elevationSample(latSWi + 1, lonSWi + 1);
 
-    std::cout << "Final elevation: " << elevation;
+    double elevation = bilerp(eleSW, eleSE, eleNW, eleNE, lonSW - lonSWi, latSW - latSWi);
 
     return elevation;
 }

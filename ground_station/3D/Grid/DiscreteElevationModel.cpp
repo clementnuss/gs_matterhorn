@@ -66,7 +66,7 @@ bool DiscreteElevationModel::contains(int latitudeIndex, int longitudeIndex) con
     return extent_.contains(latitudeIndex, longitudeIndex);
 }
 
-int DiscreteElevationModel::geoAngleToIndex(const GeoAngle &geoAngle) {
+double DiscreteElevationModel::geoAngleToIndex(const GeoAngle &geoAngle) {
     return geoAngle.degrees * GridConstants::SAMPLES_PER_DEGREE + geoAngle.minutes * GridConstants::SAMPLES_PER_MINUTE +
            geoAngle.seconds;
 }

@@ -13,7 +13,7 @@ class DiscreteElevationModel {
 public:
     explicit DiscreteElevationModel(std::string &filePath, GeoPoint &topLeftGeoPoint);
 
-    static int geoAngleToIndex(const GeoAngle &geoAngle);
+    static double geoAngleToIndex(const GeoAngle &geoAngle);
 
     float elevationAt(int latitudeIndex, int longitudeIndex) const;
 
