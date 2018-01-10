@@ -36,14 +36,14 @@ QByteArray GridGeometry::createPlaneVertexData() {
             const float x = x0 - static_cast<float>(i) * dx;
             const float v = static_cast<float>(i) * dv;
 
+            LatLon p{
+                    worldRef_->latitudeFromDistance(x, topLeftLatLon_.latitude),
+                    worldRef_->longitudeFromDistance(z, topLeftLatLon_.longitude)
+            };
 
             // position
             *fptr++ = x;
-            *fptr++ = model_->elevationAt(
-                    {
-                            worldRef_->latitudeFromDistance(x, topLeftLatLon_.latitude),
-                            worldRef_->longitudeFromDistance(z, topLeftLatLon_.longitude)
-                    });
+            *fptr++ = model_->elevationAt(p);
             *fptr++ = z;
 
             // texture coordinates
@@ -52,7 +52,7 @@ QByteArray GridGeometry::createPlaneVertexData() {
 
             // normal
             *fptr++ = 0.0f;
-            *fptr++ = 1.0f;
+            *fptr++ = model_->slopeAt(p);
             *fptr++ = 0.0f;
 
             // tangent

@@ -52,7 +52,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     std::string s{"../../ground_station/data/N46E006.hgt"};
 
     DiscreteElevationModel discreteModel{s, gp};
-    ContinuousElevationModel continuousModel{&discreteModel};
+    ContinuousElevationModel continuousModel{&discreteModel, &worldRef};
 
     LatLon gsLatLon = {46.518701, 6.562413};
     LatLon launchSiteLatLon = {46.518473, 6.566322};

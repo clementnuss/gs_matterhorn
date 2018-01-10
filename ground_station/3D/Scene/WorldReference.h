@@ -5,8 +5,8 @@
 #include <QtGui/QVector2D>
 #include <3D/CoordinateUtils.h>
 #include <3D/Utils.h>
-#include <3D/Grid/ContinuousElevationModel.h>
 #include <cmath>
+#include <3D/Grid/ContinuousElevationModel.h>
 
 class WorldReference {
 public:
@@ -21,6 +21,14 @@ public:
         return origin_;
     }
 
+    double oneSecondArcLengthWE() const {
+        return arcWestEastDistance_;
+    }
+
+    double oneSecondArcLengthNS() const {
+        return arcNorthSouthDistance_;
+    }
+
     double latitudeFromDistance(float meters, double reference) const {
         return reference + (meters / (arcNorthSouthDistance_ * GridConstants::SAMPLES_PER_DEGREE));
     }
@@ -29,7 +37,7 @@ public:
         return reference + (meters / (arcWestEastDistance_ * GridConstants::SAMPLES_PER_DEGREE));
     }
 
-    QVector3D worldPosAt(const LatLon &point, const ContinuousElevationModel *model) const {
+    QVector3D worldPosAt(const LatLon &point, const ContinuousElevationModel *const model) const {
         QVector2D v = translationFromOrigin(point);
         return {
                 v.x(),
