@@ -103,7 +103,7 @@ private:
 
     void graphWidgetSetup();
 
-    void plotSetup(QCustomPlot *, QString, QColor);
+    void plotSetup(QCustomPlot *, QString, QColor, bool labelTimeAxis);
 
     void connectComponents();
 

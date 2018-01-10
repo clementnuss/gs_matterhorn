@@ -279,8 +279,8 @@ void GSMainwindow::registerEvent(const RocketEvent &event) {
 void GSMainwindow::graphWidgetSetup() {
     QWidget *plotContainer = ui->plot_container;
 
-    plotSetup(plot1_, QStringLiteral("Altitude [m]"), QColor(180, 0, 0));
-    plotSetup(plot2_, QStringLiteral("Acceleration [G]"), QColor(0, 180, 0));
+    plotSetup(plot1_, QStringLiteral("Altitude [m]"), QColor(180, 0, 0), true);
+    plotSetup(plot2_, QStringLiteral("Acceleration [G]"), QColor(0, 180, 0), false);
 
     auto *layout = new QVBoxLayout(plotContainer);
     layout->addWidget(plot1_);
@@ -299,16 +299,14 @@ void GSMainwindow::graphWidgetSetup() {
  * @param title The title for the plot
  * @param color The color ot use to draw the plot
  */
-void GSMainwindow::plotSetup(QCustomPlot *plot, QString title, QColor color) {
+void GSMainwindow::plotSetup(QCustomPlot *plot, QString title, QColor color, bool labelTimeAxis) {
     plot->setInteractions(interactionItemsOnly_);
     plot->plotLayout()->clear();
 
     // TODO: check if needed on RaspberryPi3
     //customPlot->setOpenGl(true);
 
-    QFont titleFont = QFont("sans", 10, QFont::Bold);
-
-    auto *titleText = new QCPTextElement(plot, title, titleFont);
+    QFont labelFont = QFont("sans", 10, QFont::Bold);
 
     auto axisRect = new QCPAxisRect(plot);
 
@@ -316,15 +314,19 @@ void GSMainwindow::plotSetup(QCustomPlot *plot, QString title, QColor color) {
     axisRect->setupFullAxesBox(true);
     axisRect->setMarginGroup(QCP::msLeft | QCP::msRight, &plotMargin_);
 
-    plot->plotLayout()->addElement(0, 0, titleText);
-    plot->plotLayout()->addElement(1, 0, axisRect);
+    plot->plotLayout()->addElement(0, 0, axisRect);
 
     QFont font;
     font.setPointSize(12);
     axisRect->axis(QCPAxis::atLeft, 0)->setTickLabelFont(font);
     axisRect->axis(QCPAxis::atBottom, 0)->setTickLabelFont(font);
-    axisRect->axis(QCPAxis::atLeft, 0)->setTickLabelFont(font);
-    axisRect->axis(QCPAxis::atBottom, 0)->setTickLabelFont(font);
+
+    axisRect->axis(QCPAxis::atLeft, 0)->setLabel(title);
+    if (labelTimeAxis) {
+        axisRect->axis(QCPAxis::atBottom, 0)->setLabel("Time [seconds]");
+    }
+    axisRect->axis(QCPAxis::atLeft, 0)->setLabelFont(labelFont);
+    axisRect->axis(QCPAxis::atBottom, 0)->setLabelFont(labelFont);
 
     QPen pen;
     pen.setWidth(1);
