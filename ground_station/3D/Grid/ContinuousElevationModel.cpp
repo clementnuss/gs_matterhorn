@@ -28,7 +28,7 @@ float ContinuousElevationModel::elevationAt(const LatLon &latLon) const {
     return static_cast<float>(elevation);
 }
 
-float ContinuousElevationModel::slopeAt(const LatLon &latLon) const {
+QVector3D ContinuousElevationModel::slopeAt(const LatLon &latLon) const {
 
     GeoPoint geoPoint = latLonToGeoPoint(latLon);
 
@@ -38,14 +38,14 @@ float ContinuousElevationModel::slopeAt(const LatLon &latLon) const {
     int lonSWi = static_cast<int>(std::floor(lonSW));
     int latSWi = static_cast<int>(std::floor(latSW));
 
-    double eleSW = slopeSample(latSWi, lonSWi);
-    double eleNW = slopeSample(latSWi + 1, lonSWi);
-    double eleSE = slopeSample(latSWi, lonSWi + 1);
-    double eleNE = slopeSample(latSWi + 1, lonSWi + 1);
+    QVector3D slopeSW = slopeSample(latSWi, lonSWi);
+    QVector3D slopeNW = slopeSample(latSWi + 1, lonSWi);
+    QVector3D slopeSE = slopeSample(latSWi, lonSWi + 1);
+    QVector3D slopeNE = slopeSample(latSWi + 1, lonSWi + 1);
 
-    double elevation = bilerp(eleSW, eleSE, eleNW, eleNE, lonSW - lonSWi, latSW - latSWi);
+    QVector3D elevation = bilerpVect(slopeSW, slopeSE, slopeNW, slopeNE, lonSW - lonSWi, latSW - latSWi);
 
-    return static_cast<float>(elevation);
+    return slopeSample(latSWi, lonSWi);
 }
 
 float ContinuousElevationModel::elevationSample(const int latitudeIndex, const int longitudeIndex) const {
@@ -54,26 +54,23 @@ float ContinuousElevationModel::elevationSample(const int latitudeIndex, const i
                                                                                                  longitudeIndex) : 0;
 }
 
-float ContinuousElevationModel::slopeSample(const int latitudeIndex, const int longitudeIndex) const {
+QVector3D ContinuousElevationModel::slopeSample(const int latitudeIndex, const int longitudeIndex) const {
     double e = elevationSample(latitudeIndex, longitudeIndex);
 
     double arcN = worldRef_->oneSecondArcLengthNS();
     double arcW = worldRef_->oneSecondArcLengthWE();
-    double arcNSq = std::pow(arcN, 2);
-    double arcWSq = std::pow(arcW, 2);
-    double dESq = std::pow((e - elevationSample(latitudeIndex + 1, longitudeIndex)), 2);
-    double dNSq = std::pow((e - elevationSample(latitudeIndex, longitudeIndex + 1)), 2);
 
-    double theta = std::acos(
-            (arcN * arcW)
-            / sqrt(
-                    dESq * arcNSq
-                    + dNSq * arcWSq
-                    + arcNSq * arcWSq
-            )
-    );
+    double dN = (e - elevationSample(latitudeIndex + 1, longitudeIndex));
+    double dE = (e - elevationSample(latitudeIndex, longitudeIndex + 1));
 
-    std::cout << "theta " << theta << " ";
+    QVector3D vEast{
+            0,
+            static_cast<float>(dE),
+            static_cast<float>(arcW)};
+    QVector3D vNorth{
+            static_cast<float>(arcN),
+            static_cast<float>(dN),
+            0};
 
-    return static_cast<float>(theta);
+    return QVector3D::crossProduct(vEast, vNorth).normalized();
 }

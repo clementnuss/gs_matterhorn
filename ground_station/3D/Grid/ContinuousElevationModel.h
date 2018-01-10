@@ -15,10 +15,10 @@ public:
     //From https://cs108.epfl.ch/archive/17/p/03_elevation-models.html
     float elevationAt(const LatLon &latLon) const;
 
-    float slopeAt(const LatLon &latLon) const;
+    QVector3D slopeAt(const LatLon &latLon) const;
     float elevationSample(const int latitudeIndex, const int longitudeIndex) const;
 
-    float slopeSample(const int latitudeIndex, const int longitudeIndex) const;
+    QVector3D slopeSample(const int latitudeIndex, const int longitudeIndex) const;
 
 private:
     const DiscreteElevationModel *const discreteModel_;

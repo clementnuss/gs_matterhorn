@@ -51,9 +51,10 @@ QByteArray GridGeometry::createPlaneVertexData() {
             *fptr++ = 1.0f - v;
 
             // normal
-            *fptr++ = 0.0f;
-            *fptr++ = model_->slopeAt(p);
-            *fptr++ = 0.0f;
+            QVector3D n = model_->slopeAt(p);
+            *fptr++ = n.x();
+            *fptr++ = n.y();
+            *fptr++ = n.z();
 
             // tangent
             *fptr++ = 1.0f;

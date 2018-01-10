@@ -5,7 +5,9 @@ attribute vec2 vertexTexCoord;
 attribute vec3 vertexNormal;
 
 varying vec2 texCoord;
-varying float intensity;
+varying vec3 color;
+
+const vec3 lightSource = vec3(1, 1, -1);
 
 uniform mat4 mvp;
 uniform sampler2D heightTexture;
@@ -15,12 +17,11 @@ void main()
     // Flipped texture coordinates
     texCoord = vertexTexCoord;
 
-    // Calculate y value based upon input coordinates and time
-    vec3 pos = vertexPosition;
+    float theta = dot(normalize(lightSource), vertexNormal);
 
-    intensity = vertexNormal.y;
+    color = vec3(0.5 * (cos(theta)+1),
+                         0.5 * (cos(theta)+1),
+                         0.5 * ((0.7 * cos(theta)) + 1));
 
-    //pos.y = 260 * length(texture2D(heightTexture, texCoord).rgb);
-
-    gl_Position = mvp * vec4( pos, 1.0 );
+    gl_Position = mvp * vec4(vertexPosition, 1.0 );
 }
