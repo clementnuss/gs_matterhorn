@@ -124,7 +124,7 @@ void GSMainwindow::updateEvents(vector<RocketEvent> &events) {
             int minutes = seconds / TimeConstants::SECS_IN_MINUTE;
 
             stringstream ss;
-            ss << "T+"
+            ss << "At "
                << setw(TimeConstants::SECS_AND_MINS_WIDTH) << setfill('0') << minutes % TimeConstants::MINUTES_IN_HOUR
                << ":"
                << setw(TimeConstants::SECS_AND_MINS_WIDTH) << setfill('0') << seconds % TimeConstants::SECS_IN_MINUTE

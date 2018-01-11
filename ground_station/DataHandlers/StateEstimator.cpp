@@ -83,7 +83,7 @@ void StateEstimator::computeState(const TelemetryReading &r) {
             if (r.acceleration_.norm() > ACCELERATION_THRESHOLD) {
                 currentState_ = BURNING_PHASE;
                 initialTelemetryState_ = r;
-                RocketEvent event{r.timestamp_, 0, "MOTOR START"};
+                RocketEvent event{r.timestamp_, 0, "T+:0 \tIGNITION"};
                 pendingDetectedRocketEvents_.push_back(event);
             }
             break;
@@ -92,7 +92,7 @@ void StateEstimator::computeState(const TelemetryReading &r) {
             if (r.acceleration_.norm() < ACCELERATION_THRESHOLD) {
                 currentState_ = BURNOUT;
                 double deltaT = (r.timestamp_ - initialTelemetryState_.timestamp_) / 1'000'000.0;
-                RocketEvent event{r.timestamp_, 0, "BURN OUT\n\tt+:" + std::to_string(deltaT)};
+                RocketEvent event{r.timestamp_, 0, "T+:" + std::to_string(deltaT) + "\tENGINE BURNOUT"};
                 pendingDetectedRocketEvents_.push_back(event);
             }
             break;
@@ -102,7 +102,7 @@ void StateEstimator::computeState(const TelemetryReading &r) {
                 currentState_ = PARACHUTE_DESCENT;
                 double deltaT = (r.timestamp_ - initialTelemetryState_.timestamp_) / 1'000'000.0;
 
-                RocketEvent event{r.timestamp_, 0, "PARACHUTE_DEPLOYMENT\n\tt+:" + std::to_string(deltaT)};
+                RocketEvent event{r.timestamp_, 0, "T+:" + std::to_string(deltaT) + "\tPARACHUTE DEPLOYMENT"};
                 pendingDetectedRocketEvents_.push_back(event);
             }
             break;
@@ -112,7 +112,7 @@ void StateEstimator::computeState(const TelemetryReading &r) {
                 currentState_ = TOUCHDOWN;
                 RocketEvent touchdown{r.timestamp_, 0, "TOUCHDOWN"};
                 double flightDuration = (r.timestamp_ - initialTelemetryState_.timestamp_) / 1'000'000.0;
-                RocketEvent flightDurationEvent{r.timestamp_, 0, "FLIGHT DURATION:\n\t" + std::to_string(flightDuration)};
+                RocketEvent flightDurationEvent{r.timestamp_, 0, "FLIGHT DURATION: " + std::to_string(flightDuration)};
                 pendingDetectedRocketEvents_.push_back(touchdown);
                 pendingDetectedRocketEvents_.push_back(flightDurationEvent);
             }
