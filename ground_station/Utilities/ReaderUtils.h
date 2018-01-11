@@ -7,6 +7,7 @@
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <DataStructures/datastructs.h>
+#include <DataStructures/WindData.h>
 
 static QVector3D posFromString(const std::string &str) {
 
@@ -26,7 +27,6 @@ static QVector3D posFromString(const std::string &str) {
         x = std::stof(*it++);
         y = std::stof(*it++);
         z = std::stof(*it++);
-
 
     } catch (std::logic_error &e) {
         std::cout << "\tunable to decode this reading:\n\t" << str;
@@ -52,12 +52,12 @@ static WindPrediction windPredictionFromString(const std::string &str) {
 
         // Jump to meter value
         it += 1;
-        prediction.altitude_ = std::stof(*it);
+        prediction.altitude = std::stof(*it);
 
         // Jump to direction value
         it += 5;
-        prediction.direction_ = std::stof(*it++);
-        prediction.speed_ = std::stof(*it++) * UnitsConstants::KNOTS_TO_MS;
+        prediction.direction = std::stof(*it++);
+        prediction.speed = std::stof(*it++) * UnitsConstants::KNOTS_TO_MS;
 
 
     } catch (std::logic_error &e) {

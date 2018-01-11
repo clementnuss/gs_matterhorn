@@ -5,10 +5,15 @@
 
 #include <Qt3DCore/QEntity>
 
+enum class TextType {
+    BOLD, LEGEND
+};
+
 class Text3D : public Qt3DCore::QEntity {
 Q_OBJECT
 public:
-    explicit Text3D(QString text, Qt3DRender::QCamera *camera, QVector3D &offsetToParent, Qt3DCore::QNode *parent);
+    explicit Text3D(QString text, TextType textType, Qt3DRender::QCamera *camera, QVector3D &offsetToParent,
+                    Qt3DCore::QNode *parent);
 
 public slots:
 

@@ -4,6 +4,7 @@
 #include <Qt3DRender/QEffect>
 #include <Qt3DRender/QMaterial>
 #include <Qt3DExtras/QPlaneMesh>
+#include <3D/Grid/GridMesh.h>
 #include "Ground.h"
 
 /**
@@ -11,13 +12,19 @@
  *
  * @param parent The QNode parent to which to attach this entity. Will usually be the scene root.
  */
-Ground::Ground(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent),
-                                          transform_{new Qt3DCore::QTransform()},
-                                          highlightedArea_{nullptr} {
+Ground::Ground(Qt3DCore::QNode *parent,
+               const QVector2D &offset,
+               const LatLon &topLeftLatLon,
+               const ContinuousElevationModel *model,
+               const WorldReference *const worldRef) :
+        Qt3DCore::QEntity(parent),
+        transform_{new Qt3DCore::QTransform()},
+        highlightedArea_{nullptr} {
+
     // Build effect
     auto *shaderProgram = new Qt3DRender::QShaderProgram();
     shaderProgram->setVertexShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/terrain.vert"}));
-    shaderProgram->setFragmentShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/DShader.frag"}));
+    shaderProgram->setFragmentShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/terrain.frag"}));
 
     auto *renderPass = new Qt3DRender::QRenderPass();
     renderPass->setShaderProgram(shaderProgram);
@@ -55,12 +62,9 @@ Ground::Ground(Qt3DCore::QNode *parent) : Qt3DCore::QEntity(parent),
     material->addParameter(heightParam);
 
     // Set up mesh
-    auto *mesh = new Qt3DExtras::QPlaneMesh();
-    mesh->setHeight(10000);
-    mesh->setWidth(10000);
-    mesh->setMeshResolution(QSize{100, 100});
+    auto *mesh = new GridMesh(nullptr, model, worldRef, topLeftLatLon, 10000, 101);
 
-    transform_->setRotationY(90);
+    transform_->setTranslation(QVector3D{offset.x(), 0.0, offset.y()});
     this->addComponent(transform_);
     this->addComponent(mesh);
     this->addComponent(material);

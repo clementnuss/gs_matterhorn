@@ -53,8 +53,9 @@ void Ruler::initLabels(Qt3DRender::QCamera *camera, const QString &tickTexture) 
          i <= OpenGLConstants::RULER_MAX_HEIGHT;
          i += OpenGLConstants::RULER_SPACING) {
         tickLabels_.push_back(
-                new Tracker({0, i, 0}, camera, tickTexture, QString::number(i) + QStringLiteral(" m"),
-                            this, OpenGLConstants::RIGHT_TICK, OpenGLConstants::RIGHT_LABEL)
+                new Tracker({0, i, 0}, camera, tickTexture, QString::number(i) + QStringLiteral(" m"), TextType::BOLD,
+                            this,
+                            OpenGLConstants::RIGHT_TICK, OpenGLConstants::RIGHT_LABEL)
         );
     }
 }

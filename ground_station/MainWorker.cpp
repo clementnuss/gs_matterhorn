@@ -1,8 +1,8 @@
 #include <QThread>
 #include <iostream>
-#include <DataHandlers/TelemetrySimulator.h>
+#include <DataHandlers/Simulator/TelemetrySimulator.h>
 #include <DataHandlers/Receiver/RadioReceiver.h>
-#include <DataHandlers/TelemetryReplay.h>
+#include <DataHandlers/Replay/TelemetryReplay.h>
 #include "MainWorker.h"
 #include "Utilities/GraphUtils.h"
 #include "Utilities/TimeUtils.h"

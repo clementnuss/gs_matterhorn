@@ -14,6 +14,10 @@
 static const float pi = static_cast<float>(M_PI);
 static const float twoPi = 2.0f * pi;
 
+static inline double toRadians(double degs) {
+    return degs * (M_PI / 180.0);
+}
+
 static inline float clampViewingDistance(float vd) {
     return vd < CameraConstants::VIEWING_DISTANCE_MIN ?
            CameraConstants::VIEWING_DISTANCE_MIN :
@@ -40,9 +44,24 @@ static inline float wrapAngle(float angle) {
     return angle - twoPi * std::floor(angle / twoPi);
 }
 
-
 static inline float angularDistance(float theta1, float theta2) {
     return flooredMod((theta2 - theta1 + pi), twoPi) - pi;
+}
+
+static inline double lerp(double y0, double y1, double x) {
+    return y0 + (y1 - y0) * x;
+}
+
+static inline double bilerp(double z00, double z10, double z01, double z11, double x, double y) {
+    return lerp(lerp(z00, z10, x), lerp(z01, z11, x), y);
+}
+
+static inline QVector3D lerpVect(QVector3D y0, QVector3D y1, double x) {
+    return y0 + (y1 - y0) * x;
+}
+
+static inline QVector3D bilerpVect(QVector3D z00, QVector3D z10, QVector3D z01, QVector3D z11, double x, double y) {
+    return lerpVect(lerpVect(z00, z10, x), lerpVect(z01, z11, x), y);
 }
 
 static Qt3DRender::QTexture2D *loadTextureImage(const QUrl &textureUrl) {

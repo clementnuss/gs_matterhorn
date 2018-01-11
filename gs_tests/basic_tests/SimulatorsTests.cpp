@@ -1,5 +1,5 @@
 #include <DataHandlers/TelemetryHandler.h>
-#include <DataHandlers/TelemetrySimulator.h>
+#include <DataHandlers/Simulator/TelemetrySimulator.h>
 #include "gtest/gtest.h"
 
 TEST(SimulatorsTests, simulatedTelemetryIsCorrect) {

@@ -15,7 +15,8 @@ const QVector3D Text3D::basePosition_{0, 0, 0};
 
 //TODO: Implement common class for billboards
 //TODO: change shader name to uniform color shader
-Text3D::Text3D(QString text, Qt3DRender::QCamera *camera, QVector3D &offsetToParent, Qt3DCore::QNode *parent) :
+Text3D::Text3D(QString text, TextType textType, Qt3DRender::QCamera *camera, QVector3D &offsetToParent,
+               Qt3DCore::QNode *parent) :
         QEntity(parent),
         transform_{new Qt3DCore::QTransform()},
         camera_{camera},
@@ -45,13 +46,26 @@ Text3D::Text3D(QString text, Qt3DRender::QCamera *camera, QVector3D &offsetToPar
     material->addParameter(new Qt3DRender::QParameter("lineColor", QColor::fromRgb(255, 255, 255)));
     material->setEffect(effect);
 
-    auto *test = new Qt3DExtras::QExtrudedTextMesh();
+    auto *textMesh = new Qt3DExtras::QExtrudedTextMesh();
 
-    test->setFont({"Times", 18, QFont::Bold});
-    test->setText(text);
-    test->setDepth(0.1);
+    textMesh->setText(text);
+    textMesh->setDepth(0.1);
 
-    this->addComponent(test);
+    switch (textType) {
+        case TextType::BOLD:
+            textMesh->setFont({"Tahoma", 18, QFont::Bold});
+            break;
+        case TextType::LEGEND:
+            textMesh->setFont({"Tahoma", 18,
+                               QFont::Bold}); // Font size has limited effect in 3D space. + It can change the mesh resolution.
+            transform_->setScale(0.6);
+            break;
+        default:
+            textMesh->setFont({"Courier", 14});
+            break;
+    }
+
+    this->addComponent(textMesh);
     this->addComponent(transform_);
     this->addComponent(material);
     this->addComponent(LayerManager::getInstance().getLayer(LayerType::BILLBOARDS_1));
@@ -64,5 +78,6 @@ void Text3D::updateTransform() {
     QMatrix4x4 t{};
     // Make it face camera since default is like laying flat on ground
     t.translate(offset_);
+    t.scale(transform_->scale());
     transform_->setMatrix(billboardMV(basePosition_, camera_->viewMatrix()) * t);
 }

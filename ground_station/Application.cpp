@@ -1,5 +1,5 @@
 #include <QObject>
-#include <DataHandlers/TelemetrySimulator.h>
+#include <DataHandlers/Simulator/TelemetrySimulator.h>
 #include "Application.h"
 
 Application::Application(int &argc, char **argv) : qApplication_{argc, argv}, gsMainWindow_{}, workerThread_{} {

@@ -75,6 +75,8 @@ public:
 
     void unregisterObservable(IObservable *);
 
+    void setCameraViewCenter(const QVector3D &);
+
     void switchObservable();
 
 public slots:
