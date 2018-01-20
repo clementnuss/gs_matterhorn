@@ -13,7 +13,7 @@ Compass::Compass(Qt3DCore::QNode *parent, Qt3DRender::QCamera *cam) :
         material_{new Qt3DExtras::QTextureMaterial()},
         transform_{new Qt3DCore::QTransform()} {
 
-    transform_->setScale(0.03);
+    transform_->setScale(0.3);
     material_->setTexture(TextureManagerSingleton::getInstance().getTexture("qrc:3D/textures/compass_colors.png"));
 
     mesh_->setSource(QUrl{"qrc:3D/models/compass.obj"});
@@ -38,9 +38,9 @@ void Compass::update() {
 
      // TODO adapt right and up offset to screen size
      QVector3D pos = camera_->position();
-     pos += camera_->viewVector().normalized() * 1;
-    pos += 0.45 * rightVector;
-     pos += 0.3 * upVector;
+    pos += camera_->viewVector().normalized() * 10;
+    pos += 4.5 * rightVector;
+    pos += 3.0 * upVector;
     transform_->setTranslation(pos);
 
 }
