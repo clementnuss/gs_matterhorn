@@ -19,7 +19,13 @@ public slots:
 
     void update();
 
+    void updateHorizontalOffset(int);
+
+    void updateVerticalOffset(int);
+
 private:
+    float horizontalOffset_;
+    float verticalOffset_;
     Qt3DRender::QCamera *camera_;
     Qt3DRender::QMesh *mesh_;
     Qt3DExtras::QTextureMaterial *material_;

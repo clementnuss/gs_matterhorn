@@ -102,6 +102,8 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     auto *compass = new Compass(this, camera_);
     connect(camera_, &Qt3DRender::QCamera::viewMatrixChanged, compass, &Compass::update);
+    connect(view, &Qt3DExtras::Qt3DWindow::widthChanged, compass, &Compass::updateHorizontalOffset);
+    connect(view, &Qt3DExtras::Qt3DWindow::heightChanged, compass, &Compass::updateVerticalOffset);
 }
 
 void RootEntity::updateRocketTracker(QVector<QVector3D> &positions) {
