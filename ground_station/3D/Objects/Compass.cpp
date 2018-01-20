@@ -3,6 +3,7 @@
 #include <Qt3DExtras/QCuboidMesh>
 #include <Qt3DExtras/QPhongMaterial>
 #include <3D/TextureManagerSingleton.h>
+#include <iostream>
 #include "Compass.h"
 
 
@@ -12,8 +13,8 @@ Compass::Compass(Qt3DCore::QNode *parent, Qt3DRender::QCamera *cam) :
         mesh_{new Qt3DRender::QMesh()},
         material_{new Qt3DExtras::QTextureMaterial()},
         transform_{new Qt3DCore::QTransform()},
-        horizontalOffset_{0},
-        verticalOffset_{0} {
+        h_{0},
+        w_{0} {
 
     transform_->setScale(0.3);
     material_->setTexture(TextureManagerSingleton::getInstance().getTexture("qrc:3D/textures/compass_colors.png"));
@@ -26,13 +27,16 @@ Compass::Compass(Qt3DCore::QNode *parent, Qt3DRender::QCamera *cam) :
 }
 
 void Compass::updateHorizontalOffset(int w) {
-    horizontalOffset_ = static_cast<float>((0.5 * w) * ((7.0) / 1000.0));
+    w_ = w;
     update();
 }
 
 void Compass::updateVerticalOffset(int h) {
-    verticalOffset_ = static_cast<float>((0.5 * h) * ((6.0) / 1000.0));
+    h_ = h;
+
     update();
+
+    std::cout << h << std::endl;
 }
 
 void Compass::update() {
@@ -50,8 +54,14 @@ void Compass::update() {
     // TODO adapt right and up offset to screen size
     QVector3D pos = camera_->position();
     pos += camera_->viewVector().normalized() * 10;
-    pos += horizontalOffset_ * rightVector;
-    pos += verticalOffset_ * upVector;
+
+    float verticalOffset = 3.0f;
+    float horizontalOffset = verticalOffset
+                             - static_cast<float>((0.5 * h_) * ((6.0) / 800.0))
+                             + static_cast<float>((0.5 * w_) * ((7.0) / 1000.0));
+
+    pos += horizontalOffset * rightVector;
+    pos += verticalOffset * upVector;
     transform_->setTranslation(pos);
 
 }
