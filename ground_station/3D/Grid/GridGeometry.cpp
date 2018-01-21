@@ -39,14 +39,8 @@ QByteArray GridGeometry::createPlaneVertexData(
             const float x = x0 - static_cast<float>(i) * dx;
             const float v = static_cast<float>(i) * dv;
 
-            /*LatLon p{
-                    worldRef_->latitudeFromDistance(x, topLeftLatLon_.latitude),
-                    worldRef_->longitudeFromDistance(z, topLeftLatLon_.longitude)
-            };*/
-
             // position
             *fptr++ = x;
-            //*fptr++ = model_->elevationAt(p);
             *fptr++ = heightSampler(x, z);
             *fptr++ = z;
 
@@ -55,7 +49,6 @@ QByteArray GridGeometry::createPlaneVertexData(
             *fptr++ = 1.0f - v;
 
             // normal
-            //QVector3D n = model_->slopeAt(p);
             QVector3D n = normalSampler(x, z);
             *fptr++ = n.x();
             *fptr++ = n.y();
@@ -174,6 +167,11 @@ GridGeometry::GridGeometry(Qt3DCore::QNode *parent,
     this->addAttribute(normalAttribute_);
     this->addAttribute(tangentAttribute_);
     this->addAttribute(indexAttribute_);
+}
+
+void GridGeometry::resampleVertices(const std::function<float(int, int)> &heightSampler,
+                                    const std::function<QVector3D(int, int)> &normalSampler) {
+    vertexBuffer_->setData(createPlaneVertexData(heightSampler, normalSampler));
 }
 
 

@@ -20,6 +20,9 @@ public:
 
     float vertexHeightAt(int i, int j) const;
 
+    void resampleVertices(const std::function<float(int, int)> &heightSampler,
+                          const std::function<QVector3D(int, int)> &normalSampler);
+
 private :
     GridGeometry *geometry_;
 };

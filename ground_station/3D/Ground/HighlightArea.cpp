@@ -4,8 +4,16 @@
 #include <Qt3DRender/QMaterial>
 
 
-HighlightArea::HighlightArea(Qt3DRender::QParameter *heightParameter, Qt3DCore::QNode *parent) :
-        Qt3DCore::QEntity(parent), transform_{new Qt3DCore::QTransform()} {
+HighlightArea::HighlightArea(Qt3DCore::QNode *parent) :
+        Qt3DCore::QEntity(parent),
+        transform_{new Qt3DCore::QTransform()},
+        mesh_{new GridMesh(
+                this,
+                [](int x, int y) { return 0.0f; },
+                [](int x, int y) { return QVector3D(0, 0, 0); },
+                1000,
+                11
+        )} {
 
     // Build effect
     auto *shaderProgram = new Qt3DRender::QShaderProgram();
@@ -41,7 +49,7 @@ HighlightArea::HighlightArea(Qt3DRender::QParameter *heightParameter, Qt3DCore::
     // Set up material
     auto *material = new Qt3DRender::QMaterial();
     material->setEffect(effect);
-    material->addParameter(heightParameter);
+    //material->addParameter(heightParameter);
 
     // Set up mesh
     /*auto *mesh = new Qt3DExtras::QPlaneMesh();
@@ -57,6 +65,7 @@ HighlightArea::HighlightArea(Qt3DRender::QParameter *heightParameter, Qt3DCore::
     this->addComponent(transform_);
 }
 
-void HighlightArea::updatePos(const QVector2D &pos) {
+void HighlightArea::updatePos(const QVector2D &pos, const std::function<float(int, int)> &heightSampler) {
     transform_->setTranslation(QVector3D{pos.x(), 50, pos.y()});
+    mesh_->resampleVertices(heightSampler, [](int x, int y) { return QVector3D(0, 0, 0); });
 }
