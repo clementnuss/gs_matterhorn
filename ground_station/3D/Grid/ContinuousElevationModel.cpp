@@ -3,7 +3,7 @@
 #include <iostream>
 #include <3D/Scene/WorldReference.h>
 
-ContinuousElevationModel::ContinuousElevationModel(const DiscreteElevationModel *const discreteModel,
+ContinuousElevationModel::ContinuousElevationModel(const IDiscreteElevationModel *const discreteModel,
                                                    const WorldReference *const worldRef) : discreteModel_{
         discreteModel}, worldRef_{worldRef} {
 }
@@ -50,8 +50,8 @@ QVector3D ContinuousElevationModel::slopeAt(const LatLon &latLon) const {
 
 float ContinuousElevationModel::elevationSample(const int latitudeIndex, const int longitudeIndex) const {
 
-    return discreteModel_->contains(latitudeIndex, longitudeIndex) ? discreteModel_->elevationAt(latitudeIndex,
-                                                                                                 longitudeIndex) : 0;
+    return discreteModel_->extent().contains(latitudeIndex, longitudeIndex) ?
+           discreteModel_->elevationAt(latitudeIndex, longitudeIndex) : 0;
 }
 
 QVector3D ContinuousElevationModel::slopeSample(const int latitudeIndex, const int longitudeIndex) const {

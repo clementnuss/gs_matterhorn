@@ -38,6 +38,14 @@ public:
         return latitudeInterval_.upper();
     }
 
+    //TODO: check unionable before
+    Interval2D unionWith(const Interval2D &that) {
+        return Interval2D(
+                boost::icl::hull(this->latitudeInterval_, that.latitudeInterval_),
+                boost::icl::hull(this->longitudeInterval_, that.longitudeInterval_)
+        );
+    }
+
 private:
     boost::icl::discrete_interval<int> longitudeInterval_;
     boost::icl::discrete_interval<int> latitudeInterval_;

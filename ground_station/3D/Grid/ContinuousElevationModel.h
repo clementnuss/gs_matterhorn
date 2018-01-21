@@ -9,7 +9,7 @@ class WorldReference;
 class ContinuousElevationModel {
 
 public:
-    explicit ContinuousElevationModel(const DiscreteElevationModel *const,
+    explicit ContinuousElevationModel(const IDiscreteElevationModel *const,
                                       const WorldReference *const worldRef);
 
     //From https://cs108.epfl.ch/archive/17/p/03_elevation-models.html
@@ -21,7 +21,7 @@ public:
     QVector3D slopeSample(const int latitudeIndex, const int longitudeIndex) const;
 
 private:
-    const DiscreteElevationModel *const discreteModel_;
+    const IDiscreteElevationModel *const discreteModel_;
     const WorldReference *const worldRef_;
 };
 

@@ -7,17 +7,18 @@
 
 #include <3D/CoordinateUtils.h>
 #include <DataStructures/Interval2D.h>
+#include "IDiscreteElevationModel.h"
 
-class DiscreteElevationModel {
+class DiscreteElevationModel : public IDiscreteElevationModel {
 
 public:
     explicit DiscreteElevationModel(std::string &filePath, GeoPoint &topLeftGeoPoint);
 
     static double geoAngleToIndex(const GeoAngle &geoAngle);
 
-    float elevationAt(int latitudeIndex, int longitudeIndex) const;
+    virtual float elevationAt(int latitudeIndex, int longitudeIndex) const;
 
-    bool contains(int latitudeIndex, int longitudeIndex) const;
+    Interval2D extent() const override;
 
 private:
 

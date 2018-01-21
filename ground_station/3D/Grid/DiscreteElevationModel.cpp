@@ -61,8 +61,8 @@ float DiscreteElevationModel::elevationAt(int latitudeIndex, int longitudeIndex)
     return d;
 }
 
-bool DiscreteElevationModel::contains(int latitudeIndex, int longitudeIndex) const {
-    return extent_.contains(latitudeIndex, longitudeIndex);
+Interval2D DiscreteElevationModel::extent() const {
+    return extent_;
 }
 
 double DiscreteElevationModel::geoAngleToIndex(const GeoAngle &geoAngle) {

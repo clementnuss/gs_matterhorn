@@ -9,6 +9,7 @@
 #include <3D/ForwardRenderer/LayerManager.h>
 #include <3D/Objects/Compass.h>
 #include <3D/Ground/Ground.h>
+#include <3D/Grid/CompositeElevationModel.h>
 #include "RootEntity.h"
 
 static void addToEach(QVector<QVector3D> &v, QVector3D v3d) {
@@ -40,22 +41,33 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
 
     //TODO make sure nobody keeps a ref to this otherwise make dynamic allocation
-    WorldReference worldRef{LatLon{46.518473, 6.566322}};
+    WorldReference worldRef{LatLon{47.213905, 9.003724}};
 
 
-    LatLon nextOrigin = worldRef.latLonFromPointAndDistance(worldRef.origin(), 0, 10000);
 
     // rocket trace at 46.518473, 6.566322
     // GS pos at 46.518701, 6.562413
     GeoPoint gp{{46, 0, 0},
                 {6,  0, 0}};
+    GeoPoint gp1{{47, 0, 0},
+                 {8,  0, 0}};
+    GeoPoint gp2{{47, 0, 0},
+                 {9,  0, 0}};
+
     std::string s{"../../ground_station/data/N46E006.hgt"};
+    std::string s1{"../../ground_station/data/N47E008.hgt"};
+    std::string s2{"../../ground_station/data/N47E009.hgt"};
 
     DiscreteElevationModel discreteModel{s, gp};
-    ContinuousElevationModel continuousModel{&discreteModel, &worldRef};
+    DiscreteElevationModel discreteModel1{s1, gp1};
+    DiscreteElevationModel discreteModel2{s2, gp2};
+
+    CompositeElevationModel compositeModel{&discreteModel1, &discreteModel2};
+
+    ContinuousElevationModel continuousModel{&compositeModel, &worldRef};
 
     LatLon gsLatLon = {46.518701, 6.562413};
-    LatLon launchSiteLatLon = {46.518473, 6.566322};
+    LatLon launchSiteLatLon = {47.213905, 9.003724};
     launchSitePos_ = worldRef.worldPosAt(launchSiteLatLon, &continuousModel);
     auto *gs = new GroundStation(worldRef.worldPosAt(gsLatLon, &continuousModel), TextureConstants::DOUBLE_DOWN_ARROW,
                                  camera_, this);
