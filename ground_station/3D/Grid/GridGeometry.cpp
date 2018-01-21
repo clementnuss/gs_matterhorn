@@ -4,7 +4,10 @@
 #include <3D/Utils.h>
 #include "GridGeometry.h"
 
-QByteArray GridGeometry::createPlaneVertexData() {
+
+QByteArray GridGeometry::createPlaneVertexData(
+        const std::function<float(int, int)> &heightSampler,
+        const std::function<QVector3D(int, int)> &normalSampler) {
     Q_ASSERT(sideLength_ > 0.0f);
     Q_ASSERT(gridResolution_ >= 2);
 
@@ -36,14 +39,15 @@ QByteArray GridGeometry::createPlaneVertexData() {
             const float x = x0 - static_cast<float>(i) * dx;
             const float v = static_cast<float>(i) * dv;
 
-            LatLon p{
+            /*LatLon p{
                     worldRef_->latitudeFromDistance(x, topLeftLatLon_.latitude),
                     worldRef_->longitudeFromDistance(z, topLeftLatLon_.longitude)
-            };
+            };*/
 
             // position
             *fptr++ = x;
-            *fptr++ = model_->elevationAt(p);
+            //*fptr++ = model_->elevationAt(p);
+            *fptr++ = heightSampler(x, z);
             *fptr++ = z;
 
             // texture coordinates
@@ -51,7 +55,8 @@ QByteArray GridGeometry::createPlaneVertexData() {
             *fptr++ = 1.0f - v;
 
             // normal
-            QVector3D n = model_->slopeAt(p);
+            //QVector3D n = model_->slopeAt(p);
+            QVector3D n = normalSampler(x, z);
             *fptr++ = n.x();
             *fptr++ = n.y();
             *fptr++ = n.z();
@@ -98,16 +103,15 @@ QByteArray GridGeometry::createPlaneIndexData() {
 }
 
 
-GridGeometry::GridGeometry(Qt3DCore::QNode *parent, const ContinuousElevationModel *const model,
-                           const WorldReference *const worldRef, const LatLon &topLeftGeoPoint, int sideLength,
+GridGeometry::GridGeometry(Qt3DCore::QNode *parent,
+                           const std::function<float(int, int)> &heightSampler,
+                           const std::function<QVector3D(int, int)> &normalSampler,
+                           int sideLength,
                            int resolution)
         :
         Qt3DRender::QGeometry(parent),
-        model_{model},
-        worldRef_{worldRef},
         sideLength_{sideLength},
         gridResolution_{resolution},
-        topLeftLatLon_{topLeftGeoPoint},
         positionAttribute_(new Qt3DRender::QAttribute()),
         normalAttribute_(new Qt3DRender::QAttribute()),
         texCoordAttribute_(new Qt3DRender::QAttribute()),
@@ -120,7 +124,7 @@ GridGeometry::GridGeometry(Qt3DCore::QNode *parent, const ContinuousElevationMod
     const int stride = (3 + 2 + 3 + 4) * sizeof(float);
     const int faces = 2 * (gridResolution_ - 1) * (gridResolution_ - 1);
 
-    vertexBuffer_->setData(createPlaneVertexData());
+    vertexBuffer_->setData(createPlaneVertexData(heightSampler, normalSampler));
     indexBuffer_->setData(createPlaneIndexData());
 
     positionAttribute_->setName(Qt3DRender::QAttribute::defaultPositionAttributeName());
@@ -171,3 +175,19 @@ GridGeometry::GridGeometry(Qt3DCore::QNode *parent, const ContinuousElevationMod
     this->addAttribute(tangentAttribute_);
     this->addAttribute(indexAttribute_);
 }
+
+
+float GridGeometry::vertexHeightAt(int i, int j) const {
+    if (!(
+            0 <= i && i < gridResolution_
+            &&
+            0 <= j && j < gridResolution_
+    )) {
+        throw std::invalid_argument("Trying to access vertex height outside boudaries of mesh");
+    } else {
+        float *fptr = reinterpret_cast<float *>(vertexBuffer_->data().data());
+        return fptr[(i * gridResolution_) + j];
+    }
+}
+
+

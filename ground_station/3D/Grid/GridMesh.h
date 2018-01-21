@@ -8,16 +8,20 @@
 #include <Qt3DRender/qgeometryrenderer.h>
 #include <QtCore/QSize>
 #include "ContinuousElevationModel.h"
+#include "GridGeometry.h"
 
 
 class GridMesh : public Qt3DRender::QGeometryRenderer {
 Q_OBJECT
 
 public:
-    explicit GridMesh(Qt3DCore::QNode *parent, const ContinuousElevationModel *const model,
-                      const WorldReference *const worldRef,
-                      const LatLon &topLeftGeoPoint, int sideLength, int resolution);
+    explicit GridMesh(Qt3DCore::QNode *parent, const std::function<float(int, int)> &heightSampler,
+                      const std::function<QVector3D(int, int)> &normalSampler, int sideLength, int resolution);
 
+    float vertexHeightAt(int i, int j) const;
+
+private :
+    GridGeometry *geometry_;
 };
 
 

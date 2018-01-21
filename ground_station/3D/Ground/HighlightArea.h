@@ -8,6 +8,7 @@
 #include <Qt3DCore/QEntity>
 #include <Qt3DRender/QParameter>
 #include <Qt3DCore/QTransform>
+#include <3D/Grid/GridMesh.h>
 
 class HighlightArea : public Qt3DCore::QEntity {
 Q_OBJECT
@@ -20,6 +21,7 @@ public slots:
 
 private:
     Qt3DCore::QTransform *transform_;
+    GridMesh *mesh_;
 };
 
 

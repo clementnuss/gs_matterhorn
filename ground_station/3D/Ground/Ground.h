@@ -17,8 +17,12 @@ public:
                     const WorldReference *const worldRef,
                     int sideLength);
 
+    void groundElevationAt(const QVector2D &);
+
 private:
     const int sideLength_;
+    const int halfSideLength_;
+    const int extentFromOrigin_;
     std::vector<std::unique_ptr<GroundTile>> tiles_;
 
 };

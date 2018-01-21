@@ -1,13 +1,22 @@
 
 #include <3D/Scene/WorldReference.h>
 #include "GridMesh.h"
-#include "GridGeometry.h"
 
 
-GridMesh::GridMesh(Qt3DCore::QNode *parent, const ContinuousElevationModel *const model,
-                   const WorldReference *const worldRef,
-                   const LatLon &topLeftGeoPoint, int sideLength, int resolution)
-        : QGeometryRenderer(parent) {
-    auto *geometry = new GridGeometry(this, model, worldRef, topLeftGeoPoint, sideLength, resolution);
-    Qt3DRender::QGeometryRenderer::setGeometry(geometry);
+GridMesh::GridMesh(Qt3DCore::QNode *parent, const std::function<float(int, int)> &heightSampler,
+                   const std::function<QVector3D(int, int)> &normalSampler, int sideLength, int resolution)
+        : QGeometryRenderer(parent),
+          geometry_{new GridGeometry(
+                  this,
+                  heightSampler,
+                  normalSampler,
+                  sideLength,
+                  resolution
+          )} {
+
+    Qt3DRender::QGeometryRenderer::setGeometry(geometry_);
+}
+
+float GridMesh::vertexHeightAt(int i, int j) const {
+    return geometry_->vertexHeightAt(i, j);
 }

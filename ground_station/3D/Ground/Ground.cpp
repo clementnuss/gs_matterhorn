@@ -8,6 +8,8 @@ Ground::Ground(Qt3DCore::QNode *parent,
                const WorldReference *const worldRef,
                int sideLength) :
         sideLength_{(sideLength / 2) * 2}, // Enforce side length to be even
+        halfSideLength_{sideLength / 2},
+        extentFromOrigin_{GridConstants::GRID_LENGTH_IN_METERS * sideLength_ / 2},
         tiles_{} {
 
     if (sideLength_ <= 0) {
@@ -15,12 +17,13 @@ Ground::Ground(Qt3DCore::QNode *parent,
     }
 
 
-    for (int i = -sideLength_ / 2; i < sideLength_ / 2; i++) {
+    for (int i = -halfSideLength_; i < halfSideLength_; i++) {
 
-        for (int j = -sideLength_ / 2; j < sideLength_ / 2; j++) {
+        for (int j = -halfSideLength_; j < halfSideLength_; j++) {
 
             float dLat = static_cast<float>(-i * GridConstants::GRID_LENGTH_IN_METERS);
             float dLon = static_cast<float>(j * GridConstants::GRID_LENGTH_IN_METERS);
+
             //Compute corresponding top-left latitude and longitude coordinates
             LatLon tileOrigin = worldRef->latLonFromPointAndDistance(
                     worldRef->origin(),
@@ -35,4 +38,30 @@ Ground::Ground(Qt3DCore::QNode *parent,
         }
     }
 
+}
+
+void Ground::groundElevationAt(const QVector2D &regionCenter) {
+
+
+    int x = static_cast<int>(std::round(regionCenter.x()));
+    int y = static_cast<int>(std::round(regionCenter.y()));
+    if (isBetween(-extentFromOrigin_, extentFromOrigin_, x)
+        &&
+        isBetween(-extentFromOrigin_, extentFromOrigin_, y)) {
+        // Switch coordinate system -> go from origin in the middle of the terrain to origin on top left
+        int newx = x + halfSideLength_ * GridConstants::GRID_LENGTH_IN_METERS;
+        int newy = halfSideLength_ * GridConstants::GRID_LENGTH_IN_METERS - y;
+
+        //Find the correct tile to sample
+        int j = newx / GridConstants::GRID_LENGTH_IN_METERS + halfSideLength_;
+        int i = newy / GridConstants::GRID_LENGTH_IN_METERS + halfSideLength_;
+
+        int tileIndex = (i * sideLength_) + j;
+
+        //Find the coordinate within the tile
+        int vx = x - j * GridConstants::GRID_LENGTH_IN_METERS;
+        int vy = y - i * GridConstants::GRID_LENGTH_IN_METERS;
+
+        tiles_[tileIndex].get()->vertexHeightAt(vx, vy);
+    }
 }

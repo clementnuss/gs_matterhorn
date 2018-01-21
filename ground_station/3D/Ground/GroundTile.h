@@ -15,10 +15,13 @@ public:
                         const ContinuousElevationModel *model, const WorldReference *const worldRef,
                         const int textureID = -1);
 
+    float vertexHeightAt(int i, int j) const;
+
 public slots:
 
 private:
     Qt3DCore::QTransform *transform_;
+    GridMesh *mesh_;
 };
 
 

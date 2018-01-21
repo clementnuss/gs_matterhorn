@@ -1,15 +1,7 @@
 #include "HighlightArea.h"
-#include <ProgramConstants.h>
-#include <Qt3DRender/QShaderProgram>
-#include <QUrl>
 #include <Qt3DRender/QBlendEquationArguments>
-#include <Qt3DRender/QRenderPass>
-#include <Qt3DRender/QTechnique>
-#include <Qt3DRender/QGraphicsApiFilter>
 #include <Qt3DRender/QEffect>
 #include <Qt3DRender/QMaterial>
-#include <Qt3DExtras/QPlaneMesh>
-#include <3D/3DVisualisationConstants.h>
 
 
 HighlightArea::HighlightArea(Qt3DRender::QParameter *heightParameter, Qt3DCore::QNode *parent) :
@@ -52,15 +44,15 @@ HighlightArea::HighlightArea(Qt3DRender::QParameter *heightParameter, Qt3DCore::
     material->addParameter(heightParameter);
 
     // Set up mesh
-    auto *mesh = new Qt3DExtras::QPlaneMesh();
+    /*auto *mesh = new Qt3DExtras::QPlaneMesh();
     mesh->setHeight(500);
     mesh->setWidth(500);
-    mesh->setMeshResolution(QSize{10, 10});
+    mesh->setMeshResolution(QSize{10, 10});*/
 
     // Offset upwards to show above ground
     transform_->setTranslation(QVector3D(0, 50, 0));
 
-    this->addComponent(mesh);
+    this->addComponent(mesh_);
     this->addComponent(material);
     this->addComponent(transform_);
 }

@@ -14,6 +14,10 @@
 static const float pi = static_cast<float>(M_PI);
 static const float twoPi = 2.0f * pi;
 
+static inline bool isBetween(int a, int b, int x) {
+    return a <= x && x <= b;
+}
+
 static inline double toRadians(double degs) {
     return degs * (M_PI / 180.0);
 }

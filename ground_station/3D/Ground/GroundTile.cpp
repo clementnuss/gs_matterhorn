@@ -3,8 +3,6 @@
 
 #include <Qt3DRender/QEffect>
 #include <Qt3DRender/QMaterial>
-#include <Qt3DExtras/QPlaneMesh>
-#include <3D/Grid/GridMesh.h>
 
 /**
  * 1000x1000 units terrain surface. Correspond to meters
@@ -18,7 +16,25 @@ GroundTile::GroundTile(Qt3DCore::QNode *parent,
                        const WorldReference *const worldRef,
                        const int textureID) :
         Qt3DCore::QEntity(parent),
-        transform_{new Qt3DCore::QTransform()} {
+        transform_{new Qt3DCore::QTransform()},
+        mesh_{new GridMesh(
+                nullptr,
+                [model, worldRef, topLeftLatLon](int x, int z) {
+                    LatLon p{
+                            worldRef->latitudeFromDistance(x, topLeftLatLon.latitude),
+                            worldRef->longitudeFromDistance(z, topLeftLatLon.longitude)
+                    };
+                    return model->elevationAt(p);
+                },
+                [model, worldRef, topLeftLatLon](int x, int z) {
+                    LatLon p{
+                            worldRef->latitudeFromDistance(x, topLeftLatLon.latitude),
+                            worldRef->longitudeFromDistance(z, topLeftLatLon.longitude)
+                    };
+                    return model->slopeAt(p);
+                },
+                10000,
+                101)} {
 
     // Build effect
     auto *shaderProgram = new Qt3DRender::QShaderProgram();
@@ -64,12 +80,12 @@ GroundTile::GroundTile(Qt3DCore::QNode *parent,
         material->addParameter(diffuseParam);
     }
 
-
-    // Set up mesh
-    auto *mesh = new GridMesh(nullptr, model, worldRef, topLeftLatLon, 10000, 101);
-
     transform_->setTranslation(QVector3D{offset.x(), 0.0, offset.y()});
     this->addComponent(transform_);
-    this->addComponent(mesh);
+    this->addComponent(mesh_);
     this->addComponent(material);
+}
+
+float GroundTile::vertexHeightAt(int i, int j) const {
+    return mesh_->vertexHeightAt(i, j);
 }

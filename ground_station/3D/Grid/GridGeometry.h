@@ -16,23 +16,22 @@ Q_OBJECT
 
 public:
     explicit GridGeometry(Qt3DCore::QNode *parent,
-                          const ContinuousElevationModel *const model,
-                          const WorldReference *const worldRef,
-                          const LatLon &topLeftGeoPoint,
+                          const std::function<float(int, int)> &heightSampler,
+                          const std::function<QVector3D(int, int)> &normalSampler,
                           int sideLength,
                           int resolution);
 
+    float vertexHeightAt(int i, int j) const;
+
 private:
 
-    QByteArray createPlaneVertexData();
+    QByteArray createPlaneVertexData(const std::function<float(int, int)> &heightSampler,
+                                     const std::function<QVector3D(int, int)> &normalSamplerr);
 
     QByteArray createPlaneIndexData();
 
     int gridResolution_;
     int sideLength_;
-    LatLon topLeftLatLon_;
-    const ContinuousElevationModel *const model_;
-    const WorldReference *const worldRef_;
 
     Qt3DRender::QAttribute *positionAttribute_;
     Qt3DRender::QAttribute *normalAttribute_;
