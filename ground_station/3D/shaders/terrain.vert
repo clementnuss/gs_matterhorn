@@ -10,7 +10,6 @@ varying vec3 color;
 const vec3 lightSource = vec3(1, 1, -1);
 
 uniform mat4 mvp;
-uniform sampler2D heightTexture;
 
 void main()
 {

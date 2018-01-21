@@ -57,6 +57,7 @@ namespace GridConstants {
     static constexpr int SAMPLES_PER_DEGREE = 3600;
     static constexpr int SAMPLES_PER_MINUTE = 60;
     static constexpr int GRID_RESOLUTION = 100;
+    static constexpr int GRID_LENGTH_IN_METERS = 10000;
 }
 
 

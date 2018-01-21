@@ -2,25 +2,25 @@
 #ifndef GS_MATTERHORN_GROUND_H
 #define GS_MATTERHORN_GROUND_H
 
-#include <Qt3DCore/QNode>
+
+#include <3D/CoordinateUtils.h>
 #include <3D/Scene/WorldReference.h>
-#include "HighlightArea.h"
-#include "3D/CoordinateUtils.h"
-#include "3D/Grid/ContinuousElevationModel.h"
+#include <3D/Grid/ContinuousElevationModel.h>
+#include "GroundTile.h"
 
-class Ground : public Qt3DCore::QEntity {
-Q_OBJECT
+class Ground {
+
 public:
-    explicit Ground(Qt3DCore::QNode *parent, const QVector2D &offset, const LatLon &topLeftLatLon,
-                    const ContinuousElevationModel *model, const WorldReference *const worldRef);
 
-    void highlightArea(const QVector2D &areaCenter);
-
-public slots:
+    explicit Ground(Qt3DCore::QNode *parent,
+                    const ContinuousElevationModel *model,
+                    const WorldReference *const worldRef,
+                    int sideLength);
 
 private:
-    Qt3DCore::QTransform *transform_;
-    HighlightArea *highlightedArea_;
+    const int sideLength_;
+    std::vector<std::unique_ptr<GroundTile>> tiles_;
+
 };
 
 

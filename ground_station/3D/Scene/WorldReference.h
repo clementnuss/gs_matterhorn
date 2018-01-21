@@ -17,7 +17,7 @@ public:
             arcWestEastDistance_{arcNorthSouthDistance_ * std::cos(toRadians(origin.latitude))} {
     }
 
-    LatLon origin() {
+    LatLon origin() const {
         return origin_;
     }
 

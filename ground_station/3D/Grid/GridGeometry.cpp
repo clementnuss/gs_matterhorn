@@ -82,7 +82,7 @@ QByteArray GridGeometry::createPlaneIndexData() {
         const int nextRowStartIndex = (j + 1) * gridResolution_;
 
         // Iterate over x
-        for (int i = 0; i < GridConstants::GRID_RESOLUTION - 1; ++i) {
+        for (int i = 0; i < gridResolution_ - 1; ++i) {
             // Split quad into two triangles
             *indexPtr++ = rowStartIndex + i;
             *indexPtr++ = rowStartIndex + i + 1;

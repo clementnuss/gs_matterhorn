@@ -1,5 +1,3 @@
-
-#include <3D/Ground/Ground.h>
 #include <3D/GroundStation/GroundStation.h>
 #include <3D/Billboards/Tracker.h>
 #include <3D/ForwardRenderer/ForwardRenderer.h>
@@ -10,6 +8,7 @@
 #include <3D/Objects/Ruler.h>
 #include <3D/ForwardRenderer/LayerManager.h>
 #include <3D/Objects/Compass.h>
+#include <3D/Ground/Ground.h>
 #include "RootEntity.h"
 
 static void addToEach(QVector<QVector3D> &v, QVector3D v3d) {
@@ -40,7 +39,8 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     cameraController_->setLookSpeed(3.0f);
 
 
-    WorldReference worldRef{LatLon{46.567201, 6.501007}};
+    //TODO make sure nobody keeps a ref to this otherwise make dynamic allocation
+    WorldReference worldRef{LatLon{46.518473, 6.566322}};
 
 
     LatLon nextOrigin = worldRef.latLonFromPointAndDistance(worldRef.origin(), 0, 10000);
@@ -59,8 +59,9 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     launchSitePos_ = worldRef.worldPosAt(launchSiteLatLon, &continuousModel);
     auto *gs = new GroundStation(worldRef.worldPosAt(gsLatLon, &continuousModel), TextureConstants::DOUBLE_DOWN_ARROW,
                                  camera_, this);
-    auto *ground = new Ground(this, {0, 0}, worldRef.origin(), &continuousModel, &worldRef);
-    auto *ground2 = new Ground(this, {0, 10000}, nextOrigin, &continuousModel, &worldRef);
+
+
+    auto *ground = new Ground(this, &continuousModel, &worldRef, 2);
     rocketTracker_ = new Tracker(launchSitePos_, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
                                  TextType::BOLD, this, OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_CENTER_LABEL);
 
@@ -83,7 +84,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     SplashDownPredictor splashDownPredictor{meteoPath, this};
     splashDownPredictor.updatePos(traceData.last());
 
-    ground->highlightArea(splashDownPredictor.getTouchdownCoordinates());
+    //ground->highlightArea(splashDownPredictor.getTouchdownCoordinates());
 
     new OpenGL3DAxes(this);
     QVector3D initialPos{0, 0, 0};
