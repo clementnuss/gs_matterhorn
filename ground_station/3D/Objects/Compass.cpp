@@ -3,7 +3,6 @@
 #include <Qt3DExtras/QCuboidMesh>
 #include <Qt3DExtras/QPhongMaterial>
 #include <3D/TextureManagerSingleton.h>
-#include <iostream>
 #include "Compass.h"
 
 
@@ -35,8 +34,6 @@ void Compass::updateVerticalOffset(int h) {
     h_ = h;
 
     update();
-
-    std::cout << h << std::endl;
 }
 
 void Compass::update() {

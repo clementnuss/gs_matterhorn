@@ -33,8 +33,9 @@ private:
 
     QByteArray createPlaneIndexData();
 
-    int gridResolution_;
-    int sideLength_;
+    const int gridResolution_;
+    const int sideLength_;
+    const int vStride_;
 
     Qt3DRender::QAttribute *positionAttribute_;
     Qt3DRender::QAttribute *normalAttribute_;

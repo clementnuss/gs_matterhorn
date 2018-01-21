@@ -11,8 +11,8 @@ HighlightArea::HighlightArea(Qt3DCore::QNode *parent) :
                 this,
                 [](int x, int y) { return 0.0f; },
                 [](int x, int y) { return QVector3D(0, 0, 0); },
-                1000,
-                11
+                GridConstants::HIGHLIGHT_AREA_IN_METERS,
+                GridConstants::HIGHLIGHT_AREA_RESOLUTION
         )} {
 
     // Build effect
@@ -49,16 +49,6 @@ HighlightArea::HighlightArea(Qt3DCore::QNode *parent) :
     // Set up material
     auto *material = new Qt3DRender::QMaterial();
     material->setEffect(effect);
-    //material->addParameter(heightParameter);
-
-    // Set up mesh
-    /*auto *mesh = new Qt3DExtras::QPlaneMesh();
-    mesh->setHeight(500);
-    mesh->setWidth(500);
-    mesh->setMeshResolution(QSize{10, 10});*/
-
-    // Offset upwards to show above ground
-    transform_->setTranslation(QVector3D(0, 50, 0));
 
     this->addComponent(mesh_);
     this->addComponent(material);
@@ -66,6 +56,6 @@ HighlightArea::HighlightArea(Qt3DCore::QNode *parent) :
 }
 
 void HighlightArea::updatePos(const QVector2D &pos, const std::function<float(int, int)> &heightSampler) {
-    transform_->setTranslation(QVector3D{pos.x(), 50, pos.y()});
+    transform_->setTranslation(QVector3D{pos.x(), 100, pos.y()});
     mesh_->resampleVertices(heightSampler, [](int x, int y) { return QVector3D(0, 0, 0); });
 }

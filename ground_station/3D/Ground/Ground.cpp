@@ -1,5 +1,6 @@
 
 #include <stdexcept>
+#include <iostream>
 #include "Ground.h"
 
 
@@ -39,36 +40,45 @@ Ground::Ground(Qt3DCore::QNode *parent,
         }
     }
 
+    std::cout << tiles_.size() << std::endl;
+
 }
 
 void Ground::highlightRegion(const QVector2D &pos) {
-    QVector2D topLeft = {pos.x() + 500, pos.y() - 500};
+    QVector2D topLeft = {pos.x() + GridConstants::HIGHLIGHT_AREA_IN_METERS / 2,
+                         pos.y() - GridConstants::HIGHLIGHT_AREA_IN_METERS / 2};
     highlightArea_.updatePos(
             topLeft,
-            [this, topLeft](int x, int y) {
-                return this->groundElevationAt(topLeft.x() + x, topLeft.y() + y);
+            [this, topLeft](int x, int z) {
+                return this->groundElevationAt(topLeft.x() + x, topLeft.y() + z);
             });
 }
 
-float Ground::groundElevationAt(int x, int y) {
+float Ground::groundElevationAt(int worldX, int worldZ) {
 
-    if (isBetween(-extentFromOrigin_, extentFromOrigin_, x)
+    if (isBetween(-extentFromOrigin_, extentFromOrigin_, worldX)
         &&
-        isBetween(-extentFromOrigin_, extentFromOrigin_, y)) {
+        isBetween(-extentFromOrigin_, extentFromOrigin_, worldZ)) {
         // Switch coordinate system -> go from origin in the middle of the terrain to origin on top left
-        int newx = x + halfSideLength_ * GridConstants::GRID_LENGTH_IN_METERS;
-        int newy = halfSideLength_ * GridConstants::GRID_LENGTH_IN_METERS - y;
+        int horPos = worldZ + halfSideLength_ * GridConstants::GRID_LENGTH_IN_METERS;
+        int vertPos = halfSideLength_ * GridConstants::GRID_LENGTH_IN_METERS - worldX;
 
         //Find the correct tile to sample
-        int j = newx / GridConstants::GRID_LENGTH_IN_METERS + halfSideLength_;
-        int i = newy / GridConstants::GRID_LENGTH_IN_METERS + halfSideLength_;
+        int j = horPos / GridConstants::GRID_LENGTH_IN_METERS;
+        int i = vertPos / GridConstants::GRID_LENGTH_IN_METERS;
 
         int tileIndex = (i * sideLength_) + j;
 
         //Find the coordinate within the tile
-        int vx = x - j * GridConstants::GRID_LENGTH_IN_METERS;
-        int vy = y - i * GridConstants::GRID_LENGTH_IN_METERS;
+        int vx = horPos - j * GridConstants::GRID_LENGTH_IN_METERS;
+        int vy = vertPos - i * GridConstants::GRID_LENGTH_IN_METERS;
 
-        return tiles_[tileIndex].get()->vertexHeightAt(vx, vy);
+        //Find the vertex index
+        int vi = vx / (GridConstants::GRID_RESOLUTION - 1);
+        int vj = vy / (GridConstants::GRID_RESOLUTION - 1);
+
+        return tiles_[tileIndex].get()->vertexHeightAt(vi, vj);
+    } else {
+        return 0.0f;
     }
 }

@@ -20,7 +20,7 @@ public:
     void highlightRegion(const QVector2D &);
 
 private:
-    float groundElevationAt(int x, int y);
+    float groundElevationAt(int worldX, int worldZ);
 
     HighlightArea highlightArea_;
     const int sideLength_;

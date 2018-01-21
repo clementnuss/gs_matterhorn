@@ -33,8 +33,8 @@ GroundTile::GroundTile(Qt3DCore::QNode *parent,
                     };
                     return model->slopeAt(p);
                 },
-                10000,
-                101)} {
+                GridConstants::GRID_LENGTH_IN_METERS,
+                GridConstants::GRID_RESOLUTION)} {
 
     // Build effect
     auto *shaderProgram = new Qt3DRender::QShaderProgram();

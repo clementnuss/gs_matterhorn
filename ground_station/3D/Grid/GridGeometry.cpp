@@ -111,10 +111,10 @@ GridGeometry::GridGeometry(Qt3DCore::QNode *parent,
         tangentAttribute_(new Qt3DRender::QAttribute()),
         indexAttribute_(new Qt3DRender::QAttribute()),
         vertexBuffer_(new Qt3DRender::QBuffer()),
-        indexBuffer_(new Qt3DRender::QBuffer()) {
+        indexBuffer_(new Qt3DRender::QBuffer()),
+        vStride_{(3 + 2 + 3 + 4) * sizeof(float)} {
 
     const int nVerts = gridResolution_ * gridResolution_;
-    const int stride = (3 + 2 + 3 + 4) * sizeof(float);
     const int faces = 2 * (gridResolution_ - 1) * (gridResolution_ - 1);
 
     vertexBuffer_->setData(createPlaneVertexData(heightSampler, normalSampler));
@@ -125,7 +125,7 @@ GridGeometry::GridGeometry(Qt3DCore::QNode *parent,
     positionAttribute_->setVertexSize(3);
     positionAttribute_->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
     positionAttribute_->setBuffer(vertexBuffer_);
-    positionAttribute_->setByteStride(stride);
+    positionAttribute_->setByteStride(vStride_);
     positionAttribute_->setCount(nVerts);
 
     texCoordAttribute_->setName(Qt3DRender::QAttribute::defaultTextureCoordinateAttributeName());
@@ -133,7 +133,7 @@ GridGeometry::GridGeometry(Qt3DCore::QNode *parent,
     texCoordAttribute_->setVertexSize(2);
     texCoordAttribute_->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
     texCoordAttribute_->setBuffer(vertexBuffer_);
-    texCoordAttribute_->setByteStride(stride);
+    texCoordAttribute_->setByteStride(vStride_);
     texCoordAttribute_->setByteOffset(3 * sizeof(float));
     texCoordAttribute_->setCount(nVerts);
 
@@ -142,7 +142,7 @@ GridGeometry::GridGeometry(Qt3DCore::QNode *parent,
     normalAttribute_->setVertexSize(3);
     normalAttribute_->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
     normalAttribute_->setBuffer(vertexBuffer_);
-    normalAttribute_->setByteStride(stride);
+    normalAttribute_->setByteStride(vStride_);
     normalAttribute_->setByteOffset(5 * sizeof(float));
     normalAttribute_->setCount(nVerts);
 
@@ -151,7 +151,7 @@ GridGeometry::GridGeometry(Qt3DCore::QNode *parent,
     tangentAttribute_->setVertexSize(4);
     tangentAttribute_->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
     tangentAttribute_->setBuffer(vertexBuffer_);
-    tangentAttribute_->setByteStride(stride);
+    tangentAttribute_->setByteStride(vStride_);
     tangentAttribute_->setByteOffset(8 * sizeof(float));
     tangentAttribute_->setCount(nVerts);
 
@@ -184,7 +184,9 @@ float GridGeometry::vertexHeightAt(int i, int j) const {
         throw std::invalid_argument("Trying to access vertex height outside boudaries of mesh");
     } else {
         float *fptr = reinterpret_cast<float *>(vertexBuffer_->data().data());
-        return fptr[(i * gridResolution_) + j];
+        int index = (i * gridResolution_) + j;
+        float h = fptr[index * (vStride_ / sizeof(float)) + 1]; // +1 to access the vertical component
+        return h;
     }
 }
 
