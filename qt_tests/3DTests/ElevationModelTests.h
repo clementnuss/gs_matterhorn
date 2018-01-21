@@ -1,0 +1,13 @@
+
+#ifndef GS_MATTERHORN_DISCRETEELEVATIONMODELTESTS_H
+#define GS_MATTERHORN_DISCRETEELEVATIONMODELTESTS_H
+
+#include <QtTest/QtTest>
+
+class ElevationModelTests : public QObject {
+Q_OBJECT
+private
+    slots:
+};
+
+#endif //GS_MATTERHORN_DISCRETEELEVATIONMODELTESTS_H

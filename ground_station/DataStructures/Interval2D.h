@@ -5,7 +5,7 @@
 
 #include <boost/icl/interval.hpp>
 
-// Heavily inspired from
+// Heavily inspired from https://cs108.epfl.ch/archive/17/p/02_points_intervals.html
 class Interval2D {
 public:
 
