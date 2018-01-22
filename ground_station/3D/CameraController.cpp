@@ -49,10 +49,10 @@ void CameraController::switchObservable() {
 
     QVector3D observablePos = (*observableIt_)->getTransform()->translation();
     QVector3D obsToCam = camera()->position() - observablePos;
-    obsToCam = CameraConstants::VIEWING_DISTANCE_DEFAULT * obsToCam.normalized();
+    obsToCam = viewingDistance_ * obsToCam.normalized();
 
     // Recompute azimuthal and polar angle based on the vector going from the tracked object to the camera
-    float newPolarAngle = std::acos(obsToCam.y() / CameraConstants::VIEWING_DISTANCE_DEFAULT);
+    float newPolarAngle = std::acos(obsToCam.y() / viewingDistance_);
     float newAzimuthalAngle = std::atan2(obsToCam.z(), obsToCam.x());
 
     azimuthalAngle_ = wrapAngle(azimuthalAngle_);
@@ -71,10 +71,10 @@ void CameraController::switchObservable() {
             azimuthalAngle_ + angularDistance(azimuthalAngle_, newAzimuthalAngle),
             &azimuthalAngle_));
 
-    // Reset viewing distance
+    /*// Reset viewing distance
     animators_.push_back(std::make_shared<FloatInterpolator>(
-            CameraConstants::VIEWING_DISTANCE_DEFAULT,
-            &viewingDistance_));
+            ,
+            &viewingDistance_));*/
 
     // Reset offset
     animators_.push_back(std::make_shared<QVector3DInterpolator>(
