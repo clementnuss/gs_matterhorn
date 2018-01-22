@@ -607,8 +607,8 @@ void GSMainwindow::dummyAnimation() {
 
     if (i < traceData_.size()) {
         QVector3D speed{0, 0, 0};
-        if (i > 0) {
-            speed = (traceData_[i] - traceData_[i - 1]) / RocketConstants::SIMULATION_DT;
+        if (0 < i && i < traceData_.size() - 1) {
+            speed = (traceData_[i + 1] - traceData_[i - 1]) / (2.0 * RocketConstants::SIMULATION_DT);
         }
         QVector <QVector3D> p{bias + traceData_[i++]};
         this->registerStatus(p, speed);

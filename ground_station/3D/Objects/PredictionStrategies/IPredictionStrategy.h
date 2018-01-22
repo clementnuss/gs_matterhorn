@@ -104,7 +104,7 @@ public:
 private:
     QVector3D accumulatedSpeed_;
 
-    static constexpr float speedAccumulationFactor = 0.95f;
+    static constexpr float speedAccumulationFactor = 0.8f;
 };
 
 #endif //GS_MATTERHORN_IPREDICTIONSTRATEGY_H

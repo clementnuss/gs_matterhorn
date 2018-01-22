@@ -11,7 +11,7 @@ SplashDownPredictor::SplashDownPredictor(std::string &path, Qt3DCore::QNode *par
         predictionStrategy_{std::make_unique<AdaptiveSpeedPredictionStrategy>()},
         status_{},
         trajectory_{},
-        trajectoryLine_{new Line(parent, QColor::fromRgb(255, 153, 0))},
+        trajectoryLine_{new Line(parent, QColor::fromRgb(220, 0, 0))},
         windData_{WindData::fromFile(path)} {
     status_.position = {0, 0, 0};
     status_.speed = {0, 0, 0};
