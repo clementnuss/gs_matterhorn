@@ -20,9 +20,9 @@ GroundStation::GroundStation(QVector3D position, const QString &texture, Qt3DRen
     this->addComponent(transform_);
     this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 
-    new Tracker(QVector3D{0, 100, 0}, camera, texture, QStringLiteral("GROUND STATION"), TextType::BOLD, this,
+    new Tracker(QVector3D{0, 30, 0}, camera, texture, QStringLiteral("GROUND STATION"), TextType::BOLD, this,
                 {0, 0, 0},
-                OpenGLConstants::RIGHT_LABEL);
+                {-8, 2.5, 0});
 }
 
 Qt3DCore::QTransform *GroundStation::getTransform() {

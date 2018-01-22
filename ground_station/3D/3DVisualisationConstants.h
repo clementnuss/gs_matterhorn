@@ -15,7 +15,7 @@ namespace OpenGLConstants {
     static constexpr int RULER_SPACING = 250;
     static constexpr int RULER_MAX_HEIGHT = 5000;
     static const QVector3D ABOVE = QVector3D(0, 1, 0);
-    static const QVector3D ABOVE_CENTER_LABEL = QVector3D(-3, 4, 0);
+    static const QVector3D ABOVE_CENTER_LABEL = QVector3D(-3.2, 3, 0);
     static const QVector3D LEFT_LEGEND_TEXT_OFFSET = QVector3D(-5.5, 1, 0);
     static const QVector3D RIGHT_1 = QVector3D(1, 0, 0);
     static const QVector3D RIGHT_2 = QVector3D(2, 0, 0);
@@ -53,6 +53,8 @@ namespace CameraConstants {
     static constexpr float POLAR_MIN = 0.261799f;
     static constexpr float POLAR_MAX = 2.87979f;
     static constexpr float ANIMATION_DURATION = 400.0f;
+    static constexpr float LINEAR_SPEED = 100.0f;
+    static constexpr float LOOK_SPEED = 3.0f;
 }
 
 namespace GridConstants {

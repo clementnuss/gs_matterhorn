@@ -26,6 +26,10 @@ CameraController::~CameraController() {
 
 void CameraController::registerObservable(IObservable *o) {
     observables_.emplace_back(o);
+
+    if (observables_.size() == 1) {
+        switchObservable(); //Look at first-added observable
+    }
 }
 
 void CameraController::unregisterObservable(IObservable *o) {

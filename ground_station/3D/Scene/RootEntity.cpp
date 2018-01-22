@@ -35,29 +35,22 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 
     cameraController_->setCamera(camera_);
-    cameraController_->setLinearSpeed(200.0);
-    cameraController_->setLookSpeed(3.0f);
+    cameraController_->setLinearSpeed(CameraConstants::LINEAR_SPEED);
+    cameraController_->setLookSpeed(CameraConstants::LOOK_SPEED);
 
 
     //TODO make sure nobody keeps a ref to this otherwise make dynamic allocation
     WorldReference worldRef{LatLon{47.213905, 9.003724}};
 
 
-
-    // rocket trace at 46.518473, 6.566322
-    // GS pos at 46.518701, 6.562413
-    GeoPoint gp{{46, 0, 0},
-                {6,  0, 0}};
     GeoPoint gp1{{47, 0, 0},
                  {8,  0, 0}};
     GeoPoint gp2{{47, 0, 0},
                  {9,  0, 0}};
 
-    std::string s{"../../ground_station/data/N46E006.hgt"};
     std::string s1{"../../ground_station/data/N47E008.hgt"};
     std::string s2{"../../ground_station/data/N47E009.hgt"};
 
-    DiscreteElevationModel discreteModel{s, gp};
     DiscreteElevationModel discreteModel1{s1, gp1};
     DiscreteElevationModel discreteModel2{s2, gp2};
 
@@ -65,14 +58,12 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     ContinuousElevationModel continuousModel{&compositeModel, &worldRef};
 
-    LatLon gsLatLon = {46.518701, 6.562413};
+    LatLon gsLatLon = {47.213073, 9.006919};
     LatLon launchSiteLatLon = {47.213905, 9.003724};
     launchSitePos_ = worldRef.worldPosAt(launchSiteLatLon, &continuousModel);
+    auto *ground = new Ground(this, &continuousModel, &worldRef, 2);
     auto *gs = new GroundStation(worldRef.worldPosAt(gsLatLon, &continuousModel), TextureConstants::DOUBLE_DOWN_ARROW,
                                  camera_, this);
-
-
-    auto *ground = new Ground(this, &continuousModel, &worldRef, 2);
     ground->highlightRegion({0, 0});
 
     rocketTracker_ = new Tracker(launchSitePos_, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
