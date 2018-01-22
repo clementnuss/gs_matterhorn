@@ -8,7 +8,6 @@
 #include <3D/Objects/Ruler.h>
 #include <3D/ForwardRenderer/LayerManager.h>
 #include <3D/Objects/Compass.h>
-#include <3D/Ground/Ground.h>
 #include <3D/Grid/CompositeElevationModel.h>
 #include "RootEntity.h"
 
@@ -98,7 +97,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     SplashDownPredictor splashDownPredictor{meteoPath, this};
     splashDownPredictor.updatePos(traceData.last());
 
-    //ground->highlightArea(splashDownPredictor.getTouchdownCoordinates());
+    ground->highlightRegion(splashDownPredictor.getTouchdownCoordinates(ground));
 
     new OpenGL3DAxes(this);
     QVector3D initialPos{0, 0, 0};

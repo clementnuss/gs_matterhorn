@@ -3,6 +3,7 @@
 #include <DataStructures/datastructs.h>
 #include <FileReader.h>
 #include <Utilities/ReaderUtils.h>
+#include <3D/Ground/Ground.h>
 #include "SplashDownPredictor.h"
 
 
@@ -17,8 +18,23 @@ SplashDownPredictor::SplashDownPredictor(std::string &path, Qt3DCore::QNode *par
     status_.acceleration = {0, 0, 0};
 }
 
-QVector2D SplashDownPredictor::getTouchdownCoordinates() const {
-    return {trajectory_.last().x(), trajectory_.last().z()};
+QVector2D SplashDownPredictor::getTouchdownCoordinates(const Ground *const ground) const {
+
+    for (const QVector3D *it = trajectory_.end() - 1; it != trajectory_.begin(); it--) {
+        float x = it->x();
+        float z = it->z();
+
+        float elev = ground->groundElevationAt(
+                static_cast<int>(std::round(x)),
+                static_cast<int>(std::round(z))
+        );
+
+        if (elev < it->y()) {
+            return {x, z};
+        }
+    }
+
+    return {trajectory_.first().x(), trajectory_.first().z()};
 }
 
 void SplashDownPredictor::updatePos(const QVector3D &pos) {

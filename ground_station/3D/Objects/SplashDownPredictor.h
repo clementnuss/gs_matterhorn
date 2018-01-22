@@ -9,13 +9,14 @@
 #include <Qt3DCore/QNode>
 #include <3D/Line/Line.h>
 #include <3D/Objects/PredictionStrategies/IPredictionStrategy.h>
+#include <3D/Ground/Ground.h>
 #include "DataStructures/WindData.h"
 
 class SplashDownPredictor {
 public:
     SplashDownPredictor(std::string &path, Qt3DCore::QNode *parent);
 
-    QVector2D getTouchdownCoordinates() const;
+    QVector2D getTouchdownCoordinates(const Ground *const ground) const;
     void updatePos(const QVector3D &pos);
 
 private:

@@ -54,7 +54,7 @@ void Ground::highlightRegion(const QVector2D &pos) {
             });
 }
 
-float Ground::groundElevationAt(int worldX, int worldZ) {
+float Ground::groundElevationAt(int worldX, int worldZ) const {
 
     if (isBetween(-extentFromOrigin_, extentFromOrigin_, worldX)
         &&
