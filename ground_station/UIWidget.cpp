@@ -603,7 +603,7 @@ void GSMainwindow::dummyAnimation() {
 
     int secsFromTrigger = QTime::currentTime().msecsTo(animationTriggerTime_);
 
-    QVector3D bias{static_cast<float>(secsFromTrigger * 0.01), 0, static_cast<float>(secsFromTrigger * 0.02)};
+    QVector3D bias{static_cast<float>(secsFromTrigger * 0.01), 0, static_cast<float>(-secsFromTrigger * 0.02)};
 
     if (i < traceData_.size()) {
         QVector3D speed{0, 0, 0};
