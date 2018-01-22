@@ -55,9 +55,11 @@ GSMainwindow::GSMainwindow() :
     rootEntity3D_ = new RootEntity(view, nullptr);
     view->setRootEntity(rootEntity3D_);
 
-
-    ui->stackedWidget->removeWidget(ui->stackedWidget->widget(1));
-    ui->stackedWidget->addWidget(container);
+    ui->visualisation_3D_layout->insertWidget(0, container);
+    ui->visualisation_3D_layout->setStretch(0, 3);
+    ui->visualisation_3D_layout->setStretch(1, 1);
+    //ui->stackedWidget->removeWidget(ui->stackedWidget->widget(1));
+    //ui->visualisation_3D->chi
 
 }
 

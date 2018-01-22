@@ -787,7 +787,7 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="40,1,16">
+          <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="40,1">
         <item>
          <widget class="QFrame" name="frame">
           <property name="minimumSize">
@@ -1131,7 +1131,7 @@
                   </layout>
                  </item>
                  <item>
-                  <widget class="QFrame" name="plot_container">
+                     <widget class="QFrame" name="main_deck">
                    <property name="frameShape">
                     <enum>QFrame::StyledPanel</enum>
                    </property>
@@ -1141,82 +1141,126 @@
                    <property name="lineWidth">
                     <number>2</number>
                    </property>
-                  </widget>
+                         <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="4,1">
+                             <item>
+                                 <widget class="QFrame" name="plot_container">
+                                     <property name="frameShape">
+                                         <enum>QFrame::StyledPanel</enum>
+                                     </property>
+                                     <property name="frameShadow">
+                                         <enum>QFrame::Raised</enum>
+                                     </property>
+                                 </widget>
+                             </item>
+                             <item>
+                                 <widget class="QScrollArea" name="scrollArea">
+                                     <property name="frameShape">
+                                         <enum>QFrame::NoFrame</enum>
+                                     </property>
+                                     <property name="widgetResizable">
+                                         <bool>true</bool>
+                                     </property>
+                                     <widget class="QWidget" name="scrollAreaWidgetContents">
+                                         <property name="geometry">
+                                             <rect>
+                                                 <x>0</x>
+                                                 <y>0</y>
+                                                 <width>275</width>
+                                                 <height>740</height>
+                                             </rect>
+                                         </property>
+                                         <layout class="QVBoxLayout" name="verticalLayout_6">
+                                             <item>
+                                                 <widget class="QLabel" name="label">
+                                                     <property name="font">
+                                                         <font>
+                                                             <pointsize>12</pointsize>
+                                                             <weight>75</weight>
+                                                             <bold>true</bold>
+                                                         </font>
+                                                     </property>
+                                                     <property name="text">
+                                                         <string>EVENT LOG</string>
+                                                     </property>
+                                                 </widget>
+                                             </item>
+                                             <item>
+                                                 <widget class="QPlainTextEdit" name="event_log">
+                                                     <property name="font">
+                                                         <font>
+                                                             <pointsize>10</pointsize>
+                                                         </font>
+                                                     </property>
+                                                     <property name="readOnly">
+                                                         <bool>true</bool>
+                                                     </property>
+                                                 </widget>
+                                             </item>
+                                         </layout>
+                                     </widget>
+                                 </widget>
+                             </item>
+                         </layout>
+                     </widget>
                  </item>
                 </layout>
                </item>
               </layout>
              </widget>
-             <widget class="QWidget" name="Map"/>
+                <widget class="QWidget" name="visualisation_3D">
+                    <property name="minimumSize">
+                        <size>
+                            <width>1428</width>
+                            <height>0</height>
+                        </size>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_8">
+                        <item>
+                            <layout class="QHBoxLayout" name="visualisation_3D_layout">
+                                <item>
+                                    <widget class="QScrollArea" name="scrollArea_2">
+                                        <property name="widgetResizable">
+                                            <bool>true</bool>
+                                        </property>
+                                        <widget class="QWidget" name="scrollAreaWidgetContents_2">
+                                            <property name="geometry">
+                                                <rect>
+                                                    <x>0</x>
+                                                    <y>0</y>
+                                                    <width>1402</width>
+                                                    <height>802</height>
+                                                </rect>
+                                            </property>
+                                        </widget>
+                                    </widget>
+                                </item>
+                            </layout>
+                        </item>
+                    </layout>
+                    <zorder>scrollArea</zorder>
+                    <zorder>horizontalLayoutWidget</zorder>
+                </widget>
             </widget>
            </item>
           </layout>
          </widget>
         </item>
-        <item>
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>15</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QScrollArea" name="scrollArea">
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-          </property>
-          <property name="widgetResizable">
-           <bool>true</bool>
-          </property>
-          <widget class="QWidget" name="scrollAreaWidgetContents">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>413</width>
-             <height>929</height>
-            </rect>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_6">
-            <item>
-             <widget class="QLabel" name="label">
-              <property name="font">
-               <font>
-                <pointsize>12</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>EVENT LOG</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPlainTextEdit" name="event_log">
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </widget>
-        </item>
+              <item>
+                  <spacer name="horizontalSpacer_3">
+                      <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeType">
+                          <enum>QSizePolicy::Fixed</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                          <size>
+                              <width>15</width>
+                              <height>20</height>
+                          </size>
+                      </property>
+                  </spacer>
+              </item>
        </layout>
       </item>
      </layout>
