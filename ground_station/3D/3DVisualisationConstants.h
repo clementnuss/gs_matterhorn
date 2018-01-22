@@ -12,10 +12,10 @@ namespace OpenGLConstants {
     static constexpr int ANISOTROPY_MAX = 8;
     static constexpr int MAX_LINE_RESOLUTION = 500;
     static constexpr int MAX_LINE_DATAPOINTS = 100000;
-    static constexpr int RULER_SPACING = 500;
+    static constexpr int RULER_SPACING = 250;
     static constexpr int RULER_MAX_HEIGHT = 5000;
     static const QVector3D ABOVE = QVector3D(0, 1, 0);
-    static const QVector3D ABOVE_CENTER_LABEL = QVector3D(-4, 2.5, 0);
+    static const QVector3D ABOVE_CENTER_LABEL = QVector3D(-3, 4, 0);
     static const QVector3D LEFT_LEGEND_TEXT_OFFSET = QVector3D(-5.5, 1, 0);
     static const QVector3D RIGHT_1 = QVector3D(1, 0, 0);
     static const QVector3D RIGHT_2 = QVector3D(2, 0, 0);
@@ -25,6 +25,11 @@ namespace OpenGLConstants {
     static const QVector3D LEFT_LABEL = QVector3D(-7, -0.5f, 0);
     static const QVector3D RIGHT_TICK = QVector3D(0.5, 0, 0);
     static const QVector3D LEFT_LEGEND_ICON_OFFSET = QVector3D(-1, 1, 0);
+}
+
+namespace UI3DConstants {
+    static constexpr float TRACKER_SIZE = 20.0f;
+    static constexpr float MARKER_SCALE = 1.5f;
 }
 
 namespace TextureConstants {

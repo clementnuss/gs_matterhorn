@@ -79,6 +79,7 @@ void Marker::updateTransform() {
     QMatrix4x4 t{};
     // Make it face camera since default is like laying flat on ground
     t.translate(offset_);
+    t.scale({UI3DConstants::MARKER_SCALE, UI3DConstants::MARKER_SCALE, UI3DConstants::MARKER_SCALE});
     t.rotate(180, QVector3D(0, 1, 0));
     t.rotate(-90, QVector3D(1, 0, 0));
     transform_->setMatrix(billboardMV(basePosition_, camera_->viewMatrix()) * t);
