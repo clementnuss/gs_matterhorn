@@ -24,6 +24,7 @@ GSMainwindow::GSMainwindow() :
         autoPlay_{true},
         replayMode_{false},
         replayPlaybackSpeed_{1},
+        prevInfoHighlight_{0},
         playbackReversed_{false},
         traceData_{} {
 
@@ -59,6 +60,7 @@ GSMainwindow::GSMainwindow() :
     ui->visualisation_3D_layout->setStretch(1, 1);
 
     connect(rootEntity3D_, &RootEntity::addInfoString, this, &GSMainwindow::registerInfoString);
+    connect(rootEntity3D_, &RootEntity::updateHighlightInfoString, this, &GSMainwindow::highlightInfoString);
     rootEntity3D_->init();
 }
 
@@ -276,6 +278,32 @@ void GSMainwindow::registerEvent(const RocketEvent &event) {
 
 void GSMainwindow::registerInfoString(const QString &s) {
     ui->visualisation_info_textedit->textCursor().insertText(s);
+}
+
+void GSMainwindow::highlightLine(int lineNumber, bool highlighted, QTextCursor &cursor) {
+    cursor.movePosition(QTextCursor::Start);
+    cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, lineNumber);
+    cursor.select(QTextCursor::LineUnderCursor);
+
+    QTextCharFormat format{};
+    format.setFontWeight(highlighted ? 87 : 50);
+    format.setFontUnderline(highlighted);
+    format.setFontOverline(highlighted);
+
+    cursor.setCharFormat(format);
+}
+
+void GSMainwindow::highlightInfoString(int lineNumber) {
+
+    QTextCursor cursor = ui->visualisation_info_textedit->textCursor();
+
+    highlightLine(prevInfoHighlight_, false, cursor);
+    highlightLine(lineNumber, true, cursor);
+
+    cursor.clearSelection();
+    prevInfoHighlight_ = lineNumber;
+
+    ui->visualisation_info_textedit->setTextCursor(cursor);
 }
 
 /**

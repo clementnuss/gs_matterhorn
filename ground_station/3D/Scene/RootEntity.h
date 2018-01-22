@@ -26,6 +26,8 @@ signals:
 
     void addInfoString(const QString &);
 
+    void updateHighlightInfoString(int);
+
 private:
 
     void initRenderSettings(Qt3DExtras::Qt3DWindow *view);

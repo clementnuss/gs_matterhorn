@@ -81,6 +81,8 @@ public slots:
 
     void registerInfoString(const QString &);
 
+    void highlightInfoString(int n);
+
 #if TEST3D
 
     void dummyAnimation();
@@ -111,6 +113,9 @@ private:
 
     void applyToAllPlots(const std::function<void(QCustomPlot *)> &);
 
+    void highlightLine(int, bool, QTextCursor &cursor);
+
+    int prevInfoHighlight_;
     QCustomPlot *plot1_;
     QCustomPlot *plot2_;
     QCPMarginGroup plotMargin_;

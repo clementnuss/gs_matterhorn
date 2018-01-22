@@ -107,6 +107,7 @@ void RootEntity::reportWindData() {
            << std::setw(8) << std::setfill(' ') << std::setprecision(2) << std::fixed << speedAndAngle.second << "°\n";
         emit addInfoString(QString::fromStdString(ss.str()));
     }
+
 }
 
 void RootEntity::updateRocketTracker(QVector<QVector3D> &positions, const QVector3D &speed) {
@@ -117,15 +118,19 @@ void RootEntity::updateRocketTracker(QVector<QVector3D> &positions, const QVecto
     accumulatedBias += RocketConstants::SIMULATION_DT * QVector3D{bias.x(), 0, bias.y()};
 
     addToEach(positions, launchSitePos_ + accumulatedBias);
+    QVector3D lastPos = positions.last();
 
-    rocketTracker_->updatePosition(positions.last());
-    rocketRuler_->updatePosition(positions.last());
+    rocketTracker_->updatePosition(lastPos);
+    rocketRuler_->updatePosition(lastPos);
     rocketTrace_->appendData(positions);
 
-    splashDownPredictor_->updatePos(positions.last());
+    splashDownPredictor_->updatePos(lastPos);
     splashDownPredictor_->updateSpeed(speed);
     splashDownPredictor_->recomputePrediction();
     //splashDownPredictor_->highlightTouchdown(ground_);
+
+    emit updateHighlightInfoString(
+            UI3DConstants::WIND_REPORT_N_LINES - static_cast<int>(lastPos.y() / UI3DConstants::WIND_REPORT_INTERVAL));
 }
 
 void RootEntity::registerEvent(const RocketEvent &event) {

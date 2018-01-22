@@ -34,8 +34,9 @@ namespace RocketConstants {
 namespace UI3DConstants {
     static constexpr float TRACKER_SIZE = 40.0f;
     static constexpr float MARKER_SCALE = 1.5f;
-    static constexpr float WIND_REPORT_MAX = 3000.0f;
+    static constexpr float WIND_REPORT_MAX = 3500.0f;
     static constexpr float WIND_REPORT_INTERVAL = 100.0f;
+    static constexpr int WIND_REPORT_N_LINES = static_cast<int>(WIND_REPORT_MAX / WIND_REPORT_INTERVAL);
 }
 
 namespace TextureConstants {
