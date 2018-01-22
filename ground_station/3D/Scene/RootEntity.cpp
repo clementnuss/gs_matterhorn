@@ -69,7 +69,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
                            launchSitePos_});
 
     // Initialise simulated rocket trace
-    simTrace_ = new Line(this, QColor::fromRgb(0, 200, 0), true);
+    simTrace_ = new Line(this, QColor::fromRgb(0, 180, 0), true);
 
     std::string tracePath{"../../ground_station/data/simulated_trajectory.csv"};
     FileReader<QVector3D> traceReader{tracePath, posFromString};

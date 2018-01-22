@@ -20,7 +20,7 @@ void main()
 
     color = vec3(0.5 * (cos(theta)+1),
                          0.5 * (cos(theta)+1),
-                         0.5 * ((0.7 * cos(theta)) + 1));
+                         0.5 * ((1.0* cos(theta)) + 1));
 
     gl_Position = mvp * vec4(vertexPosition, 1.0 );
 }
