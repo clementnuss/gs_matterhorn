@@ -45,9 +45,9 @@ namespace CameraConstants {
     static const QVector3D UP_VECTOR = QVector3D(0, 1, 0);
     static constexpr float INTERPOLATION_STRENGTH = 0.1f;
     static constexpr float INTERPOLATION_THRESHOLD = 0.0001f;
-    static constexpr float VIEWING_DISTANCE_MIN = 400.0f;
+    static constexpr float VIEWING_DISTANCE_MIN = 300.0f;
     static constexpr float VIEWING_DISTANCE_MAX = 10000.0f;
-    static constexpr float VIEWING_DISTANCE_DEFAULT = 5000.0f;
+    static constexpr float VIEWING_DISTANCE_DEFAULT = 1000.0f;
     static constexpr float AZIMUTH_STEP = 0.785398f; // 45 degrees
     static constexpr float POLAR_STEP = 0.261799f; // 15 degrees
     static constexpr float POLAR_MIN = 0.261799f;

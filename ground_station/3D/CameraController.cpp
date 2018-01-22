@@ -9,10 +9,10 @@ CameraController::CameraController(Qt3DCore::QNode *parent)
           keyboardHandler_{new Qt3DInput::QKeyboardHandler(this)},
           arrowPressed_{false},
           azimuthalAngle_{0},
-          polarAngle_{M_PI / 4.0f},
+          polarAngle_{M_PI / 2.4f},
           viewCenter_{0, 0, 0},
           viewCenterOffset_{0, 0, 0},
-          viewingDistance_{5000.0f},
+          viewingDistance_{CameraConstants::VIEWING_DISTANCE_DEFAULT},
           animators_{},
           observables_{},
           observableIt_{observables_.begin()} {
