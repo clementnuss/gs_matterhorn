@@ -58,8 +58,8 @@ namespace GridConstants {
     static constexpr int SAMPLES_PER_MINUTE = 60;
     static constexpr int GRID_RESOLUTION = 101;
     static constexpr int GRID_LENGTH_IN_METERS = 10000;
-    static constexpr int HIGHLIGHT_AREA_IN_METERS = 1000;
-    static constexpr int HIGHLIGHT_AREA_RESOLUTION = 11;
+    static constexpr int HIGHLIGHT_AREA_IN_METERS = 200;
+    static constexpr int HIGHLIGHT_AREA_RESOLUTION = 2;
 }
 
 

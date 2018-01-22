@@ -56,6 +56,6 @@ HighlightArea::HighlightArea(Qt3DCore::QNode *parent) :
 }
 
 void HighlightArea::updatePos(const QVector2D &pos, const std::function<float(int, int)> &heightSampler) {
-    transform_->setTranslation(QVector3D{pos.x(), 100, pos.y()});
+    transform_->setTranslation(QVector3D{pos.x(), 20, pos.y()});
     mesh_->resampleVertices(heightSampler, [](int x, int y) { return QVector3D(0, 0, 0); });
 }
