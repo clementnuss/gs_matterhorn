@@ -1,4 +1,4 @@
-#version 120
+#version 330
 
 uniform vec3 lineColor;
 

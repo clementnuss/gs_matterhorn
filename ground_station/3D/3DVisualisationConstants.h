@@ -7,8 +7,8 @@
 #include <QString>
 
 namespace OpenGLConstants {
-    static constexpr int VERSION_MAJOR = 2;
-    static constexpr int VERSION_MINOR = 1;
+    static constexpr int VERSION_MAJOR = 3;
+    static constexpr int VERSION_MINOR = 3;
     static constexpr int ANISOTROPY_MAX = 8;
     static constexpr int MAX_LINE_RESOLUTION = 500;
     static constexpr int MAX_LINE_DATAPOINTS = 100000;
@@ -25,6 +25,10 @@ namespace OpenGLConstants {
     static const QVector3D LEFT_LABEL = QVector3D(-7, -0.5f, 0);
     static const QVector3D RIGHT_TICK = QVector3D(0.5, 0, 0);
     static const QVector3D LEFT_LEGEND_ICON_OFFSET = QVector3D(-1, 1, 0);
+}
+
+namespace RocketConstants {
+    static constexpr float SIMULATION_DT = 0.005f;
 }
 
 namespace UI3DConstants {

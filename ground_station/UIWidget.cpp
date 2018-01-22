@@ -265,8 +265,8 @@ void GSMainwindow::updateGroundStatus(float temperature, float pressure) {
     ui->ground_temperature_value->setText(QString::number(pressure, 'f', UIConstants::PRECISION));
 }
 
-void GSMainwindow::register3DPoints(QVector<QVector3D> &positions) {
-    rootEntity3D_->updateRocketTracker(positions);
+void GSMainwindow::registerStatus(QVector<QVector3D> &positions, const QVector3D &speed) {
+    rootEntity3D_->updateRocketTracker(positions, speed);
 }
 
 void GSMainwindow::registerEvent(const RocketEvent &event) {
@@ -568,7 +568,7 @@ bool GSMainwindow::event(QEvent *event) {
             if (!triggered) {
                 triggered = true;
                 auto *launchTimer = new QTimer();
-                launchTimer->start(std::lround((1.0 / 240.0) * 1000));
+                launchTimer->start(std::lround((RocketConstants::SIMULATION_DT) * 1000));
                 animationTriggerTime_ = QTime::currentTime();
                 connect(launchTimer, &QTimer::timeout, this, &GSMainwindow::dummyAnimation);
             }
@@ -606,8 +606,12 @@ void GSMainwindow::dummyAnimation() {
     QVector3D bias{static_cast<float>(secsFromTrigger * 0.01), 0, static_cast<float>(secsFromTrigger * 0.02)};
 
     if (i < traceData_.size()) {
+        QVector3D speed{0, 0, 0};
+        if (i > 0) {
+            speed = (traceData_[i] - traceData_[i - 1]) / RocketConstants::SIMULATION_DT;
+        }
         QVector <QVector3D> p{bias + traceData_[i++]};
-        this->register3DPoints(p);
+        this->registerStatus(p, speed);
     }
 }
 

@@ -75,7 +75,7 @@ public slots:
     void reversePlayback();
 
     // 3D visualisation slots
-    void register3DPoints(QVector<QVector3D> &);
+    void registerStatus(QVector<QVector3D> &, const QVector3D &);
 
     void registerEvent(const RocketEvent &);
 

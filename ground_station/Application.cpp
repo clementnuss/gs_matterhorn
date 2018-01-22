@@ -38,9 +38,9 @@ void Application::connectSlotsAndSignals() {
                      &GSMainwindow::updateTelemetry);
 
     QObject::connect(worker_,
-                     &Worker::points3DReady,
+                     &Worker::status3DReady,
                      &gsMainWindow_,
-                     &GSMainwindow::register3DPoints);
+                     &GSMainwindow::registerStatus);
 
     QObject::connect(worker_,
                      &Worker::loggingStatusReady,

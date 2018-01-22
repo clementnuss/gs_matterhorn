@@ -25,19 +25,12 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         rocketTrace_{nullptr},
         simTrace_{nullptr},
         rocketRuler_{nullptr},
+        splashDownPredictor_{nullptr},
+        ground_{nullptr},
         registeredEvents_{} {
 
-    auto *renderSettings = new Qt3DRender::QRenderSettings();
-    auto *forwardRenderer = new ForwardRenderer(view, renderSettings);
-    renderSettings->setActiveFrameGraph(forwardRenderer);
-
-    this->addComponent(renderSettings);
-    this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
-
-    cameraController_->setCamera(camera_);
-    cameraController_->setLinearSpeed(CameraConstants::LINEAR_SPEED);
-    cameraController_->setLookSpeed(CameraConstants::LOOK_SPEED);
-
+    initRenderSettings(view);
+    initCamera(view);
 
     //TODO make sure nobody keeps a ref to this otherwise make dynamic allocation
     WorldReference worldRef{LatLon{47.213905, 9.003724}};
@@ -61,10 +54,12 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     LatLon gsLatLon = {47.213073, 9.006919};
     LatLon launchSiteLatLon = {47.213905, 9.003724};
     launchSitePos_ = worldRef.worldPosAt(launchSiteLatLon, &continuousModel);
-    auto *ground = new Ground(this, &continuousModel, &worldRef, 2);
+    cameraController_->setCameraViewCenter(launchSitePos_);
+
+
+    ground_ = new Ground(this, &continuousModel, &worldRef, 2);
     auto *gs = new GroundStation(worldRef.worldPosAt(gsLatLon, &continuousModel), TextureConstants::DOUBLE_DOWN_ARROW,
                                  camera_, this);
-    ground->highlightRegion({0, 0});
 
     rocketTracker_ = new Tracker(launchSitePos_, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
                                  TextType::BOLD, this, OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_CENTER_LABEL);
@@ -85,39 +80,29 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
 
     std::string meteoPath{"../../ground_station/MeteoData/meteo_payerne_test.txt"};
-    SplashDownPredictor splashDownPredictor{meteoPath, this};
-    splashDownPredictor.updatePos(traceData.last());
-
-    ground->highlightRegion(splashDownPredictor.getTouchdownCoordinates(ground));
+    splashDownPredictor_ = new SplashDownPredictor(meteoPath, this);
 
     new OpenGL3DAxes(this);
     QVector3D initialPos{0, 0, 0};
     rocketRuler_ = new Ruler(initialPos, camera_, TextureConstants::CARET_LEFT, this);
 
-    camera_->setProjectionType(Qt3DRender::QCameraLens::PerspectiveProjection);
-    camera_->setFieldOfView(45.0);
-    camera_->setNearPlane(0.1);
-    camera_->setFarPlane(100000.0);
-    camera_->setPosition(launchSitePos_ + QVector3D{-5000.0, 2000.0, 3000.0});
-    camera_->setUpVector(QVector3D{0.0, 1.0, 0.0});
-
-    cameraController_->setCameraViewCenter(launchSitePos_);
     cameraController_->registerObservable(rocketTracker_);
     cameraController_->registerObservable(gs);
 
-    auto *compass = new Compass(this, camera_);
-    connect(camera_, &Qt3DRender::QCamera::viewMatrixChanged, compass, &Compass::update);
-    connect(view, &Qt3DExtras::Qt3DWindow::widthChanged, compass, &Compass::updateHorizontalOffset);
-    connect(view, &Qt3DExtras::Qt3DWindow::heightChanged, compass, &Compass::updateVerticalOffset);
 }
 
-void RootEntity::updateRocketTracker(QVector<QVector3D> &positions) {
+void RootEntity::updateRocketTracker(QVector<QVector3D> &positions, const QVector3D &speed) {
 
     addToEach(positions, launchSitePos_);
 
     rocketTracker_->updatePosition(positions.last());
     rocketRuler_->updatePosition(positions.last());
     rocketTrace_->appendData(positions);
+
+    splashDownPredictor_->updatePos(positions.last());
+    splashDownPredictor_->updateSpeed(speed);
+    splashDownPredictor_->recomputePrediction();
+    //splashDownPredictor_->highlightTouchdown(ground_);
 }
 
 void RootEntity::registerEvent(const RocketEvent &event) {
@@ -134,4 +119,31 @@ void RootEntity::registerEvent(const RocketEvent &event) {
                                                                                 TextType::LEGEND, this,
                                                                                 OpenGLConstants::LEFT_LEGEND_ICON_OFFSET,
                                                                                 OpenGLConstants::LEFT_LEGEND_TEXT_OFFSET)));
+}
+
+
+void RootEntity::initRenderSettings(Qt3DExtras::Qt3DWindow *view) {
+    auto *renderSettings = new Qt3DRender::QRenderSettings();
+    auto *forwardRenderer = new ForwardRenderer(view, renderSettings);
+    renderSettings->setActiveFrameGraph(forwardRenderer);
+    this->addComponent(renderSettings);
+    this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
+}
+
+void RootEntity::initCamera(Qt3DExtras::Qt3DWindow *view) {
+    cameraController_->setCamera(camera_);
+    cameraController_->setLinearSpeed(CameraConstants::LINEAR_SPEED);
+    cameraController_->setLookSpeed(CameraConstants::LOOK_SPEED);
+
+    camera_->setProjectionType(Qt3DRender::QCameraLens::PerspectiveProjection);
+    camera_->setFieldOfView(45.0);
+    camera_->setNearPlane(0.1);
+    camera_->setFarPlane(100000.0);
+    camera_->setPosition(launchSitePos_ + QVector3D{-5000.0, 2000.0, 3000.0});
+    camera_->setUpVector(QVector3D{0.0, 1.0, 0.0});
+
+    auto *compass = new Compass(this, camera_);
+    connect(camera_, &Qt3DRender::QCamera::viewMatrixChanged, compass, &Compass::update);
+    connect(view, &Qt3DExtras::Qt3DWindow::widthChanged, compass, &Compass::updateHorizontalOffset);
+    connect(view, &Qt3DExtras::Qt3DWindow::heightChanged, compass, &Compass::updateVerticalOffset);
 }

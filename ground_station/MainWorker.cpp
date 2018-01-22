@@ -198,7 +198,6 @@ void Worker::checkLinkStatuses() {
  *
  * @param tr The telemetry struct to be displayed.
  */
-//TODO: harmonise with graph updates
 void Worker::displayMostRecentTelemetry(TelemetryReading tr) {
 
     chrono::system_clock::time_point now = chrono::system_clock::now();

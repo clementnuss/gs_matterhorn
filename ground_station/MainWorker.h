@@ -51,7 +51,7 @@ signals:
 
     void newEventsReady(vector<RocketEvent> &);
 
-    void points3DReady(QVector<QVector3D> &);
+    void status3DReady(QVector<QVector3D> &, QVector3D &);
 
     void linkStatusReady(HandlerStatus);
 

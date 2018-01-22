@@ -8,7 +8,7 @@
 
 
 SplashDownPredictor::SplashDownPredictor(std::string &path, Qt3DCore::QNode *parent) :
-        predictionStrategy_{std::make_unique<NaivePredictionStrategy>()},
+        predictionStrategy_{std::make_unique<AdaptiveSpeedPredictionStrategy>()},
         status_{},
         trajectory_{},
         trajectoryLine_{new Line(parent, QColor::fromRgb(255, 153, 0))},
@@ -18,7 +18,7 @@ SplashDownPredictor::SplashDownPredictor(std::string &path, Qt3DCore::QNode *par
     status_.acceleration = {0, 0, 0};
 }
 
-QVector2D SplashDownPredictor::getTouchdownCoordinates(const Ground *const ground) const {
+void SplashDownPredictor::highlightTouchdown(Ground *const ground) const {
 
     for (const QVector3D *it = trajectory_.end() - 1; it != trajectory_.begin(); it--) {
         float x = it->x();
@@ -30,16 +30,19 @@ QVector2D SplashDownPredictor::getTouchdownCoordinates(const Ground *const groun
         );
 
         if (elev < it->y()) {
-            return {x, z};
+            ground->highlightRegion({x, z});
         }
     }
 
-    return {trajectory_.first().x(), trajectory_.first().z()};
+    ground->highlightRegion({trajectory_.first().x(), trajectory_.first().z()});
 }
 
 void SplashDownPredictor::updatePos(const QVector3D &pos) {
     status_.position = pos;
-    this->recomputePrediction();
+}
+
+void SplashDownPredictor::updateSpeed(const QVector3D &speed) {
+    status_.speed = status_.speed * SplashDownPredictor::LEAKY_FACTOR + speed * (1 - SplashDownPredictor::LEAKY_FACTOR);
 }
 
 void SplashDownPredictor::recomputePrediction() {

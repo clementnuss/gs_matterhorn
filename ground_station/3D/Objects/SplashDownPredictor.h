@@ -16,12 +16,14 @@ class SplashDownPredictor {
 public:
     SplashDownPredictor(std::string &path, Qt3DCore::QNode *parent);
 
-    QVector2D getTouchdownCoordinates(const Ground *const ground) const;
+    void highlightTouchdown(Ground *const ground) const;
     void updatePos(const QVector3D &pos);
 
-private:
+    void updateSpeed(const QVector3D &speed);
     void recomputePrediction();
 
+private:
+    static constexpr float LEAKY_FACTOR = 0.95f;
     std::unique_ptr<IPredictionStrategy> predictionStrategy_;
     FlightStatus status_;
     QVector<QVector3D> trajectory_;

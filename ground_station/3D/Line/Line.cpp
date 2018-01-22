@@ -10,6 +10,7 @@
 #include <Qt3DRender/QParameter>
 #include <QUrl>
 #include <3D/3DVisualisationConstants.h>
+#include <Qt3DRender/QLineWidth>
 #include "Line.h"
 
 
@@ -28,9 +29,12 @@ Line::Line(Qt3DCore::QNode *parent, QColor &&color, bool isStatic) : Qt3DCore::Q
     shaderProgram->setVertexShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/line.vert"}));
     shaderProgram->setFragmentShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/line.frag"}));
 
-    auto *renderPass = new Qt3DRender::QRenderPass();
+    auto *lineWidth = new Qt3DRender::QLineWidth();
+    lineWidth->setValue(4.0f);
 
+    auto *renderPass = new Qt3DRender::QRenderPass();
     renderPass->setShaderProgram(shaderProgram);
+    renderPass->addRenderState(lineWidth);
 
     auto *filterKey = new Qt3DRender::QFilterKey();
     filterKey->setName("renderingStyle");
