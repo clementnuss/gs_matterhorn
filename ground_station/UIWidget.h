@@ -79,6 +79,8 @@ public slots:
 
     void registerEvent(const RocketEvent &);
 
+    void registerInfoString(const QString &);
+
 #if TEST3D
 
     void dummyAnimation();

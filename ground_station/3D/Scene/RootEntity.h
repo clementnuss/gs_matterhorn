@@ -1,8 +1,7 @@
-
 #ifndef GS_MATTERHORN_ROOTENTITY_H
 #define GS_MATTERHORN_ROOTENTITY_H
-
 #include <Qt3DExtras/Qt3DWindow>
+
 #include <Qt3DExtras/QOrbitCameraController>
 #include <Qt3DCore/QNode>
 #include <3D/Line/Line.h>
@@ -11,15 +10,21 @@
 #include <3D/Objects/Ruler.h>
 #include <DataStructures/datastructs.h>
 #include <3D/Objects/SplashDownPredictor.h>
-
 class RootEntity : public Qt3DCore::QEntity {
 Q_OBJECT
 public:
     explicit RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent = nullptr);
 
+    void init();
+
     void updateRocketTracker(QVector<QVector3D> &positions, const QVector3D &speed);
 
     void registerEvent(const RocketEvent &);
+
+
+signals:
+
+    void addInfoString(const QString &);
 
 private:
 
@@ -27,7 +32,10 @@ private:
 
     void initCamera(Qt3DExtras::Qt3DWindow *view);
 
+    void reportWindData();
+
     Ground *ground_;
+    const WindData *windData_;
     SplashDownPredictor *splashDownPredictor_;
     CameraController *cameraController_;
     Qt3DRender::QCamera *camera_;
@@ -41,3 +49,5 @@ private:
 };
 
 #endif //GS_MATTERHORN_ROOTENTITY_H
+
+

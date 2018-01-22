@@ -18,9 +18,10 @@ public:
 
     void highlightTouchdown(Ground *const ground) const;
     void updatePos(const QVector3D &pos);
-
     void updateSpeed(const QVector3D &speed);
     void recomputePrediction();
+
+    const WindData *windData();
 
 private:
     static constexpr float LEAKY_FACTOR = 0.95f;

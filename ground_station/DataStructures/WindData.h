@@ -18,12 +18,15 @@ public:
 
     QVector2D operator[](const float &altitude) const;
 
+    std::pair<float, float> speedAndAngleForAltitude(const float &altitude) const;
+
 private:
     explicit WindData(std::vector<WindPrediction> &&preds);
 
     QVector2D dataToWindVector(const float &windSpeed, const float &windDirection);
 
     boost::icl::interval_map<float, QVector2D> windTable_;
+    std::vector<WindPrediction> rawPreds_;
 
 };
 

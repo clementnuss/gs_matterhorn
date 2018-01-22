@@ -49,3 +49,7 @@ void SplashDownPredictor::recomputePrediction() {
     trajectory_ = predictionStrategy_.get()->predictTrajectory(status_, windData_);
     this->trajectoryLine_->setData(trajectory_);
 }
+
+const WindData * SplashDownPredictor::windData() {
+    return &windData_;
+}

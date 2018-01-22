@@ -34,7 +34,6 @@ struct DataReading {
 };
 
 struct RocketEvent : TimedData, ILoggable {
-    //TODO: rule of three
     RocketEvent() = default;
 
     RocketEvent(const RocketEvent &that) = default;

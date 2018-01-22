@@ -16,7 +16,7 @@ namespace OpenGLConstants {
     static constexpr int RULER_MAX_HEIGHT = 5000;
     static const QVector3D ABOVE = QVector3D(0, 1, 0);
     static const QVector3D ABOVE_CENTER_LABEL = QVector3D(-3.2, 3, 0);
-    static const QVector3D LEFT_LEGEND_TEXT_OFFSET = QVector3D(-5.5, 1, 0);
+    static const QVector3D LEFT_LEGEND_TEXT_OFFSET = QVector3D(-10, 1, 0);
     static const QVector3D RIGHT_1 = QVector3D(1, 0, 0);
     static const QVector3D RIGHT_2 = QVector3D(2, 0, 0);
     static const QVector3D RIGHT_4 = QVector3D(4, 0, 0);
@@ -24,7 +24,7 @@ namespace OpenGLConstants {
     static const QVector3D RIGHT_LABEL = QVector3D(3, -0.5f, 0);
     static const QVector3D LEFT_LABEL = QVector3D(-7, -0.5f, 0);
     static const QVector3D RIGHT_TICK = QVector3D(0.5, 0, 0);
-    static const QVector3D LEFT_LEGEND_ICON_OFFSET = QVector3D(-1, 1, 0);
+    static const QVector3D LEFT_LEGEND_ICON_OFFSET = QVector3D(-1.5, 1.5, 0);
 }
 
 namespace RocketConstants {
@@ -32,8 +32,10 @@ namespace RocketConstants {
 }
 
 namespace UI3DConstants {
-    static constexpr float TRACKER_SIZE = 20.0f;
+    static constexpr float TRACKER_SIZE = 40.0f;
     static constexpr float MARKER_SCALE = 1.5f;
+    static constexpr float WIND_REPORT_MAX = 3000.0f;
+    static constexpr float WIND_REPORT_INTERVAL = 100.0f;
 }
 
 namespace TextureConstants {
@@ -51,7 +53,7 @@ namespace CameraConstants {
     static constexpr float INTERPOLATION_THRESHOLD = 0.0001f;
     static constexpr float VIEWING_DISTANCE_MIN = 300.0f;
     static constexpr float VIEWING_DISTANCE_MAX = 10000.0f;
-    static constexpr float VIEWING_DISTANCE_DEFAULT = 1000.0f;
+    static constexpr float VIEWING_DISTANCE_DEFAULT = 5000.0f;
     static constexpr float AZIMUTH_STEP = 0.785398f; // 45 degrees
     static constexpr float POLAR_STEP = 0.261799f; // 15 degrees
     static constexpr float POLAR_MIN = 0.261799f;

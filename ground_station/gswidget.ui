@@ -1165,8 +1165,8 @@
                                              <rect>
                                                  <x>0</x>
                                                  <y>0</y>
-                                                 <width>275</width>
-                                                 <height>740</height>
+                                                 <width>134</width>
+                                                 <height>140</height>
                                              </rect>
                                          </property>
                                          <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -1218,27 +1218,24 @@
                         <item>
                             <layout class="QHBoxLayout" name="visualisation_3D_layout">
                                 <item>
-                                    <widget class="QScrollArea" name="scrollArea_2">
-                                        <property name="widgetResizable">
+                                    <widget class="QPlainTextEdit" name="visualisation_info_textedit">
+                                        <property name="font">
+                                            <font>
+                                                <family>Consolas</family>
+                                                <pointsize>12</pointsize>
+                                            </font>
+                                        </property>
+                                        <property name="readOnly">
                                             <bool>true</bool>
                                         </property>
-                                        <widget class="QWidget" name="scrollAreaWidgetContents_2">
-                                            <property name="geometry">
-                                                <rect>
-                                                    <x>0</x>
-                                                    <y>0</y>
-                                                    <width>1402</width>
-                                                    <height>802</height>
-                                                </rect>
-                                            </property>
-                                        </widget>
+                                        <property name="plainText">
+                                            <string notr="true"/>
+                                        </property>
                                     </widget>
                                 </item>
                             </layout>
                         </item>
                     </layout>
-                    <zorder>scrollArea</zorder>
-                    <zorder>horizontalLayoutWidget</zorder>
                 </widget>
             </widget>
            </item>

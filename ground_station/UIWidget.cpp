@@ -42,7 +42,6 @@ GSMainwindow::GSMainwindow() :
 
     traceData_ = QVector<QVector3D>::fromStdVector(traceReader.readFile());
 
-
     auto *view = new Qt3DExtras::Qt3DWindow();
     QWidget *container = QWidget::createWindowContainer(view);
     container->setMinimumSize(QSize(200, 100));
@@ -51,16 +50,16 @@ GSMainwindow::GSMainwindow() :
 
     view->registerAspect(input);
 
-
     rootEntity3D_ = new RootEntity(view, nullptr);
+
     view->setRootEntity(rootEntity3D_);
 
     ui->visualisation_3D_layout->insertWidget(0, container);
     ui->visualisation_3D_layout->setStretch(0, 3);
     ui->visualisation_3D_layout->setStretch(1, 1);
-    //ui->stackedWidget->removeWidget(ui->stackedWidget->widget(1));
-    //ui->visualisation_3D->chi
 
+    connect(rootEntity3D_, &RootEntity::addInfoString, this, &GSMainwindow::registerInfoString);
+    rootEntity3D_->init();
 }
 
 GSMainwindow::~GSMainwindow() {
@@ -273,6 +272,10 @@ void GSMainwindow::registerStatus(QVector<QVector3D> &positions, const QVector3D
 
 void GSMainwindow::registerEvent(const RocketEvent &event) {
     rootEntity3D_->registerEvent(event);
+}
+
+void GSMainwindow::registerInfoString(const QString &s) {
+    ui->visualisation_info_textedit->textCursor().insertText(s);
 }
 
 /**
@@ -602,17 +605,40 @@ void GSMainwindow::changeToRealTimeModeAction() {
 
 void GSMainwindow::dummyAnimation() {
     static int i = 0;
+    static bool burnout = false;
+    static bool maxV = false;
+    static float maxSpeed{0};
 
-    int secsFromTrigger = QTime::currentTime().msecsTo(animationTriggerTime_);
+    int secsFromTrigger = -QTime::currentTime().msecsTo(animationTriggerTime_);
 
-    QVector3D bias{static_cast<float>(secsFromTrigger * 0.01), 0, static_cast<float>(-secsFromTrigger * 0.02)};
+    //QVector3D bias{static_cast<float>(secsFromTrigger * 0.01), 0, static_cast<float>(-secsFromTrigger * 0.02)};
 
     if (i < traceData_.size()) {
+
+        if (secsFromTrigger > 4000 && !burnout) {
+            burnout = true;
+
+            rootEntity3D_->registerEvent({0, 10, ""});
+        }
+
+        if (i == traceData_.size() - 1) {
+            rootEntity3D_->registerEvent({0, 40, ""});
+        }
+
         QVector3D speed{0, 0, 0};
         if (0 < i && i < traceData_.size() - 1) {
             speed = (traceData_[i + 1] - traceData_[i - 1]) / (2.0 * RocketConstants::SIMULATION_DT);
+
+            float speedNorm = speed.length();
+            if (speedNorm > maxSpeed) {
+                maxSpeed = speedNorm;
+            } else if (!maxV) {
+                rootEntity3D_->registerEvent({0, 30, ""});
+                maxV = true;
+            }
+
         }
-        QVector <QVector3D> p{bias + traceData_[i++]};
+        QVector<QVector3D> p{traceData_[i++]};
         this->registerStatus(p, speed);
     }
 }

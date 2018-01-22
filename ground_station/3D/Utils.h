@@ -22,6 +22,10 @@ static inline double toRadians(double degs) {
     return degs * (M_PI / 180.0);
 }
 
+static inline double toDegrees(double rads) {
+    return rads * (180.0 / M_PI);
+}
+
 static inline float clampViewingDistance(float vd) {
     return vd < CameraConstants::VIEWING_DISTANCE_MIN ?
            CameraConstants::VIEWING_DISTANCE_MIN :

@@ -27,11 +27,14 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         rocketRuler_{nullptr},
         splashDownPredictor_{nullptr},
         ground_{nullptr},
+        windData_{nullptr},
         registeredEvents_{} {
 
     initRenderSettings(view);
     initCamera(view);
+}
 
+void RootEntity::init() {
     //TODO make sure nobody keeps a ref to this otherwise make dynamic allocation
     WorldReference worldRef{LatLon{47.213905, 9.003724}};
 
@@ -51,7 +54,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     ContinuousElevationModel continuousModel{&compositeModel, &worldRef};
 
-    LatLon gsLatLon = {47.213073, 9.006919};
+    LatLon gsLatLon = {47.213073, 8.997};
     LatLon launchSiteLatLon = {47.213905, 9.003724};
     launchSitePos_ = worldRef.worldPosAt(launchSiteLatLon, &continuousModel);
     cameraController_->setCameraViewCenter(launchSitePos_);
@@ -89,11 +92,31 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     cameraController_->registerObservable(rocketTracker_);
     cameraController_->registerObservable(gs);
 
+    reportWindData();
+}
+
+void RootEntity::reportWindData() {
+
+    windData_ = splashDownPredictor_->windData();
+
+    for (float i = UI3DConstants::WIND_REPORT_MAX; i > 0; i -= UI3DConstants::WIND_REPORT_INTERVAL) {
+        std::stringstream ss;
+        std::pair<float, float> speedAndAngle = windData_->speedAndAngleForAltitude(i);
+        ss << std::setw(7) << std::setfill(' ') << i << "m"
+           << std::setw(7) << std::setfill(' ') << std::setprecision(2) << std::fixed << speedAndAngle.first << "m/s"
+           << std::setw(8) << std::setfill(' ') << std::setprecision(2) << std::fixed << speedAndAngle.second << "°\n";
+        emit addInfoString(QString::fromStdString(ss.str()));
+    }
 }
 
 void RootEntity::updateRocketTracker(QVector<QVector3D> &positions, const QVector3D &speed) {
 
-    addToEach(positions, launchSitePos_);
+    static QVector3D accumulatedBias{0, 0, 0};
+
+    QVector2D bias = (*windData_)[positions.last().y()];
+    accumulatedBias += RocketConstants::SIMULATION_DT * QVector3D{bias.x(), 0, bias.y()};
+
+    addToEach(positions, launchSitePos_ + accumulatedBias);
 
     rocketTracker_->updatePosition(positions.last());
     rocketRuler_->updatePosition(positions.last());

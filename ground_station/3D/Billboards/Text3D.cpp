@@ -58,7 +58,7 @@ Text3D::Text3D(QString text, TextType textType, Qt3DRender::QCamera *camera, QVe
         case TextType::LEGEND:
             textMesh->setFont({"Tahoma", 18,
                                QFont::Bold}); // Font size has limited effect in 3D space. + It can change the mesh resolution.
-            transform_->setScale(0.6);
+            transform_->setScale(0.8);
             break;
         default:
             textMesh->setFont({"Courier", 14});
