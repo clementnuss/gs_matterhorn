@@ -13,23 +13,28 @@
  * @param io
  */
 RadioReceiver::RadioReceiver(string portAddress)
-        : byteDecoder_{}, device_{std::move(portAddress)}, serialPort_{}, thread_{},
+        : byteDecoder_{}, devicePort_{std::move(portAddress)}, serialPort_{}, thread_{},
           recvBuffer_{}, telemQueue_{100},
           bytesLogger_{LogConstants::BYTES_LOG_PATH} {
 
     vector<serial::PortInfo> devices_found = serial::list_ports();
     if (!devices_found.empty()) {
-        std::cout << "Serial port list: " << std::endl;
+//        std::cout << "Serial port list: " << std::endl;
         auto iter = devices_found.begin();
         while (iter != devices_found.end()) {
             serial::PortInfo device = *iter++;
-            printf("(%s, %s, %s)\n",
-                   device.port.c_str(), device.description.c_str(), device.hardware_id.c_str());
+            /*printf("(%s, %s, %s)\n",
+                   device.port.c_str(), device.description.c_str(), device.hardware_id.c_str());*/
+            if (device.hardware_id == "FTDIBUS\\COMPORT&VID_0403&PID_6015"){
+                devicePort_ = device.port;
+            }
         }
 
-        if (device_.empty()) {
-            device_ = devices_found.front().port;
-            std::cout << "The first port of the list will be used, with address: " << device_ << std::endl;
+
+
+        if (devicePort_.empty()) {
+            devicePort_ = devices_found.front().port;
+            std::cout << "The first port of the list will be used, with address: " << devicePort_ << std::endl;
         }
     } else {
         std::cerr << "No Serial port available!" << std::endl;
@@ -39,7 +44,7 @@ RadioReceiver::RadioReceiver(string portAddress)
     serialPort_.setBaudrate(CommunicationsConstants::TELEMETRY_BAUD_RATE);
     serialPort_.setFlowcontrol(serial::flowcontrol_none);
     serialPort_.setStopbits(serial::stopbits_one);
-    serialPort_.setPort(device_);
+    serialPort_.setPort(devicePort_);
 
     /*
      * Timeouts in [ms]
@@ -59,13 +64,13 @@ void RadioReceiver::startup() {
 
 void RadioReceiver::openSerialPort() {
 
-    std::cout << "Opening serial port " << device_ << " at " << CommunicationsConstants::TELEMETRY_BAUD_RATE
+    std::cout << "Opening serial port " << devicePort_ << " at " << CommunicationsConstants::TELEMETRY_BAUD_RATE
               << " bauds/s" << std::endl;
 
     try {
         serialPort_.open();
     } catch (serial::SerialException &e) {
-        throw (std::runtime_error("Unable to open COM port for device " + device_ + "\n" + e.what()));
+        throw (std::runtime_error("Unable to open COM port for device " + devicePort_ + "\n" + e.what()));
     } catch (std::invalid_argument &e) {
         throw (std::runtime_error("Unable to open COM port, invalid argument\n"));
     } catch (serial::IOException &e) {
