@@ -42,6 +42,7 @@ namespace UI3DConstants {
 namespace TextureConstants {
     static const QString DOWNWARD_DIAGONAL = QStringLiteral("qrc:/3D/textures/downward_diagonal.png");
     static const QString CARET_LEFT = QStringLiteral("qrc:/3D/textures/angle_left.png");
+    static const QString CROSSHAIR = QStringLiteral("qrc:/3D/textures/crosshair.png");
     static const QString CARET_RIGHT = QStringLiteral("qrc:/3D/textures/angle_right.png");
     static const QString CARET_DOWN = QStringLiteral("qrc:/3D/textures/caret_down.png");
     static const QString DOUBLE_DOWN_ARROW = QStringLiteral("qrc:/3D/textures/double_down_arrow.png");

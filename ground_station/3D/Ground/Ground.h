@@ -17,13 +17,10 @@ public:
                     const WorldReference *const worldRef,
                     int sideLength);
 
-    void highlightRegion(const QVector2D &);
-
     float groundElevationAt(int worldX, int worldZ) const;
 
 private:
 
-    HighlightArea highlightArea_;
     const int sideLength_;
     const int halfSideLength_;
     const int extentFromOrigin_;

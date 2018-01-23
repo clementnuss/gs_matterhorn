@@ -11,7 +11,6 @@ Ground::Ground(Qt3DCore::QNode *parent,
         sideLength_{(sideLength / 2) * 2}, // Enforce side length to be even
         halfSideLength_{sideLength / 2},
         extentFromOrigin_{GridConstants::GRID_LENGTH_IN_METERS * sideLength_ / 2},
-        highlightArea_{parent},
         tiles_{} {
 
     if (sideLength_ <= 0) {
@@ -42,16 +41,6 @@ Ground::Ground(Qt3DCore::QNode *parent,
 
     std::cout << tiles_.size() << std::endl;
 
-}
-
-void Ground::highlightRegion(const QVector2D &pos) {
-    QVector2D topLeft = {pos.x() + GridConstants::HIGHLIGHT_AREA_IN_METERS / 2,
-                         pos.y() - GridConstants::HIGHLIGHT_AREA_IN_METERS / 2};
-    highlightArea_.updatePos(
-            topLeft,
-            [this, topLeft](int x, int z) {
-                return this->groundElevationAt(topLeft.x() + x, topLeft.y() + z);
-            });
 }
 
 float Ground::groundElevationAt(int worldX, int worldZ) const {

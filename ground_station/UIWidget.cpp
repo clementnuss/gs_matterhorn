@@ -633,21 +633,11 @@ void GSMainwindow::changeToRealTimeModeAction() {
 
 void GSMainwindow::dummyAnimation() {
     static int i = 0;
-    static bool burnout = false;
     static bool maxV = false;
     static float maxSpeed{0};
 
-    int secsFromTrigger = -QTime::currentTime().msecsTo(animationTriggerTime_);
-
-    //QVector3D bias{static_cast<float>(secsFromTrigger * 0.01), 0, static_cast<float>(-secsFromTrigger * 0.02)};
 
     if (i < traceData_.size()) {
-
-        if (secsFromTrigger > 4000 && !burnout) {
-            burnout = true;
-
-            rootEntity3D_->registerEvent({0, 10, ""});
-        }
 
         if (i == traceData_.size() - 1) {
             rootEntity3D_->registerEvent({0, 40, ""});
@@ -666,6 +656,7 @@ void GSMainwindow::dummyAnimation() {
             }
 
         }
+
         QVector<QVector3D> p{traceData_[i++]};
         this->registerStatus(p, speed);
     }

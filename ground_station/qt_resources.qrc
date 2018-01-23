@@ -26,6 +26,7 @@
         <file>3D/textures/text/ground_station.png</file>
         <file>3D/textures/text/rocket.png</file>
         <file>3D/textures/text/sim.png</file>
+        <file>3D/textures/crosshair.png</file>
         <file>3D/models/compass.obj</file>
         <file>3D/textures/compass_colors.png</file>
     </qresource>

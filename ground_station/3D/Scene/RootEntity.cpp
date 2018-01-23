@@ -35,7 +35,6 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 }
 
 void RootEntity::init() {
-    //TODO make sure nobody keeps a ref to this otherwise make dynamic allocation
     WorldReference worldRef{LatLon{47.213905, 9.003724}};
 
 
@@ -61,6 +60,7 @@ void RootEntity::init() {
 
 
     ground_ = new Ground(this, &continuousModel, &worldRef, 2);
+
     auto *gs = new GroundStation(worldRef.worldPosAt(gsLatLon, &continuousModel), TextureConstants::DOUBLE_DOWN_ARROW,
                                  camera_, this);
 
@@ -127,7 +127,8 @@ void RootEntity::updateRocketTracker(QVector<QVector3D> &positions, const QVecto
     splashDownPredictor_->updatePos(lastPos);
     splashDownPredictor_->updateSpeed(speed);
     splashDownPredictor_->recomputePrediction();
-    //splashDownPredictor_->highlightTouchdown(ground_);
+
+    //touchdownCrosshair_->updatePosition(splashDownPredictor_->getTouchdownCoordinates(ground_));
 
     emit updateHighlightInfoString(
             UI3DConstants::WIND_REPORT_N_LINES - static_cast<int>(lastPos.y() / UI3DConstants::WIND_REPORT_INTERVAL));

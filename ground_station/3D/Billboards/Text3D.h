@@ -12,7 +12,7 @@ enum class TextType {
 class Text3D : public Qt3DCore::QEntity {
 Q_OBJECT
 public:
-    explicit Text3D(QString text, TextType textType, Qt3DRender::QCamera *camera, QVector3D &offsetToParent,
+    explicit Text3D(QString text, TextType textType, Qt3DRender::QCamera *camera, const QVector3D &offsetToParent,
                     Qt3DCore::QNode *parent);
 
 public slots:

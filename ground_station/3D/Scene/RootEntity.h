@@ -10,6 +10,8 @@
 #include <3D/Objects/Ruler.h>
 #include <DataStructures/datastructs.h>
 #include <3D/Objects/SplashDownPredictor.h>
+#include <3D/Objects/TouchdownCrosshair.h>
+
 class RootEntity : public Qt3DCore::QEntity {
 Q_OBJECT
 public:

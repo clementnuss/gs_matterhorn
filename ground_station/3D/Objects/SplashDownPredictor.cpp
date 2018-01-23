@@ -18,7 +18,7 @@ SplashDownPredictor::SplashDownPredictor(std::string &path, Qt3DCore::QNode *par
     status_.acceleration = {0, 0, 0};
 }
 
-void SplashDownPredictor::highlightTouchdown(Ground *const ground) const {
+QVector3D SplashDownPredictor::getTouchdownCoordinates(Ground *const ground) const {
 
     for (const QVector3D *it = trajectory_.end() - 1; it != trajectory_.begin(); it--) {
         float x = it->x();
@@ -30,11 +30,11 @@ void SplashDownPredictor::highlightTouchdown(Ground *const ground) const {
         );
 
         if (elev < it->y()) {
-            ground->highlightRegion({x, z});
+            return {x, elev, z};
         }
     }
 
-    ground->highlightRegion({trajectory_.first().x(), trajectory_.first().z()});
+    return {0, 0, 0};
 }
 
 void SplashDownPredictor::updatePos(const QVector3D &pos) {
