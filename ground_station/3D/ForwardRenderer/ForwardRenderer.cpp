@@ -1,6 +1,7 @@
 
 #include <ProgramConstants.h>
 #include "ForwardRenderer.h"
+#include "LayerManager.h"
 
 
 ForwardRenderer::ForwardRenderer(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) : Qt3DRender::QTechniqueFilter(
@@ -25,7 +26,6 @@ ForwardRenderer::ForwardRenderer(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *
     clearBuffer->setBuffers(Qt3DRender::QClearBuffers::ColorDepthBuffer);
     clearBuffer->setClearColor(QColor{"#383838"});
 
-    /*
 
     auto *visibleLayerFilter = new Qt3DRender::QLayerFilter(clearBuffer);
     visibleLayerFilter->setFilterMode(Qt3DRender::QLayerFilter::DiscardAnyMatchingLayers);
