@@ -607,6 +607,8 @@ bool GSMainwindow::event(QEvent *event) {
             }
         } else if (ke->key() == Qt::Key_E) {
             this->registerEvent(RocketEvent(0, 0, ""));
+        } else if (ke->key() == Qt::Key_T) {
+            emit toggleTracking();
         }
 #endif
 

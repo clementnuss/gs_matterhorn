@@ -73,7 +73,7 @@ private:
     std::atomic<bool> updateHandler_;
 
 #if USE_TRACKING
-    boost::circular_buffer<int> angleBuffer_{25};
+    boost::circular_buffer<double> altitudeBuffer{25};
     chrono::system_clock::time_point lastTrackingAngleUpdate;
     serial::Serial serialPort_{};
 #endif
