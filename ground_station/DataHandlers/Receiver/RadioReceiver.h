@@ -7,7 +7,7 @@
 #include <boost/array.hpp>
 #include <boost/lockfree/spsc_queue.hpp>
 #include <utility>
-#include <FileLogger.h>
+#include <Loggers/FileLogger.h>
 #include <serial/serial.h>
 
 /**

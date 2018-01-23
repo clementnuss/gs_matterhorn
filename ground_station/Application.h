@@ -4,7 +4,7 @@
 
 
 #include <QtWidgets/QApplication>
-#include "UIWidget.h"
+#include "UI/UIWidget.h"
 
 class Application {
 

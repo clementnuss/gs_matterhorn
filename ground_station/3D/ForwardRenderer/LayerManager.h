@@ -3,6 +3,7 @@
 #define GS_MATTERHORN_LAYERMANAGER_H
 
 #include <Qt3DRender/QLayer>
+#include <iostream>
 
 enum class LayerType {
     VISIBLE, INVISIBLE, BILLBOARDS_1, BILLBOARDS_2

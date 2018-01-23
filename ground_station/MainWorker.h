@@ -6,10 +6,10 @@
 #include <DataHandlers/TelemetryHandler.h>
 #include <qcustomplot.h>
 #include <chrono>
-#include "GraphFeature.h"
-#include "FileLogger.h"
 #include <serial/serial.h>
 #include <boost/circular_buffer.hpp>
+#include "UI/GraphFeature.h"
+#include "Loggers/FileLogger.h"
 
 class GSMainwindow;
 using namespace std;

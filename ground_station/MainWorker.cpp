@@ -7,7 +7,7 @@
 #include "MainWorker.h"
 #include "Utilities/GraphUtils.h"
 #include "Utilities/TimeUtils.h"
-#include "UIWidget.h"
+#include "UI/UIWidget.h"
 
 using namespace std;
 

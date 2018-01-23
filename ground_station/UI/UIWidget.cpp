@@ -1,6 +1,6 @@
 #include "UIWidget.h"
 #include "UI/Colors.h"
-#include "FileReader.h"
+#include "Readers/FileReader.h"
 #include <Qt3DInput/QInputAspect>
 #include <Utilities/ReaderUtils.h>
 

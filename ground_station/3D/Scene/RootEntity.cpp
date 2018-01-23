@@ -4,7 +4,7 @@
 #include <3D/Objects/SplashDownPredictor.h>
 #include <3D/Objects/OpenGL3DAxes.h>
 #include <Utilities/ReaderUtils.h>
-#include <FileReader.h>
+#include <Readers/FileReader.h>
 #include <3D/Objects/Ruler.h>
 #include <3D/ForwardRenderer/LayerManager.h>
 #include <3D/Objects/Compass.h>
