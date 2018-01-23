@@ -3,11 +3,11 @@
 #include <DataHandlers/Simulator/TelemetrySimulator.h>
 #include <DataHandlers/Receiver/RadioReceiver.h>
 #include <DataHandlers/Replay/TelemetryReplay.h>
+#include <DataHandlers/StateEstimator.h>
 #include "MainWorker.h"
 #include "Utilities/GraphUtils.h"
 #include "Utilities/TimeUtils.h"
 #include "UIWidget.h"
-
 
 using namespace std;
 
@@ -38,6 +38,34 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
     }
 
     telemetryHandler_ = unique_ptr<TelemetryHandler>{handler};
+
+#ifdef USE_TRACKING
+    vector<serial::PortInfo> devices_found = serial::list_ports();
+    if (!devices_found.empty()) {
+        auto iter = devices_found.begin();
+        while (iter != devices_found.end()) {
+            serial::PortInfo device = *iter++;
+            if (device.hardware_id == "USB\\VID_2A03&PID_0042&REV_0001" /*Arduino MEGA serial hardware id*/) {
+                serialPort_.setPort(device.port);
+                cout << "Arduino serial port found.\n";
+            }
+        }
+    } else {
+        std::cerr << "No Serial port available, won't perform tracking!" << std::endl;
+    }
+    serialPort_.setBaudrate(CommunicationsConstants::TELEMETRY_BAUD_RATE);
+    serialPort_.setFlowcontrol(serial::flowcontrol_none);
+    serialPort_.setStopbits(serial::stopbits_one);
+    serialPort_.setTimeout(1, 5, 0, 5, 0);
+
+    try {
+        serialPort_.open();
+    } catch (std::exception &e) {
+        cout << "Error while opening Arduino serial port: \n" << e.what();
+    }
+
+    lastTrackingAngleUpdate = chrono::system_clock::now();
+#endif
 
 }
 
@@ -114,6 +142,10 @@ void Worker::mainRoutine() {
     }
 
     if (!telemReadings.empty()) {
+#ifdef USE_TRACKING
+        moveTrackingSystem((*--telemReadings.end()).altitude_);
+#endif
+
         millisBetweenLastTwoPackets = msecsBetween(timeOfLastReceivedTelemetry, now);
         timeOfLastReceivedTelemetry = now;
         displayMostRecentTelemetry(*--telemReadings.end());
@@ -276,4 +308,41 @@ void Worker::defineRealtimeMode(const QString &parameters) {
     }
     newHandler_ = unique_ptr<TelemetryHandler>{handler};
     updateHandler_.store(true);
+}
+
+void Worker::moveTrackingSystem(double currentAltitude) {
+#if USE_TRACKING
+    /**
+     * We use the law of sines to get the correct angle. The tracking altitude corresponds to the ground station's
+     * relative elevation with regards to the launch site altitude.
+     * The distanceToLaunchSite variable is the horizontal distance between the launch site and the GS.
+     */
+
+    double beta = atan(SensorConstants::distanceToLaunchSite / abs(currentAltitude - SensorConstants::launchAltitude));
+    double hypothenuseToLaunchSite = sqrt(
+            pow(SensorConstants::distanceToLaunchSite, 2) +
+            pow(SensorConstants::trackingAltitude - currentAltitude, 2));
+    double gamma = asin(abs(currentAltitude - SensorConstants::launchAltitude) * sin(beta) / hypothenuseToLaunchSite);
+
+    gamma *= 180 / M_PI;
+    gamma = 123 - gamma;
+    angleBuffer_.push_back((int) gamma);
+
+
+    float movAverage = 0;
+    for (int i: angleBuffer_) {
+        movAverage += i;
+    }
+    movAverage /= angleBuffer_.size();
+
+    if (msecsBetween(lastTrackingAngleUpdate, chrono::system_clock::now()) > 100) {
+        lastTrackingAngleUpdate = chrono::system_clock::now();
+        std::string toSend = std::to_string(static_cast<int>(movAverage)) + "\r\n";
+        cout << "angle for tracking: " << toSend;
+        serialPort_.write(toSend);
+        uint8_t carriageReturn = 0x0d;
+        serialPort_.write(&carriageReturn, 1);
+    }
+
+#endif
 }
