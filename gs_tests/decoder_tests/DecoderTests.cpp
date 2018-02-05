@@ -486,6 +486,6 @@ TEST(DecoderTests, MultipleEventPacketsTest) {
 
 }
 
-TEST(DecoderTests, ControlTests) {
+TEST(DecoderTests, SingleControlPacketTest) {
 
 }

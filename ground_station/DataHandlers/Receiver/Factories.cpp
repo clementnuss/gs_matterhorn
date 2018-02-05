@@ -100,11 +100,13 @@ shared_ptr<IDeserializable> Factories::telemetryControlFactory(std::vector<uint8
     assert(payloadBuffer.size() == PayloadType::CONTROL.length());
 
     auto it = payloadBuffer.begin();
-
+    auto measurement_time = parse32<uint32_t>(it);
     auto partCode = parse8<uint8_t>(it);
     auto statusValue = parse16<uint16_t>(it);
 
     ControlStatus r{};
+
+    r.timestamp_ = measurement_time;
 
     if (ControlConstants::CONTROL_PARTS_CODES.find(partCode) != ControlConstants::CONTROL_PARTS_CODES.end()) {
         r.partCode_ = partCode;
