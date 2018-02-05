@@ -33,7 +33,7 @@ struct DataReading {
     bool validity;
 };
 
-struct RocketEvent : TimedData, ILoggable {
+struct RocketEvent : TimedData, ILoggable, IDeserializable {
     RocketEvent() = default;
 
     RocketEvent(const RocketEvent &that) = default;
@@ -56,6 +56,18 @@ struct RocketEvent : TimedData, ILoggable {
 
         return ss.str();
     }
+};
+
+struct ControlStatus : TimedData, IDeserializable {
+    ControlStatus() = default;
+
+    ControlStatus(const ControlStatus &that) = default;
+
+    ControlStatus(uint32_t timestamp, int8_t partCode, int16_t statusValue) :
+            TimedData{timestamp}, partCode_{partCode}, statusValue_{statusValue} {}
+
+    int8_t partCode_;
+    int16_t statusValue_;
 };
 
 struct XYZReading : ILoggable {

@@ -136,7 +136,8 @@ void RootEntity::updateRocketTracker(QVector<QVector3D> &positions, const QVecto
 
 void RootEntity::registerEvent(const RocketEvent &event) {
 
-    if (EVENT_CODES.find(event.code) == EVENT_CODES.end()) {
+    //TODO: invalid event are already checked for in decoding function
+    if (RocketEventConstants::EVENT_CODES.find(event.code) == RocketEventConstants::EVENT_CODES.end()) {
         std::cout << "This event code is invalid: " << event.code << std::endl;
         return;
     }
@@ -144,7 +145,8 @@ void RootEntity::registerEvent(const RocketEvent &event) {
     registeredEvents_.emplace_back(std::make_pair(event.timestamp_, new Tracker(rocketTracker_->getPosition(), camera_,
                                                                                 TextureConstants::DOWNWARD_DIAGONAL,
                                                                                 QString::fromStdString(
-                                                                                        EVENT_CODES.at(event.code)),
+                                                                                        RocketEventConstants::EVENT_CODES.at(
+                                                                                                event.code)),
                                                                                 TextType::LEGEND, this,
                                                                                 OpenGLConstants::LEFT_LEGEND_ICON_OFFSET,
                                                                                 OpenGLConstants::LEFT_LEGEND_TEXT_OFFSET)));

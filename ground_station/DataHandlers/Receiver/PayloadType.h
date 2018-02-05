@@ -19,6 +19,8 @@
 class PayloadType {
 public:
     static const PayloadType TELEMETRY;
+    static const PayloadType EVENT;
+    static const PayloadType CONTROL;
 
 private:
     int code_;

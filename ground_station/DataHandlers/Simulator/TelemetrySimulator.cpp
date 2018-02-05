@@ -118,7 +118,7 @@ const TelemetryReading TelemetrySimulator::generateTelemetry() {
 
     double rnd = qrand();
     return TelemetryReading{
-            msecs,
+            static_cast<uint32_t>(msecs),
             10000 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 1000.0 * sin(keysec / 0.8),
             XYZReading{
                     900 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 90.0 * sin(keysec / 0.38),
@@ -145,11 +145,12 @@ const TelemetryReading TelemetrySimulator::generateTelemetry() {
 RocketEvent TelemetrySimulator::generateEvent() {
 
     // Select an event randomly
-    auto code = static_cast<int>(round((EVENT_CODES.size() - 1) * qrand() / static_cast<double>(RAND_MAX)));
+    auto code = static_cast<int>(round(
+            (RocketEventConstants::EVENT_CODES.size() - 1) * qrand() / static_cast<double>(RAND_MAX)));
     long long int msecs = msecsBetween(timeOfInitialization, chrono::system_clock::now());
 
-    assert(EVENT_CODES.find(code) != EVENT_CODES.end());
-    return RocketEvent {static_cast<uint32_t>(msecs), code, EVENT_CODES.at(code)};
+    assert(RocketEventConstants::EVENT_CODES.find(code) != RocketEventConstants::EVENT_CODES.end());
+    return RocketEvent {static_cast<uint32_t>(msecs), code, RocketEventConstants::EVENT_CODES.at(code)};
 }
 
 

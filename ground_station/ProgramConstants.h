@@ -89,7 +89,7 @@ namespace SensorConstants {
     static float currentLocationTemperature = 1.6f;
      */
 
-    static float adjustedSeaLevelPressure = 1029;
+    static float adjustedSeaLevelPressure = 1028.6;
     static float launchAltitude = 408.3;
     static float trackingAltitude = 409;
     static float distanceToLaunchSite = 0.9;
@@ -124,15 +124,32 @@ namespace CommunicationsConstants {
     static constexpr float MSECS_LOSSY_RATE = 500;
 }
 
-static const std::map<int, std::string> EVENT_CODES = {
-        {0,  "Liftoff"},
-        {10, "Burnout"},
-        {20, "Max G"},
-        {30, "Max V"},
-        {40, "Apogee"},
-        {50, "Drogue deploy"},
-        {60, "Main deploy"},
-        {70, "Touchdown"}
-};
+//TODO: use uint8 ?
+namespace RocketEventConstants {
+
+    static constexpr int INVALID_EVENT_CODE = 0;
+
+    static const std::map<int, std::string> EVENT_CODES = {
+            {1,  "Liftoff"},
+            {10, "Burnout"},
+            {20, "Max G"},
+            {30, "Max V"},
+            {40, "Apogee"},
+            {50, "Drogue deploy"},
+            {60, "Main deploy"},
+            {70, "Touchdown"}
+    };
+}
+
+
+namespace ControlConstants {
+
+    static constexpr uint8_t INVALID_PART_CODE = 0;
+    static constexpr uint16_t INVALID_PART_VALUE = 0;
+    static const std::map<uint8_t, std::string> CONTROL_PARTS_CODES = {
+            {1, "Airbrake"}
+    };
+
+}
 
 #endif //GS_MATTERHORN_PROGRAMCONSTANTS_H

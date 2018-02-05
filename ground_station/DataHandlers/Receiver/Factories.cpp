@@ -63,3 +63,56 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
                        0};
     return std::make_shared<TelemetryReading>(r);
 }
+
+/**
+ * Builds an Event struct given a sequence of bytes
+ *
+ * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
+ * @return An Event struct
+ */
+shared_ptr<IDeserializable> Factories::telemetryEventFactory(std::vector<uint8_t> payloadBuffer) {
+    assert(payloadBuffer.size() == PayloadType::EVENT.length());
+
+    auto it = payloadBuffer.begin();
+
+    auto eventCode = parse8<uint8_t>(it);
+
+    RocketEvent r{};
+
+    if (RocketEventConstants::EVENT_CODES.find(eventCode) != RocketEventConstants::EVENT_CODES.end()) {
+        r.code = eventCode;
+
+    } else {
+        r.code = RocketEventConstants::INVALID_EVENT_CODE;
+    }
+
+    return std::make_shared<RocketEvent>(r);
+}
+
+/**
+ * Builds a Control struct given a sequence of bytes
+ *
+ * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
+ * @return A Control struct
+ */
+shared_ptr<IDeserializable> Factories::telemetryControlFactory(std::vector<uint8_t> payloadBuffer) {
+    assert(payloadBuffer.size() == PayloadType::CONTROL.length());
+
+    auto it = payloadBuffer.begin();
+
+    auto partCode = parse8<uint8_t>(it);
+    auto statusValue = parse16<uint16_t>(it);
+
+    ControlStatus r{};
+
+    if (ControlConstants::CONTROL_PARTS_CODES.find(partCode) != ControlConstants::CONTROL_PARTS_CODES.end()) {
+        r.partCode_ = partCode;
+        r.statusValue_ = statusValue;
+
+    } else {
+        r.partCode_ = ControlConstants::INVALID_PART_CODE;
+        r.statusValue_ = ControlConstants::INVALID_PART_VALUE;
+    }
+
+    return std::make_shared<ControlStatus>(r);
+}
