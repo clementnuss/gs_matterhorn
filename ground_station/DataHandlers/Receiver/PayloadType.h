@@ -70,8 +70,7 @@ public:
         return length_;
     }
 
-    //TODO: change operator overloading to simple function name such as 'process'
-    std::shared_ptr<IDeserializable> operator()(std::vector<uint8_t> bytes) const {
+    std::shared_ptr<IDeserializable> process(std::vector<uint8_t> bytes) const {
         return factoryFunc_(bytes);
     }
 

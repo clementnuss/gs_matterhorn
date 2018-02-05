@@ -59,7 +59,7 @@ bool Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
 void Decoder::processTelemetryPayload(std::vector<uint8_t> payloadBuffer) {
 
     currentDatagram_.deserializedPayload_ = std::move(
-            (*currentDatagram_.payloadType_)(payloadBuffer)
+            currentDatagram_.payloadType_->process(payloadBuffer)
     );
 }
 
