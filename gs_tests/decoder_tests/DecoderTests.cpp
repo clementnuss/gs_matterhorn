@@ -76,6 +76,44 @@ createDatagram(uint32_t seqnum, uint32_t timestamp, int16_t ax, int16_t ay, int1
 }
 
 
+static vector<uint8_t>
+createEventDatagram(uint32_t seqnum, uint32_t timestamp, int8_t code) {
+    // Create datagram header
+    vector<uint8_t> datagram{
+            HEADER_PREAMBLE_FLAG,
+            HEADER_PREAMBLE_FLAG,
+            HEADER_PREAMBLE_FLAG,
+            HEADER_PREAMBLE_FLAG};
+    vector<uint8_t> checksumAccumulator{};
+
+    for (int i = 3; i >= 0; --i) {
+        datagram.push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
+        checksumAccumulator.push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
+    }
+
+    datagram.push_back(static_cast<uint8_t>(PayloadType::EVENT));
+    checksumAccumulator.push_back(static_cast<uint8_t>(PayloadType::EVENT));
+    datagram.push_back(CONTROL_FLAG);
+
+    for (int i = 3; i >= 0; --i) {
+        datagram.push_back(static_cast<uint8_t>(timestamp >> (8 * i)));
+        checksumAccumulator.push_back(static_cast<uint8_t>(timestamp >> (8 * i)));
+    }
+
+    datagram.emplace_back(code);
+    checksumAccumulator.emplace_back(code);
+
+    checksum_t crc = CRC::Calculate(&checksumAccumulator[0], checksumAccumulator.size(),
+                                    CommunicationsConstants::CRC_16_GENERATOR_POLY);
+
+    for (int i = sizeof(checksum_t) - 1; i >= 0; i--) {
+        datagram.push_back(static_cast<uint8_t>(crc >> (8 * i)));
+    }
+
+    return datagram;
+}
+
+
 static void feedWithValidPreamble(Decoder &decoder) {
     if (decoder.currentState() != DecodingState::SEEKING_FRAMESTART) {
         cerr << " problem " << endl;
@@ -121,10 +159,9 @@ static void feedWithValidHeader(Decoder &decoder) {
     ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_PAYLOAD);
 }
 
-static void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint32_t timestamp,
-                               XYZReading accelReading, XYZReading magReading, XYZReading gyroReading,
-                               float temp, float pres, uint16_t pitot
-) {
+
+static void parsePacket(Decoder &decoder, vector<uint8_t> &datagram, PayloadType payloadType, Datagram *out) {
+
     size_t k = 0;
 
     // Process preamble
@@ -147,7 +184,7 @@ static void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint
     decoder.processByte(datagram[k++]);
 
     // Process payload
-    for (size_t i = 0; i < PayloadType::TELEMETRY.length(); i++) {
+    for (size_t i = 0; i < payloadType.length(); i++) {
         ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_PAYLOAD);
         ASSERT_FALSE(decoder.datagramReady());
         decoder.processByte(datagram[k++]);
@@ -164,11 +201,21 @@ static void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint
     ASSERT_TRUE(decoder.datagramReady());
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
-    Datagram d = decoder.retrieveDatagram();
+    *out = decoder.retrieveDatagram();
 
     // State machine should be reset
     ASSERT_FALSE(decoder.datagramReady());
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+
+}
+
+static void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint32_t timestamp,
+                               XYZReading accelReading, XYZReading magReading, XYZReading gyroReading,
+                               float temp, float pres, uint16_t pitot
+) {
+
+    Datagram d;
+    parsePacket(decoder, datagram, PayloadType::TELEMETRY, &d);
 
     std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(d.deserializedPayload_);
     EXPECT_EQ(timestamp, (*data).timestamp_);
@@ -376,5 +423,32 @@ TEST(DecoderTests, wrongChecksumDropsPacket) {
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
     ASSERT_TRUE(decoder.datagramReady());
+
+}
+
+TEST(DecoderTests, SingleEventTest) {
+
+    Decoder decoder{};
+
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+
+    uint32_t seqnum{1234};
+    uint32_t timestamp{18};
+    int8_t code{0};
+
+    vector<uint8_t> datagram = createEventDatagram(seqnum, timestamp, code);
+    Datagram d{};
+
+    parsePacket(decoder, datagram, PayloadType::EVENT, &d);
+
+    //TODO: check contents
+
+}
+
+TEST(DecoderTests, EventTests) {
+
+}
+
+TEST(DecoderTests, ControlTests) {
 
 }
