@@ -2,8 +2,9 @@
 #include <gtest/gtest.h>
 #include <DataHandlers/Receiver/Decoder.h>
 #include <Utilities/RandUtils.h>
+#include <Utilities/SensorUtils.h>
 
-static constexpr double epsilon = 1e-4;
+static constexpr double epsilon = 1e-3;
 
 static void push3D(std::vector<uint8_t> &v, size_t byteCount, uint32_t a, uint32_t b, uint32_t c) {
     for (int i = byteCount - 1; i >= 0; --i)
@@ -14,20 +15,9 @@ static void push3D(std::vector<uint8_t> &v, size_t byteCount, uint32_t a, uint32
         v.push_back(static_cast<uint8_t>(c >> (8 * i)));
 }
 
-static vector<uint8_t> createDatagram(uint32_t seqnum,
-                                      uint32_t timestamp,
-                                      int16_t ax,
-                                      int16_t ay,
-                                      int16_t az,
-                                      int16_t mx,
-                                      int16_t my,
-                                      int16_t mz,
-                                      int16_t gx,
-                                      int16_t gy,
-                                      int16_t gz,
-                                      float temp,
-                                      float pres,
-                                      float alt) {
+static vector<uint8_t>
+createDatagram(uint32_t seqnum, uint32_t timestamp, int16_t ax, int16_t ay, int16_t az, int16_t mx, int16_t my,
+               int16_t mz, int16_t gx, int16_t gy, int16_t gz, float temp, float pres, int16_t pitot) {
     // Create datagram header
     vector<uint8_t> datagram{
             HEADER_PREAMBLE_FLAG,
@@ -52,10 +42,10 @@ static vector<uint8_t> createDatagram(uint32_t seqnum,
 
     push3D(datagram, 2, ax, ay, az);
     push3D(checksumAccumulator, 2, ax, ay, az);
-    push3D(datagram, 2, mx, my, mz);
-    push3D(checksumAccumulator, 2, mx, my, mz);
     push3D(datagram, 2, gx, gy, gz);
     push3D(checksumAccumulator, 2, gx, gy, gz);
+    push3D(datagram, 2, mx, my, mz);
+    push3D(checksumAccumulator, 2, mx, my, mz);
 
     float_cast temperature{.fl = temp};
     for (int i = 3; i >= 0; --i) {
@@ -70,11 +60,9 @@ static vector<uint8_t> createDatagram(uint32_t seqnum,
         checksumAccumulator.push_back(static_cast<uint8_t>(pressure.uint32 >> (8 * i)));
     }
 
-
-    float_cast altitude{.fl= alt};
-    for (int i = 3; i >= 0; --i) {
-        datagram.push_back(static_cast<uint8_t>(altitude.uint32 >> (8 * i)));
-        checksumAccumulator.push_back(static_cast<uint8_t>(altitude.uint32 >> (8 * i)));
+    for (int i = 1; i >= 0; --i) {
+        datagram.push_back(static_cast<uint8_t>(pitot >> (8 * i)));
+        checksumAccumulator.push_back(static_cast<uint8_t>(pitot >> (8 * i)));
     }
 
     checksum_t crc = CRC::Calculate(&checksumAccumulator[0], checksumAccumulator.size(),
@@ -135,7 +123,7 @@ static void feedWithValidHeader(Decoder &decoder) {
 
 static void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint32_t timestamp,
                                XYZReading accelReading, XYZReading magReading, XYZReading gyroReading,
-                               float temp, float pres, float alt
+                               float temp, float pres, uint16_t pitot
 ) {
     size_t k = 0;
 
@@ -183,19 +171,20 @@ static void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
     std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(d.deserializedPayload_);
-    EXPECT_EQ(timestamp / 1000, (*data).timestamp_);
+    EXPECT_EQ(timestamp, (*data).timestamp_);
     EXPECT_NEAR(accelReading.x_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.x_, epsilon);
     EXPECT_NEAR(accelReading.y_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.y_, epsilon);
     EXPECT_NEAR(accelReading.z_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.z_, epsilon);
-    EXPECT_NEAR(magReading.x_, (*data).magnetometer_.x_, epsilon);
-    EXPECT_NEAR(magReading.y_, (*data).magnetometer_.y_, epsilon);
-    EXPECT_NEAR(magReading.z_, (*data).magnetometer_.z_, epsilon);
     EXPECT_NEAR(gyroReading.x_, (*data).gyroscope_.x_, epsilon);
     EXPECT_NEAR(gyroReading.y_, (*data).gyroscope_.y_, epsilon);
     EXPECT_NEAR(gyroReading.z_, (*data).gyroscope_.z_, epsilon);
+    EXPECT_NEAR(magReading.x_, (*data).magnetometer_.x_, epsilon);
+    EXPECT_NEAR(magReading.y_, (*data).magnetometer_.y_, epsilon);
+    EXPECT_NEAR(magReading.z_, (*data).magnetometer_.z_, epsilon);
     EXPECT_NEAR(temp, (*data).temperature_, epsilon);
     EXPECT_NEAR(pres / 100.0f, (*data).pressure_, epsilon);
-    EXPECT_NEAR(alt, (*data).altitude_, epsilon);
+    EXPECT_NEAR(altitudeFromPressure(pres / 100.0f), (*data).altitude_, epsilon);
+    EXPECT_NEAR(airSpeedFromPitotPressure(pitot), (*data).air_speed_, epsilon);
 }
 
 TEST(DecoderTests, singlePacketDecoding) {
@@ -218,15 +207,15 @@ TEST(DecoderTests, singlePacketDecoding) {
     int16_t gz = -9;
     float temp = 12345.6789f;
     float pres = 1.41;
-    float alt = 98765.3210f;
+    uint16_t pitot = 5000;
 
 
-    vector<uint8_t> datagram = createDatagram(seqnum, timestamp, ax, ay, az, mx, my, mz, gx, gy, gz, temp, pres, alt);
+    vector<uint8_t> datagram = createDatagram(seqnum, timestamp, ax, ay, az, mx, my, mz, gx, gy, gz, temp, pres, pitot);
 
     parseAndTestPacket(decoder, datagram, timestamp,
                        {static_cast<double>(ax), static_cast<double>(ay), static_cast<double>(az)},
                        {static_cast<double>(mx), static_cast<double>(my), static_cast<double>(mz)},
-                       {static_cast<double>(gx), static_cast<double>(gy), static_cast<double>(gz)}, temp, pres, alt);
+                       {static_cast<double>(gx), static_cast<double>(gy), static_cast<double>(gz)}, temp, pres, pitot);
 }
 
 TEST(DecoderTests, multipleConsecutivePacketsDecoding) {
@@ -238,12 +227,13 @@ TEST(DecoderTests, multipleConsecutivePacketsDecoding) {
 
     // Test values
     std::array<uint32_t, measureCount> seqnum{}, timestamp{};
-    std::array<int16_t, measureCount> ax{}, ay{}, az{}, mx{}, my{}, mz{}, gx{}, gy{}, gz{};
-    std::array<float, measureCount> temp{}, pressure{}, alt{};
+    std::array<int16_t, measureCount> ax{}, ay{}, az{}, mx{}, my{}, mz{}, gx{}, gy{}, gz{}, pitot{};
+    std::array<float, measureCount> temp{}, pressure{};
 
     Rand<uint32_t> uint32Rand;
     Rand<int16_t> int16Rand;
-    Rand<double> doubleRand(-FLT_MAX, FLT_MAX);
+    Rand<double> positiveDoubleRand(0, 1000000);
+    Rand<double> doubleRand(-10000, 10000);
 
     for (size_t i = 0; i < measureCount; i++) {
         timestamp[i] = uint32Rand();
@@ -258,22 +248,19 @@ TEST(DecoderTests, multipleConsecutivePacketsDecoding) {
         gy[i] = int16Rand();
         gz[i] = int16Rand();
         temp[i] = static_cast<float>(doubleRand());
-        pressure[i] = static_cast<float>(doubleRand());
-        alt[i] = static_cast<float>(doubleRand());
+        pressure[i] = static_cast<float>(positiveDoubleRand());
+        pitot[i] = 5000 + i;
     }
 
     for (size_t i = 0; i < measureCount; i++) {
-        vector<uint8_t> datagram = createDatagram(seqnum[i], timestamp[i],
-                                                  ax[i], ay[i], az[i],
-                                                  mx[i], my[i], mz[i],
-                                                  gx[i], gy[i], gz[i],
-                                                  temp[i], pressure[i], alt[i]);
+        vector<uint8_t> datagram = createDatagram(seqnum[i], timestamp[i], ax[i], ay[i], az[i], mx[i], my[i], mz[i],
+                                                  gx[i], gy[i], gz[i], temp[i], pressure[i], pitot[i]);
 
         parseAndTestPacket(decoder, datagram, timestamp[i],
                            {static_cast<double>(ax[i]), static_cast<double>(ay[i]), static_cast<double>(az[i])},
                            {static_cast<double>(mx[i]), static_cast<double>(my[i]), static_cast<double>(mz[i])},
                            {static_cast<double>(gx[i]), static_cast<double>(gy[i]), static_cast<double>(gz[i])},
-                           temp[i], pressure[i], alt[i]);
+                           temp[i], pressure[i], pitot[i]);
     }
 
 }
@@ -366,7 +353,7 @@ TEST(DecoderTests, missingControlFlagResetsMachine) {
 TEST(DecoderTests, wrongChecksumDropsPacket) {
     Decoder decoder{};
 
-    vector<uint8_t> datagram = createDatagram(1410, 999, -1, 2, -3, 4, -5, 6, -7, 8, -9, 12.34, 56.78, 9.0);
+    vector<uint8_t> datagram = createDatagram(1410, 999, -1, 2, -3, 4, -5, 6, -7, 8, -9, 12.34, 56.78, 0);
     vector<uint8_t> validDatagram = datagram;
 
     datagram[datagram.size() - 1] += 1;

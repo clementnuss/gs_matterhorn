@@ -1,5 +1,6 @@
 #include <memory>
 #include <cassert>
+#include <Utilities/SensorUtils.h>
 #include "Factories.h"
 #include "Utilities/ParsingUtilities.h"
 #include "DatagramSpec.h"
@@ -41,16 +42,12 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
                   273.15)), -5.257);
       */
 
-    double altitude = 44330 * (1.0 - pow(pressure_hPa / SensorConstants::adjustedSeaLevelPressure, 0.1903));
+    //TODO: factorize functions and test independently
+    double altitude = altitudeFromPressure(pressure_hPa);
 
-    auto press = parse16<uint16_t>(it);
+    auto pitotPressure = parse16<uint16_t>(it);
 
-    double p_press =
-            (((float) press) - 1652) * (SensorConstants::PRESSURE_SENSOR2_MAX - SensorConstants::PRESSURE_SENSOR2_MIN) /
-            (14745 - 1652) +
-            SensorConstants::PRESSURE_SENSOR2_MIN;
-
-    double air_speed = sqrt(2 * p_press / SensorConstants::AIR_DENSITY);
+    double air_speed = airSpeedFromPitotPressure(pitotPressure);
 
     TelemetryReading r{measurement_time,
                        altitude,
@@ -61,6 +58,7 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
                        temperature.fl,
                        air_speed,
                        0};
+
     return std::make_shared<TelemetryReading>(r);
 }
 
