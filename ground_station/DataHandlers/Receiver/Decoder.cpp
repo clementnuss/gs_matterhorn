@@ -35,7 +35,7 @@ bool Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
 
     uint8_t payloadType = headerBuffer[SEQUENCE_NUMBER_SIZE];
 
-    if (0 <= payloadType && payloadType < 1) {
+    if (0 <= payloadType && payloadType < PayloadType::TYPES_TABLE.size()) {
 
         currentDatagram_.sequenceNumber_ = seqNum;
         currentDatagram_.payloadType_ = PayloadType::typeFromCode(payloadType);

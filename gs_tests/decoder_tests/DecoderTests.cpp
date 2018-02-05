@@ -105,7 +105,7 @@ static void feedWithValidSequenceNumber(Decoder &decoder) {
 static void feedWithValidPayloadType(Decoder &decoder) {
     // Select randomly one of the datagram payload types
     decoder.processByte(
-            static_cast<uint8_t>(rand() % 1));
+            static_cast<uint8_t>(rand() % PayloadType::TYPES_TABLE.size()));
 }
 
 static void feedWithValidHeader(Decoder &decoder) {

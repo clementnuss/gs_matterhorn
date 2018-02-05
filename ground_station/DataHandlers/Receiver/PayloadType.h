@@ -22,6 +22,8 @@ public:
     static const PayloadType EVENT;
     static const PayloadType CONTROL;
 
+    static const std::map<int, PayloadType> TYPES_TABLE;
+
 private:
     int code_;
     size_t length_;
@@ -30,6 +32,14 @@ private:
 
     PayloadType(int code, size_t length, std::shared_ptr<IDeserializable>(*factoryFunc)(std::vector<uint8_t>)) :
             code_{code}, length_{length}, factoryFunc_{factoryFunc} {}
+
+    static std::map<int, PayloadType> createPayloadTypesMap() {
+        return std::map<int, PayloadType>{
+                {CommunicationsConstants::TELEMETRY_TYPE, TELEMETRY},
+                {CommunicationsConstants::EVENT_TYPE,     EVENT},
+                {CommunicationsConstants::CONTROL_TYPE,   CONTROL},
+        };
+    }
 
 public:
     PayloadType &operator=(const PayloadType &) = default;
@@ -74,16 +84,15 @@ public:
      * @return The PayloadType corresponding to the given code
      */
     static const PayloadType *typeFromCode(int code) {
-        switch (code) {
-            case 0:
-                return &TELEMETRY;
-            default:
-                std::cerr << "A payload type has not been associated with this code: ";
-                std::cerr << code << std::endl;
-                assert(false);
-                break;
 
+        if (TYPES_TABLE.find(code) == TYPES_TABLE.end()) {
+            std::cerr << "A payload type has not been associated with this code: ";
+            std::cerr << code << std::endl;
+            assert(false);
+        } else {
+            return &(TYPES_TABLE.at(code));
         }
+
     }
 };
 
