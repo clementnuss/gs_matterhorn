@@ -73,9 +73,12 @@ shared_ptr<IDeserializable> Factories::telemetryEventFactory(std::vector<uint8_t
 
     auto it = payloadBuffer.begin();
 
+    auto measurement_time = parse32<uint32_t>(it);
     auto eventCode = parse8<uint8_t>(it);
 
     RocketEvent r{};
+
+    r.timestamp_ = measurement_time;
 
     if (RocketEventConstants::EVENT_CODES.find(eventCode) != RocketEventConstants::EVENT_CODES.end()) {
         r.code = eventCode;

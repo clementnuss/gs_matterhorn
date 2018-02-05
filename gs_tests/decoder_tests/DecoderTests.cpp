@@ -209,9 +209,9 @@ static void parsePacket(Decoder &decoder, vector<uint8_t> &datagram, PayloadType
 
 }
 
-static void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint32_t timestamp,
-                               XYZReading accelReading, XYZReading magReading, XYZReading gyroReading,
-                               float temp, float pres, uint16_t pitot
+static void parseAndTestTelemetryPacket(Decoder &decoder, vector<uint8_t> &datagram, uint32_t timestamp,
+                                        XYZReading accelReading, XYZReading magReading, XYZReading gyroReading,
+                                        float temp, float pres, uint16_t pitot
 ) {
 
     Datagram d;
@@ -234,7 +234,7 @@ static void parseAndTestPacket(Decoder &decoder, vector<uint8_t> &datagram, uint
     EXPECT_NEAR(airSpeedFromPitotPressure(pitot), (*data).air_speed_, epsilon);
 }
 
-TEST(DecoderTests, singlePacketDecoding) {
+TEST(DecoderTests, singleTelemetryPacketDecoding) {
 
     Decoder decoder{};
 
@@ -259,13 +259,14 @@ TEST(DecoderTests, singlePacketDecoding) {
 
     vector<uint8_t> datagram = createDatagram(seqnum, timestamp, ax, ay, az, mx, my, mz, gx, gy, gz, temp, pres, pitot);
 
-    parseAndTestPacket(decoder, datagram, timestamp,
-                       {static_cast<double>(ax), static_cast<double>(ay), static_cast<double>(az)},
-                       {static_cast<double>(mx), static_cast<double>(my), static_cast<double>(mz)},
-                       {static_cast<double>(gx), static_cast<double>(gy), static_cast<double>(gz)}, temp, pres, pitot);
+    parseAndTestTelemetryPacket(decoder, datagram, timestamp,
+                                {static_cast<double>(ax), static_cast<double>(ay), static_cast<double>(az)},
+                                {static_cast<double>(mx), static_cast<double>(my), static_cast<double>(mz)},
+                                {static_cast<double>(gx), static_cast<double>(gy), static_cast<double>(gz)}, temp, pres,
+                                pitot);
 }
 
-TEST(DecoderTests, multipleConsecutivePacketsDecoding) {
+TEST(DecoderTests, multipleConsecutiveTelemetryPacketsDecoding) {
     Decoder decoder{};
     srand(0);
     constexpr size_t measureCount = 10000;
@@ -303,11 +304,14 @@ TEST(DecoderTests, multipleConsecutivePacketsDecoding) {
         vector<uint8_t> datagram = createDatagram(seqnum[i], timestamp[i], ax[i], ay[i], az[i], mx[i], my[i], mz[i],
                                                   gx[i], gy[i], gz[i], temp[i], pressure[i], pitot[i]);
 
-        parseAndTestPacket(decoder, datagram, timestamp[i],
-                           {static_cast<double>(ax[i]), static_cast<double>(ay[i]), static_cast<double>(az[i])},
-                           {static_cast<double>(mx[i]), static_cast<double>(my[i]), static_cast<double>(mz[i])},
-                           {static_cast<double>(gx[i]), static_cast<double>(gy[i]), static_cast<double>(gz[i])},
-                           temp[i], pressure[i], pitot[i]);
+        parseAndTestTelemetryPacket(decoder, datagram, timestamp[i],
+                                    {static_cast<double>(ax[i]), static_cast<double>(ay[i]),
+                                     static_cast<double>(az[i])},
+                                    {static_cast<double>(mx[i]), static_cast<double>(my[i]),
+                                     static_cast<double>(mz[i])},
+                                    {static_cast<double>(gx[i]), static_cast<double>(gy[i]),
+                                     static_cast<double>(gz[i])},
+                                    temp[i], pressure[i], pitot[i]);
     }
 
 }
@@ -427,7 +431,6 @@ TEST(DecoderTests, wrongChecksumDropsPacket) {
 }
 
 TEST(DecoderTests, SingleEventTest) {
-
     Decoder decoder{};
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
@@ -441,11 +444,45 @@ TEST(DecoderTests, SingleEventTest) {
 
     parsePacket(decoder, datagram, PayloadType::EVENT, &d);
 
-    //TODO: check contents
-
+    std::shared_ptr<RocketEvent> data = std::dynamic_pointer_cast<RocketEvent>(d.deserializedPayload_);
+    EXPECT_EQ(seqnum, d.sequenceNumber_);
+    EXPECT_EQ(timestamp, data.get()->timestamp_);
+    EXPECT_EQ(code, data.get()->code);
 }
 
-TEST(DecoderTests, EventTests) {
+TEST(DecoderTests, MultipleEventPacketsTest) {
+
+    size_t measureCount = 256 * 5;
+
+    Decoder decoder{};
+
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+
+    Rand<uint32_t> uint32Rand;
+    Rand<uint8_t> uint8Rand;
+
+    for (size_t i = 0; i < measureCount; i++) {
+        uint32_t timestamp = uint32Rand();
+        uint32_t seqnum = uint32Rand();
+        uint8_t code = uint8Rand();
+
+        std::cout << static_cast<int>(code) << std::endl;
+
+        vector<uint8_t> datagram = createEventDatagram(seqnum, timestamp, code);
+        Datagram d{};
+
+        parsePacket(decoder, datagram, PayloadType::EVENT, &d);
+
+        std::shared_ptr<RocketEvent> data = std::dynamic_pointer_cast<RocketEvent>(d.deserializedPayload_);
+        EXPECT_EQ(seqnum, d.sequenceNumber_);
+        EXPECT_EQ(timestamp, (*data).timestamp_);
+        if (RocketEventConstants::EVENT_CODES.find(code)
+            != RocketEventConstants::EVENT_CODES.end()) {
+            EXPECT_EQ(code, data.get()->code);
+        } else {
+            EXPECT_EQ(RocketEventConstants::INVALID_EVENT_CODE, data.get()->code);
+        }
+    }
 
 }
 
