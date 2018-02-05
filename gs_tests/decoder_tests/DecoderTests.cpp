@@ -276,7 +276,7 @@ static void parseAndTestTelemetryPacket(Decoder &decoder, vector<uint8_t> &datag
     EXPECT_NEAR(airSpeedFromPitotPressure(pitot), (*data).air_speed_, epsilon);
 }
 
-TEST(DecoderTests, singleTelemetryPacketDecoding) {
+TEST(DecoderTests, singleTelemetryPacket) {
 
     Decoder decoder{};
 
@@ -308,7 +308,7 @@ TEST(DecoderTests, singleTelemetryPacketDecoding) {
                                 pitot);
 }
 
-TEST(DecoderTests, multipleConsecutiveTelemetryPacketsDecoding) {
+TEST(DecoderTests, multipleTelemetryPackets) {
     Decoder decoder{};
     srand(0);
     constexpr size_t measureCount = 10000;
@@ -354,6 +354,124 @@ TEST(DecoderTests, multipleConsecutiveTelemetryPacketsDecoding) {
                                     {static_cast<double>(gx[i]), static_cast<double>(gy[i]),
                                      static_cast<double>(gz[i])},
                                     temp[i], pressure[i], pitot[i]);
+    }
+
+}
+
+TEST(DecoderTests, singleEventPacket) {
+    Decoder decoder{};
+
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+
+    uint32_t seqnum{1234};
+    uint32_t timestamp{18};
+    int8_t code{0};
+
+    vector<uint8_t> datagram = createEventDatagram(seqnum, timestamp, code);
+    Datagram d{};
+
+    parsePacket(decoder, datagram, PayloadType::EVENT, &d);
+
+    std::shared_ptr<RocketEvent> data = std::dynamic_pointer_cast<RocketEvent>(d.deserializedPayload_);
+    EXPECT_EQ(seqnum, d.sequenceNumber_);
+    EXPECT_EQ(timestamp, data.get()->timestamp_);
+    EXPECT_EQ(code, data.get()->code);
+}
+
+TEST(DecoderTests, multipleEventPackets) {
+
+    size_t measureCount = 256 * 5;
+
+    Decoder decoder{};
+
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+
+    Rand<uint32_t> uint32Rand;
+    Rand<uint8_t> uint8Rand;
+
+    for (size_t i = 0; i < measureCount; i++) {
+        uint32_t timestamp = uint32Rand();
+        uint32_t seqnum = uint32Rand();
+        uint8_t code = uint8Rand();
+
+        vector<uint8_t> datagram = createEventDatagram(seqnum, timestamp, code);
+        Datagram d{};
+
+        parsePacket(decoder, datagram, PayloadType::EVENT, &d);
+
+        std::shared_ptr<RocketEvent> data = std::dynamic_pointer_cast<RocketEvent>(d.deserializedPayload_);
+        EXPECT_EQ(seqnum, d.sequenceNumber_);
+        EXPECT_EQ(timestamp, (*data).timestamp_);
+        if (RocketEventConstants::EVENT_CODES.find(code)
+            != RocketEventConstants::EVENT_CODES.end()) {
+            EXPECT_EQ(code, data.get()->code);
+        } else {
+            EXPECT_EQ(RocketEventConstants::INVALID_EVENT_CODE, data.get()->code);
+        }
+    }
+
+}
+
+TEST(DecoderTests, singleControlPacket) {
+
+    Decoder decoder{};
+
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+
+    uint32_t seqnum{1234};
+    uint32_t timestamp{18};
+    int8_t partCode{1};
+    uint16_t statusValue{300};
+
+    vector<uint8_t> datagram = createControlDatagram(seqnum, timestamp, partCode, statusValue);
+    Datagram d{};
+
+    parsePacket(decoder, datagram, PayloadType::CONTROL, &d);
+
+    std::shared_ptr<ControlStatus> data = std::dynamic_pointer_cast<ControlStatus>(d.deserializedPayload_);
+    EXPECT_EQ(seqnum, d.sequenceNumber_);
+    EXPECT_EQ(timestamp, data.get()->timestamp_);
+    EXPECT_EQ(partCode, data.get()->partCode_);
+    EXPECT_EQ(statusValue, data.get()->statusValue_);
+
+}
+
+
+TEST(DecoderTests, multipleControlPackets) {
+    size_t measureCount = 256 * 5;
+
+    Decoder decoder{};
+
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+
+    Rand<uint32_t> uint32Rand;
+    Rand<uint16_t> uint16Rand;
+    Rand<uint8_t> uint8Rand;
+
+    for (size_t i = 0; i < measureCount; i++) {
+
+        uint32_t seqnum = uint32Rand();
+        uint32_t timestamp = uint32Rand();
+        int8_t partCode = uint8Rand();
+        uint16_t statusValue = uint16Rand();
+
+        vector<uint8_t> datagram = createControlDatagram(seqnum, timestamp, partCode, statusValue);
+        Datagram d{};
+
+        parsePacket(decoder, datagram, PayloadType::CONTROL, &d);
+
+        std::shared_ptr<ControlStatus> data = std::dynamic_pointer_cast<ControlStatus>(d.deserializedPayload_);
+        EXPECT_EQ(seqnum, d.sequenceNumber_);
+        EXPECT_EQ(timestamp, data.get()->timestamp_);
+
+        if (ControlConstants::CONTROL_PARTS_CODES.find(partCode)
+            != ControlConstants::CONTROL_PARTS_CODES.end()) {
+            EXPECT_EQ(partCode, data.get()->partCode_);
+            EXPECT_EQ(statusValue, data.get()->statusValue_);
+        } else {
+            EXPECT_EQ(ControlConstants::INVALID_PART_CODE, data.get()->partCode_);
+            EXPECT_EQ(ControlConstants::INVALID_STATUS_VALUE, data.get()->statusValue_);
+        }
     }
 
 }
@@ -469,125 +587,5 @@ TEST(DecoderTests, wrongChecksumDropsPacket) {
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
     ASSERT_TRUE(decoder.datagramReady());
-
-}
-
-TEST(DecoderTests, SingleEventTest) {
-    Decoder decoder{};
-
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
-
-    uint32_t seqnum{1234};
-    uint32_t timestamp{18};
-    int8_t code{0};
-
-    vector<uint8_t> datagram = createEventDatagram(seqnum, timestamp, code);
-    Datagram d{};
-
-    parsePacket(decoder, datagram, PayloadType::EVENT, &d);
-
-    std::shared_ptr<RocketEvent> data = std::dynamic_pointer_cast<RocketEvent>(d.deserializedPayload_);
-    EXPECT_EQ(seqnum, d.sequenceNumber_);
-    EXPECT_EQ(timestamp, data.get()->timestamp_);
-    EXPECT_EQ(code, data.get()->code);
-}
-
-TEST(DecoderTests, MultipleEventPacketsTest) {
-
-    size_t measureCount = 256 * 5;
-
-    Decoder decoder{};
-
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
-
-    Rand<uint32_t> uint32Rand;
-    Rand<uint8_t> uint8Rand;
-
-    for (size_t i = 0; i < measureCount; i++) {
-        uint32_t timestamp = uint32Rand();
-        uint32_t seqnum = uint32Rand();
-        uint8_t code = uint8Rand();
-
-        std::cout << static_cast<int>(code) << std::endl;
-
-        vector<uint8_t> datagram = createEventDatagram(seqnum, timestamp, code);
-        Datagram d{};
-
-        parsePacket(decoder, datagram, PayloadType::EVENT, &d);
-
-        std::shared_ptr<RocketEvent> data = std::dynamic_pointer_cast<RocketEvent>(d.deserializedPayload_);
-        EXPECT_EQ(seqnum, d.sequenceNumber_);
-        EXPECT_EQ(timestamp, (*data).timestamp_);
-        if (RocketEventConstants::EVENT_CODES.find(code)
-            != RocketEventConstants::EVENT_CODES.end()) {
-            EXPECT_EQ(code, data.get()->code);
-        } else {
-            EXPECT_EQ(RocketEventConstants::INVALID_EVENT_CODE, data.get()->code);
-        }
-    }
-
-}
-
-TEST(DecoderTests, SingleControlPacketTest) {
-
-    Decoder decoder{};
-
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
-
-    uint32_t seqnum{1234};
-    uint32_t timestamp{18};
-    int8_t partCode{1};
-    uint16_t statusValue{300};
-
-    vector<uint8_t> datagram = createControlDatagram(seqnum, timestamp, partCode, statusValue);
-    Datagram d{};
-
-    parsePacket(decoder, datagram, PayloadType::CONTROL, &d);
-
-    std::shared_ptr<ControlStatus> data = std::dynamic_pointer_cast<ControlStatus>(d.deserializedPayload_);
-    EXPECT_EQ(seqnum, d.sequenceNumber_);
-    EXPECT_EQ(timestamp, data.get()->timestamp_);
-    EXPECT_EQ(partCode, data.get()->partCode_);
-    EXPECT_EQ(statusValue, data.get()->statusValue_);
-
-}
-
-
-TEST(DecoderTests, MultipleControlPacketTest) {
-    size_t measureCount = 256 * 5;
-
-    Decoder decoder{};
-
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
-
-    Rand<uint32_t> uint32Rand;
-    Rand<uint16_t> uint16Rand;
-    Rand<uint8_t> uint8Rand;
-
-    for (size_t i = 0; i < measureCount; i++) {
-
-        uint32_t seqnum = uint32Rand();
-        uint32_t timestamp = uint32Rand();
-        int8_t partCode = uint8Rand();
-        uint16_t statusValue = uint16Rand();
-
-        vector<uint8_t> datagram = createControlDatagram(seqnum, timestamp, partCode, statusValue);
-        Datagram d{};
-
-        parsePacket(decoder, datagram, PayloadType::CONTROL, &d);
-
-        std::shared_ptr<ControlStatus> data = std::dynamic_pointer_cast<ControlStatus>(d.deserializedPayload_);
-        EXPECT_EQ(seqnum, d.sequenceNumber_);
-        EXPECT_EQ(timestamp, data.get()->timestamp_);
-
-        if (ControlConstants::CONTROL_PARTS_CODES.find(partCode)
-            != ControlConstants::CONTROL_PARTS_CODES.end()) {
-            EXPECT_EQ(partCode, data.get()->partCode_);
-            EXPECT_EQ(statusValue, data.get()->statusValue_);
-        } else {
-            EXPECT_EQ(ControlConstants::INVALID_PART_CODE, data.get()->partCode_);
-            EXPECT_EQ(ControlConstants::INVALID_STATUS_VALUE, data.get()->statusValue_);
-        }
-    }
 
 }
