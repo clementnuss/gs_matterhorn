@@ -149,7 +149,7 @@ namespace RocketEventConstants {
 namespace ControlConstants {
 
     static constexpr uint8_t INVALID_PART_CODE = 0;
-    static constexpr uint16_t INVALID_PART_VALUE = 0;
+    static constexpr uint16_t INVALID_STATUS_VALUE = 0;
     static const std::map<uint8_t, std::string> CONTROL_PARTS_CODES = {
             {1, "Airbrake"}
     };

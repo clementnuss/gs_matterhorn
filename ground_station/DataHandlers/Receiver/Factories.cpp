@@ -114,7 +114,7 @@ shared_ptr<IDeserializable> Factories::telemetryControlFactory(std::vector<uint8
 
     } else {
         r.partCode_ = ControlConstants::INVALID_PART_CODE;
-        r.statusValue_ = ControlConstants::INVALID_PART_VALUE;
+        r.statusValue_ = ControlConstants::INVALID_STATUS_VALUE;
     }
 
     return std::make_shared<ControlStatus>(r);

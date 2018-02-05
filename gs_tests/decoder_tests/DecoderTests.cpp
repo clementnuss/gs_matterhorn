@@ -15,6 +15,7 @@ static void push3D(std::vector<uint8_t> &v, size_t byteCount, uint32_t a, uint32
         v.push_back(static_cast<uint8_t>(c >> (8 * i)));
 }
 
+//TODO: remove code duplicate among datagram creation functions
 static vector<uint8_t>
 createDatagram(uint32_t seqnum, uint32_t timestamp, int16_t ax, int16_t ay, int16_t az, int16_t mx, int16_t my,
                int16_t mz, int16_t gx, int16_t gy, int16_t gz, float temp, float pres, int16_t pitot) {
@@ -77,7 +78,7 @@ createDatagram(uint32_t seqnum, uint32_t timestamp, int16_t ax, int16_t ay, int1
 
 
 static vector<uint8_t>
-createEventDatagram(uint32_t seqnum, uint32_t timestamp, int8_t code) {
+createEventDatagram(uint32_t seqnum, uint32_t timestamp, uint8_t code) {
     // Create datagram header
     vector<uint8_t> datagram{
             HEADER_PREAMBLE_FLAG,
@@ -113,6 +114,47 @@ createEventDatagram(uint32_t seqnum, uint32_t timestamp, int8_t code) {
     return datagram;
 }
 
+static vector<uint8_t>
+createControlDatagram(uint32_t seqnum, uint32_t timestamp, int8_t partCode, uint16_t statusValue) {
+    // Create datagram header
+    vector<uint8_t> datagram{
+            HEADER_PREAMBLE_FLAG,
+            HEADER_PREAMBLE_FLAG,
+            HEADER_PREAMBLE_FLAG,
+            HEADER_PREAMBLE_FLAG};
+    vector<uint8_t> checksumAccumulator{};
+
+    for (int i = 3; i >= 0; --i) {
+        datagram.push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
+        checksumAccumulator.push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
+    }
+
+    datagram.push_back(static_cast<uint8_t>(PayloadType::CONTROL));
+    checksumAccumulator.push_back(static_cast<uint8_t>(PayloadType::CONTROL));
+    datagram.push_back(CONTROL_FLAG);
+
+    for (int i = 3; i >= 0; --i) {
+        datagram.push_back(static_cast<uint8_t>(timestamp >> (8 * i)));
+        checksumAccumulator.push_back(static_cast<uint8_t>(timestamp >> (8 * i)));
+    }
+
+    datagram.emplace_back(partCode);
+    checksumAccumulator.emplace_back(partCode);
+
+    for (int i = 1; i >= 0; --i) {
+        datagram.push_back(static_cast<uint8_t>(statusValue >> (8 * i)));
+        checksumAccumulator.push_back(static_cast<uint8_t>(statusValue >> (8 * i)));
+    }
+
+    checksum_t crc = CRC::Calculate(&checksumAccumulator[0], checksumAccumulator.size(),
+                                    CommunicationsConstants::CRC_16_GENERATOR_POLY);
+
+    for (int i = sizeof(checksum_t) - 1; i >= 0; i--) {
+        datagram.push_back(static_cast<uint8_t>(crc >> (8 * i)));
+    }
+
+    return datagram;
+}
 
 static void feedWithValidPreamble(Decoder &decoder) {
     if (decoder.currentState() != DecodingState::SEEKING_FRAMESTART) {
@@ -487,5 +529,65 @@ TEST(DecoderTests, MultipleEventPacketsTest) {
 }
 
 TEST(DecoderTests, SingleControlPacketTest) {
+
+    Decoder decoder{};
+
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+
+    uint32_t seqnum{1234};
+    uint32_t timestamp{18};
+    int8_t partCode{1};
+    uint16_t statusValue{300};
+
+    vector<uint8_t> datagram = createControlDatagram(seqnum, timestamp, partCode, statusValue);
+    Datagram d{};
+
+    parsePacket(decoder, datagram, PayloadType::CONTROL, &d);
+
+    std::shared_ptr<ControlStatus> data = std::dynamic_pointer_cast<ControlStatus>(d.deserializedPayload_);
+    EXPECT_EQ(seqnum, d.sequenceNumber_);
+    EXPECT_EQ(timestamp, data.get()->timestamp_);
+    EXPECT_EQ(partCode, data.get()->partCode_);
+    EXPECT_EQ(statusValue, data.get()->statusValue_);
+
+}
+
+
+TEST(DecoderTests, MultipleControlPacketTest) {
+    size_t measureCount = 256 * 5;
+
+    Decoder decoder{};
+
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+
+    Rand<uint32_t> uint32Rand;
+    Rand<uint16_t> uint16Rand;
+    Rand<uint8_t> uint8Rand;
+
+    for (size_t i = 0; i < measureCount; i++) {
+
+        uint32_t seqnum = uint32Rand();
+        uint32_t timestamp = uint32Rand();
+        int8_t partCode = uint8Rand();
+        uint16_t statusValue = uint16Rand();
+
+        vector<uint8_t> datagram = createControlDatagram(seqnum, timestamp, partCode, statusValue);
+        Datagram d{};
+
+        parsePacket(decoder, datagram, PayloadType::CONTROL, &d);
+
+        std::shared_ptr<ControlStatus> data = std::dynamic_pointer_cast<ControlStatus>(d.deserializedPayload_);
+        EXPECT_EQ(seqnum, d.sequenceNumber_);
+        EXPECT_EQ(timestamp, data.get()->timestamp_);
+
+        if (ControlConstants::CONTROL_PARTS_CODES.find(partCode)
+            != ControlConstants::CONTROL_PARTS_CODES.end()) {
+            EXPECT_EQ(partCode, data.get()->partCode_);
+            EXPECT_EQ(statusValue, data.get()->statusValue_);
+        } else {
+            EXPECT_EQ(ControlConstants::INVALID_PART_CODE, data.get()->partCode_);
+            EXPECT_EQ(ControlConstants::INVALID_STATUS_VALUE, data.get()->statusValue_);
+        }
+    }
 
 }
