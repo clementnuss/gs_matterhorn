@@ -21,6 +21,7 @@ public:
     static const PayloadType TELEMETRY;
     static const PayloadType EVENT;
     static const PayloadType CONTROL;
+    static const PayloadType GPS;
 
     static const std::map<int, PayloadType> TYPES_TABLE;
 
