@@ -73,8 +73,8 @@ private:
     std::atomic<bool> updateHandler_;
 
 #if USE_TRACKING
-    boost::circular_buffer<double> altitudeBuffer{25};
-    chrono::system_clock::time_point lastTrackingAngleUpdate;
+    boost::circular_buffer<double> altitudeBuffer_{25};
+    chrono::system_clock::time_point lastTrackingAngleUpdate_;
     serial::Serial serialPort_{};
 #endif
 
@@ -85,13 +85,14 @@ private:
 
     unique_ptr<TelemetryHandler> telemetryHandler_;
     unique_ptr<TelemetryHandler> newHandler_;
-    FileLogger telemetryLogger;
-    FileLogger eventLogger;
-    chrono::system_clock::time_point lastUIupdate;
-    chrono::system_clock::time_point lastIteration;
-    chrono::system_clock::time_point timeOfLastLinkCheck;
-    chrono::system_clock::time_point timeOfLastReceivedTelemetry;
-    long long int millisBetweenLastTwoPackets;
+    FileLogger sensorsLogger_;
+    FileLogger eventsLogger_;
+    FileLogger gpsLogger_;
+    chrono::system_clock::time_point lastUIupdate_;
+    chrono::system_clock::time_point lastIteration_;
+    chrono::system_clock::time_point timeOfLastLinkCheck_;
+    chrono::system_clock::time_point timeOfLastReceivedTelemetry_;
+    long long int millisBetweenLastTwoPackets_;
 
     QVector<QCPGraphData> extractGraphData(vector<SensorsPacket> &, QCPGraphData (*)(SensorsPacket));
 

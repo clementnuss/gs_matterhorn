@@ -17,13 +17,14 @@ using namespace std;
  */
 Worker::Worker(GSMainwindow *gsMainwindow) :
         loggingEnabled_{false},
-        telemetryLogger{LogConstants::WORKER_TELEMETRY_LOG_PATH},
-        eventLogger{LogConstants::WORKER_EVENTS_LOG_PATH},
-        lastUIupdate{chrono::system_clock::now()},
-        lastIteration{chrono::system_clock::now()},
-        timeOfLastLinkCheck{chrono::system_clock::now()},
-        timeOfLastReceivedTelemetry{chrono::system_clock::now()},
-        millisBetweenLastTwoPackets{0},
+        sensorsLogger_{LogConstants::WORKER_TELEMETRY_LOG_PATH},
+        eventsLogger_{LogConstants::WORKER_EVENTS_LOG_PATH},
+        gpsLogger_{LogConstants::WORKER_GPS_LOG_PATH},
+        lastUIupdate_{chrono::system_clock::now()},
+        lastIteration_{chrono::system_clock::now()},
+        timeOfLastLinkCheck_{chrono::system_clock::now()},
+        timeOfLastReceivedTelemetry_{chrono::system_clock::now()},
+        millisBetweenLastTwoPackets_{0},
         replayMode_{false},
         updateHandler_{false},
         telemetryHandler_{} {
@@ -64,7 +65,7 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
         cout << "Error while opening Arduino serial port: \n" << e.what();
     }
 
-    lastTrackingAngleUpdate = chrono::system_clock::now();
+    lastTrackingAngleUpdate_ = chrono::system_clock::now();
 #endif
 
 }
@@ -90,11 +91,11 @@ void Worker::run() {
         if (updateHandler_.load()) {
             loggingEnabled_ = false;
             replayMode_ = false;
-            millisBetweenLastTwoPackets = 0;
-            lastUIupdate = chrono::system_clock::now();
-            lastIteration = chrono::system_clock::now();
-            timeOfLastLinkCheck = chrono::system_clock::now();
-            timeOfLastReceivedTelemetry = chrono::system_clock::now();
+            millisBetweenLastTwoPackets_ = 0;
+            lastUIupdate_ = chrono::system_clock::now();
+            lastIteration_ = chrono::system_clock::now();
+            timeOfLastLinkCheck_ = chrono::system_clock::now();
+            timeOfLastReceivedTelemetry_ = chrono::system_clock::now();
 
 
             telemetryHandler_.swap(newHandler_);
@@ -112,8 +113,8 @@ void Worker::run() {
     }
 
     std::cout << "The worker has finished" << std::endl;
-    telemetryLogger.close();
-    eventLogger.close();
+    sensorsLogger_.close();
+    eventsLogger_.close();
 }
 
 /**
@@ -121,37 +122,39 @@ void Worker::run() {
  */
 void Worker::mainRoutine() {
     //TODO: adapt sleep time so as to have proper framerate
-    auto elapsed = msecsBetween(lastIteration, chrono::system_clock::now());
+    auto elapsed = msecsBetween(lastIteration_, chrono::system_clock::now());
     if (elapsed < UIConstants::REFRESH_RATE) {
         QThread::msleep(UIConstants::REFRESH_RATE - static_cast<unsigned long>(elapsed));
     }
-    lastIteration = chrono::system_clock::now();
+    lastIteration_ = chrono::system_clock::now();
     checkLinkStatuses();
 
-    vector < EventPacket > rocketEvents = telemetryHandler_->pollEventsData();
-    vector < SensorsPacket > telemReadings = telemetryHandler_->pollSensorsData();
-    vector < GPSPacket > geoData = telemetryHandler_->pollGPSData();
+    vector<EventPacket> eventsData = telemetryHandler_->pollEventsData();
+    vector<SensorsPacket> sensorsData = telemetryHandler_->pollSensorsData();
+    vector<GPSPacket> gpsData = telemetryHandler_->pollGPSData();
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
 
     if (loggingEnabled_) {
-        telemetryLogger.registerData(
-                std::vector<std::reference_wrapper<ILoggable>>(begin(telemReadings), end(telemReadings)));
-        eventLogger.registerData(
-                std::vector<std::reference_wrapper<ILoggable>>(begin(rocketEvents), end(rocketEvents)));
+        sensorsLogger_.registerData(
+                std::vector<std::reference_wrapper<ILoggable>>(begin(sensorsData), end(sensorsData)));
+        eventsLogger_.registerData(
+                std::vector<std::reference_wrapper<ILoggable>>(begin(eventsData), end(eventsData)));
+        gpsLogger_.registerData(
+                std::vector<std::reference_wrapper<ILoggable>>(begin(gpsData), end(gpsData)));
     }
 
-    if (!telemReadings.empty()) {
+    if (!sensorsData.empty()) {
 #ifdef USE_TRACKING
-        moveTrackingSystem((*--telemReadings.end()).altitude_);
+        moveTrackingSystem((*--sensorsData.end()).altitude_);
 #endif
 
-        millisBetweenLastTwoPackets = msecsBetween(timeOfLastReceivedTelemetry, now);
-        timeOfLastReceivedTelemetry = now;
-        displayMostRecentTelemetry(*--telemReadings.end());
+        millisBetweenLastTwoPackets_ = msecsBetween(timeOfLastReceivedTelemetry_, now);
+        timeOfLastReceivedTelemetry_ = now;
+        displayMostRecentTelemetry(*--sensorsData.end());
 
-        QVector<QCPGraphData> altitudeDataBuffer = extractGraphData(telemReadings, altitudeFromReading);
-        QVector<QCPGraphData> accelDataBuffer = extractGraphData(telemReadings, accelerationFromReading);
+        QVector<QCPGraphData> altitudeDataBuffer = extractGraphData(sensorsData, altitudeFromReading);
+        QVector<QCPGraphData> accelDataBuffer = extractGraphData(sensorsData, accelerationFromReading);
         emit graphDataReady(altitudeDataBuffer, GraphFeature::FEATURE1);
         emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
     } else {
@@ -167,13 +170,13 @@ void Worker::mainRoutine() {
         }
     }
 
-    if (!geoData.empty()) {
+    if (!gpsData.empty()) {
 
         //emit points3DReady(v);
     }
 
-    if (!rocketEvents.empty()) {
-        emit newEventsReady(rocketEvents);
+    if (!eventsData.empty()) {
+        emit newEventsReady(eventsData);
     }
 
     QCoreApplication::sendPostedEvents(this);
@@ -195,10 +198,10 @@ void Worker::toggleTracking() {
     trackingEnabled_ = !trackingEnabled_;
 
     double movAverage = 0;
-    for (double i: altitudeBuffer) {
+    for (double i: altitudeBuffer_) {
         movAverage += i;
     }
-    movAverage /= altitudeBuffer.size();
+    movAverage /= altitudeBuffer_.size();
 
     SensorConstants::launchAltitude = static_cast<float>(movAverage);
     SensorConstants::trackingAltitude = static_cast<float>(movAverage + 1);
@@ -209,21 +212,21 @@ void Worker::toggleTracking() {
  */
 void Worker::checkLinkStatuses() {
     chrono::system_clock::time_point now = chrono::system_clock::now();
-    long long elapsedMillis = msecsBetween(timeOfLastLinkCheck, now);
+    long long elapsedMillis = msecsBetween(timeOfLastLinkCheck_, now);
 
     if (elapsedMillis > CommunicationsConstants::MSECS_BETWEEN_LINK_CHECKS) {
 
-        timeOfLastLinkCheck = now;
+        timeOfLastLinkCheck_ = now;
 
-        elapsedMillis = msecsBetween(timeOfLastReceivedTelemetry, now);
+        elapsedMillis = msecsBetween(timeOfLastReceivedTelemetry_, now);
 
         HandlerStatus status;
 
         if (elapsedMillis > CommunicationsConstants::MSECS_LOSSY_RATE
-            || millisBetweenLastTwoPackets > CommunicationsConstants::MSECS_LOSSY_RATE) {
+            || millisBetweenLastTwoPackets_ > CommunicationsConstants::MSECS_LOSSY_RATE) {
             status = HandlerStatus::DOWN;
-        } else if (CommunicationsConstants::MSECS_NOMINAL_RATE < millisBetweenLastTwoPackets
-                   && millisBetweenLastTwoPackets <= CommunicationsConstants::MSECS_LOSSY_RATE) {
+        } else if (CommunicationsConstants::MSECS_NOMINAL_RATE < millisBetweenLastTwoPackets_
+                   && millisBetweenLastTwoPackets_ <= CommunicationsConstants::MSECS_LOSSY_RATE) {
             status = HandlerStatus::LOSSY;
         } else {
             status = HandlerStatus::NOMINAL;
@@ -242,10 +245,10 @@ void Worker::checkLinkStatuses() {
 void Worker::displayMostRecentTelemetry(SensorsPacket tr) {
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
-    long long elapsedMillis = msecsBetween(lastUIupdate, now);
+    long long elapsedMillis = msecsBetween(lastUIupdate_, now);
 
     if (elapsedMillis > UIConstants::NUMERICAL_VALUES_REFRESH_RATE) {
-        lastUIupdate = now;
+        lastUIupdate_ = now;
         emit telemetryReady(tr);
     }
 }
@@ -322,12 +325,12 @@ void Worker::defineRealtimeMode(const QString &parameters) {
 void Worker::moveTrackingSystem(double currentAltitude) {
 #if USE_TRACKING
 
-    altitudeBuffer.push_back(currentAltitude);
+    altitudeBuffer_.push_back(currentAltitude);
     double movAverage = 0;
-    for (double i: altitudeBuffer) {
+    for (double i: altitudeBuffer_) {
         movAverage += i;
     }
-    movAverage /= altitudeBuffer.size();
+    movAverage /= altitudeBuffer_.size();
 
     /**
      * We use the law of sines to get the correct angle. The tracking altitude corresponds to the ground station's
@@ -345,9 +348,8 @@ void Worker::moveTrackingSystem(double currentAltitude) {
     gamma = 123 - gamma;
 
 
-
-    if (msecsBetween(lastTrackingAngleUpdate, chrono::system_clock::now()) > 100) {
-        lastTrackingAngleUpdate = chrono::system_clock::now();
+    if (msecsBetween(lastTrackingAngleUpdate_, chrono::system_clock::now()) > 100) {
+        lastTrackingAngleUpdate_ = chrono::system_clock::now();
         std::string toSend = std::to_string(static_cast<int>(gamma)) + "\r\n";
         cout << "angle for tracking: " << toSend;
         if (trackingEnabled_) {

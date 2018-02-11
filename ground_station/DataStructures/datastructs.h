@@ -62,7 +62,7 @@ struct ControlPacket : TimedData, IDeserializable {
     uint16_t statusValue_;
 };
 
-struct GPSPacket : TimedData, IDeserializable {
+struct GPSPacket : TimedData, ILoggable, IDeserializable {
     GPSPacket() = default;
 
     GPSPacket(const GPSPacket &that) = default;
@@ -80,6 +80,18 @@ struct GPSPacket : TimedData, IDeserializable {
     float latitude_;
     float longitude_;
     float altitude_;
+
+    string toString() const override {
+        stringstream ss;
+
+        ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << satsCount_
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << rssi_
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << latitude_
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << longitude_
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << altitude_;
+
+        return ss.str();
+    }
 };
 
 struct Data3D : ILoggable {
