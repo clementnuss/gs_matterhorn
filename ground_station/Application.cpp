@@ -33,14 +33,19 @@ void Application::connectSlotsAndSignals() {
 
 
     QObject::connect(worker_,
-                     &Worker::telemetryReady,
+                     &Worker::sensorsDataReady,
                      &gsMainWindow_,
-                     &GSMainwindow::updateTelemetry);
+                     &GSMainwindow::receiveSensorData);
 
     QObject::connect(worker_,
-                     &Worker::status3DReady,
+                     &Worker::eventDataReady,
                      &gsMainWindow_,
-                     &GSMainwindow::registerStatus);
+                     &GSMainwindow::receiveEventData);
+
+    QObject::connect(worker_,
+                     &Worker::gpsDataReady,
+                     &gsMainWindow_,
+                     &GSMainwindow::receiveGPSData);
 
     QObject::connect(worker_,
                      &Worker::loggingStatusReady,
@@ -53,14 +58,9 @@ void Application::connectSlotsAndSignals() {
                      &GSMainwindow::updateLinkStatus);
 
     QObject::connect(worker_,
-                     &Worker::newEventsReady,
-                     &gsMainWindow_,
-                     &GSMainwindow::updateEvents);
-
-    QObject::connect(worker_,
                      &Worker::graphDataReady,
                      &gsMainWindow_,
-                     &GSMainwindow::updateGraphData);
+                     &GSMainwindow::receiveGraphData);
 
     QObject::connect(&workerThread_,
                      &QThread::started,

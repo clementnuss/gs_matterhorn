@@ -36,31 +36,38 @@ public:
 
 public slots:
 
-    void dummySlot(bool);
+    /* TELEMETRY-RELATED SLOTS */
+    void receiveSensorData(SensorsPacket);
 
+    void receiveEventData(EventPacket &);
+
+    void receiveGPSData(GPSPacket &);
+
+    void receiveGraphData(QVector<QCPGraphData> &, GraphFeature);
+
+
+    /* USER INTERACTION SLOTS */
     void graphClicked(QCPAbstractPlottable *, int);
 
-    void updateTime();
+    void mouseWheelOnPlot();
 
-    void updateEvents(vector<EventPacket> &);
+    void mousePressOnPlot();
 
-    void updateGraphData(QVector<QCPGraphData> &, GraphFeature);
 
-    void clearAllGraphItems(bool);
-
-    void resetUIState();
-
-    void updateTelemetry(SensorsPacket);
-
+    /* STATUS UPDATE SLOTS */
     void updateLoggingStatus(bool);
 
     void updateLinkStatus(HandlerStatus);
 
     void updateGroundStatus(float, float);
 
-    void mouseWheelOnPlot();
 
-    void mousePressOnPlot();
+    /* CONTROL SLOTS */
+    void updateTime();
+
+    void clearAllGraphItems(bool);
+
+    void resetUIState();
 
     void updateAutoPlay(bool);
 
@@ -74,7 +81,7 @@ public slots:
 
     void reversePlayback();
 
-    // 3D visualisation slots
+    /* 3D VISUALISATION SLOTS */
     void registerStatus(QVector<QVector3D> &, const QVector3D &);
 
     void registerEvent(const EventPacket &);

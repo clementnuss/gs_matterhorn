@@ -49,13 +49,13 @@ signals:
 
     void loggingStatusReady(bool);
 
-    void telemetryReady(SensorsPacket);
+    void sensorsDataReady(SensorsPacket);
+
+    void eventDataReady(EventPacket &);
+
+    void gpsDataReady(GPSPacket &);
 
     void graphDataReady(QVector<QCPGraphData> &, GraphFeature);
-
-    void newEventsReady(vector<EventPacket> &);
-
-    void status3DReady(QVector<QVector3D> &, QVector3D &);
 
     void linkStatusReady(HandlerStatus);
 
@@ -65,7 +65,14 @@ signals:
 
 
 private:
-    double lastAltitude;
+
+    void checkLinkStatuses();
+
+    void displaySensorData(SensorsPacket);
+
+    void displayEventData(EventPacket);
+
+    void displayGPSData(GPSPacket);
 
     bool trackingEnabled_{false};
     bool loggingEnabled_;
@@ -78,17 +85,15 @@ private:
     serial::Serial serialPort_{};
 #endif
 
-    void checkLinkStatuses();
-
-    void displayMostRecentTelemetry(SensorsPacket);
-
 
     unique_ptr<TelemetryHandler> telemetryHandler_;
     unique_ptr<TelemetryHandler> newHandler_;
     FileLogger sensorsLogger_;
     FileLogger eventsLogger_;
     FileLogger gpsLogger_;
-    chrono::system_clock::time_point lastUIupdate_;
+    uint32_t lastEventTimestamp_;
+    uint32_t lastGPSTimestamp_;
+    chrono::system_clock::time_point lastNumericalValuesUpdate_;
     chrono::system_clock::time_point lastIteration_;
     chrono::system_clock::time_point timeOfLastLinkCheck_;
     chrono::system_clock::time_point timeOfLastReceivedTelemetry_;

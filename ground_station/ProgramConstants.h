@@ -54,7 +54,7 @@ namespace UIConstants {
     static constexpr int PRECISION = 2;
 
     // Refresh rates are in milliseconds
-    static constexpr int NUMERICAL_VALUES_REFRESH_RATE = 100;
+    static constexpr int NUMERICAL_SENSORS_VALUES_REFRESH_RATE = 100;
     static constexpr int REFRESH_RATE = 20; // 20ms = 50 FPS
 
     // Time in microseconds between each data point in the real-time graphs

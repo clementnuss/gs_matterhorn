@@ -20,7 +20,7 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
         sensorsLogger_{LogConstants::WORKER_TELEMETRY_LOG_PATH},
         eventsLogger_{LogConstants::WORKER_EVENTS_LOG_PATH},
         gpsLogger_{LogConstants::WORKER_GPS_LOG_PATH},
-        lastUIupdate_{chrono::system_clock::now()},
+        lastNumericalValuesUpdate_{chrono::system_clock::now()},
         lastIteration_{chrono::system_clock::now()},
         timeOfLastLinkCheck_{chrono::system_clock::now()},
         timeOfLastReceivedTelemetry_{chrono::system_clock::now()},
@@ -92,7 +92,7 @@ void Worker::run() {
             loggingEnabled_ = false;
             replayMode_ = false;
             millisBetweenLastTwoPackets_ = 0;
-            lastUIupdate_ = chrono::system_clock::now();
+            lastNumericalValuesUpdate_ = chrono::system_clock::now();
             lastIteration_ = chrono::system_clock::now();
             timeOfLastLinkCheck_ = chrono::system_clock::now();
             timeOfLastReceivedTelemetry_ = chrono::system_clock::now();
@@ -151,7 +151,7 @@ void Worker::mainRoutine() {
 
         millisBetweenLastTwoPackets_ = msecsBetween(timeOfLastReceivedTelemetry_, now);
         timeOfLastReceivedTelemetry_ = now;
-        displayMostRecentTelemetry(*--sensorsData.end());
+        displaySensorData(*--sensorsData.end());
 
         QVector<QCPGraphData> altitudeDataBuffer = extractGraphData(sensorsData, altitudeFromReading);
         QVector<QCPGraphData> accelDataBuffer = extractGraphData(sensorsData, accelerationFromReading);
@@ -170,17 +170,59 @@ void Worker::mainRoutine() {
         }
     }
 
-    if (!gpsData.empty()) {
-
-        //emit points3DReady(v);
+    for (auto d : eventsData) {
+        displayEventData(d);
     }
 
-    if (!eventsData.empty()) {
-        emit newEventsReady(eventsData);
+    for (auto d : gpsData) {
+        displayGPSData(d);
     }
 
     QCoreApplication::sendPostedEvents(this);
     QCoreApplication::processEvents();
+}
+
+/**
+ * Emits to the UI the latest sensors data. If the interval between two calls to this function is lower
+ * than the program constant regulating the UI sensors refresh rate then the function has no effect.
+ *
+ * @param sp The SensorPacket to be displayed.
+ */
+void Worker::displaySensorData(SensorsPacket sp) {
+
+    chrono::system_clock::time_point now = chrono::system_clock::now();
+    long long elapsedMillis = msecsBetween(lastNumericalValuesUpdate_, now);
+
+    if (elapsedMillis > UIConstants::NUMERICAL_SENSORS_VALUES_REFRESH_RATE) {
+        lastNumericalValuesUpdate_ = now;
+        emit sensorsDataReady(sp);
+    }
+}
+
+/**
+ * Emits to the UI the latest event data. If the event has already been registered then the function has no effect.
+ *
+ * @param ep The EventPacket to be displayed.
+ */
+void Worker::displayEventData(EventPacket ep) {
+
+    if (ep.timestamp_ != lastEventTimestamp_) {
+        lastEventTimestamp_ = ep.timestamp_;
+        emit eventDataReady(ep);
+    }
+}
+
+/**
+ * Emits to the UI the latest sensors data. If the gps data has already been registered then the function has no effect.
+ *
+ * @param gp The GPSPacket to be displayed.
+ */
+void Worker::displayGPSData(GPSPacket gp) {
+
+    if (gp.timestamp_ != lastEventTimestamp_) {
+        lastGPSTimestamp_ = gp.timestamp_;
+        emit gpsDataReady(gp);
+    }
 }
 
 /**
@@ -235,24 +277,6 @@ void Worker::checkLinkStatuses() {
         emit linkStatusReady(status);
     }
 }
-
-/**
- * Emits to the UI the latest telemetry data. If the interval between two calls to this function is lower
- * than the program constant regulating the UI telemetry refresh rate then the function has no effect.
- *
- * @param tr The telemetry struct to be displayed.
- */
-void Worker::displayMostRecentTelemetry(SensorsPacket tr) {
-
-    chrono::system_clock::time_point now = chrono::system_clock::now();
-    long long elapsedMillis = msecsBetween(lastUIupdate_, now);
-
-    if (elapsedMillis > UIConstants::NUMERICAL_VALUES_REFRESH_RATE) {
-        lastUIupdate_ = now;
-        emit telemetryReady(tr);
-    }
-}
-
 
 /**
  *

@@ -95,18 +95,6 @@ void GSMainwindow::connectComponents() {
     );
 }
 
-/**
- * Qt SLOT for testing and debugging purposes
- *
- * @param b
- */
-void GSMainwindow::dummySlot(bool b) {
-    std::cout << "The dummy slot was called. Time was: "
-              << QTime::currentTime().toString().toStdString()
-              << "." << std::setw(3) << std::setfill('0')
-              << QTime::currentTime().msec() << std::endl;
-}
-
 
 /**
  * Qt SLOT for updating the watch of the user interface
@@ -115,30 +103,58 @@ void GSMainwindow::updateTime() {
     ui->ground_time->setText(QTime::currentTime().toString());
 }
 
+
+/**
+ * Qt SLOT for receiving telemetry data and displaying it
+ *
+ * @param t The Telemetry object from which to extract data to update the display
+ */
+void GSMainwindow::receiveSensorData(SensorsPacket t) {
+    ui->telemetry_altitude_value->setText(QString::number(t.altitude_, 'f', UIConstants::PRECISION));
+    ui->telemetry_speed_value->setText(QString::number(t.air_speed_, 'f', UIConstants::PRECISION));
+    ui->telemetry_acceleration_value->setText(QString::number(t.acceleration_.norm(), 'f', UIConstants::PRECISION));
+    ui->telemetry_pressure_value->setText(QString::number(t.pressure_, 'f', UIConstants::PRECISION));
+    ui->telemetry_temperature_value->setText(QString::number(t.temperature_, 'f', UIConstants::PRECISION));
+    ui->telemetry_yaw_value->setText(QString::number(t.magnetometer_.x_, 'f', UIConstants::PRECISION));
+    ui->telemetry_pitch_value->setText(QString::number(t.magnetometer_.y_, 'f', UIConstants::PRECISION));
+    ui->telemetry_roll_value->setText(QString::number(t.magnetometer_.z_, 'f', UIConstants::PRECISION));
+}
+
+
 /**
  * Qt SLOT to receive and display events related to the rocket and payload
  *
- * @param events A vector of events
+ * @param event
  */
-void GSMainwindow::updateEvents(vector<EventPacket> &events) {
-    if (!events.empty()) {
-        for (EventPacket &e : events) {
-            int seconds = e.timestamp_ / TimeConstants::MSECS_IN_SEC;
-            int minutes = seconds / TimeConstants::SECS_IN_MINUTE;
+void GSMainwindow::receiveEventData(EventPacket &event) {
 
-            stringstream ss;
-            ss << "At "
-               << setw(TimeConstants::SECS_AND_MINS_WIDTH) << setfill('0') << minutes % TimeConstants::MINUTES_IN_HOUR
-               << ":"
-               << setw(TimeConstants::SECS_AND_MINS_WIDTH) << setfill('0') << seconds % TimeConstants::SECS_IN_MINUTE
-               << ":"
-               << setw(TimeConstants::MSECS_WIDTH) << setfill('0') << e.timestamp_ % TimeConstants::MSECS_IN_SEC
-               << "    " << (e.description);
+    int seconds = event.timestamp_ / TimeConstants::MSECS_IN_SEC;
+    int minutes = seconds / TimeConstants::SECS_IN_MINUTE;
 
-            ui->event_log->appendPlainText(QString::fromStdString(ss.str()));
-        }
-    }
+    stringstream ss;
+    ss << "At "
+       << setw(TimeConstants::SECS_AND_MINS_WIDTH) << setfill('0') << minutes % TimeConstants::MINUTES_IN_HOUR
+       << ":"
+       << setw(TimeConstants::SECS_AND_MINS_WIDTH) << setfill('0') << seconds % TimeConstants::SECS_IN_MINUTE
+       << ":"
+       << setw(TimeConstants::MSECS_WIDTH) << setfill('0') << event.timestamp_ % TimeConstants::MSECS_IN_SEC
+       << "    " << (event.description);
+
+    ui->event_log->appendPlainText(QString::fromStdString(ss.str()));
+
 }
+
+
+/**
+ * Qt SLOT to receive and display gps data from the rocket
+ *
+ * @param gpsData
+ */
+void GSMainwindow::receiveGPSData(GPSPacket &gpsData) {
+
+    //TODO: process gps data
+}
+
 
 /**
  * Qt SLOT for adding QCPGraphData objects to a given plot
@@ -147,7 +163,7 @@ void GSMainwindow::updateEvents(vector<EventPacket> &events) {
  * @param feature A GraphFeature enumerated value to indicate to which plot to add the data points
  */
 //TODO: only use qvectors or only use vectors
-void GSMainwindow::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
+void GSMainwindow::receiveGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 
     if (d.isEmpty()) {
 
@@ -213,21 +229,6 @@ void GSMainwindow::updateGraphData(QVector<QCPGraphData> &d, GraphFeature featur
     plotVector_[static_cast<int>(feature)]->replot();
 }
 
-/**
- * Qt SLOT for receiving telemetry data and displaying it
- *
- * @param t The Telemetry object from which to extract data to update the display
- */
-void GSMainwindow::updateTelemetry(SensorsPacket t) {
-    ui->telemetry_altitude_value->setText(QString::number(t.altitude_, 'f', UIConstants::PRECISION));
-    ui->telemetry_speed_value->setText(QString::number(t.air_speed_, 'f', UIConstants::PRECISION));
-    ui->telemetry_acceleration_value->setText(QString::number(t.acceleration_.norm(), 'f', UIConstants::PRECISION));
-    ui->telemetry_pressure_value->setText(QString::number(t.pressure_, 'f', UIConstants::PRECISION));
-    ui->telemetry_temperature_value->setText(QString::number(t.temperature_, 'f', UIConstants::PRECISION));
-    ui->telemetry_yaw_value->setText(QString::number(t.magnetometer_.x_, 'f', UIConstants::PRECISION));
-    ui->telemetry_pitch_value->setText(QString::number(t.magnetometer_.y_, 'f', UIConstants::PRECISION));
-    ui->telemetry_roll_value->setText(QString::number(t.magnetometer_.z_, 'f', UIConstants::PRECISION));
-}
 
 /**
  * Qt SLOT for updating the color indicator on the logging label
@@ -501,7 +502,7 @@ void GSMainwindow::resetUIState() {
             QString::number(replayPlaybackSpeed_, 'f', 2));
 
     ui->event_log->clear();
-    updateTelemetry(SensorsPacket{});
+    receiveSensorData(SensorsPacket{});
 
     for (auto &g_idx : plotVector_) {
         QCPGraph *g = g_idx->graph();
