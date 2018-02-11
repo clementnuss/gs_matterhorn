@@ -15,31 +15,41 @@ static void push3D(std::vector<uint8_t> &v, size_t byteCount, uint32_t a, uint32
         v.push_back(static_cast<uint8_t>(c >> (8 * i)));
 }
 
+static void fillHeaderAndTimestamp(std::vector<uint8_t> *datagram,
+                                   std::vector<uint8_t> *checksumAccumulator,
+                                   uint32_t seqnum,
+                                   PayloadType type,
+                                   uint32_t timestamp) {
+    // Create datagram header
+    datagram->push_back(HEADER_PREAMBLE_FLAG);
+    datagram->push_back(HEADER_PREAMBLE_FLAG);
+    datagram->push_back(HEADER_PREAMBLE_FLAG);
+    datagram->push_back(HEADER_PREAMBLE_FLAG);
+
+    for (int i = 3; i >= 0; --i) {
+        datagram->push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
+        checksumAccumulator->push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
+    }
+
+    datagram->push_back(static_cast<uint8_t>(type));
+    checksumAccumulator->push_back(static_cast<uint8_t>(type));
+    datagram->push_back(CONTROL_FLAG);
+
+    for (int i = 3; i >= 0; --i) {
+        datagram->push_back(static_cast<uint8_t>(timestamp >> (8 * i)));
+        checksumAccumulator->push_back(static_cast<uint8_t>(timestamp >> (8 * i)));
+    }
+}
+
 //TODO: remove code duplicate among datagram creation functions
 static vector<uint8_t>
 createDatagram(uint32_t seqnum, uint32_t timestamp, int16_t ax, int16_t ay, int16_t az, int16_t mx, int16_t my,
                int16_t mz, int16_t gx, int16_t gy, int16_t gz, float temp, float pres, int16_t pitot) {
-    // Create datagram header
-    vector<uint8_t> datagram{
-            HEADER_PREAMBLE_FLAG,
-            HEADER_PREAMBLE_FLAG,
-            HEADER_PREAMBLE_FLAG,
-            HEADER_PREAMBLE_FLAG};
-    vector<uint8_t> checksumAccumulator{};
 
-    for (int i = 3; i >= 0; --i) {
-        datagram.push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
-        checksumAccumulator.push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
-    }
+    std::vector<uint8_t> datagram{};
+    std::vector<uint8_t> checksumAccumulator{};
 
-    datagram.push_back(static_cast<uint8_t>(PayloadType::TELEMETRY));
-    checksumAccumulator.push_back(static_cast<uint8_t>(PayloadType::TELEMETRY));
-    datagram.push_back(CONTROL_FLAG);
-
-    for (int i = 3; i >= 0; --i) {
-        datagram.push_back(static_cast<uint8_t>(timestamp >> (8 * i)));
-        checksumAccumulator.push_back(static_cast<uint8_t>(timestamp >> (8 * i)));
-    }
+    fillHeaderAndTimestamp(&datagram, &checksumAccumulator, seqnum, PayloadType::TELEMETRY, timestamp);
 
     push3D(datagram, 2, ax, ay, az);
     push3D(checksumAccumulator, 2, ax, ay, az);
@@ -79,27 +89,11 @@ createDatagram(uint32_t seqnum, uint32_t timestamp, int16_t ax, int16_t ay, int1
 
 static vector<uint8_t>
 createEventDatagram(uint32_t seqnum, uint32_t timestamp, uint8_t code) {
-    // Create datagram header
-    vector<uint8_t> datagram{
-            HEADER_PREAMBLE_FLAG,
-            HEADER_PREAMBLE_FLAG,
-            HEADER_PREAMBLE_FLAG,
-            HEADER_PREAMBLE_FLAG};
-    vector<uint8_t> checksumAccumulator{};
 
-    for (int i = 3; i >= 0; --i) {
-        datagram.push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
-        checksumAccumulator.push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
-    }
+    std::vector<uint8_t> datagram{};
+    std::vector<uint8_t> checksumAccumulator{};
 
-    datagram.push_back(static_cast<uint8_t>(PayloadType::EVENT));
-    checksumAccumulator.push_back(static_cast<uint8_t>(PayloadType::EVENT));
-    datagram.push_back(CONTROL_FLAG);
-
-    for (int i = 3; i >= 0; --i) {
-        datagram.push_back(static_cast<uint8_t>(timestamp >> (8 * i)));
-        checksumAccumulator.push_back(static_cast<uint8_t>(timestamp >> (8 * i)));
-    }
+    fillHeaderAndTimestamp(&datagram, &checksumAccumulator, seqnum, PayloadType::EVENT, timestamp);
 
     datagram.emplace_back(code);
     checksumAccumulator.emplace_back(code);
@@ -116,27 +110,11 @@ createEventDatagram(uint32_t seqnum, uint32_t timestamp, uint8_t code) {
 
 static vector<uint8_t>
 createControlDatagram(uint32_t seqnum, uint32_t timestamp, int8_t partCode, uint16_t statusValue) {
-    // Create datagram header
-    vector<uint8_t> datagram{
-            HEADER_PREAMBLE_FLAG,
-            HEADER_PREAMBLE_FLAG,
-            HEADER_PREAMBLE_FLAG,
-            HEADER_PREAMBLE_FLAG};
-    vector<uint8_t> checksumAccumulator{};
 
-    for (int i = 3; i >= 0; --i) {
-        datagram.push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
-        checksumAccumulator.push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
-    }
+    std::vector<uint8_t> datagram{};
+    std::vector<uint8_t> checksumAccumulator{};
 
-    datagram.push_back(static_cast<uint8_t>(PayloadType::CONTROL));
-    checksumAccumulator.push_back(static_cast<uint8_t>(PayloadType::CONTROL));
-    datagram.push_back(CONTROL_FLAG);
-
-    for (int i = 3; i >= 0; --i) {
-        datagram.push_back(static_cast<uint8_t>(timestamp >> (8 * i)));
-        checksumAccumulator.push_back(static_cast<uint8_t>(timestamp >> (8 * i)));
-    }
+    fillHeaderAndTimestamp(&datagram, &checksumAccumulator, seqnum, PayloadType::CONTROL, timestamp);
 
     datagram.emplace_back(partCode);
     checksumAccumulator.emplace_back(partCode);
