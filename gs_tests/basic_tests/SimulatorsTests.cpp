@@ -8,7 +8,7 @@ TEST(SimulatorsTests, simulatedTelemetryIsCorrect) {
     TelemetryHandler &telemetryHandler = ts;
 
     for (int i = 0; i < 100; i++) {
-        vector<SensorsPacket> data = ts.pollData();
+        vector<SensorsPacket> data = ts.pollSensorsData();
 
         EXPECT_TRUE(data.size() >= 0);
         EXPECT_TRUE(data.size() <= SimulatorConstants::MAX_RANDOM_VECTOR_LENGTH);

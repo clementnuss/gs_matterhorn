@@ -19,7 +19,7 @@ TelemetrySimulator::TelemetrySimulator() : timeOfLastPolledData{chrono::system_c
                                            simulatorStatus{HandlerStatus::NOMINAL} {
 }
 
-vector<SensorsPacket> TelemetrySimulator::pollData() {
+vector<SensorsPacket> TelemetrySimulator::pollSensorsData() {
 
     vector<SensorsPacket> generatedVector = generateTelemetryVector();
     chrono::system_clock::time_point now = chrono::system_clock::now();
@@ -54,7 +54,7 @@ vector<SensorsPacket> TelemetrySimulator::pollData() {
     return vector<SensorsPacket>();
 }
 
-vector<EventPacket> TelemetrySimulator::pollEvents() {
+vector<EventPacket> TelemetrySimulator::pollEventsData() {
     vector<EventPacket> v;
 
     if ((qrand() / static_cast<double>(RAND_MAX)) * EVENT_PROBABILITY_INTERVAL <= 1) {
@@ -66,10 +66,12 @@ vector<EventPacket> TelemetrySimulator::pollEvents() {
     return v;
 }
 
-vector<Data3D> TelemetrySimulator::pollLocations() {
+vector<GPSPacket> TelemetrySimulator::pollGPSData() {
 
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-    vector<Data3D> generatedVector{};
+    vector<GPSPacket> generatedVector{};
+
+    /*
 
     long long millisSinceLastPoll = msecsBetween(timeOfLastPolledGeoData, now);
     if (millisSinceLastPoll > TimeConstants::MSECS_IN_SEC / 10) {
@@ -87,6 +89,8 @@ vector<Data3D> TelemetrySimulator::pollLocations() {
 
         generatedVector.push_back(r);
     }
+
+    */
 
     return generatedVector;
 }

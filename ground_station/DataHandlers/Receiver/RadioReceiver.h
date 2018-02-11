@@ -26,11 +26,11 @@ public:
 
     void startup() override;
 
-    vector<SensorsPacket> pollData() override;
+    vector<SensorsPacket> pollSensorsData() override;
 
-    vector<EventPacket> pollEvents() override;
+    vector<EventPacket> pollEventsData() override;
 
-    vector<Data3D> pollLocations() override;
+    vector<GPSPacket> pollGPSData() override;
 
     bool isReplayHandler() override;
 
@@ -54,7 +54,9 @@ private:
     boost::thread thread_;
     uint8_t *recvBuffer_;
     FileLogger bytesLogger_;
-    boost::lockfree::spsc_queue<SensorsPacket> telemQueue_;
+    boost::lockfree::spsc_queue<SensorsPacket> sensorsDataQueue_;
+    boost::lockfree::spsc_queue<EventPacket> eventsDataQueue_;
+    boost::lockfree::spsc_queue<GPSPacket> gpsDataQueue_;
 
 };
 

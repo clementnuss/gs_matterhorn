@@ -19,13 +19,13 @@ public:
      *
      * @return The events received by this TelemetryHandler since the last call to the function
      */
-    virtual std::vector<EventPacket> pollEvents() = 0;
+    virtual std::vector<EventPacket> pollEventsData() = 0;
 
     /**
      *
      * @return The locations received by this TelemetryHandler since the last call to the function
      */
-    virtual std::vector<Data3D> pollLocations() = 0;
+    virtual std::vector<GPSPacket> pollGPSData() = 0;
 
     virtual bool isReplayHandler()= 0;
 

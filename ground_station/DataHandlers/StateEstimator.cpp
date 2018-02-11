@@ -15,8 +15,8 @@ void StateEstimator::startup() {
 
 }
 
-vector<EventPacket> StateEstimator::pollEvents() {
-    auto polledEvents = handler_->pollEvents();
+vector<EventPacket> StateEstimator::pollEventsData() {
+    auto polledEvents = handler_->pollEventsData();
     if (!pendingDetectedRocketEvents_.empty()) {
         polledEvents.insert(polledEvents.end(),
                             pendingDetectedRocketEvents_.begin(), pendingDetectedRocketEvents_.end());
@@ -25,8 +25,8 @@ vector<EventPacket> StateEstimator::pollEvents() {
     return polledEvents;
 }
 
-vector<SensorsPacket> StateEstimator::pollData() {
-    auto polledData = handler_->pollData();
+vector<SensorsPacket> StateEstimator::pollSensorsData() {
+    auto polledData = handler_->pollSensorsData();
     vector<SensorsPacket> smoothedReadings;
 
     for (const auto &telemReading : polledData) {
@@ -123,6 +123,6 @@ void StateEstimator::computeState(const SensorsPacket &r) {
     }
 }
 
-vector<Data3D> StateEstimator::pollLocations() {
-    return vector<Data3D>();
+vector<GPSPacket> StateEstimator::pollGPSData() {
+    return vector<GPSPacket>();
 }

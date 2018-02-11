@@ -128,9 +128,9 @@ void Worker::mainRoutine() {
     lastIteration = chrono::system_clock::now();
     checkLinkStatuses();
 
-    vector<EventPacket> rocketEvents = telemetryHandler_->pollEvents();
-    vector<SensorsPacket> telemReadings = telemetryHandler_->pollData();
-    vector<Data3D> geoData = telemetryHandler_->pollLocations();
+    vector < EventPacket > rocketEvents = telemetryHandler_->pollEventsData();
+    vector < SensorsPacket > telemReadings = telemetryHandler_->pollSensorsData();
+    vector < GPSPacket > geoData = telemetryHandler_->pollGPSData();
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
 
@@ -168,12 +168,7 @@ void Worker::mainRoutine() {
     }
 
     if (!geoData.empty()) {
-        QVector<QVector3D> v{};
-        for (auto geoPoint : geoData) {
-            v.append(QVector3D{static_cast<float>(geoPoint.x_),
-                               static_cast<float>(geoPoint.y_),
-                               static_cast<float>(geoPoint.z_)});
-        }
+
         //emit points3DReady(v);
     }
 

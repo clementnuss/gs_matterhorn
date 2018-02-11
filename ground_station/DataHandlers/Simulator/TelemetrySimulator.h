@@ -18,13 +18,13 @@ public:
 
     void startup() override;
 
-    vector<EventPacket> pollEvents() override;
+    vector<EventPacket> pollEventsData() override;
 
-    vector<SensorsPacket> pollData() override;
+    vector<SensorsPacket> pollSensorsData() override;
 
     bool isReplayHandler() override;
 
-    vector<Data3D> pollLocations() override;
+    vector<GPSPacket> pollGPSData() override;
 
     void setVariableRate(bool);
 

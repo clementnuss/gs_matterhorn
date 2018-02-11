@@ -41,11 +41,11 @@ void TelemetryReplay::startup() {
     resetPlayback();
 }
 
-vector<EventPacket> TelemetryReplay::pollEvents() {
+vector<EventPacket> TelemetryReplay::pollEventsData() {
     return vector<EventPacket>();
 }
 
-vector<SensorsPacket> TelemetryReplay::pollData() {
+vector<SensorsPacket> TelemetryReplay::pollSensorsData() {
     vector<SensorsPacket> vec{};
     auto localLastPlaybackTime = std::chrono::system_clock::now();
     double adjustedTime = usecsBetween(lastPlaybackTime_, localLastPlaybackTime);
@@ -184,7 +184,7 @@ bool TelemetryReplay::isReplayHandler() {
     return true;
 }
 
-vector<Data3D> TelemetryReplay::pollLocations() {
-    return vector<Data3D>();
+vector<GPSPacket> TelemetryReplay::pollGPSData() {
+    return vector<GPSPacket>();
 }
 

@@ -14,7 +14,7 @@
  */
 RadioReceiver::RadioReceiver(string portAddress)
         : byteDecoder_{}, devicePort_{std::move(portAddress)}, serialPort_{}, thread_{},
-          recvBuffer_{}, telemQueue_{100},
+          recvBuffer_{}, sensorsDataQueue_{100}, eventsDataQueue_{100}, gpsDataQueue_{100},
           bytesLogger_{LogConstants::BYTES_LOG_PATH} {
 
     vector<serial::PortInfo> devices_found = serial::list_ports();
@@ -79,20 +79,23 @@ void RadioReceiver::openSerialPort() {
 //    serialPort_.flush();
 }
 
-vector<SensorsPacket> RadioReceiver::pollData() {
-    std::vector<SensorsPacket> telemetryBuffer{};
-    telemQueue_.consume_all([&telemetryBuffer](SensorsPacket tR) { telemetryBuffer.push_back(tR); });
-    return telemetryBuffer;
+template<class S>
+static std::vector<S> consumeQueue(boost::lockfree::spsc_queue<S> *queue) {
+    std::vector<S> recipient{};
+    queue->consume_all([&recipient](S s) { recipient.push_back(s); });
+    return recipient;
+};
+
+std::vector<SensorsPacket> RadioReceiver::pollSensorsData() {
+    return consumeQueue(&sensorsDataQueue_);
 }
 
-vector<EventPacket> RadioReceiver::pollEvents() {
-    std::vector<EventPacket> eventBuffer{};
-    return eventBuffer;
+std::vector<EventPacket> RadioReceiver::pollEventsData() {
+    return consumeQueue(&eventsDataQueue_);
 }
 
-
-vector<Data3D> RadioReceiver::pollLocations() {
-    return vector<Data3D>();
+std::vector<GPSPacket> RadioReceiver::pollGPSData() {
+    return consumeQueue(&gpsDataQueue_);
 }
 
 void RadioReceiver::readSerialPort() {
@@ -144,7 +147,7 @@ void RadioReceiver::unpackPayload() {
         std::shared_ptr<SensorsPacket> data = std::dynamic_pointer_cast<SensorsPacket>(
                 d.deserializedPayload_);
         //TODO: make sure that the memory behaviour is correct
-        telemQueue_.push(*data);
+        sensorsDataQueue_.push(*data);
     } else {
         std::cout << "Wrong datagram payload type!";
     }

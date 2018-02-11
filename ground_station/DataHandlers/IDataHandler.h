@@ -27,7 +27,7 @@ public:
      *
      * @return The data produced by this DataHandler since the last call to the function
      */
-    virtual std::vector<T> pollData() = 0;
+    virtual std::vector<T> pollSensorsData() = 0;
 
 };
 

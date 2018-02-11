@@ -15,11 +15,11 @@ public:
 
     void startup() override;
 
-    vector<EventPacket> pollEvents() override;
+    vector<EventPacket> pollEventsData() override;
 
-    vector<SensorsPacket> pollData() override;
+    vector<SensorsPacket> pollSensorsData() override;
 
-    vector<Data3D> pollLocations() override;
+    vector<GPSPacket> pollGPSData() override;
 
     void updatePlaybackSpeed(double) override;
 
