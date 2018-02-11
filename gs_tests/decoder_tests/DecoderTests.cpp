@@ -15,6 +15,22 @@ static void push3D(std::vector<uint8_t> &v, size_t byteCount, uint32_t a, uint32
         v.push_back(static_cast<uint8_t>(c >> (8 * i)));
 }
 
+static void pushFloat(std::vector<uint8_t> *datagram,
+                      std::vector<uint8_t> *checksumAccumulator,
+                      float val) {
+    float_cast fl_val{.fl = val};
+    for (int i = sizeof(float) - 1; i >= 0; --i) {
+        datagram->push_back(static_cast<uint8_t>(fl_val.uint32 >> (8 * i)));
+        checksumAccumulator->push_back(static_cast<uint8_t>(fl_val.uint32 >> (8 * i)));
+    }
+}
+
+static void pushChecksum(std::vector<uint8_t> *datagram, checksum_t crc) {
+    for (int i = sizeof(checksum_t) - 1; i >= 0; i--) {
+        datagram->push_back(static_cast<uint8_t>(crc >> (8 * i)));
+    }
+}
+
 static void fillHeaderAndTimestamp(std::vector<uint8_t> *datagram,
                                    std::vector<uint8_t> *checksumAccumulator,
                                    uint32_t seqnum,
@@ -130,6 +146,31 @@ createControlDatagram(uint32_t seqnum, uint32_t timestamp, int8_t partCode, uint
     for (int i = sizeof(checksum_t) - 1; i >= 0; i--) {
         datagram.push_back(static_cast<uint8_t>(crc >> (8 * i)));
     }
+
+    return datagram;
+}
+
+static vector<uint8_t>
+createGPSDatagram(uint32_t seqnum, uint32_t timestamp, uint8_t satCount, float rssi, float latitude, float longitude,
+                  float altitude) {
+
+    std::vector<uint8_t> datagram{};
+    std::vector<uint8_t> checksumAccumulator{};
+
+    fillHeaderAndTimestamp(&datagram, &checksumAccumulator, seqnum, PayloadType::GPS, timestamp);
+
+    datagram.emplace_back(satCount);
+    checksumAccumulator.emplace_back(satCount);
+
+    pushFloat(&datagram, &checksumAccumulator, rssi);
+    pushFloat(&datagram, &checksumAccumulator, latitude);
+    pushFloat(&datagram, &checksumAccumulator, longitude);
+    pushFloat(&datagram, &checksumAccumulator, altitude);
+
+    checksum_t crc = CRC::Calculate(&checksumAccumulator[0], checksumAccumulator.size(),
+                                    CommunicationsConstants::CRC_16_GENERATOR_POLY);
+
+    pushChecksum(&datagram, crc);
 
     return datagram;
 }
@@ -300,8 +341,8 @@ TEST(DecoderTests, multipleTelemetryPackets) {
 
     Rand<uint32_t> uint32Rand;
     Rand<int16_t> int16Rand;
-    Rand<double> positiveDoubleRand(0, 1000000);
-    Rand<double> doubleRand(-10000, 10000);
+    Rand<double> positiveDoubleRand(0.0, 1000000.0);
+    Rand<double> doubleRand(-10000.0, 10000.0);
 
     for (size_t i = 0; i < measureCount; i++) {
         timestamp[i] = uint32Rand();
@@ -452,6 +493,74 @@ TEST(DecoderTests, multipleControlPackets) {
         }
     }
 
+}
+
+TEST(DecoderTests, singleGPSPacket) {
+
+    Decoder decoder{};
+
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+
+    uint32_t seqnum{1234};
+    uint32_t timestamp{18};
+
+    uint8_t satsCount{1};
+    float rssi{1234};
+    float latitude{12.4587};
+    float longitude{45.4537};
+    float altitude{123.4167};
+
+    vector<uint8_t> datagram = createGPSDatagram(seqnum, timestamp, satsCount, rssi, latitude, longitude, altitude);
+    Datagram d{};
+
+    parsePacket(decoder, datagram, PayloadType::GPS, &d);
+
+    std::shared_ptr<GPSPacket> data = std::dynamic_pointer_cast<GPSPacket>(d.deserializedPayload_);
+    EXPECT_EQ(seqnum, d.sequenceNumber_);
+    EXPECT_EQ(timestamp, data.get()->timestamp_);
+    EXPECT_EQ(satsCount, data.get()->satsCount_);
+    EXPECT_NEAR(rssi, data.get()->rssi_, epsilon);
+    EXPECT_NEAR(latitude, data.get()->latitude_, epsilon);
+    EXPECT_NEAR(longitude, data.get()->longitude_, epsilon);
+    EXPECT_NEAR(altitude, data.get()->altitude_, epsilon);
+}
+
+
+TEST(DecoderTests, multipleGPSPackets) {
+    size_t measureCount = 256 * 5;
+
+    Decoder decoder{};
+
+    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+
+    Rand<uint32_t> uint32Rand;
+    Rand<uint8_t> uint8Rand;
+    Rand<float> floatRand(-100000.0f, 100000.0f);
+
+    for (size_t i = 0; i < measureCount; i++) {
+
+        uint32_t seqnum = uint32Rand();
+        uint32_t timestamp = uint32Rand();
+        uint8_t satsCount = uint8Rand();
+        float rssi = floatRand();
+        float latitude = floatRand();
+        float longitude = floatRand();
+        float altitude = floatRand();
+
+        vector<uint8_t> datagram = createGPSDatagram(seqnum, timestamp, satsCount, rssi, latitude, longitude, altitude);
+        Datagram d{};
+
+        parsePacket(decoder, datagram, PayloadType::GPS, &d);
+
+        std::shared_ptr<GPSPacket> data = std::dynamic_pointer_cast<GPSPacket>(d.deserializedPayload_);
+        EXPECT_EQ(seqnum, d.sequenceNumber_);
+        EXPECT_EQ(timestamp, data.get()->timestamp_);
+        EXPECT_EQ(satsCount, data.get()->satsCount_);
+        EXPECT_NEAR(rssi, data.get()->rssi_, epsilon);
+        EXPECT_NEAR(latitude, data.get()->latitude_, epsilon);
+        EXPECT_NEAR(longitude, data.get()->longitude_, epsilon);
+        EXPECT_NEAR(altitude, data.get()->altitude_, epsilon);
+    }
 }
 
 TEST(DecoderTests, resistsToRandomByteSequence) {
