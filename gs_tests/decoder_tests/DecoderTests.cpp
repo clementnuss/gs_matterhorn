@@ -6,13 +6,25 @@
 
 static constexpr double epsilon = 1e-3;
 
-static void push3D(std::vector<uint8_t> &v, size_t byteCount, uint32_t a, uint32_t b, uint32_t c) {
-    for (int i = byteCount - 1; i >= 0; --i)
-        v.push_back(static_cast<uint8_t>(a >> (8 * i)));
-    for (int i = byteCount - 1; i >= 0; --i)
-        v.push_back(static_cast<uint8_t>(b >> (8 * i)));
-    for (int i = byteCount - 1; i >= 0; --i)
-        v.push_back(static_cast<uint8_t>(c >> (8 * i)));
+
+// ------------------------------ Helper functions for pushing values in datagram vector ---------------------------- //
+template<class T>
+static void pushInteger(std::vector<uint8_t> *datagram,
+                        std::vector<uint8_t> *checksumAccumulator,
+                        T val) {
+    for (int i = sizeof(T) - 1; i >= 0; --i) {
+        datagram->push_back(static_cast<uint8_t>(val >> (8 * i)));
+        checksumAccumulator->push_back(static_cast<uint8_t>(val >> (8 * i)));
+    }
+}
+
+template<class T>
+static void pushIntegers3D(std::vector<uint8_t> *datagram,
+                           std::vector<uint8_t> *checksumAccumulator,
+                           T a, T b, T c) {
+    pushInteger(datagram, checksumAccumulator, a);
+    pushInteger(datagram, checksumAccumulator, b);
+    pushInteger(datagram, checksumAccumulator, c);
 }
 
 static void pushFloat(std::vector<uint8_t> *datagram,
@@ -31,6 +43,8 @@ static void pushChecksum(std::vector<uint8_t> *datagram, checksum_t crc) {
     }
 }
 
+
+// ---------------------------------- Helper functions for creating datagrams  -------------------------------------- //
 static void fillHeaderAndTimestamp(std::vector<uint8_t> *datagram,
                                    std::vector<uint8_t> *checksumAccumulator,
                                    uint32_t seqnum,
@@ -42,22 +56,15 @@ static void fillHeaderAndTimestamp(std::vector<uint8_t> *datagram,
     datagram->push_back(HEADER_PREAMBLE_FLAG);
     datagram->push_back(HEADER_PREAMBLE_FLAG);
 
-    for (int i = 3; i >= 0; --i) {
-        datagram->push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
-        checksumAccumulator->push_back(static_cast<uint8_t>(seqnum >> (8 * i)));
-    }
+    pushInteger(datagram, checksumAccumulator, seqnum);
+    pushInteger(datagram, checksumAccumulator, static_cast<uint8_t>(type));
 
-    datagram->push_back(static_cast<uint8_t>(type));
-    checksumAccumulator->push_back(static_cast<uint8_t>(type));
     datagram->push_back(CONTROL_FLAG);
 
-    for (int i = 3; i >= 0; --i) {
-        datagram->push_back(static_cast<uint8_t>(timestamp >> (8 * i)));
-        checksumAccumulator->push_back(static_cast<uint8_t>(timestamp >> (8 * i)));
-    }
+    pushInteger(datagram, checksumAccumulator, timestamp);
 }
 
-//TODO: remove code duplicate among datagram creation functions
+
 static vector<uint8_t>
 createDatagram(uint32_t seqnum, uint32_t timestamp, int16_t ax, int16_t ay, int16_t az, int16_t mx, int16_t my,
                int16_t mz, int16_t gx, int16_t gy, int16_t gz, float temp, float pres, int16_t pitot) {
@@ -67,37 +74,14 @@ createDatagram(uint32_t seqnum, uint32_t timestamp, int16_t ax, int16_t ay, int1
 
     fillHeaderAndTimestamp(&datagram, &checksumAccumulator, seqnum, PayloadType::TELEMETRY, timestamp);
 
-    push3D(datagram, 2, ax, ay, az);
-    push3D(checksumAccumulator, 2, ax, ay, az);
-    push3D(datagram, 2, gx, gy, gz);
-    push3D(checksumAccumulator, 2, gx, gy, gz);
-    push3D(datagram, 2, mx, my, mz);
-    push3D(checksumAccumulator, 2, mx, my, mz);
-
-    float_cast temperature{.fl = temp};
-    for (int i = 3; i >= 0; --i) {
-        datagram.push_back(static_cast<uint8_t>(temperature.uint32 >> (8 * i)));
-        checksumAccumulator.push_back(static_cast<uint8_t>(temperature.uint32 >> (8 * i)));
-    }
-
-
-    float_cast pressure{.fl = pres};
-    for (int i = 3; i >= 0; --i) {
-        datagram.push_back(static_cast<uint8_t>(pressure.uint32 >> (8 * i)));
-        checksumAccumulator.push_back(static_cast<uint8_t>(pressure.uint32 >> (8 * i)));
-    }
-
-    for (int i = 1; i >= 0; --i) {
-        datagram.push_back(static_cast<uint8_t>(pitot >> (8 * i)));
-        checksumAccumulator.push_back(static_cast<uint8_t>(pitot >> (8 * i)));
-    }
-
-    checksum_t crc = CRC::Calculate(&checksumAccumulator[0], checksumAccumulator.size(),
-                                    CommunicationsConstants::CRC_16_GENERATOR_POLY);
-
-    for (int i = sizeof(checksum_t) - 1; i >= 0; i--) {
-        datagram.push_back(static_cast<uint8_t>(crc >> (8 * i)));
-    }
+    pushIntegers3D(&datagram, &checksumAccumulator, ax, ay, az);
+    pushIntegers3D(&datagram, &checksumAccumulator, gx, gy, gz);
+    pushIntegers3D(&datagram, &checksumAccumulator, mx, my, mz);
+    pushFloat(&datagram, &checksumAccumulator, temp);
+    pushFloat(&datagram, &checksumAccumulator, pres);
+    pushInteger(&datagram, &checksumAccumulator, pitot);
+    pushChecksum(&datagram, CRC::Calculate(&checksumAccumulator[0], checksumAccumulator.size(),
+                                           CommunicationsConstants::CRC_16_GENERATOR_POLY));
 
     return datagram;
 }
@@ -111,15 +95,9 @@ createEventDatagram(uint32_t seqnum, uint32_t timestamp, uint8_t code) {
 
     fillHeaderAndTimestamp(&datagram, &checksumAccumulator, seqnum, PayloadType::EVENT, timestamp);
 
-    datagram.emplace_back(code);
-    checksumAccumulator.emplace_back(code);
-
-    checksum_t crc = CRC::Calculate(&checksumAccumulator[0], checksumAccumulator.size(),
-                                    CommunicationsConstants::CRC_16_GENERATOR_POLY);
-
-    for (int i = sizeof(checksum_t) - 1; i >= 0; i--) {
-        datagram.push_back(static_cast<uint8_t>(crc >> (8 * i)));
-    }
+    pushInteger(&datagram, &checksumAccumulator, code);
+    pushChecksum(&datagram, CRC::Calculate(&checksumAccumulator[0], checksumAccumulator.size(),
+                                           CommunicationsConstants::CRC_16_GENERATOR_POLY));
 
     return datagram;
 }
@@ -132,20 +110,10 @@ createControlDatagram(uint32_t seqnum, uint32_t timestamp, int8_t partCode, uint
 
     fillHeaderAndTimestamp(&datagram, &checksumAccumulator, seqnum, PayloadType::CONTROL, timestamp);
 
-    datagram.emplace_back(partCode);
-    checksumAccumulator.emplace_back(partCode);
-
-    for (int i = 1; i >= 0; --i) {
-        datagram.push_back(static_cast<uint8_t>(statusValue >> (8 * i)));
-        checksumAccumulator.push_back(static_cast<uint8_t>(statusValue >> (8 * i)));
-    }
-
-    checksum_t crc = CRC::Calculate(&checksumAccumulator[0], checksumAccumulator.size(),
-                                    CommunicationsConstants::CRC_16_GENERATOR_POLY);
-
-    for (int i = sizeof(checksum_t) - 1; i >= 0; i--) {
-        datagram.push_back(static_cast<uint8_t>(crc >> (8 * i)));
-    }
+    pushInteger(&datagram, &checksumAccumulator, partCode);
+    pushInteger(&datagram, &checksumAccumulator, statusValue);
+    pushChecksum(&datagram, CRC::Calculate(&checksumAccumulator[0], checksumAccumulator.size(),
+                                           CommunicationsConstants::CRC_16_GENERATOR_POLY));
 
     return datagram;
 }
@@ -167,14 +135,14 @@ createGPSDatagram(uint32_t seqnum, uint32_t timestamp, uint8_t satCount, float r
     pushFloat(&datagram, &checksumAccumulator, longitude);
     pushFloat(&datagram, &checksumAccumulator, altitude);
 
-    checksum_t crc = CRC::Calculate(&checksumAccumulator[0], checksumAccumulator.size(),
-                                    CommunicationsConstants::CRC_16_GENERATOR_POLY);
-
-    pushChecksum(&datagram, crc);
+    pushChecksum(&datagram, CRC::Calculate(&checksumAccumulator[0], checksumAccumulator.size(),
+                                           CommunicationsConstants::CRC_16_GENERATOR_POLY));
 
     return datagram;
 }
 
+
+// -------------------------- Helper functions for reaching specific Decoder states  ------------------------------- //
 static void feedWithValidPreamble(Decoder &decoder) {
     if (decoder.currentState() != DecodingState::SEEKING_FRAMESTART) {
         cerr << " problem " << endl;
@@ -221,6 +189,7 @@ static void feedWithValidHeader(Decoder &decoder) {
 }
 
 
+// ------------------------------------- Helper functions for testing payloads -------------------------------------- //
 static void parsePacket(Decoder &decoder, vector<uint8_t> &datagram, PayloadType payloadType, Datagram *out) {
 
     size_t k = 0;
@@ -295,6 +264,10 @@ static void parseAndTestTelemetryPacket(Decoder &decoder, vector<uint8_t> &datag
     EXPECT_NEAR(airSpeedFromPitotPressure(pitot), (*data).air_speed_, epsilon);
 }
 
+
+
+
+// ------------------------------------------------ Unit tests ------------------------------------------------------ //
 TEST(DecoderTests, singleTelemetryPacket) {
 
     Decoder decoder{};
