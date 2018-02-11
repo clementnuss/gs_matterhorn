@@ -15,11 +15,11 @@ public:
 
     void startup() override;
 
-    vector<RocketEvent> pollEvents() override;
+    vector<EventPacket> pollEvents() override;
 
-    vector<TelemetryReading> pollData() override;
+    vector<SensorsPacket> pollData() override;
 
-    vector<XYZReading> pollLocations() override;
+    vector<Data3D> pollLocations() override;
 
     void updatePlaybackSpeed(double) override;
 
@@ -42,20 +42,20 @@ private:
     };
 
     State currentState_ = READY;
-    TelemetryReading initialTelemetryState_{};
+    SensorsPacket initialTelemetryState_{};
 
     static constexpr int MOVING_AVERAGE_POINTS = 5;
     static constexpr double ACCELERATION_THRESHOLD = 1.5;
 
-    boost::circular_buffer<TelemetryReading> readingsBuffer_;
-    vector<RocketEvent> pendingDetectedRocketEvents_;
+    boost::circular_buffer<SensorsPacket> readingsBuffer_;
+    vector<EventPacket> pendingDetectedRocketEvents_;
 
     unique_ptr<TelemetryHandler> handler_;
     unique_ptr<ITelemetryReplayHandler> replayHandler_;
 
-    TelemetryReading computeMA(const TelemetryReading &);
+    SensorsPacket computeMA(const SensorsPacket &);
 
-    void computeState(const TelemetryReading &);
+    void computeState(const SensorsPacket &);
 
 };
 

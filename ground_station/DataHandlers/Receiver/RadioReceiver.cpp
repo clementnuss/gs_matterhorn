@@ -79,20 +79,20 @@ void RadioReceiver::openSerialPort() {
 //    serialPort_.flush();
 }
 
-vector<TelemetryReading> RadioReceiver::pollData() {
-    std::vector<TelemetryReading> telemetryBuffer{};
-    telemQueue_.consume_all([&telemetryBuffer](TelemetryReading tR) { telemetryBuffer.push_back(tR); });
+vector<SensorsPacket> RadioReceiver::pollData() {
+    std::vector<SensorsPacket> telemetryBuffer{};
+    telemQueue_.consume_all([&telemetryBuffer](SensorsPacket tR) { telemetryBuffer.push_back(tR); });
     return telemetryBuffer;
 }
 
-vector<RocketEvent> RadioReceiver::pollEvents() {
-    std::vector<RocketEvent> eventBuffer{};
+vector<EventPacket> RadioReceiver::pollEvents() {
+    std::vector<EventPacket> eventBuffer{};
     return eventBuffer;
 }
 
 
-vector<XYZReading> RadioReceiver::pollLocations() {
-    return vector<XYZReading>();
+vector<Data3D> RadioReceiver::pollLocations() {
+    return vector<Data3D>();
 }
 
 void RadioReceiver::readSerialPort() {
@@ -141,7 +141,7 @@ void RadioReceiver::unpackPayload() {
     Datagram d = byteDecoder_.retrieveDatagram();
 //    cout << d.sequenceNumber_ << endl;
     if (d.payloadType_->code() == PayloadType::TELEMETRY.code()) {
-        std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(
+        std::shared_ptr<SensorsPacket> data = std::dynamic_pointer_cast<SensorsPacket>(
                 d.deserializedPayload_);
         //TODO: make sure that the memory behaviour is correct
         telemQueue_.push(*data);

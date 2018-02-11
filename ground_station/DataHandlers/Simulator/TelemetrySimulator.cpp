@@ -19,9 +19,9 @@ TelemetrySimulator::TelemetrySimulator() : timeOfLastPolledData{chrono::system_c
                                            simulatorStatus{HandlerStatus::NOMINAL} {
 }
 
-vector<TelemetryReading> TelemetrySimulator::pollData() {
+vector<SensorsPacket> TelemetrySimulator::pollData() {
 
-    vector<TelemetryReading> generatedVector = generateTelemetryVector();
+    vector<SensorsPacket> generatedVector = generateTelemetryVector();
     chrono::system_clock::time_point now = chrono::system_clock::now();
 
     if (variableRate) {
@@ -51,14 +51,14 @@ vector<TelemetryReading> TelemetrySimulator::pollData() {
         return generateTelemetryVector();
     }
 
-    return vector<TelemetryReading>();
+    return vector<SensorsPacket>();
 }
 
-vector<RocketEvent> TelemetrySimulator::pollEvents() {
-    vector<RocketEvent> v;
+vector<EventPacket> TelemetrySimulator::pollEvents() {
+    vector<EventPacket> v;
 
     if ((qrand() / static_cast<double>(RAND_MAX)) * EVENT_PROBABILITY_INTERVAL <= 1) {
-        RocketEvent r = generateEvent();
+        EventPacket r = generateEvent();
         cout << "Generating event: " << r.description << endl;
         v.push_back(r);
     }
@@ -66,10 +66,10 @@ vector<RocketEvent> TelemetrySimulator::pollEvents() {
     return v;
 }
 
-vector<XYZReading> TelemetrySimulator::pollLocations() {
+vector<Data3D> TelemetrySimulator::pollLocations() {
 
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-    vector<XYZReading> generatedVector{};
+    vector<Data3D> generatedVector{};
 
     long long millisSinceLastPoll = msecsBetween(timeOfLastPolledGeoData, now);
     if (millisSinceLastPoll > TimeConstants::MSECS_IN_SEC / 10) {
@@ -79,7 +79,7 @@ vector<XYZReading> TelemetrySimulator::pollLocations() {
 
         double x = 2 * static_cast<double>(msecs) / 10;
 
-        XYZReading r;
+        Data3D r;
 
         r.x_ = 0;
         r.y_ = 50 * sqrt(x);
@@ -99,10 +99,10 @@ void TelemetrySimulator::startup() {
 
 }
 
-const vector<TelemetryReading> TelemetrySimulator::generateTelemetryVector() {
+const vector<SensorsPacket> TelemetrySimulator::generateTelemetryVector() {
     auto vlength = static_cast<size_t>(
             qrand() / static_cast<double>(RAND_MAX) * MAX_RANDOM_VECTOR_LENGTH + 1);
-    vector<TelemetryReading> v;
+    vector<SensorsPacket> v;
 
     for (size_t i = 0; i < vlength; i++) {
         v.push_back(generateTelemetry());
@@ -111,26 +111,26 @@ const vector<TelemetryReading> TelemetrySimulator::generateTelemetryVector() {
     return v;
 }
 
-const TelemetryReading TelemetrySimulator::generateTelemetry() {
+const SensorsPacket TelemetrySimulator::generateTelemetry() {
 
     long long int msecs = msecsBetween(timeOfInitialization, chrono::system_clock::now());
     double keysec = msecs / 1000.0;
 
     double rnd = qrand();
-    return TelemetryReading{
+    return SensorsPacket{
             static_cast<uint32_t>(msecs),
             10000 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 1000.0 * sin(keysec / 0.8),
-            XYZReading{
+            Data3D{
                     900 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 90.0 * sin(keysec / 0.38),
                     900 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 90.0 * sin(keysec / 0.37),
                     900 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 90.0 * sin(keysec / 0.36)
             },
-            XYZReading{
+            Data3D{
                     200 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 20.0 * sin(keysec / 0.27),
                     200 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 20.0 * sin(keysec / 0.26),
                     200 * sin(keysec) + rnd / static_cast<double>(RAND_MAX) * 20.0 * sin(keysec / 0.25)
             },
-            XYZReading{
+            Data3D{
                     100 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 10.0 * sin(keysec / 0.6),
                     100 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 10.0 * sin(keysec / 0.5),
                     100 * (keysec) + rnd / static_cast<double>(RAND_MAX) * 10.0 * sin(keysec / 0.4)
@@ -142,7 +142,7 @@ const TelemetryReading TelemetrySimulator::generateTelemetry() {
     };
 }
 
-RocketEvent TelemetrySimulator::generateEvent() {
+EventPacket TelemetrySimulator::generateEvent() {
 
     // Select an event randomly
     auto code = static_cast<int>(round(
@@ -150,7 +150,7 @@ RocketEvent TelemetrySimulator::generateEvent() {
     long long int msecs = msecsBetween(timeOfInitialization, chrono::system_clock::now());
 
     assert(RocketEventConstants::EVENT_CODES.find(code) != RocketEventConstants::EVENT_CODES.end());
-    return RocketEvent {static_cast<uint32_t>(msecs), code, RocketEventConstants::EVENT_CODES.at(code)};
+    return EventPacket {static_cast<uint32_t>(msecs), code, RocketEventConstants::EVENT_CODES.at(code)};
 }
 
 

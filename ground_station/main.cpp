@@ -3,10 +3,10 @@
 
 int main(int argc, char **argv) {
 
-    qRegisterMetaType<TelemetryReading>("TelemetryReading");
+    qRegisterMetaType<SensorsPacket>("TelemetryReading");
     qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>&");
     qRegisterMetaType<QVector<QVector3D>>("QVector<QVector3D>&");
-    qRegisterMetaType<vector<RocketEvent>>("vector<RocketEvent>&");
+    qRegisterMetaType<vector<EventPacket>>("vector<RocketEvent>&");
     qRegisterMetaType<GraphFeature>("GraphFeature");
     qRegisterMetaType<HandlerStatus>("HandlerStatus");
 

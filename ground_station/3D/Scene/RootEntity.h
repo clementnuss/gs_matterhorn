@@ -21,7 +21,7 @@ public:
 
     void updateRocketTracker(QVector<QVector3D> &positions, const QVector3D &speed);
 
-    void registerEvent(const RocketEvent &);
+    void registerEvent(const EventPacket &);
 
 
 signals:

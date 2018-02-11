@@ -24,24 +24,16 @@ struct TimedData {
     uint32_t timestamp_;
 };
 
-struct DataReading {
-    DataReading() = default;
 
-    DataReading(double v, bool b) : value{v}, validity{b} {}
+struct EventPacket : TimedData, ILoggable, IDeserializable {
+    EventPacket() = default;
 
-    double value;
-    bool validity;
-};
+    EventPacket(const EventPacket &that) = default;
 
-struct RocketEvent : TimedData, ILoggable, IDeserializable {
-    RocketEvent() = default;
-
-    RocketEvent(const RocketEvent &that) = default;
-
-    RocketEvent(uint32_t timestamp, int code, const std::string &description) :
+    EventPacket(uint32_t timestamp, int code, const std::string &description) :
             TimedData{timestamp}, code{code}, description{std::move(description)} {}
 
-    ~RocketEvent() = default;
+    ~EventPacket() = default;
 
     int code;
     std::string description;
@@ -58,12 +50,12 @@ struct RocketEvent : TimedData, ILoggable, IDeserializable {
     }
 };
 
-struct ControlStatus : TimedData, IDeserializable {
-    ControlStatus() = default;
+struct ControlPacket : TimedData, IDeserializable {
+    ControlPacket() = default;
 
-    ControlStatus(const ControlStatus &that) = default;
+    ControlPacket(const ControlPacket &that) = default;
 
-    ControlStatus(uint32_t timestamp, uint8_t partCode, uint16_t statusValue) :
+    ControlPacket(uint32_t timestamp, uint8_t partCode, uint16_t statusValue) :
             TimedData{timestamp}, partCode_{partCode}, statusValue_{statusValue} {}
 
     uint8_t partCode_;
@@ -90,10 +82,10 @@ struct GPSPacket : TimedData, IDeserializable {
     float altitude_;
 };
 
-struct XYZReading : ILoggable {
-    XYZReading() : x_{0}, y_{0}, z_{0} {};
+struct Data3D : ILoggable {
+    Data3D() : x_{0}, y_{0}, z_{0} {};
 
-    XYZReading(double x, double y, double z) : x_{x}, y_{y}, z_{z} {}
+    Data3D(double x, double y, double z) : x_{x}, y_{y}, z_{z} {}
 
     double x_;
     double y_;
@@ -113,30 +105,30 @@ struct XYZReading : ILoggable {
         return std::sqrt(x_ * x_ + y_ * y_ + z_ * z_);
     }
 
-    XYZReading operator+(XYZReading &rhs) const {
-        XYZReading result{};
+    Data3D operator+(Data3D &rhs) const {
+        Data3D result{};
         result.x_ = this->x_ + rhs.x_;
         result.y_ = this->y_ + rhs.y_;
         result.z_ = this->z_ + rhs.z_;
         return result;
     }
 
-    XYZReading operator*=(double coeff) {
+    Data3D operator*=(double coeff) {
         x_ *= coeff;
         y_ *= coeff;
         z_ *= coeff;
 
     }
 
-    XYZReading operator+=(const XYZReading &rhs) {
+    Data3D operator+=(const Data3D &rhs) {
         x_ += rhs.x_;
         y_ += rhs.y_;
         z_ += rhs.z_;
     }
 };
 
-struct TelemetryReading : TimedData, ILoggable, IDeserializable {
-    TelemetryReading() : TimedData{0},
+struct SensorsPacket : TimedData, ILoggable, IDeserializable {
+    SensorsPacket() : TimedData{0},
                          altitude_{0},
                          acceleration_{},
                          magnetometer_{},
@@ -146,9 +138,9 @@ struct TelemetryReading : TimedData, ILoggable, IDeserializable {
                          air_speed_{0},
                          sequenceNumber_{0} {};
 
-    TelemetryReading(uint32_t t, double altitude, XYZReading acceleration,
-                     XYZReading magnetometer, XYZReading gyroscope,
-                     double pressure, double temperature, double air_speed, uint32_t sequenceNumber) :
+    SensorsPacket(uint32_t t, double altitude, Data3D acceleration,
+                  Data3D magnetometer, Data3D gyroscope,
+                  double pressure, double temperature, double air_speed, uint32_t sequenceNumber) :
             TimedData{t},
             altitude_{altitude},
             acceleration_{acceleration},
@@ -159,13 +151,13 @@ struct TelemetryReading : TimedData, ILoggable, IDeserializable {
             air_speed_{air_speed},
             sequenceNumber_{sequenceNumber} {}
 
-    TelemetryReading(const TelemetryReading &that) = default;
+    SensorsPacket(const SensorsPacket &that) = default;
 
-    ~TelemetryReading() override = default;
+    ~SensorsPacket() override = default;
 
-    XYZReading acceleration_;
-    XYZReading magnetometer_;
-    XYZReading gyroscope_;
+    Data3D acceleration_;
+    Data3D magnetometer_;
+    Data3D gyroscope_;
     double altitude_;
     double pressure_;
     double temperature_;
@@ -190,7 +182,7 @@ struct TelemetryReading : TimedData, ILoggable, IDeserializable {
         return ss.str();
     }
 
-    TelemetryReading operator+=(const TelemetryReading &rhs) {
+    SensorsPacket operator+=(const SensorsPacket &rhs) {
         air_speed_ += rhs.air_speed_;
         pressure_ += rhs.pressure_;
         temperature_ += rhs.temperature_;
@@ -201,7 +193,7 @@ struct TelemetryReading : TimedData, ILoggable, IDeserializable {
     }
 
 
-    TelemetryReading operator*=(double coeff) {
+    SensorsPacket operator*=(double coeff) {
         air_speed_ *= coeff;
         pressure_ *= coeff;
         temperature_ *= coeff;

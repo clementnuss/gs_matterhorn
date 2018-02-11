@@ -15,11 +15,11 @@ public:
 
     void startup() override;
 
-    vector<RocketEvent> pollEvents() override;
+    vector<EventPacket> pollEvents() override;
 
-    vector<TelemetryReading> pollData() override;
+    vector<SensorsPacket> pollData() override;
 
-    vector<XYZReading> pollLocations() override;
+    vector<Data3D> pollLocations() override;
 
     void updatePlaybackSpeed(double) override;
 
@@ -33,9 +33,9 @@ public:
 
 private:
     boost::filesystem::path path_;
-    vector<TelemetryReading> readings_;
-    vector<TelemetryReading>::const_iterator endReadingsIter_;
-    vector<TelemetryReading>::const_iterator frontReadingsIter_;
+    vector<SensorsPacket> readings_;
+    vector<SensorsPacket>::const_iterator endReadingsIter_;
+    vector<SensorsPacket>::const_iterator frontReadingsIter_;
     chrono::system_clock::time_point lastPlaybackTime_;
     uint32_t lastTimeStamp_;
     double playbackSpeed_;

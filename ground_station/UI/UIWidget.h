@@ -42,7 +42,7 @@ public slots:
 
     void updateTime();
 
-    void updateEvents(vector<RocketEvent> &);
+    void updateEvents(vector<EventPacket> &);
 
     void updateGraphData(QVector<QCPGraphData> &, GraphFeature);
 
@@ -50,7 +50,7 @@ public slots:
 
     void resetUIState();
 
-    void updateTelemetry(TelemetryReading);
+    void updateTelemetry(SensorsPacket);
 
     void updateLoggingStatus(bool);
 
@@ -77,7 +77,7 @@ public slots:
     // 3D visualisation slots
     void registerStatus(QVector<QVector3D> &, const QVector3D &);
 
-    void registerEvent(const RocketEvent &);
+    void registerEvent(const EventPacket &);
 
     void registerInfoString(const QString &);
 

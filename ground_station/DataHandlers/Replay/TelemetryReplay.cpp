@@ -32,7 +32,7 @@ void TelemetryReplay::startup() {
 
     if (readings_.empty()) {
         //Add a blank reading to prevent the UI from crashing
-        TelemetryReading r{};
+        SensorsPacket r{};
         readings_.push_back(r);
         resetPlayback();
         throw (std::runtime_error("No reading has been found in the path: \n" + path_.string()));
@@ -41,12 +41,12 @@ void TelemetryReplay::startup() {
     resetPlayback();
 }
 
-vector<RocketEvent> TelemetryReplay::pollEvents() {
-    return vector<RocketEvent>();
+vector<EventPacket> TelemetryReplay::pollEvents() {
+    return vector<EventPacket>();
 }
 
-vector<TelemetryReading> TelemetryReplay::pollData() {
-    vector<TelemetryReading> vec{};
+vector<SensorsPacket> TelemetryReplay::pollData() {
+    vector<SensorsPacket> vec{};
     auto localLastPlaybackTime = std::chrono::system_clock::now();
     double adjustedTime = usecsBetween(lastPlaybackTime_, localLastPlaybackTime);
     adjustedTime *= playbackSpeed_;
@@ -143,8 +143,8 @@ void TelemetryReplay::parseFile(boost::filesystem::path p) {
             double my = std::stod(*it++);
             double mz = std::stod(*it++);
 
-            TelemetryReading r{
-                    timestamp, altitude, XYZReading{ax, ay, az}, XYZReading{mx, my, mz}, XYZReading{gx, gy, gz},
+            SensorsPacket r{
+                    timestamp, altitude, Data3D{ax, ay, az}, Data3D{mx, my, mz}, Data3D{gx, gy, gz},
                     pressure, temperature, air_speed, seqNumber};
             readings_.push_back(std::move(r));
 
@@ -184,7 +184,7 @@ bool TelemetryReplay::isReplayHandler() {
     return true;
 }
 
-vector<XYZReading> TelemetryReplay::pollLocations() {
-    return vector<XYZReading>();
+vector<Data3D> TelemetryReplay::pollLocations() {
+    return vector<Data3D>();
 }
 

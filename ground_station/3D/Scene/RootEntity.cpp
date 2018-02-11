@@ -134,7 +134,7 @@ void RootEntity::updateRocketTracker(QVector<QVector3D> &positions, const QVecto
             UI3DConstants::WIND_REPORT_N_LINES - static_cast<int>(lastPos.y() / UI3DConstants::WIND_REPORT_INTERVAL));
 }
 
-void RootEntity::registerEvent(const RocketEvent &event) {
+void RootEntity::registerEvent(const EventPacket &event) {
 
     //TODO: invalid event are already checked for in decoding function
     if (RocketEventConstants::EVENT_CODES.find(event.code) == RocketEventConstants::EVENT_CODES.end()) {

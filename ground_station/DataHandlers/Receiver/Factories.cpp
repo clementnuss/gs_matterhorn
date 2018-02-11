@@ -49,17 +49,17 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
 
     double air_speed = airSpeedFromPitotPressure(pitotPressure);
 
-    TelemetryReading r{measurement_time,
-                       altitude,
-                       {ax, ay, az},
-                       {mx, my, mz},
-                       {gx, gy, gz},
-                       pressure_hPa,
-                       temperature.fl,
-                       air_speed,
-                       0};
+    SensorsPacket r{measurement_time,
+                    altitude,
+                    {ax, ay, az},
+                    {mx, my, mz},
+                    {gx, gy, gz},
+                    pressure_hPa,
+                    temperature.fl,
+                    air_speed,
+                    0};
 
-    return std::make_shared<TelemetryReading>(r);
+    return std::make_shared<SensorsPacket>(r);
 }
 
 /**
@@ -76,7 +76,7 @@ shared_ptr<IDeserializable> Factories::telemetryEventFactory(std::vector<uint8_t
     auto measurement_time = parse32<uint32_t>(it);
     auto eventCode = parse8<uint8_t>(it);
 
-    RocketEvent r{};
+    EventPacket r{};
 
     r.timestamp_ = measurement_time;
 
@@ -87,7 +87,7 @@ shared_ptr<IDeserializable> Factories::telemetryEventFactory(std::vector<uint8_t
         r.code = RocketEventConstants::INVALID_EVENT_CODE;
     }
 
-    return std::make_shared<RocketEvent>(r);
+    return std::make_shared<EventPacket>(r);
 }
 
 /**
@@ -104,7 +104,7 @@ shared_ptr<IDeserializable> Factories::telemetryControlFactory(std::vector<uint8
     auto partCode = parse8<uint8_t>(it);
     auto statusValue = parse16<uint16_t>(it);
 
-    ControlStatus r{};
+    ControlPacket r{};
 
     r.timestamp_ = measurement_time;
 
@@ -117,7 +117,7 @@ shared_ptr<IDeserializable> Factories::telemetryControlFactory(std::vector<uint8
         r.statusValue_ = ControlConstants::INVALID_STATUS_VALUE;
     }
 
-    return std::make_shared<ControlStatus>(r);
+    return std::make_shared<ControlPacket>(r);
 }
 
 

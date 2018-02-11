@@ -128,9 +128,9 @@ void Worker::mainRoutine() {
     lastIteration = chrono::system_clock::now();
     checkLinkStatuses();
 
-    vector<RocketEvent> rocketEvents = telemetryHandler_->pollEvents();
-    vector<TelemetryReading> telemReadings = telemetryHandler_->pollData();
-    vector<XYZReading> geoData = telemetryHandler_->pollLocations();
+    vector<EventPacket> rocketEvents = telemetryHandler_->pollEvents();
+    vector<SensorsPacket> telemReadings = telemetryHandler_->pollData();
+    vector<Data3D> geoData = telemetryHandler_->pollLocations();
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
 
@@ -244,7 +244,7 @@ void Worker::checkLinkStatuses() {
  *
  * @param tr The telemetry struct to be displayed.
  */
-void Worker::displayMostRecentTelemetry(TelemetryReading tr) {
+void Worker::displayMostRecentTelemetry(SensorsPacket tr) {
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
     long long elapsedMillis = msecsBetween(lastUIupdate, now);
@@ -264,11 +264,11 @@ void Worker::displayMostRecentTelemetry(TelemetryReading tr) {
  * @return A QVector of QCPGraphData.
  */
 QVector<QCPGraphData>
-Worker::extractGraphData(vector<TelemetryReading> &data, QCPGraphData (*extractionFct)(TelemetryReading)) {
+Worker::extractGraphData(vector<SensorsPacket> &data, QCPGraphData (*extractionFct)(SensorsPacket)) {
     QVector<QCPGraphData> v;
     long long int lastTimestampSeen = 0;
 
-    for (TelemetryReading reading : data) {
+    for (SensorsPacket reading : data) {
         if (abs(lastTimestampSeen - reading.timestamp_) > UIConstants::GRAPH_DATA_INTERVAL_USECS) {
             v.append(extractionFct(reading));
             lastTimestampSeen = reading.timestamp_;

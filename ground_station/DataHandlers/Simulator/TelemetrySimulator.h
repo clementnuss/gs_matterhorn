@@ -18,27 +18,27 @@ public:
 
     void startup() override;
 
-    vector<RocketEvent> pollEvents() override;
+    vector<EventPacket> pollEvents() override;
 
-    vector<TelemetryReading> pollData() override;
+    vector<SensorsPacket> pollData() override;
 
     bool isReplayHandler() override;
 
-    vector<XYZReading> pollLocations() override;
+    vector<Data3D> pollLocations() override;
 
     void setVariableRate(bool);
 
 private:
 
-    RocketEvent generateEvent();
+    EventPacket generateEvent();
 
     void updateHandlerStatus();
 
     static constexpr double VARIABLE_RATE_TIME_MULTIPLIER = 2.0 * M_PI * 0.05;
 
-    const TelemetryReading generateTelemetry();
+    const SensorsPacket generateTelemetry();
 
-    const vector<TelemetryReading> generateTelemetryVector();
+    const vector<SensorsPacket> generateTelemetryVector();
 
     HandlerStatus simulatorStatus;
     uint32_t sequenceNumber_;

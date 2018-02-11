@@ -49,11 +49,11 @@ signals:
 
     void loggingStatusReady(bool);
 
-    void telemetryReady(TelemetryReading);
+    void telemetryReady(SensorsPacket);
 
     void graphDataReady(QVector<QCPGraphData> &, GraphFeature);
 
-    void newEventsReady(vector<RocketEvent> &);
+    void newEventsReady(vector<EventPacket> &);
 
     void status3DReady(QVector<QVector3D> &, QVector3D &);
 
@@ -80,7 +80,7 @@ private:
 
     void checkLinkStatuses();
 
-    void displayMostRecentTelemetry(TelemetryReading);
+    void displayMostRecentTelemetry(SensorsPacket);
 
 
     unique_ptr<TelemetryHandler> telemetryHandler_;
@@ -93,7 +93,7 @@ private:
     chrono::system_clock::time_point timeOfLastReceivedTelemetry;
     long long int millisBetweenLastTwoPackets;
 
-    QVector<QCPGraphData> extractGraphData(vector<TelemetryReading> &, QCPGraphData (*)(TelemetryReading));
+    QVector<QCPGraphData> extractGraphData(vector<SensorsPacket> &, QCPGraphData (*)(SensorsPacket));
 
     void moveTrackingSystem(double currentAltitude);
 };

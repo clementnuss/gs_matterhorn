@@ -120,9 +120,9 @@ void GSMainwindow::updateTime() {
  *
  * @param events A vector of events
  */
-void GSMainwindow::updateEvents(vector<RocketEvent> &events) {
+void GSMainwindow::updateEvents(vector<EventPacket> &events) {
     if (!events.empty()) {
-        for (RocketEvent &e : events) {
+        for (EventPacket &e : events) {
             int seconds = e.timestamp_ / TimeConstants::MSECS_IN_SEC;
             int minutes = seconds / TimeConstants::SECS_IN_MINUTE;
 
@@ -218,7 +218,7 @@ void GSMainwindow::updateGraphData(QVector<QCPGraphData> &d, GraphFeature featur
  *
  * @param t The Telemetry object from which to extract data to update the display
  */
-void GSMainwindow::updateTelemetry(TelemetryReading t) {
+void GSMainwindow::updateTelemetry(SensorsPacket t) {
     ui->telemetry_altitude_value->setText(QString::number(t.altitude_, 'f', UIConstants::PRECISION));
     ui->telemetry_speed_value->setText(QString::number(t.air_speed_, 'f', UIConstants::PRECISION));
     ui->telemetry_acceleration_value->setText(QString::number(t.acceleration_.norm(), 'f', UIConstants::PRECISION));
@@ -272,7 +272,7 @@ void GSMainwindow::registerStatus(QVector<QVector3D> &positions, const QVector3D
     rootEntity3D_->updateRocketTracker(positions, speed);
 }
 
-void GSMainwindow::registerEvent(const RocketEvent &event) {
+void GSMainwindow::registerEvent(const EventPacket &event) {
     rootEntity3D_->registerEvent(event);
 }
 
@@ -501,7 +501,7 @@ void GSMainwindow::resetUIState() {
             QString::number(replayPlaybackSpeed_, 'f', 2));
 
     ui->event_log->clear();
-    updateTelemetry(TelemetryReading{});
+    updateTelemetry(SensorsPacket{});
 
     for (auto &g_idx : plotVector_) {
         QCPGraph *g = g_idx->graph();
@@ -606,7 +606,7 @@ bool GSMainwindow::event(QEvent *event) {
                 connect(launchTimer, &QTimer::timeout, this, &GSMainwindow::dummyAnimation);
             }
         } else if (ke->key() == Qt::Key_E) {
-            this->registerEvent(RocketEvent(0, 0, ""));
+            this->registerEvent(EventPacket(0, 0, ""));
         } else if (ke->key() == Qt::Key_T) {
             emit toggleTracking();
         }

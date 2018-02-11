@@ -240,14 +240,14 @@ static void parsePacket(Decoder &decoder, vector<uint8_t> &datagram, PayloadType
 }
 
 static void parseAndTestTelemetryPacket(Decoder &decoder, vector<uint8_t> &datagram, uint32_t timestamp,
-                                        XYZReading accelReading, XYZReading magReading, XYZReading gyroReading,
+                                        Data3D accelReading, Data3D magReading, Data3D gyroReading,
                                         float temp, float pres, uint16_t pitot
 ) {
 
     Datagram d;
     parsePacket(decoder, datagram, PayloadType::TELEMETRY, &d);
 
-    std::shared_ptr<TelemetryReading> data = std::dynamic_pointer_cast<TelemetryReading>(d.deserializedPayload_);
+    std::shared_ptr<SensorsPacket> data = std::dynamic_pointer_cast<SensorsPacket>(d.deserializedPayload_);
     EXPECT_EQ(timestamp, (*data).timestamp_);
     EXPECT_NEAR(accelReading.x_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.x_, epsilon);
     EXPECT_NEAR(accelReading.y_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.y_, epsilon);
@@ -364,7 +364,7 @@ TEST(DecoderTests, singleEventPacket) {
 
     parsePacket(decoder, datagram, PayloadType::EVENT, &d);
 
-    std::shared_ptr<RocketEvent> data = std::dynamic_pointer_cast<RocketEvent>(d.deserializedPayload_);
+    std::shared_ptr<EventPacket> data = std::dynamic_pointer_cast<EventPacket>(d.deserializedPayload_);
     EXPECT_EQ(seqnum, d.sequenceNumber_);
     EXPECT_EQ(timestamp, data.get()->timestamp_);
     EXPECT_EQ(code, data.get()->code);
@@ -391,7 +391,7 @@ TEST(DecoderTests, multipleEventPackets) {
 
         parsePacket(decoder, datagram, PayloadType::EVENT, &d);
 
-        std::shared_ptr<RocketEvent> data = std::dynamic_pointer_cast<RocketEvent>(d.deserializedPayload_);
+        std::shared_ptr<EventPacket> data = std::dynamic_pointer_cast<EventPacket>(d.deserializedPayload_);
         EXPECT_EQ(seqnum, d.sequenceNumber_);
         EXPECT_EQ(timestamp, (*data).timestamp_);
         if (RocketEventConstants::EVENT_CODES.find(code)
@@ -420,7 +420,7 @@ TEST(DecoderTests, singleControlPacket) {
 
     parsePacket(decoder, datagram, PayloadType::CONTROL, &d);
 
-    std::shared_ptr<ControlStatus> data = std::dynamic_pointer_cast<ControlStatus>(d.deserializedPayload_);
+    std::shared_ptr<ControlPacket> data = std::dynamic_pointer_cast<ControlPacket>(d.deserializedPayload_);
     EXPECT_EQ(seqnum, d.sequenceNumber_);
     EXPECT_EQ(timestamp, data.get()->timestamp_);
     EXPECT_EQ(partCode, data.get()->partCode_);
@@ -452,7 +452,7 @@ TEST(DecoderTests, multipleControlPackets) {
 
         parsePacket(decoder, datagram, PayloadType::CONTROL, &d);
 
-        std::shared_ptr<ControlStatus> data = std::dynamic_pointer_cast<ControlStatus>(d.deserializedPayload_);
+        std::shared_ptr<ControlPacket> data = std::dynamic_pointer_cast<ControlPacket>(d.deserializedPayload_);
         EXPECT_EQ(seqnum, d.sequenceNumber_);
         EXPECT_EQ(timestamp, data.get()->timestamp_);
 

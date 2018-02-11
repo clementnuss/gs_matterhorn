@@ -25,9 +25,9 @@ int Application::exec() {
 }
 
 void Application::connectSlotsAndSignals() {
-    qRegisterMetaType<TelemetryReading>("TelemetryReading");
+    qRegisterMetaType<SensorsPacket>("TelemetryReading");
     qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>&");
-    qRegisterMetaType<vector<RocketEvent>>("vector<RocketEvent>&");
+    qRegisterMetaType<vector<EventPacket>>("vector<RocketEvent>&");
     qRegisterMetaType<GraphFeature>("GraphFeature");
     qRegisterMetaType<HandlerStatus>("HandlerStatus");
 

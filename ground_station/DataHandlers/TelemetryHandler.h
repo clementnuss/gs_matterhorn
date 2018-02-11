@@ -9,7 +9,7 @@
 /**
  * The TelemetryHandler is the base class for telemetry-producing instances
  */
-class TelemetryHandler : public IDataHandler<TelemetryReading> {
+class TelemetryHandler : public IDataHandler<SensorsPacket> {
 
 public:
     //TODO: move port and baud rate from derived class to here
@@ -19,13 +19,13 @@ public:
      *
      * @return The events received by this TelemetryHandler since the last call to the function
      */
-    virtual std::vector<RocketEvent> pollEvents() = 0;
+    virtual std::vector<EventPacket> pollEvents() = 0;
 
     /**
      *
      * @return The locations received by this TelemetryHandler since the last call to the function
      */
-    virtual std::vector<XYZReading> pollLocations() = 0;
+    virtual std::vector<Data3D> pollLocations() = 0;
 
     virtual bool isReplayHandler()= 0;
 

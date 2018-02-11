@@ -15,7 +15,7 @@ void StateEstimator::startup() {
 
 }
 
-vector<RocketEvent> StateEstimator::pollEvents() {
+vector<EventPacket> StateEstimator::pollEvents() {
     auto polledEvents = handler_->pollEvents();
     if (!pendingDetectedRocketEvents_.empty()) {
         polledEvents.insert(polledEvents.end(),
@@ -25,9 +25,9 @@ vector<RocketEvent> StateEstimator::pollEvents() {
     return polledEvents;
 }
 
-vector<TelemetryReading> StateEstimator::pollData() {
+vector<SensorsPacket> StateEstimator::pollData() {
     auto polledData = handler_->pollData();
-    vector<TelemetryReading> smoothedReadings;
+    vector<SensorsPacket> smoothedReadings;
 
     for (const auto &telemReading : polledData) {
         auto readingMA = computeMA(telemReading);
@@ -62,8 +62,8 @@ bool StateEstimator::endOfPlayback() {
     return replayHandler_->endOfPlayback();
 }
 
-TelemetryReading StateEstimator::computeMA(const TelemetryReading &r) {
-    TelemetryReading movAverage;
+SensorsPacket StateEstimator::computeMA(const SensorsPacket &r) {
+    SensorsPacket movAverage;
     readingsBuffer_.push_back(r);
 
     for (const auto &telemReading : readingsBuffer_) {
@@ -77,13 +77,13 @@ TelemetryReading StateEstimator::computeMA(const TelemetryReading &r) {
     return movAverage;
 }
 
-void StateEstimator::computeState(const TelemetryReading &r) {
+void StateEstimator::computeState(const SensorsPacket &r) {
     switch (currentState_) {
         case READY: {
             if (r.acceleration_.norm() > ACCELERATION_THRESHOLD) {
                 currentState_ = BURNING_PHASE;
                 initialTelemetryState_ = r;
-                RocketEvent event{r.timestamp_, 0, "T+:0 \tIGNITION"};
+                EventPacket event{r.timestamp_, 0, "T+:0 \tIGNITION"};
                 pendingDetectedRocketEvents_.push_back(event);
             }
             break;
@@ -92,7 +92,7 @@ void StateEstimator::computeState(const TelemetryReading &r) {
             if (r.acceleration_.norm() < ACCELERATION_THRESHOLD) {
                 currentState_ = BURNOUT;
                 double deltaT = (r.timestamp_ - initialTelemetryState_.timestamp_) / 1'000'000.0;
-                RocketEvent event{r.timestamp_, 0, "T+:" + std::to_string(deltaT) + "\tENGINE BURNOUT"};
+                EventPacket event{r.timestamp_, 0, "T+:" + std::to_string(deltaT) + "\tENGINE BURNOUT"};
                 pendingDetectedRocketEvents_.push_back(event);
             }
             break;
@@ -102,7 +102,7 @@ void StateEstimator::computeState(const TelemetryReading &r) {
                 currentState_ = PARACHUTE_DESCENT;
                 double deltaT = (r.timestamp_ - initialTelemetryState_.timestamp_) / 1'000'000.0;
 
-                RocketEvent event{r.timestamp_, 0, "T+:" + std::to_string(deltaT) + "\tPARACHUTE DEPLOYMENT"};
+                EventPacket event{r.timestamp_, 0, "T+:" + std::to_string(deltaT) + "\tPARACHUTE DEPLOYMENT"};
                 pendingDetectedRocketEvents_.push_back(event);
             }
             break;
@@ -110,9 +110,9 @@ void StateEstimator::computeState(const TelemetryReading &r) {
         case PARACHUTE_DESCENT: {
             if (abs(r.altitude_ - initialTelemetryState_.altitude_) < 15) {
                 currentState_ = TOUCHDOWN;
-                RocketEvent touchdown{r.timestamp_, 0, "TOUCHDOWN"};
+                EventPacket touchdown{r.timestamp_, 0, "TOUCHDOWN"};
                 double flightDuration = (r.timestamp_ - initialTelemetryState_.timestamp_) / 1'000'000.0;
-                RocketEvent flightDurationEvent{r.timestamp_, 0, "FLIGHT DURATION: " + std::to_string(flightDuration)};
+                EventPacket flightDurationEvent{r.timestamp_, 0, "FLIGHT DURATION: " + std::to_string(flightDuration)};
                 pendingDetectedRocketEvents_.push_back(touchdown);
                 pendingDetectedRocketEvents_.push_back(flightDurationEvent);
             }
@@ -123,6 +123,6 @@ void StateEstimator::computeState(const TelemetryReading &r) {
     }
 }
 
-vector<XYZReading> StateEstimator::pollLocations() {
-    return vector<XYZReading>();
+vector<Data3D> StateEstimator::pollLocations() {
+    return vector<Data3D>();
 }
