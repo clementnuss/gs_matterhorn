@@ -39,6 +39,7 @@ private:
                 {CommunicationsConstants::TELEMETRY_TYPE, TELEMETRY},
                 {CommunicationsConstants::EVENT_TYPE,     EVENT},
                 {CommunicationsConstants::CONTROL_TYPE,   CONTROL},
+                {CommunicationsConstants::GPS_TYPE,       GPS}
         };
     }
 

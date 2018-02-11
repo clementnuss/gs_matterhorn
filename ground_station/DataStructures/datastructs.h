@@ -70,6 +70,26 @@ struct ControlStatus : TimedData, IDeserializable {
     uint16_t statusValue_;
 };
 
+struct GPSPacket : TimedData, IDeserializable {
+    GPSPacket() = default;
+
+    GPSPacket(const GPSPacket &that) = default;
+
+    GPSPacket(uint32_t timestamp, uint8_t satsCount, float rssi, float latitude, float longitude, float altitude) :
+            TimedData{timestamp},
+            satsCount_{satsCount},
+            rssi_{rssi},
+            latitude_{latitude},
+            longitude_{longitude},
+            altitude_{altitude} {}
+
+    uint8_t satsCount_;
+    float rssi_;
+    float latitude_;
+    float longitude_;
+    float altitude_;
+};
+
 struct XYZReading : ILoggable {
     XYZReading() : x_{0}, y_{0}, z_{0} {};
 

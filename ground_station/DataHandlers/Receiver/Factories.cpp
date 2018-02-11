@@ -119,3 +119,34 @@ shared_ptr<IDeserializable> Factories::telemetryControlFactory(std::vector<uint8
 
     return std::make_shared<ControlStatus>(r);
 }
+
+
+/**
+ * Builds a GPS struct given a sequence of bytes
+ *
+ * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
+ * @return A GPS struct
+ */
+shared_ptr<IDeserializable> Factories::telemetryGPSFactory(std::vector<uint8_t> payloadBuffer) {
+    assert(payloadBuffer.size() == PayloadType::GPS.length());
+
+    auto it = payloadBuffer.begin();
+
+    auto measurement_time = parse32<uint32_t>(it);
+
+    uint8_t satsCount = parse8<uint8_t>(it);
+
+    float_cast rssi = {.uint32 = parse32<uint32_t>(it)};
+    float_cast lat = {.uint32 = parse32<uint32_t>(it)};
+    float_cast lon = {.uint32 = parse32<uint32_t>(it)};
+    float_cast alt = {.uint32 = parse32<uint32_t>(it)};
+
+    GPSPacket g{measurement_time,
+                satsCount,
+                rssi.fl,
+                lat.fl,
+                lon.fl,
+                alt.fl};
+
+    return std::make_shared<GPSPacket>(g);
+}

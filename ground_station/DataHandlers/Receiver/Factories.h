@@ -22,6 +22,8 @@ public:
     static shared_ptr<IDeserializable> telemetryEventFactory(std::vector<uint8_t>);
 
     static shared_ptr<IDeserializable> telemetryControlFactory(std::vector<uint8_t>);
+
+    static shared_ptr<IDeserializable> telemetryGPSFactory(std::vector<uint8_t>);
 };
 
 
