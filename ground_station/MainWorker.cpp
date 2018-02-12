@@ -170,11 +170,11 @@ void Worker::mainRoutine() {
         }
     }
 
-    for (auto d : eventsData) {
+    for (auto const &d : eventsData) {
         displayEventData(d);
     }
 
-    for (auto d : gpsData) {
+    for (auto const &d : gpsData) {
         displayGPSData(d);
     }
 

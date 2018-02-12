@@ -152,7 +152,10 @@ void GSMainwindow::receiveEventData(EventPacket &event) {
  */
 void GSMainwindow::receiveGPSData(GPSPacket &gpsData) {
 
-    //TODO: process gps data
+    ui->gps_sats_value->setText(QString::number(gpsData.satsCount_));
+    ui->gps_rssi_value->setText(QString::number(gpsData.rssi_, 'f', UIConstants::PRECISION));
+    ui->gps_latitude_value->setText(QString::number(gpsData.latitude_, 'f', UIConstants::PRECISION));
+    ui->gps_longitude_value->setText(QString::number(gpsData.longitude_, 'f', UIConstants::PRECISION));
 }
 
 
