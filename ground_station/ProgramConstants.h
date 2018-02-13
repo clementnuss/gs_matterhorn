@@ -6,10 +6,22 @@
 #include "CRC/CRC.h"
 #include <QVector3D>
 #include <Qt3DRender/QLayer>
+#include <3D/CoordinateUtils.h>
 
 #define DEBUG false
 #define USE_TRACKING true
+#define USE_3D_MODULE true
 #define TEST3D true
+
+static const LatLon ORIGIN_3D_MODULE = {47.213905, 9.003724};
+static const LatLon LAUNCH_SITE_LATLON = ORIGIN_3D_MODULE;
+static const LatLon GS_LATLON = {47.213073, 8.997};
+static const std::string DEM_PATH_1 = "../../ground_station/data/N47E008.hgt";
+static const std::string DEM_PATH_2 = "../../ground_station/data/N47E009.hgt";
+static const GeoPoint DEM_TL_1{{47, 0, 0},
+                               {8,  0, 0}};
+static const GeoPoint DEM_TL_2{{47, 0, 0},
+                               {9,  0, 0}};
 
 namespace UnitsConstants {
     static constexpr float KNOTS_TO_MS = 0.514444;

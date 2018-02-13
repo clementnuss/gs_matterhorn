@@ -34,6 +34,8 @@ public:
 
     void setRealTimeMode();
 
+    const RootEntity *get3DModule();
+
 public slots:
 
     /* TELEMETRY-RELATED SLOTS */
@@ -114,9 +116,11 @@ signals:
 
 private:
 
-    void graphWidgetSetup();
+    void setupGraphWidgets();
 
-    void plotSetup(QCustomPlot *, QString, QColor, bool labelTimeAxis);
+    void setupPlots(QCustomPlot *, QString, QColor, bool labelTimeAxis);
+
+    void setup3DModule();
 
     void connectComponents();
 

@@ -30,7 +30,7 @@ GSMainwindow::GSMainwindow() :
 
     ui->setupUi(this);
 
-    graphWidgetSetup();
+    setupGraphWidgets();
     connectComponents();
     clockTimer.start(std::lround((1.0 / 60.0) * 1000));
 
@@ -38,30 +38,9 @@ GSMainwindow::GSMainwindow() :
     ui->graph_sync_button->setIcon(QIcon(":/UI/icons/sync.png"));
     ui->graph_autoplay_button->setIcon(QIcon(":/UI/icons/play.png"));
 
-    std::string tracePath{"../../ground_station/data/simulated_trajectory.csv"};
-    FileReader<QVector3D> traceReader{tracePath, posFromString};
-
-    traceData_ = QVector<QVector3D>::fromStdVector(traceReader.readFile());
-
-    auto *view = new Qt3DExtras::Qt3DWindow();
-    QWidget *container = QWidget::createWindowContainer(view);
-    container->setMinimumSize(QSize(200, 100));
-
-    auto *input = new Qt3DInput::QInputAspect;
-
-    view->registerAspect(input);
-
-    rootEntity3D_ = new RootEntity(view, nullptr);
-
-    view->setRootEntity(rootEntity3D_);
-
-    ui->visualisation_3D_layout->insertWidget(0, container);
-    ui->visualisation_3D_layout->setStretch(0, 3);
-    ui->visualisation_3D_layout->setStretch(1, 1);
-
-    connect(rootEntity3D_, &RootEntity::addInfoString, this, &GSMainwindow::registerInfoString);
-    connect(rootEntity3D_, &RootEntity::updateHighlightInfoString, this, &GSMainwindow::highlightInfoString);
-    rootEntity3D_->init();
+#if USE_3D_MODULE
+    setup3DModule();
+#endif
 }
 
 GSMainwindow::~GSMainwindow() {
@@ -310,14 +289,45 @@ void GSMainwindow::highlightInfoString(int lineNumber) {
     ui->visualisation_info_textedit->setTextCursor(cursor);
 }
 
+void GSMainwindow::setup3DModule() {
+    std::string tracePath{"../../ground_station/data/simulated_trajectory.csv"};
+    FileReader<QVector3D> traceReader{tracePath, posFromString};
+
+    traceData_ = QVector<QVector3D>::fromStdVector(traceReader.readFile());
+
+    auto *view = new Qt3DExtras::Qt3DWindow();
+    QWidget *container = QWidget::createWindowContainer(view);
+    container->setMinimumSize(QSize(200, 100));
+
+    auto *input = new Qt3DInput::QInputAspect;
+
+    view->registerAspect(input);
+
+    rootEntity3D_ = new RootEntity(view, nullptr);
+
+    view->setRootEntity(rootEntity3D_);
+
+    ui->visualisation_3D_layout->insertWidget(0, container);
+    ui->visualisation_3D_layout->setStretch(0, 3);
+    ui->visualisation_3D_layout->setStretch(1, 1);
+
+    connect(rootEntity3D_, &RootEntity::addInfoString, this, &GSMainwindow::registerInfoString);
+    connect(rootEntity3D_, &RootEntity::updateHighlightInfoString, this, &GSMainwindow::highlightInfoString);
+    rootEntity3D_->init();
+}
+
+const RootEntity *GSMainwindow::get3DModule() {
+    return rootEntity3D_;
+}
+
 /**
  * Setup the container widget which will hold and display all the QCustomPlot objects
  */
-void GSMainwindow::graphWidgetSetup() {
+void GSMainwindow::setupGraphWidgets() {
     QWidget *plotContainer = ui->plot_container;
 
-    plotSetup(plot1_, QStringLiteral("Altitude [m]"), QColor(180, 0, 0), true);
-    plotSetup(plot2_, QStringLiteral("Acceleration [G]"), QColor(0, 180, 0), false);
+    setupPlots(plot1_, QStringLiteral("Altitude [m]"), QColor(180, 0, 0), true);
+    setupPlots(plot2_, QStringLiteral("Acceleration [G]"), QColor(0, 180, 0), false);
 
     auto *layout = new QVBoxLayout(plotContainer);
     layout->addWidget(plot1_);
@@ -336,7 +346,7 @@ void GSMainwindow::graphWidgetSetup() {
  * @param title The title for the plot
  * @param color The color ot use to draw the plot
  */
-void GSMainwindow::plotSetup(QCustomPlot *plot, QString title, QColor color, bool labelTimeAxis) {
+void GSMainwindow::setupPlots(QCustomPlot *plot, QString title, QColor color, bool labelTimeAxis) {
     plot->setInteractions(interactionItemsOnly_);
     plot->plotLayout()->clear();
 

@@ -28,40 +28,41 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         splashDownPredictor_{nullptr},
         ground_{nullptr},
         windData_{nullptr},
-        registeredEvents_{} {
+        lastReportedAltitude_{0},
+        lastReportedXCoord_{0},
+        lastReportedYCoord_{0},
+        lastComputedPositionTime_{std::chrono::system_clock::now()},
+        lastComputedSpeed_{0, 0, 0},
+        lastComputedPosition_{0, 0, 0},
+        previousComputedPosition_{0, 0, 0},
+        registeredEvents_{},
+        worldRef_{{}} {
 
     initRenderSettings(view);
     initCamera(view);
 }
 
 void RootEntity::init() {
-    WorldReference worldRef{LatLon{47.213905, 9.003724}};
+    WorldReference ref{ORIGIN_3D_MODULE};
+    worldRef_ = ref;
 
 
-    GeoPoint gp1{{47, 0, 0},
-                 {8,  0, 0}};
-    GeoPoint gp2{{47, 0, 0},
-                 {9,  0, 0}};
-
-    std::string s1{"../../ground_station/data/N47E008.hgt"};
-    std::string s2{"../../ground_station/data/N47E009.hgt"};
-
-    DiscreteElevationModel discreteModel1{s1, gp1};
-    DiscreteElevationModel discreteModel2{s2, gp2};
+    DiscreteElevationModel discreteModel1{DEM_PATH_1, DEM_TL_1};
+    DiscreteElevationModel discreteModel2{DEM_PATH_2, DEM_TL_2};
 
     CompositeElevationModel compositeModel{&discreteModel1, &discreteModel2};
 
-    ContinuousElevationModel continuousModel{&compositeModel, &worldRef};
+    ContinuousElevationModel continuousModel{&compositeModel, &worldRef_};
 
-    LatLon gsLatLon = {47.213073, 8.997};
-    LatLon launchSiteLatLon = {47.213905, 9.003724};
-    launchSitePos_ = worldRef.worldPosAt(launchSiteLatLon, &continuousModel);
+    LatLon gsLatLon = GS_LATLON;
+    LatLon launchSiteLatLon = LAUNCH_SITE_LATLON;
+    launchSitePos_ = worldRef_.worldPosAt(launchSiteLatLon, &continuousModel);
     cameraController_->setCameraViewCenter(launchSitePos_);
 
+    //TODO: value escapes local scope. Reason for segfault when computing touchdown coordinates ?
+    ground_ = new Ground(this, &continuousModel, &worldRef_, 2);
 
-    ground_ = new Ground(this, &continuousModel, &worldRef, 2);
-
-    auto *gs = new GroundStation(worldRef.worldPosAt(gsLatLon, &continuousModel), TextureConstants::DOUBLE_DOWN_ARROW,
+    auto *gs = new GroundStation(worldRef_.worldPosAt(gsLatLon, &continuousModel), TextureConstants::DOUBLE_DOWN_ARROW,
                                  camera_, this);
 
     rocketTracker_ = new Tracker(launchSitePos_, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
@@ -110,6 +111,34 @@ void RootEntity::reportWindData() {
 
 }
 
+void RootEntity::updateFlightPosition(const Position &pos) {
+
+    QVector2D horizontalWorldPos = worldRef_.translationFromOrigin(pos.latLon);
+    previousComputedPosition_ = lastComputedPosition_;
+    lastComputedPosition_ = {horizontalWorldPos.x(), static_cast<float>(pos.altitude), horizontalWorldPos.y()};
+
+    double elapsedTime = msecsBetween(lastComputedPositionTime_, std::chrono::system_clock::now()) / 1000.0;
+
+    if (elapsedTime > 0 && previousComputedPosition_.length() > 0) {
+        lastComputedSpeed_ = (lastComputedPosition_ - previousComputedPosition_) / elapsedTime;
+
+        rocketTracker_->updatePosition(lastComputedPosition_);
+        rocketRuler_->updatePosition(lastComputedPosition_);
+        rocketTrace_->appendData(lastComputedPosition_);
+
+        splashDownPredictor_->updatePos(lastComputedPosition_);
+        splashDownPredictor_->updateSpeed(lastComputedSpeed_);
+        splashDownPredictor_->recomputePrediction();
+
+
+        emit updateHighlightInfoString(
+                UI3DConstants::WIND_REPORT_N_LINES -
+                static_cast<int>(lastComputedPosition_.y() / UI3DConstants::WIND_REPORT_INTERVAL));
+    }
+}
+
+
+//TODO: delete ?
 void RootEntity::updateRocketTracker(QVector<QVector3D> &positions, const QVector3D &speed) {
 
     static QVector3D accumulatedBias{0, 0, 0};

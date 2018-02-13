@@ -27,6 +27,7 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
         millisBetweenLastTwoPackets_{0},
         replayMode_{false},
         updateHandler_{false},
+        lastComputedPosition_{},
         telemetryHandler_{} {
 
     gsMainwindow->setRealTimeMode();
@@ -145,13 +146,16 @@ void Worker::mainRoutine() {
     }
 
     if (!sensorsData.empty()) {
+        SensorsPacket &lastSensorValue = *--sensorsData.end();
+
 #ifdef USE_TRACKING
-        moveTrackingSystem((*--sensorsData.end()).altitude_);
+        moveTrackingSystem(lastSensorValue.altitude_);
 #endif
+        lastComputedPosition_.altitude = lastSensorValue.altitude_;
 
         millisBetweenLastTwoPackets_ = msecsBetween(timeOfLastReceivedTelemetry_, now);
         timeOfLastReceivedTelemetry_ = now;
-        displaySensorData(*--sensorsData.end());
+        displaySensorData(lastSensorValue);
 
         QVector<QCPGraphData> altitudeDataBuffer = extractGraphData(sensorsData, altitudeFromReading);
         QVector<QCPGraphData> accelDataBuffer = extractGraphData(sensorsData, accelerationFromReading);
@@ -219,9 +223,15 @@ void Worker::displayEventData(EventPacket ep) {
  */
 void Worker::displayGPSData(GPSPacket gp) {
 
-    if (gp.timestamp_ != lastEventTimestamp_) {
+    if (gp.timestamp_ != lastGPSTimestamp_) {
         lastGPSTimestamp_ = gp.timestamp_;
+        lastComputedPosition_.latLon = {gp.latitude_, gp.longitude_};
         emit gpsDataReady(gp);
+
+
+#if USE_3D_MODULE
+        emit flightPositionReady(lastComputedPosition_);
+#endif
     }
 }
 

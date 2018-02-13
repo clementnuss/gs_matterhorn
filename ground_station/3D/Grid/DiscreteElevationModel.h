@@ -12,7 +12,7 @@
 class DiscreteElevationModel : public IDiscreteElevationModel {
 
 public:
-    explicit DiscreteElevationModel(std::string &filePath, GeoPoint &topLeftGeoPoint);
+    explicit DiscreteElevationModel(const std::string &filePath, const GeoPoint &topLeftGeoPoint);
 
     static double geoAngleToIndex(const GeoAngle &geoAngle);
 

@@ -8,6 +8,7 @@
 #include <cmath>
 #include <3D/Grid/ContinuousElevationModel.h>
 
+//TODO: make immutable
 class WorldReference {
 public:
     explicit WorldReference(const LatLon &origin) :
@@ -68,7 +69,7 @@ public:
     }
 
 private:
-    const LatLon origin_;
+    LatLon origin_;
     double arcNorthSouthDistance_;
     double arcWestEastDistance_;
 };

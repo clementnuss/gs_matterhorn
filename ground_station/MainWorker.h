@@ -8,6 +8,7 @@
 #include <chrono>
 #include <serial/serial.h>
 #include <boost/circular_buffer.hpp>
+#include <3D/CoordinateUtils.h>
 #include "UI/GraphFeature.h"
 #include "Loggers/FileLogger.h"
 
@@ -55,6 +56,8 @@ signals:
 
     void gpsDataReady(GPSPacket &);
 
+    void flightPositionReady(Position &);
+
     void graphDataReady(QVector<QCPGraphData> &, GraphFeature);
 
     void linkStatusReady(HandlerStatus);
@@ -93,6 +96,7 @@ private:
     FileLogger gpsLogger_;
     uint32_t lastEventTimestamp_;
     uint32_t lastGPSTimestamp_;
+    Position lastComputedPosition_;
     chrono::system_clock::time_point lastNumericalValuesUpdate_;
     chrono::system_clock::time_point lastIteration_;
     chrono::system_clock::time_point timeOfLastLinkCheck_;

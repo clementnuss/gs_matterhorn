@@ -21,8 +21,11 @@ public:
 
     void updateRocketTracker(QVector<QVector3D> &positions, const QVector3D &speed);
 
-    void registerEvent(const EventPacket &);
+    void registerEvent(const EventPacket &eventPacket);
 
+public slots:
+
+    void updateFlightPosition(const Position &pos);
 
 signals:
 
@@ -37,6 +40,16 @@ private:
     void initCamera(Qt3DExtras::Qt3DWindow *view);
 
     void reportWindData();
+
+    WorldReference worldRef_;
+
+    float lastReportedAltitude_;
+    float lastReportedXCoord_;
+    float lastReportedYCoord_;
+    QVector3D lastComputedSpeed_;
+    QVector3D lastComputedPosition_;
+    QVector3D previousComputedPosition_;
+    std::chrono::system_clock::time_point lastComputedPositionTime_;
 
     Ground *ground_;
     const WindData *windData_;

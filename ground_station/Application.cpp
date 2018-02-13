@@ -30,6 +30,15 @@ void Application::connectSlotsAndSignals() {
     qRegisterMetaType<vector<EventPacket>>("vector<RocketEvent>&");
     qRegisterMetaType<GraphFeature>("GraphFeature");
     qRegisterMetaType<HandlerStatus>("HandlerStatus");
+    qRegisterMetaType<Position>("Position");
+
+    //TODO: change those preprocessor commands for global variables
+#if USE_3D_MODULE
+    QObject::connect(worker_,
+                     &Worker::flightPositionReady,
+                     gsMainWindow_.get3DModule(),
+                     &RootEntity::updateFlightPosition);
+#endif
 
 
     QObject::connect(worker_,

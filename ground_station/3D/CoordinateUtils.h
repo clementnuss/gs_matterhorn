@@ -20,6 +20,10 @@ struct GeoPoint {
     GeoAngle longitude;
 };
 
+struct Position {
+    LatLon latLon;
+    double altitude;
+};
 
 static GeoPoint latLonToGeoPoint(const LatLon &latLon) {
 

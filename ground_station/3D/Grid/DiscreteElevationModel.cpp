@@ -3,7 +3,7 @@
 #include <3D/3DVisualisationConstants.h>
 #include "DiscreteElevationModel.h"
 
-DiscreteElevationModel::DiscreteElevationModel(std::string &filePath, GeoPoint &topLeftGeoPoint) {
+DiscreteElevationModel::DiscreteElevationModel(const std::string &filePath, const GeoPoint &topLeftGeoPoint) {
 
     int numberOfElements =
             (DiscreteElevationModel::MODEL_RESOLUTION + 1) * (DiscreteElevationModel::MODEL_RESOLUTION + 1);
