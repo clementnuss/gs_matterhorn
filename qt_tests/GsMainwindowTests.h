@@ -2,7 +2,7 @@
 #define GS_MATTERHORN_REPLAYTESTS_H
 
 #include <QtTest/QtTest>
-#include "UIWidget.h"
+#include "UI/UIWidget.h"
 
 class GsMainwindowTests : public QObject {
 Q_OBJECT

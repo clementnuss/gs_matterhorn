@@ -11,12 +11,13 @@ set(CMAKE_AUTOMOC ON)
 file(GLOB_RECURSE SOURCES "*.cpp")
 file(GLOB_RECURSE HEADERS "*.h")
 
-qt5_wrap_ui(UIS_HDRS ../ground_station/gswidget.ui)
+qt5_wrap_ui(UIS_HDRS ../ground_station/UI/gswidget.ui)
 qt5_add_resources(RESOURCES ../ground_station/qt_resources.qrc)
 
 add_executable(qt_tests ${SOURCES} ${HEADERS} ${UIS_HDRS} ${RESOURCES})
-add_test(qt_tests DummyTests)
-add_test(qt_tests IntervalTests)
+
+set_property(SOURCE ${CMAKE_BINARY_DIR}/qt_tests/ui_gswidget.h
+        ${CMAKE_BINARY_DIR}/qt_tests/qrc_qt_resources.cpp PROPERTY SKIP_AUTOGEN ON)
 
 # This will link_libraries for the specified Qt modules
 target_link_libraries(qt_tests Qt5::Test
@@ -26,5 +27,7 @@ target_link_libraries(qt_tests Qt5::Test
 
 # Include QCustomPlot libtrary and include file
 include_directories(${CMAKE_BINARY_DIR}/qcustomplot-src/)
+# Include serial library
+include_directories(${CMAKE_BINARY_DIR}/serial-src/include/)
 
 target_link_libraries(qt_tests ground_station_lib)

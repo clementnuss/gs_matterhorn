@@ -9,12 +9,16 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 
+qt5_wrap_ui(UIS_HDRS /UI/gswidget.ui)
 qt5_add_resources(RESOURCES qt_resources.qrc)
+
+set_property(SOURCE ${CMAKE_BINARY_DIR}/ground_station/ui_gswidget.h
+        ${CMAKE_BINARY_DIR}/ground_station/qrc_qt_resources.cpp PROPERTY SKIP_AUTOGEN ON)
 
 file(GLOB_RECURSE SOURCES "*.cpp")
 file(GLOB_RECURSE HEADERS "*.h")
 
-add_executable(ground_station ${SOURCES} ${HEADERS} ${RESOURCES})
+add_executable(ground_station ${SOURCES} ${UIS_HDRS} ${HEADERS} ${RESOURCES})
 add_library(ground_station_lib ${SOURCES} ${HEADERS})
 
 # Include QCustomPlot libtrary and include file

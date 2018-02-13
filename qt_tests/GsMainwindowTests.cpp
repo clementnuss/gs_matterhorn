@@ -5,10 +5,10 @@
 #include "GsMainwindowTests.h"
 
 void GsMainwindowTests::telemetryReadingCorrectlyDisplayed() {
-    qRegisterMetaType<TelemetryReading>("TelemetryReading");
+    qRegisterMetaType<SensorsPacket>("TelemetryReading");
     qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>&");
     qRegisterMetaType<QVector<QVector3D>>("QVector<QVector3D>&");
-    qRegisterMetaType<vector<RocketEvent>>
+    qRegisterMetaType<vector<EventPacket>>
             ("vector<RocketEvent>&");
     qRegisterMetaType<GraphFeature>("GraphFeature");
     qRegisterMetaType<HandlerStatus>("HandlerStatus");
@@ -24,9 +24,9 @@ void GsMainwindowTests::telemetryReadingCorrectlyDisplayed() {
     QCOMPARE(gsMainWindow_.ui->telemetry_speed_value->text().toStdString(), "0.0");
     QCOMPARE(gsMainWindow_.ui->telemetry_temperature_value->text().toStdString(), "0.0");
 
-    TelemetryReading r{1, 100.14, {1, 0, 0}, {1, 1, 1}, {1, 1, 1},
-                       40.14, 25.086, 15.149, 1234};
-    gsMainWindow_.updateTelemetry(r);
+    SensorsPacket r{1, 100.14, {1, 0, 0}, {1, 1, 1}, {1, 1, 1},
+                    40.14, 25.086, 15.149, 1234};
+    gsMainWindow_.receiveSensorData(r);
 
     QCOMPARE(gsMainWindow_.ui->telemetry_yaw_value->text().toStdString(), "1.00");
     QCOMPARE(gsMainWindow_.ui->telemetry_pitch_value->text().toStdString(), "1.00");
