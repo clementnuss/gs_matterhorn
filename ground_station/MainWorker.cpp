@@ -318,7 +318,7 @@ void Worker::reversePlayback(bool reversed) {
     telemReplay->setPlaybackReversed(reversed);
 }
 
-//TODO: determine wether a non working handler should be used or not
+//TODO: determine whether a non working handler should be used or not
 
 
 void Worker::defineReplayMode(const QString &parameters) {
