@@ -67,16 +67,16 @@ struct GPSPacket : TimedData, ILoggable, IDeserializable {
 
     GPSPacket(const GPSPacket &that) = default;
 
-    GPSPacket(uint32_t timestamp, uint8_t satsCount, float rssi, float latitude, float longitude, float altitude) :
+    GPSPacket(uint32_t timestamp, uint8_t satsCount, float hdop, float latitude, float longitude, float altitude) :
             TimedData{timestamp},
             satsCount_{satsCount},
-            rssi_{rssi},
+            hdop_{hdop},
             latitude_{latitude},
             longitude_{longitude},
             altitude_{altitude} {}
 
     uint8_t satsCount_;
-    float rssi_;
+    float hdop_;
     float latitude_;
     float longitude_;
     float altitude_;
@@ -85,7 +85,7 @@ struct GPSPacket : TimedData, ILoggable, IDeserializable {
         stringstream ss;
 
         ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << satsCount_
-           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << rssi_
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << hdop_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << latitude_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << longitude_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << altitude_;

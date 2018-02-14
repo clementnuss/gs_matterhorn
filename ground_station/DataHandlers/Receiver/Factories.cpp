@@ -136,17 +136,17 @@ shared_ptr<IDeserializable> Factories::telemetryGPSFactory(std::vector<uint8_t> 
 
     uint8_t satsCount = parse8<uint8_t>(it);
 
-    float_cast rssi = {.uint32 = parse32<uint32_t>(it)};
+    float_cast hdop = {.uint32 = parse32<uint32_t>(it)};
     float_cast lat = {.uint32 = parse32<uint32_t>(it)};
     float_cast lon = {.uint32 = parse32<uint32_t>(it)};
-    float_cast alt = {.uint32 = parse32<uint32_t>(it)};
+    int32_t alt = parse32<int32_t>(it);
 
     GPSPacket g{measurement_time,
                 satsCount,
-                rssi.fl,
+                hdop.fl,
                 lat.fl,
                 lon.fl,
-                alt.fl};
+                alt / 100.0f};
 
     return std::make_shared<GPSPacket>(g);
 }

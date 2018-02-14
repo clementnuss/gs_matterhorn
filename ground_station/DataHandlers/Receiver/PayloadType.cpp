@@ -24,7 +24,7 @@ const PayloadType PayloadType::EVENT{CommunicationsConstants::EVENT_TYPE, 5, &Fa
 const PayloadType PayloadType::CONTROL{CommunicationsConstants::CONTROL_TYPE, 7, &Factories::telemetryControlFactory};
 
 /*
- *  [TIMESTAMP | SATS NUM | RSSI | LAT | LON | ALT ]        Field name
+ *  [TIMESTAMP | SATS NUM | HDOP | LAT | LON | ALT ]        Field name
  *       4          1         4     4     4     4           Size in bytes 21
  */
 const PayloadType PayloadType::GPS{CommunicationsConstants::GPS_TYPE, 21, &Factories::telemetryGPSFactory};

@@ -120,7 +120,7 @@ createControlDatagram(uint32_t seqnum, uint32_t timestamp, int8_t partCode, uint
 
 static vector<uint8_t>
 createGPSDatagram(uint32_t seqnum, uint32_t timestamp, uint8_t satCount, float rssi, float latitude, float longitude,
-                  float altitude) {
+                  int altitude) {
 
     std::vector<uint8_t> datagram{};
     std::vector<uint8_t> checksumAccumulator{};
@@ -133,7 +133,7 @@ createGPSDatagram(uint32_t seqnum, uint32_t timestamp, uint8_t satCount, float r
     pushFloat(&datagram, &checksumAccumulator, rssi);
     pushFloat(&datagram, &checksumAccumulator, latitude);
     pushFloat(&datagram, &checksumAccumulator, longitude);
-    pushFloat(&datagram, &checksumAccumulator, altitude);
+    pushInteger(&datagram, &checksumAccumulator, altitude);
 
     pushChecksum(&datagram, CRC::Calculate(&checksumAccumulator[0], checksumAccumulator.size(),
                                            CommunicationsConstants::CRC_16_GENERATOR_POLY));
@@ -481,7 +481,7 @@ TEST(DecoderTests, singleGPSPacket) {
     float rssi{1234};
     float latitude{12.4587};
     float longitude{45.4537};
-    float altitude{123.4167};
+    int altitude{12300};
 
     vector<uint8_t> datagram = createGPSDatagram(seqnum, timestamp, satsCount, rssi, latitude, longitude, altitude);
     Datagram d{};
@@ -492,10 +492,10 @@ TEST(DecoderTests, singleGPSPacket) {
     EXPECT_EQ(seqnum, d.sequenceNumber_);
     EXPECT_EQ(timestamp, data.get()->timestamp_);
     EXPECT_EQ(satsCount, data.get()->satsCount_);
-    EXPECT_NEAR(rssi, data.get()->rssi_, epsilon);
+    EXPECT_NEAR(rssi, data.get()->hdop_, epsilon);
     EXPECT_NEAR(latitude, data.get()->latitude_, epsilon);
     EXPECT_NEAR(longitude, data.get()->longitude_, epsilon);
-    EXPECT_NEAR(altitude, data.get()->altitude_, epsilon);
+    EXPECT_NEAR(altitude / 100.0f, data.get()->altitude_, epsilon);
 }
 
 
@@ -507,6 +507,7 @@ TEST(DecoderTests, multipleGPSPackets) {
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
     Rand<uint32_t> uint32Rand;
+    Rand<int32_t> int32Rand(10000000, 10000000);
     Rand<uint8_t> uint8Rand;
     Rand<float> floatRand(-100000.0f, 100000.0f);
 
@@ -518,7 +519,7 @@ TEST(DecoderTests, multipleGPSPackets) {
         float rssi = floatRand();
         float latitude = floatRand();
         float longitude = floatRand();
-        float altitude = floatRand();
+        int altitude = int32Rand();
 
         vector<uint8_t> datagram = createGPSDatagram(seqnum, timestamp, satsCount, rssi, latitude, longitude, altitude);
         Datagram d{};
@@ -529,10 +530,10 @@ TEST(DecoderTests, multipleGPSPackets) {
         EXPECT_EQ(seqnum, d.sequenceNumber_);
         EXPECT_EQ(timestamp, data.get()->timestamp_);
         EXPECT_EQ(satsCount, data.get()->satsCount_);
-        EXPECT_NEAR(rssi, data.get()->rssi_, epsilon);
+        EXPECT_NEAR(rssi, data.get()->hdop_, epsilon);
         EXPECT_NEAR(latitude, data.get()->latitude_, epsilon);
         EXPECT_NEAR(longitude, data.get()->longitude_, epsilon);
-        EXPECT_NEAR(altitude, data.get()->altitude_, epsilon);
+        EXPECT_NEAR(altitude / 100.0f, data.get()->altitude_, epsilon);
     }
 }
 
