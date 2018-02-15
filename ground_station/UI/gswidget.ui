@@ -600,45 +600,22 @@
                                     </widget>
                                 </item>
                                 <item>
-                                    <spacer name="horizontalSpacer_2">
-                                        <property name="orientation">
-                                            <enum>Qt::Horizontal</enum>
-                                        </property>
-                                        <property name="sizeType">
-                                            <enum>QSizePolicy::Maximum</enum>
-                                        </property>
-                                        <property name="sizeHint" stdset="0">
-                                            <size>
-                                                <width>40</width>
-                                                <height>20</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                </item>
-                                <item>
-                                    <widget class="QLabel" name="gps_rssi">
+                                    <widget class="QLabel" name="gps_hdop">
                                         <property name="text">
-                                            <string>RSSI</string>
+                                            <string>HDOP</string>
                                         </property>
                                         <property name="alignment">
-                                            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                                            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                                         </property>
                                     </widget>
                                 </item>
                                 <item>
-                                    <widget class="QLabel" name="gps_rssi_value">
+                                    <widget class="QLabel" name="gps_hdop_value">
                                         <property name="text">
                                             <string>0</string>
                                         </property>
                                         <property name="alignment">
-                                            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                                        </property>
-                                    </widget>
-                                </item>
-                                <item>
-                                    <widget class="QLabel" name="gps_rssi_units">
-                                        <property name="text">
-                                            <string>dB</string>
+                                            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                                         </property>
                                     </widget>
                                 </item>
