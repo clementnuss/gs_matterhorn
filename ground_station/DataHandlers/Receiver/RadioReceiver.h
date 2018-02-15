@@ -56,6 +56,7 @@ private:
     FileLogger bytesLogger_;
     boost::lockfree::spsc_queue<SensorsPacket> sensorsDataQueue_;
     boost::lockfree::spsc_queue<EventPacket> eventsDataQueue_;
+    boost::lockfree::spsc_queue<ControlPacket> controlDataQueue_;
     boost::lockfree::spsc_queue<GPSPacket> gpsDataQueue_;
 
 };

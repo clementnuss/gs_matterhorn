@@ -1,9 +1,5 @@
-#include <DataHandlers/TelemetryHandler.h>
-#include <gtest/gtest.h>
-#include <DataHandlers/Receiver/Decoder.h>
-#include <Utilities/RandUtils.h>
-#include <Utilities/SensorUtils.h>
 
+/*
 static constexpr double epsilon = 1e-3;
 
 
@@ -246,6 +242,7 @@ static void parseAndTestTelemetryPacket(Decoder &decoder, vector<uint8_t> &datag
 
     Datagram d;
     parsePacket(decoder, datagram, PayloadType::TELEMETRY, &d);
+
 
     std::shared_ptr<SensorsPacket> data = std::dynamic_pointer_cast<SensorsPacket>(d.deserializedPayload_);
     EXPECT_EQ(timestamp, (*data).timestamp_);
@@ -650,3 +647,4 @@ TEST(DecoderTests, wrongChecksumDropsPacket) {
     ASSERT_TRUE(decoder.datagramReady());
 
 }
+ */

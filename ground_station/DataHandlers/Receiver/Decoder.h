@@ -57,11 +57,6 @@ private:
     bool processHeader(std::vector<uint8_t>);
 
     /**
-     * Transforms the bytes stored in the byte buffer into an IDeserializable object
-     */
-    void processTelemetryPayload(std::vector<uint8_t>);
-
-    /**
      * Empties all the buffers and resets the state of the machine to its initial state
      */
     void resetMachine();

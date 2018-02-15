@@ -26,13 +26,11 @@ public:
     static const std::map<int, PayloadType> TYPES_TABLE;
 
 private:
-    int code_;
-    size_t length_;
+    const int code_;
+    const size_t length_;
 
-    std::shared_ptr<IDeserializable> (*factoryFunc_)(std::vector<uint8_t>);
-
-    PayloadType(int code, size_t length, std::shared_ptr<IDeserializable>(*factoryFunc)(std::vector<uint8_t>)) :
-            code_{code}, length_{length}, factoryFunc_{factoryFunc} {}
+    PayloadType(int code, size_t length) :
+            code_{code}, length_{length} {}
 
     static std::map<int, PayloadType> createPayloadTypesMap() {
         return std::map<int, PayloadType>{
@@ -58,22 +56,10 @@ public:
 
     /**
      *
-     * @return The code associated with this payload type.
-     */
-    int code() const {
-        return code_;
-    }
-
-    /**
-     *
      * @return The length associated with this payload type.
      */
     size_t length() const {
         return length_;
-    }
-
-    std::shared_ptr<IDeserializable> process(std::vector<uint8_t> bytes) const {
-        return factoryFunc_(bytes);
     }
 
     /**

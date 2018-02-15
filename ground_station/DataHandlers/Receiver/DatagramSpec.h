@@ -7,7 +7,7 @@
 #include <vector>
 #include <memory>
 #include "DataStructures/datastructs.h"
-#include "Factories.h"
+#include "PayloadDataConverter.h"
 #include "PayloadType.h"
 
 typedef uint16_t checksum_t;
@@ -23,10 +23,10 @@ enum class DecodingState {
 };
 
 struct Datagram {
-    Datagram() : sequenceNumber_{0}, payloadType_{nullptr}, deserializedPayload_{}, complete{false} {}
+    Datagram() : sequenceNumber_{0}, payloadType_{nullptr}, payloadData_{}, complete{false} {}
     uint32_t sequenceNumber_;
     const PayloadType *payloadType_;
-    std::shared_ptr<IDeserializable> deserializedPayload_;
+    std::vector<uint8_t> payloadData_;
     bool complete;
 };
 

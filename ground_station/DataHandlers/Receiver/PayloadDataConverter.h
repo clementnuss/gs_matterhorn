@@ -14,16 +14,16 @@ typedef union {
     uint32_t uint32;
 } float_cast;
 
-class Factories {
+class PayloadDataConverter {
 
 public:
-    static shared_ptr<IDeserializable> telemetryReadingFactory(std::vector<uint8_t>);
+    static SensorsPacket toSensorsPacket(const std::vector<uint8_t> &);
 
-    static shared_ptr<IDeserializable> telemetryEventFactory(std::vector<uint8_t>);
+    static EventPacket toEventPacket(const std::vector<uint8_t> &);
 
-    static shared_ptr<IDeserializable> telemetryControlFactory(std::vector<uint8_t>);
+    static ControlPacket toControlPacket(const std::vector<uint8_t> &);
 
-    static shared_ptr<IDeserializable> telemetryGPSFactory(std::vector<uint8_t>);
+    static GPSPacket toGPSPacket(const vector<uint8_t> &);
 };
 
 

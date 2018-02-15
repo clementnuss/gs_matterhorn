@@ -1,7 +1,7 @@
 #include <memory>
 #include <cassert>
 #include <Utilities/SensorUtils.h>
-#include "Factories.h"
+#include "PayloadDataConverter.h"
 #include "Utilities/ParsingUtilities.h"
 #include "DatagramSpec.h"
 
@@ -11,7 +11,8 @@
  * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
  * @return A Telemetry struct
  */
-shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8_t> payloadBuffer) {
+
+SensorsPacket PayloadDataConverter::toSensorsPacket(const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::TELEMETRY.length());
 
     auto it = payloadBuffer.begin();
@@ -49,17 +50,15 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
 
     double air_speed = airSpeedFromPitotPressure(pitotPressure);
 
-    SensorsPacket r{measurement_time,
-                    altitude,
-                    {ax, ay, az},
-                    {mx, my, mz},
-                    {gx, gy, gz},
-                    pressure_hPa,
-                    temperature.fl,
-                    air_speed,
-                    0};
-
-    return std::make_shared<SensorsPacket>(r);
+    return {measurement_time,
+            altitude,
+            {ax, ay, az},
+            {mx, my, mz},
+            {gx, gy, gz},
+            pressure_hPa,
+            temperature.fl,
+            air_speed,
+            0};
 }
 
 /**
@@ -68,7 +67,7 @@ shared_ptr<IDeserializable> Factories::telemetryReadingFactory(std::vector<uint8
  * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
  * @return An Event struct
  */
-shared_ptr<IDeserializable> Factories::telemetryEventFactory(std::vector<uint8_t> payloadBuffer) {
+EventPacket PayloadDataConverter::toEventPacket(const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::EVENT.length());
 
     auto it = payloadBuffer.begin();
@@ -87,7 +86,7 @@ shared_ptr<IDeserializable> Factories::telemetryEventFactory(std::vector<uint8_t
         r.code = RocketEventConstants::INVALID_EVENT_CODE;
     }
 
-    return std::make_shared<EventPacket>(r);
+    return r;
 }
 
 /**
@@ -96,7 +95,7 @@ shared_ptr<IDeserializable> Factories::telemetryEventFactory(std::vector<uint8_t
  * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
  * @return A Control struct
  */
-shared_ptr<IDeserializable> Factories::telemetryControlFactory(std::vector<uint8_t> payloadBuffer) {
+ControlPacket PayloadDataConverter::toControlPacket(const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::CONTROL.length());
 
     auto it = payloadBuffer.begin();
@@ -117,7 +116,7 @@ shared_ptr<IDeserializable> Factories::telemetryControlFactory(std::vector<uint8
         r.statusValue_ = ControlConstants::INVALID_STATUS_VALUE;
     }
 
-    return std::make_shared<ControlPacket>(r);
+    return r;
 }
 
 
@@ -127,7 +126,7 @@ shared_ptr<IDeserializable> Factories::telemetryControlFactory(std::vector<uint8
  * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
  * @return A GPS struct
  */
-shared_ptr<IDeserializable> Factories::telemetryGPSFactory(std::vector<uint8_t> payloadBuffer) {
+GPSPacket PayloadDataConverter::toGPSPacket(const vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::GPS.length());
 
     auto it = payloadBuffer.begin();
@@ -141,12 +140,10 @@ shared_ptr<IDeserializable> Factories::telemetryGPSFactory(std::vector<uint8_t> 
     float_cast lon = {.uint32 = parse32<uint32_t>(it)};
     int32_t alt = parse32<int32_t>(it);
 
-    GPSPacket g{measurement_time,
-                satsCount,
-                hdop.fl,
-                lat.fl,
-                lon.fl,
+    return {measurement_time,
+            satsCount,
+            hdop.fl,
+            lat.fl,
+            lon.fl,
                 alt / 100.0f};
-
-    return std::make_shared<GPSPacket>(g);
 }

@@ -14,7 +14,7 @@
  */
 RadioReceiver::RadioReceiver(string portAddress)
         : byteDecoder_{}, devicePort_{std::move(portAddress)}, serialPort_{}, thread_{},
-          recvBuffer_{}, sensorsDataQueue_{100}, eventsDataQueue_{100}, gpsDataQueue_{100},
+          recvBuffer_{}, sensorsDataQueue_{100}, eventsDataQueue_{100}, controlDataQueue_{100}, gpsDataQueue_{100},
           bytesLogger_{LogConstants::BYTES_LOG_PATH} {
 
     vector<serial::PortInfo> devices_found = serial::list_ports();
@@ -141,25 +141,22 @@ void RadioReceiver::handleReceive(std::size_t bytesTransferred) {
 
 void RadioReceiver::unpackPayload() {
     Datagram d = byteDecoder_.retrieveDatagram();
-//    cout << d.sequenceNumber_ << endl;
-    if (d.payloadType_->code() == PayloadType::TELEMETRY.code()) {
-        auto data = std::dynamic_pointer_cast<SensorsPacket>(
-                d.deserializedPayload_);
-        sensorsDataQueue_.push(*data);
-    } else if (d.payloadType_->code() == PayloadType::EVENT.code()) {
-        auto data = std::dynamic_pointer_cast<EventPacket>(
-                d.deserializedPayload_);
-        eventsDataQueue_.push(*data);
-    }/* else if (d.payloadType_->code() == PayloadType::CONTROL.code()) {
-        auto data = std::dynamic_pointer_cast<ControlPacket>(
-                d.deserializedPayload_);
-        controlDataQueue.push(*data);
-    }*/ else if (d.payloadType_->code() == PayloadType::GPS.code()) {
-        auto data = std::dynamic_pointer_cast<GPSPacket>(
-                d.deserializedPayload_);
-        gpsDataQueue_.push(*data);
-    } else {
-        std::cout << "Wrong datagram payload type!";
+
+    switch (int(d.payloadType_)) {
+        case CommunicationsConstants::TELEMETRY_TYPE:
+            sensorsDataQueue_.push(PayloadDataConverter::toSensorsPacket(d.payloadData_));
+            break;
+        case CommunicationsConstants::EVENT_TYPE:
+            eventsDataQueue_.push(PayloadDataConverter::toEventPacket(d.payloadData_));
+            break;
+        case CommunicationsConstants::CONTROL_TYPE:
+            controlDataQueue_.push(PayloadDataConverter::toControlPacket(d.payloadData_));
+            break;
+        case CommunicationsConstants::GPS_TYPE:
+            gpsDataQueue_.push(PayloadDataConverter::toGPSPacket(d.payloadData_));
+            break;
+        default:
+            break;
     }
 }
 

@@ -55,14 +55,6 @@ bool Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
     };
 }
 
-
-void Decoder::processTelemetryPayload(std::vector<uint8_t> payloadBuffer) {
-
-    currentDatagram_.deserializedPayload_ = std::move(
-            currentDatagram_.payloadType_->process(payloadBuffer)
-    );
-}
-
 bool Decoder::datagramReady() {
     return currentDatagram_.complete;
 }
@@ -143,7 +135,7 @@ void Decoder::accumulatePayload(uint8_t byte) {
     checksumAccumulator_.push_back(byte);
 
     if (byteBuffer_.size() == currentDatagram_.payloadType_->length()) {
-        processTelemetryPayload(byteBuffer_);
+        currentDatagram_.payloadData_ = byteBuffer_;
         byteBuffer_.clear();
         jumpToNextState();
     }
@@ -170,7 +162,7 @@ bool Decoder::validatePayload() {
     uint16_t crc = CRC::Calculate(&checksumAccumulator_[0], checksumAccumulator_.size(),
                                   CommunicationsConstants::CRC_16_GENERATOR_POLY);
 
-    auto it = byteBuffer_.begin();
+    std::vector<uint8_t>::const_iterator it = byteBuffer_.begin();
     auto receivedCRC = parse16<checksum_t>(it);
 
     if (crc == receivedCRC) {
