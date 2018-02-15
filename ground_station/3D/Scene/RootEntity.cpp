@@ -111,7 +111,7 @@ void RootEntity::reportWindData() {
 
 }
 
-void RootEntity::updateFlightPosition(const Position &pos) {
+void RootEntity::updateFlightPosition(const Position pos) {
 
     QVector2D horizontalWorldPos = worldRef_.translationFromOrigin(pos.latLon);
     previousComputedPosition_ = lastComputedPosition_;

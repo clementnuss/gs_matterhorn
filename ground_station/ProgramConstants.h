@@ -9,7 +9,7 @@
 #include <3D/CoordinateUtils.h>
 
 #define DEBUG false
-#define USE_TRACKING true
+#define USE_TRACKING false
 #define USE_3D_MODULE true
 #define TEST3D true
 

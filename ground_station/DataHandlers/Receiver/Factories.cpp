@@ -134,7 +134,7 @@ shared_ptr<IDeserializable> Factories::telemetryGPSFactory(std::vector<uint8_t> 
 
     auto measurement_time = parse32<uint32_t>(it);
 
-    uint8_t satsCount = parse8<uint8_t>(it);
+    auto satsCount = parse8<uint8_t>(it);
 
     float_cast hdop = {.uint32 = parse32<uint32_t>(it)};
     float_cast lat = {.uint32 = parse32<uint32_t>(it)};

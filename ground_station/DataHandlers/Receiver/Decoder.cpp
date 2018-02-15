@@ -48,7 +48,7 @@ bool Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
         ss << setw(PrintConstants::FIELD_WIDTH) << msecsBetween(startupTime_, std::chrono::system_clock::now());
         ss << PrintConstants::DELIMITER;
         ss << "Wrong datagram payload type: ";
-        ss << std::hex << static_cast<int>(payloadType);
+        ss << "0x" << setw(2) << setfill('0') << std::hex << static_cast<int>(payloadType);
         logger_.registerString(ss.str());
 
         return false;

@@ -52,11 +52,11 @@ signals:
 
     void sensorsDataReady(SensorsPacket);
 
-    void eventDataReady(EventPacket &);
+    void eventDataReady(EventPacket);
 
-    void gpsDataReady(GPSPacket &);
+    void gpsDataReady(GPSPacket);
 
-    void flightPositionReady(Position &);
+    void flightPositionReady(Position);
 
     void graphDataReady(QVector<QCPGraphData> &, GraphFeature);
 
@@ -71,11 +71,11 @@ private:
 
     void checkLinkStatuses();
 
-    void displaySensorData(SensorsPacket);
+    void displaySensorData(SensorsPacket&);
 
-    void displayEventData(EventPacket);
+    void displayEventData(EventPacket&);
 
-    void displayGPSData(GPSPacket);
+    void displayGPSData(GPSPacket&);
 
     bool trackingEnabled_{false};
     bool loggingEnabled_;

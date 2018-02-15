@@ -88,7 +88,7 @@ void GSMainwindow::updateTime() {
  *
  * @param t The Telemetry object from which to extract data to update the display
  */
-void GSMainwindow::receiveSensorData(SensorsPacket t) {
+void GSMainwindow::receiveSensorData(const SensorsPacket t) {
     ui->telemetry_altitude_value->setText(QString::number(t.altitude_, 'f', UIConstants::PRECISION));
     ui->telemetry_speed_value->setText(QString::number(t.air_speed_, 'f', UIConstants::PRECISION));
     ui->telemetry_acceleration_value->setText(QString::number(t.acceleration_.norm(), 'f', UIConstants::PRECISION));
@@ -105,7 +105,7 @@ void GSMainwindow::receiveSensorData(SensorsPacket t) {
  *
  * @param event
  */
-void GSMainwindow::receiveEventData(EventPacket &event) {
+void GSMainwindow::receiveEventData(const EventPacket event) {
 
     int seconds = event.timestamp_ / TimeConstants::MSECS_IN_SEC;
     int minutes = seconds / TimeConstants::SECS_IN_MINUTE;
@@ -129,7 +129,7 @@ void GSMainwindow::receiveEventData(EventPacket &event) {
  *
  * @param gpsData
  */
-void GSMainwindow::receiveGPSData(GPSPacket &gpsData) {
+void GSMainwindow::receiveGPSData(const GPSPacket gpsData) {
 
     ui->gps_sats_value->setText(QString::number(gpsData.satsCount_));
     ui->gps_rssi_value->setText(QString::number(gpsData.hdop_, 'f', UIConstants::PRECISION));

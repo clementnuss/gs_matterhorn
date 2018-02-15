@@ -25,7 +25,7 @@ public:
 
 public slots:
 
-    void updateFlightPosition(const Position &pos);
+    void updateFlightPosition(const Position pos);
 
 signals:
 

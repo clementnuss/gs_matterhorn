@@ -41,7 +41,7 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
 
     telemetryHandler_ = unique_ptr<TelemetryHandler>{handler};
 
-#ifdef USE_TRACKING
+#if USE_TRACKING
     vector<serial::PortInfo> devices_found = serial::list_ports();
     if (!devices_found.empty()) {
         auto iter = devices_found.begin();
@@ -174,11 +174,11 @@ void Worker::mainRoutine() {
         }
     }
 
-    for (auto const &d : eventsData) {
+    for (auto &d : eventsData) {
         displayEventData(d);
     }
 
-    for (auto const &d : gpsData) {
+    for (auto &d : gpsData) {
         displayGPSData(d);
     }
 
@@ -192,7 +192,7 @@ void Worker::mainRoutine() {
  *
  * @param sp The SensorPacket to be displayed.
  */
-void Worker::displaySensorData(SensorsPacket sp) {
+void Worker::displaySensorData(SensorsPacket &sp) {
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
     long long elapsedMillis = msecsBetween(lastNumericalValuesUpdate_, now);
@@ -208,7 +208,7 @@ void Worker::displaySensorData(SensorsPacket sp) {
  *
  * @param ep The EventPacket to be displayed.
  */
-void Worker::displayEventData(EventPacket ep) {
+void Worker::displayEventData(EventPacket &ep) {
 
     if (ep.timestamp_ != lastEventTimestamp_) {
         lastEventTimestamp_ = ep.timestamp_;
@@ -221,7 +221,7 @@ void Worker::displayEventData(EventPacket ep) {
  *
  * @param gp The GPSPacket to be displayed.
  */
-void Worker::displayGPSData(GPSPacket gp) {
+void Worker::displayGPSData(GPSPacket &gp) {
 
     if (gp.timestamp_ != lastGPSTimestamp_) {
         lastGPSTimestamp_ = gp.timestamp_;
@@ -249,6 +249,8 @@ void Worker::updateLoggingStatus() {
 void Worker::toggleTracking() {
     trackingEnabled_ = !trackingEnabled_;
 
+#if USE_TRACKING
+
     double movAverage = 0;
     for (double i: altitudeBuffer_) {
         movAverage += i;
@@ -257,6 +259,7 @@ void Worker::toggleTracking() {
 
     SensorConstants::launchAltitude = static_cast<float>(movAverage);
     SensorConstants::trackingAltitude = static_cast<float>(movAverage + 1);
+#endif
 }
 
 /**

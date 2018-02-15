@@ -25,11 +25,10 @@ RadioReceiver::RadioReceiver(string portAddress)
             serial::PortInfo device = *iter++;
             /*printf("(%s, %s, %s)\n",
                    device.port.c_str(), device.description.c_str(), device.hardware_id.c_str());*/
-            if (device.hardware_id == "FTDIBUS\\COMPORT&VID_0403&PID_6015"){
+            if (device.hardware_id == "FTDIBUS\\COMPORT&VID_0403&PID_6015") {
                 devicePort_ = device.port;
             }
         }
-
 
 
         if (devicePort_.empty()) {
@@ -144,10 +143,21 @@ void RadioReceiver::unpackPayload() {
     Datagram d = byteDecoder_.retrieveDatagram();
 //    cout << d.sequenceNumber_ << endl;
     if (d.payloadType_->code() == PayloadType::TELEMETRY.code()) {
-        std::shared_ptr<SensorsPacket> data = std::dynamic_pointer_cast<SensorsPacket>(
+        auto data = std::dynamic_pointer_cast<SensorsPacket>(
                 d.deserializedPayload_);
-        //TODO: make sure that the memory behaviour is correct
         sensorsDataQueue_.push(*data);
+    } else if (d.payloadType_->code() == PayloadType::EVENT.code()) {
+        auto data = std::dynamic_pointer_cast<EventPacket>(
+                d.deserializedPayload_);
+        eventsDataQueue_.push(*data);
+    }/* else if (d.payloadType_->code() == PayloadType::CONTROL.code()) {
+        auto data = std::dynamic_pointer_cast<ControlPacket>(
+                d.deserializedPayload_);
+        controlDataQueue.push(*data);
+    }*/ else if (d.payloadType_->code() == PayloadType::GPS.code()) {
+        auto data = std::dynamic_pointer_cast<GPSPacket>(
+                d.deserializedPayload_);
+        gpsDataQueue_.push(*data);
     } else {
         std::cout << "Wrong datagram payload type!";
     }
