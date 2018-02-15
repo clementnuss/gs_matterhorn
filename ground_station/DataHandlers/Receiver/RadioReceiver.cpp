@@ -142,7 +142,7 @@ void RadioReceiver::handleReceive(std::size_t bytesTransferred) {
 void RadioReceiver::unpackPayload() {
     Datagram d = byteDecoder_.retrieveDatagram();
 
-    switch (int(d.payloadType_)) {
+    switch (d.payloadType_->code()) {
         case CommunicationsConstants::TELEMETRY_TYPE:
             sensorsDataQueue_.push(PayloadDataConverter::toSensorsPacket(d.payloadData_));
             break;

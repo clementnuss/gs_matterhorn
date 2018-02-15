@@ -56,6 +56,14 @@ public:
 
     /**
      *
+     * @return The code associated with this payload type.
+     */
+    int code() const {
+        return code_;
+    }
+
+    /**
+     *
      * @return The length associated with this payload type.
      */
     size_t length() const {
