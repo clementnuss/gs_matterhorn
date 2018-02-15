@@ -179,7 +179,8 @@ void Worker::mainRoutine() {
     }
 
     for (auto &d : gpsData) {
-        displayGPSData(d);
+        if (d.isValid())
+            displayGPSData(d);
     }
 
     QCoreApplication::sendPostedEvents(this);

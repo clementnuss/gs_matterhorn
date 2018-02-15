@@ -14,6 +14,8 @@ using namespace PrintConstants;
 
 struct IDeserializable {
     virtual ~IDeserializable() = default;
+
+    virtual bool isValid() const = 0;
 };
 
 struct TimedData {
@@ -48,6 +50,10 @@ struct EventPacket : TimedData, ILoggable, IDeserializable {
 
         return ss.str();
     }
+
+    bool isValid() const override {
+        return false;
+    }
 };
 
 struct ControlPacket : TimedData, IDeserializable {
@@ -60,6 +66,10 @@ struct ControlPacket : TimedData, IDeserializable {
 
     uint8_t partCode_;
     uint16_t statusValue_;
+
+    bool isValid() const override {
+        return false;
+    }
 };
 
 struct GPSPacket : TimedData, ILoggable, IDeserializable {
@@ -91,6 +101,12 @@ struct GPSPacket : TimedData, ILoggable, IDeserializable {
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << altitude_;
 
         return ss.str();
+    }
+
+    bool isValid() const override {
+        return (-90.0f <= latitude_ && latitude_ <= 90.0f)
+               &
+               (-180.0f <= longitude_ && longitude_ <= 180.0f);
     }
 };
 
@@ -215,6 +231,9 @@ struct SensorsPacket : TimedData, ILoggable, IDeserializable {
         gyroscope_ *= coeff;
     }
 
+    bool isValid() const override {
+        return false;
+    }
 };
 
 #endif // DATASTRUCTS_H
