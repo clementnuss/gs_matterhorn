@@ -117,7 +117,7 @@ void GSMainwindow::receiveEventData(const EventPacket event) {
        << setw(TimeConstants::SECS_AND_MINS_WIDTH) << setfill('0') << seconds % TimeConstants::SECS_IN_MINUTE
        << ":"
        << setw(TimeConstants::MSECS_WIDTH) << setfill('0') << event.timestamp_ % TimeConstants::MSECS_IN_SEC
-       << "    " << (event.description);
+       << "    " << (event.description_);
 
     ui->event_log->appendPlainText(QString::fromStdString(ss.str()));
 

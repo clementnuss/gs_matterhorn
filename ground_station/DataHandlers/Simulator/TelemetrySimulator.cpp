@@ -59,7 +59,7 @@ vector<EventPacket> TelemetrySimulator::pollEventsData() {
 
     if ((qrand() / static_cast<double>(RAND_MAX)) * EVENT_PROBABILITY_INTERVAL <= 1) {
         EventPacket r = generateEvent();
-        cout << "Generating event: " << r.description << endl;
+        cout << "Generating event: " << r.description_ << endl;
         v.push_back(r);
     }
 

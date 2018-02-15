@@ -31,20 +31,20 @@ struct EventPacket : TimedData, ILoggable, IDeserializable {
     EventPacket(const EventPacket &that) = default;
 
     EventPacket(uint32_t timestamp, int code, const std::string &description) :
-            TimedData{timestamp}, code{code}, description{std::move(description)} {}
+            TimedData{timestamp}, code_{code}, description_{std::move(description)} {}
 
     ~EventPacket() = default;
 
-    int code;
-    std::string description;
+    int code_;
+    std::string description_;
 
     string toString() const override {
         stringstream ss;
 
         ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << timestamp_
-           << setw(FIELD_WIDTH) << setfill(DELIMITER) << code
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << code_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << " "
-           << description;
+           << description_;
 
         return ss.str();
     }

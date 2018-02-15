@@ -80,10 +80,10 @@ EventPacket PayloadDataConverter::toEventPacket(const std::vector<uint8_t> &payl
     r.timestamp_ = measurement_time;
 
     if (RocketEventConstants::EVENT_CODES.find(eventCode) != RocketEventConstants::EVENT_CODES.end()) {
-        r.code = eventCode;
+        r.code_ = eventCode;
 
     } else {
-        r.code = RocketEventConstants::INVALID_EVENT_CODE;
+        r.code_ = RocketEventConstants::INVALID_EVENT_CODE;
     }
 
     return r;

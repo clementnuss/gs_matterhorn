@@ -1,5 +1,9 @@
+#include <DataHandlers/TelemetryHandler.h>
+#include <gtest/gtest.h>
+#include <DataHandlers/Receiver/Decoder.h>
+#include <Utilities/RandUtils.h>
+#include <Utilities/SensorUtils.h>
 
-/*
 static constexpr double epsilon = 1e-3;
 
 
@@ -243,22 +247,21 @@ static void parseAndTestTelemetryPacket(Decoder &decoder, vector<uint8_t> &datag
     Datagram d;
     parsePacket(decoder, datagram, PayloadType::TELEMETRY, &d);
 
-
-    std::shared_ptr<SensorsPacket> data = std::dynamic_pointer_cast<SensorsPacket>(d.deserializedPayload_);
-    EXPECT_EQ(timestamp, (*data).timestamp_);
-    EXPECT_NEAR(accelReading.x_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.x_, epsilon);
-    EXPECT_NEAR(accelReading.y_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.y_, epsilon);
-    EXPECT_NEAR(accelReading.z_ * SensorConstants::MPU_ACCEL_MULTIPLIER, (*data).acceleration_.z_, epsilon);
-    EXPECT_NEAR(gyroReading.x_, (*data).gyroscope_.x_, epsilon);
-    EXPECT_NEAR(gyroReading.y_, (*data).gyroscope_.y_, epsilon);
-    EXPECT_NEAR(gyroReading.z_, (*data).gyroscope_.z_, epsilon);
-    EXPECT_NEAR(magReading.x_, (*data).magnetometer_.x_, epsilon);
-    EXPECT_NEAR(magReading.y_, (*data).magnetometer_.y_, epsilon);
-    EXPECT_NEAR(magReading.z_, (*data).magnetometer_.z_, epsilon);
-    EXPECT_NEAR(temp, (*data).temperature_, epsilon);
-    EXPECT_NEAR(pres / 100.0f, (*data).pressure_, epsilon);
-    EXPECT_NEAR(altitudeFromPressure(pres / 100.0f), (*data).altitude_, epsilon);
-    EXPECT_NEAR(airSpeedFromPitotPressure(pitot), (*data).air_speed_, epsilon);
+    SensorsPacket data = PayloadDataConverter::toSensorsPacket(d.payloadData_);
+    EXPECT_EQ(timestamp, data.timestamp_);
+    EXPECT_NEAR(accelReading.x_ * SensorConstants::MPU_ACCEL_MULTIPLIER, data.acceleration_.x_, epsilon);
+    EXPECT_NEAR(accelReading.y_ * SensorConstants::MPU_ACCEL_MULTIPLIER, data.acceleration_.y_, epsilon);
+    EXPECT_NEAR(accelReading.z_ * SensorConstants::MPU_ACCEL_MULTIPLIER, data.acceleration_.z_, epsilon);
+    EXPECT_NEAR(gyroReading.x_, data.gyroscope_.x_, epsilon);
+    EXPECT_NEAR(gyroReading.y_, data.gyroscope_.y_, epsilon);
+    EXPECT_NEAR(gyroReading.z_, data.gyroscope_.z_, epsilon);
+    EXPECT_NEAR(magReading.x_, data.magnetometer_.x_, epsilon);
+    EXPECT_NEAR(magReading.y_, data.magnetometer_.y_, epsilon);
+    EXPECT_NEAR(magReading.z_, data.magnetometer_.z_, epsilon);
+    EXPECT_NEAR(temp, data.temperature_, epsilon);
+    EXPECT_NEAR(pres / 100.0f, data.pressure_, epsilon);
+    EXPECT_NEAR(altitudeFromPressure(pres / 100.0f), data.altitude_, epsilon);
+    EXPECT_NEAR(airSpeedFromPitotPressure(pitot), data.air_speed_, epsilon);
 }
 
 
@@ -361,10 +364,10 @@ TEST(DecoderTests, singleEventPacket) {
 
     parsePacket(decoder, datagram, PayloadType::EVENT, &d);
 
-    std::shared_ptr<EventPacket> data = std::dynamic_pointer_cast<EventPacket>(d.deserializedPayload_);
+    EventPacket data = PayloadDataConverter::toEventPacket(d.payloadData_);
     EXPECT_EQ(seqnum, d.sequenceNumber_);
-    EXPECT_EQ(timestamp, data.get()->timestamp_);
-    EXPECT_EQ(code, data.get()->code);
+    EXPECT_EQ(timestamp, data.timestamp_);
+    EXPECT_EQ(code, data.code_);
 }
 
 TEST(DecoderTests, multipleEventPackets) {
@@ -388,14 +391,14 @@ TEST(DecoderTests, multipleEventPackets) {
 
         parsePacket(decoder, datagram, PayloadType::EVENT, &d);
 
-        std::shared_ptr<EventPacket> data = std::dynamic_pointer_cast<EventPacket>(d.deserializedPayload_);
+        EventPacket data = PayloadDataConverter::toEventPacket(d.payloadData_);
         EXPECT_EQ(seqnum, d.sequenceNumber_);
-        EXPECT_EQ(timestamp, (*data).timestamp_);
+        EXPECT_EQ(timestamp, data.timestamp_);
         if (RocketEventConstants::EVENT_CODES.find(code)
             != RocketEventConstants::EVENT_CODES.end()) {
-            EXPECT_EQ(code, data.get()->code);
+            EXPECT_EQ(code, data.code_);
         } else {
-            EXPECT_EQ(RocketEventConstants::INVALID_EVENT_CODE, data.get()->code);
+            EXPECT_EQ(RocketEventConstants::INVALID_EVENT_CODE, data.code_);
         }
     }
 
@@ -417,11 +420,11 @@ TEST(DecoderTests, singleControlPacket) {
 
     parsePacket(decoder, datagram, PayloadType::CONTROL, &d);
 
-    std::shared_ptr<ControlPacket> data = std::dynamic_pointer_cast<ControlPacket>(d.deserializedPayload_);
+    ControlPacket data = PayloadDataConverter::toControlPacket(d.payloadData_);
     EXPECT_EQ(seqnum, d.sequenceNumber_);
-    EXPECT_EQ(timestamp, data.get()->timestamp_);
-    EXPECT_EQ(partCode, data.get()->partCode_);
-    EXPECT_EQ(statusValue, data.get()->statusValue_);
+    EXPECT_EQ(timestamp, data.timestamp_);
+    EXPECT_EQ(partCode, data.partCode_);
+    EXPECT_EQ(statusValue, data.statusValue_);
 
 }
 
@@ -449,17 +452,17 @@ TEST(DecoderTests, multipleControlPackets) {
 
         parsePacket(decoder, datagram, PayloadType::CONTROL, &d);
 
-        std::shared_ptr<ControlPacket> data = std::dynamic_pointer_cast<ControlPacket>(d.deserializedPayload_);
+        ControlPacket data = PayloadDataConverter::toControlPacket(d.payloadData_);
         EXPECT_EQ(seqnum, d.sequenceNumber_);
-        EXPECT_EQ(timestamp, data.get()->timestamp_);
+        EXPECT_EQ(timestamp, data.timestamp_);
 
         if (ControlConstants::CONTROL_PARTS_CODES.find(partCode)
             != ControlConstants::CONTROL_PARTS_CODES.end()) {
-            EXPECT_EQ(partCode, data.get()->partCode_);
-            EXPECT_EQ(statusValue, data.get()->statusValue_);
+            EXPECT_EQ(partCode, data.partCode_);
+            EXPECT_EQ(statusValue, data.statusValue_);
         } else {
-            EXPECT_EQ(ControlConstants::INVALID_PART_CODE, data.get()->partCode_);
-            EXPECT_EQ(ControlConstants::INVALID_STATUS_VALUE, data.get()->statusValue_);
+            EXPECT_EQ(ControlConstants::INVALID_PART_CODE, data.partCode_);
+            EXPECT_EQ(ControlConstants::INVALID_STATUS_VALUE, data.statusValue_);
         }
     }
 
@@ -485,14 +488,14 @@ TEST(DecoderTests, singleGPSPacket) {
 
     parsePacket(decoder, datagram, PayloadType::GPS, &d);
 
-    std::shared_ptr<GPSPacket> data = std::dynamic_pointer_cast<GPSPacket>(d.deserializedPayload_);
+    GPSPacket data = PayloadDataConverter::toGPSPacket(d.payloadData_);
     EXPECT_EQ(seqnum, d.sequenceNumber_);
-    EXPECT_EQ(timestamp, data.get()->timestamp_);
-    EXPECT_EQ(satsCount, data.get()->satsCount_);
-    EXPECT_NEAR(rssi, data.get()->hdop_, epsilon);
-    EXPECT_NEAR(latitude, data.get()->latitude_, epsilon);
-    EXPECT_NEAR(longitude, data.get()->longitude_, epsilon);
-    EXPECT_NEAR(altitude / 100.0f, data.get()->altitude_, epsilon);
+    EXPECT_EQ(timestamp, data.timestamp_);
+    EXPECT_EQ(satsCount, data.satsCount_);
+    EXPECT_NEAR(rssi, data.hdop_, epsilon);
+    EXPECT_NEAR(latitude, data.latitude_, epsilon);
+    EXPECT_NEAR(longitude, data.longitude_, epsilon);
+    EXPECT_NEAR(altitude / 100.0f, data.altitude_, epsilon);
 }
 
 
@@ -523,14 +526,14 @@ TEST(DecoderTests, multipleGPSPackets) {
 
         parsePacket(decoder, datagram, PayloadType::GPS, &d);
 
-        std::shared_ptr<GPSPacket> data = std::dynamic_pointer_cast<GPSPacket>(d.deserializedPayload_);
+        GPSPacket data = PayloadDataConverter::toGPSPacket(d.payloadData_);
         EXPECT_EQ(seqnum, d.sequenceNumber_);
-        EXPECT_EQ(timestamp, data.get()->timestamp_);
-        EXPECT_EQ(satsCount, data.get()->satsCount_);
-        EXPECT_NEAR(rssi, data.get()->hdop_, epsilon);
-        EXPECT_NEAR(latitude, data.get()->latitude_, epsilon);
-        EXPECT_NEAR(longitude, data.get()->longitude_, epsilon);
-        EXPECT_NEAR(altitude / 100.0f, data.get()->altitude_, epsilon);
+        EXPECT_EQ(timestamp, data.timestamp_);
+        EXPECT_EQ(satsCount, data.satsCount_);
+        EXPECT_NEAR(rssi, data.hdop_, epsilon);
+        EXPECT_NEAR(latitude, data.latitude_, epsilon);
+        EXPECT_NEAR(longitude, data.longitude_, epsilon);
+        EXPECT_NEAR(altitude / 100.0f, data.altitude_, epsilon);
     }
 }
 
@@ -647,4 +650,3 @@ TEST(DecoderTests, wrongChecksumDropsPacket) {
     ASSERT_TRUE(decoder.datagramReady());
 
 }
- */
