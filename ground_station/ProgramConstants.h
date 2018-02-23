@@ -85,7 +85,7 @@ namespace SimulatorConstants {
 }
 
 namespace SensorConstants {
-    static constexpr float MPU_ACCEL_RANGE = 8.0f;
+    static constexpr float MPU_ACCEL_RANGE = 16.0f;
     static constexpr uint32_t ACCEL_SENSITIVITY = 32768;
     static constexpr float MPU_ACCEL_MULTIPLIER = MPU_ACCEL_RANGE / ACCEL_SENSITIVITY;
 

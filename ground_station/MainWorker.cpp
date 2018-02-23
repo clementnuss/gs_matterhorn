@@ -241,6 +241,12 @@ void Worker::displayGPSData(GPSPacket &gp) {
  */
 void Worker::updateLoggingStatus() {
 
+    if (loggingEnabled_){
+        gpsLogger_.close();
+        sensorsLogger_.close();
+        eventsLogger_.close();
+    }
+
     loggingEnabled_ = !loggingEnabled_;
     emit loggingStatusReady(loggingEnabled_);
     cout << "Logging is now " << (loggingEnabled_ ? "enabled" : "disabled") << endl;
