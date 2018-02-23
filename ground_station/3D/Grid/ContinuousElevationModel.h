@@ -9,8 +9,8 @@ class WorldReference;
 class ContinuousElevationModel {
 
 public:
-    explicit ContinuousElevationModel(const IDiscreteElevationModel *const,
-                                      const WorldReference *const worldRef);
+    explicit ContinuousElevationModel(std::unique_ptr<const IDiscreteElevationModel>,
+                                      std::shared_ptr<const WorldReference>);
 
     //From https://cs108.epfl.ch/archive/17/p/03_elevation-models.html
     float elevationAt(const LatLon &latLon) const;
@@ -21,8 +21,8 @@ public:
     QVector3D slopeSample(const int latitudeIndex, const int longitudeIndex) const;
 
 private:
-    const IDiscreteElevationModel *const discreteModel_;
-    const WorldReference *const worldRef_;
+    std::unique_ptr<const IDiscreteElevationModel> discreteModel_;
+    std::shared_ptr<const WorldReference> worldRef_;
 };
 
 

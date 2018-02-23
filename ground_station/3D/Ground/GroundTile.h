@@ -11,8 +11,11 @@
 class GroundTile : public Qt3DCore::QEntity {
 Q_OBJECT
 public:
-    explicit GroundTile(Qt3DCore::QNode *parent, const QVector2D &offset, const LatLon &topLeftLatLon,
-                        const ContinuousElevationModel *model, const WorldReference *const worldRef,
+    explicit GroundTile(Qt3DCore::QNode *parent,
+                        const QVector2D &offset,
+                        const LatLon &topLeftLatLon,
+                        std::shared_ptr<const ContinuousElevationModel> model,
+                        std::shared_ptr<const WorldReference> worldRef,
                         const int textureID = -1);
 
     float vertexHeightAt(int i, int j) const;

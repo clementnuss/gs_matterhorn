@@ -13,8 +13,8 @@ class Ground {
 public:
 
     explicit Ground(Qt3DCore::QNode *parent,
-                    const ContinuousElevationModel *model,
-                    const WorldReference *const worldRef,
+                    std::shared_ptr<const ContinuousElevationModel> model,
+                    std::shared_ptr<const WorldReference> worldRef,
                     int sideLength);
 
     float groundElevationAt(int worldX, int worldZ) const;

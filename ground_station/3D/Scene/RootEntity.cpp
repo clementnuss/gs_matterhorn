@@ -36,33 +36,39 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         lastComputedPosition_{0, 0, 0},
         previousComputedPosition_{0, 0, 0},
         registeredEvents_{},
-        worldRef_{{}} {
+        worldRef_{std::make_shared<const WorldReference>(ORIGIN_3D_MODULE)},
+        elevationModel_{nullptr} {
 
     initRenderSettings(view);
     initCamera(view);
 }
 
 void RootEntity::init() {
-    WorldReference ref{ORIGIN_3D_MODULE};
-    worldRef_ = ref;
 
 
-    DiscreteElevationModel discreteModel1{DEM_PATH_1, DEM_TL_1};
-    DiscreteElevationModel discreteModel2{DEM_PATH_2, DEM_TL_2};
+    std::unique_ptr<const DiscreteElevationModel> discreteModel1 = std::make_unique<const DiscreteElevationModel>(
+            DEM_PATH_1,
+            DEM_TL_1
+    );
+    std::unique_ptr<const DiscreteElevationModel> discreteModel2 = std::make_unique<const DiscreteElevationModel>(
+            DEM_PATH_2,
+            DEM_TL_2
+    );
+    std::unique_ptr<const CompositeElevationModel> compositeModel = std::make_unique<const CompositeElevationModel>(
+            std::move(discreteModel1),
+            std::move(discreteModel2)
+    );
 
-    CompositeElevationModel compositeModel{&discreteModel1, &discreteModel2};
-
-    ContinuousElevationModel continuousModel{&compositeModel, &worldRef_};
+    elevationModel_ = std::make_shared<const ContinuousElevationModel>(std::move(compositeModel), worldRef_);
 
     LatLon gsLatLon = GS_LATLON;
     LatLon launchSiteLatLon = LAUNCH_SITE_LATLON;
-    launchSitePos_ = worldRef_.worldPosAt(launchSiteLatLon, &continuousModel);
+    launchSitePos_ = worldRef_->worldPosAt(launchSiteLatLon, elevationModel_);
     cameraController_->setCameraViewCenter(launchSitePos_);
 
-    //TODO: value escapes local scope. Reason for segfault when computing touchdown coordinates ?
-    ground_ = new Ground(this, &continuousModel, &worldRef_, 2);
+    ground_ = new Ground(this, elevationModel_, worldRef_, 2);
 
-    auto *gs = new GroundStation(worldRef_.worldPosAt(gsLatLon, &continuousModel), TextureConstants::DOUBLE_DOWN_ARROW,
+    auto *gs = new GroundStation(worldRef_->worldPosAt(gsLatLon, elevationModel_), TextureConstants::DOUBLE_DOWN_ARROW,
                                  camera_, this);
 
     rocketTracker_ = new Tracker(launchSitePos_, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
@@ -73,15 +79,14 @@ void RootEntity::init() {
                            launchSitePos_});
 
     // Initialise simulated rocket trace
+    /*
     simTrace_ = new Line(this, QColor::fromRgb(0, 180, 0), true);
-
     std::string tracePath{"../../ground_station/data/simulated_trajectory.csv"};
     FileReader<QVector3D> traceReader{tracePath, posFromString};
-
     QVector<QVector3D> traceData = QVector<QVector3D>::fromStdVector(traceReader.readFile());
     addToEach(traceData, launchSitePos_);
     simTrace_->appendData(traceData);
-
+    */
 
     std::string meteoPath{"../../ground_station/MeteoData/meteo_payerne_test.txt"};
     splashDownPredictor_ = new SplashDownPredictor(meteoPath, this);
@@ -113,7 +118,7 @@ void RootEntity::reportWindData() {
 
 void RootEntity::updateFlightPosition(const Position pos) {
 
-    QVector2D horizontalWorldPos = worldRef_.translationFromOrigin(pos.latLon);
+    QVector2D horizontalWorldPos = worldRef_->translationFromOrigin(pos.latLon);
     previousComputedPosition_ = lastComputedPosition_;
     lastComputedPosition_ = {horizontalWorldPos.x(), static_cast<float>(pos.altitude), horizontalWorldPos.y()};
 
@@ -135,6 +140,10 @@ void RootEntity::updateFlightPosition(const Position pos) {
                 UI3DConstants::WIND_REPORT_N_LINES -
                 static_cast<int>(lastComputedPosition_.y() / UI3DConstants::WIND_REPORT_INTERVAL));
     }
+}
+
+void RootEntity::resetTrace() {
+    rocketTrace_->clearData();
 }
 
 
@@ -206,4 +215,6 @@ void RootEntity::initCamera(Qt3DExtras::Qt3DWindow *view) {
     connect(camera_, &Qt3DRender::QCamera::viewMatrixChanged, compass, &Compass::update);
     connect(view, &Qt3DExtras::Qt3DWindow::widthChanged, compass, &Compass::updateHorizontalOffset);
     connect(view, &Qt3DExtras::Qt3DWindow::heightChanged, compass, &Compass::updateVerticalOffset);
+
+    connect(cameraController_, &CameraController::resetPressed, this, &RootEntity::resetTrace);
 }

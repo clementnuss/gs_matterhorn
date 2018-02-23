@@ -76,6 +76,7 @@ Line::Line(Qt3DCore::QNode *parent, QColor &&color, bool isStatic) : Qt3DCore::Q
 
 
 void Line::setData(const QVector<QVector3D> &positions) {
+
     QByteArray ba;
     ba.resize(positions.size() * sizeof(VBOData));
     auto *vboData = reinterpret_cast<VBOData *>(ba.data());
@@ -94,9 +95,10 @@ void Line::setData(const QVector<QVector3D> &positions) {
 
 void Line::clearData() {
 
-    drawBuffer_->setData(QByteArray{});
-    attribute_->setCount(0);
-    geometryRenderer_->setInstanceCount(0);
+    if (lineData_.size() > 1) {
+        lineData_.remove(0, lineData_.size() - 1);
+        setData(lineData_);
+    }
 }
 
 void Line::appendData(const QVector3D position) {

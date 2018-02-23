@@ -27,6 +27,8 @@ public slots:
 
     void updateFlightPosition(const Position pos);
 
+    void resetTrace();
+
 signals:
 
     void addInfoString(const QString &);
@@ -41,7 +43,8 @@ private:
 
     void reportWindData();
 
-    WorldReference worldRef_;
+    std::shared_ptr<const WorldReference> worldRef_;
+    std::shared_ptr<const ContinuousElevationModel> elevationModel_;
 
     float lastReportedAltitude_;
     float lastReportedXCoord_;

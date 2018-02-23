@@ -5,8 +5,8 @@
 
 
 Ground::Ground(Qt3DCore::QNode *parent,
-               const ContinuousElevationModel *model,
-               const WorldReference *const worldRef,
+               std::shared_ptr<const ContinuousElevationModel> model,
+               std::shared_ptr<const WorldReference> worldRef,
                int sideLength) :
         sideLength_{(sideLength / 2) * 2}, // Enforce side length to be even
         halfSideLength_{sideLength / 2},

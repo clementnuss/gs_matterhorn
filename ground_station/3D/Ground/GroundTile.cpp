@@ -12,8 +12,8 @@
 GroundTile::GroundTile(Qt3DCore::QNode *parent,
                        const QVector2D &offset,
                        const LatLon &topLeftLatLon,
-                       const ContinuousElevationModel *model,
-                       const WorldReference *const worldRef,
+                       std::shared_ptr<const ContinuousElevationModel> model,
+                       std::shared_ptr<const WorldReference> worldRef,
                        const int textureID) :
         Qt3DCore::QEntity(parent),
         transform_{new Qt3DCore::QTransform()},
