@@ -8,15 +8,16 @@
 
 class CompositeElevationModel : public IDiscreteElevationModel {
 public:
-    explicit CompositeElevationModel(const IDiscreteElevationModel *const d1, const IDiscreteElevationModel *const d2);
+    explicit CompositeElevationModel(std::unique_ptr<const IDiscreteElevationModel> d1,
+                                     std::unique_ptr<const IDiscreteElevationModel> d2);
 
     float elevationAt(int latitudeIndex, int longitudeIndex) const override;
 
     Interval2D extent() const;
 
 private:
-    const IDiscreteElevationModel *dem1_;
-    const IDiscreteElevationModel *dem2_;
+    std::unique_ptr<const IDiscreteElevationModel> dem1_;
+    std::unique_ptr<const IDiscreteElevationModel> dem2_;
     Interval2D extent_;
 };
 

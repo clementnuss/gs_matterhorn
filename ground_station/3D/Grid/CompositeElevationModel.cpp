@@ -3,9 +3,9 @@
 #include "CompositeElevationModel.h"
 
 CompositeElevationModel::CompositeElevationModel(
-        const IDiscreteElevationModel *const d1,
-        const IDiscreteElevationModel *const d2) :
-        dem1_{d1}, dem2_{d2}, extent_{} {
+        std::unique_ptr<const IDiscreteElevationModel> d1,
+        std::unique_ptr<const IDiscreteElevationModel> d2) :
+        dem1_{std::move(d1)}, dem2_{std::move(d2)}, extent_{} {
 
     requireNonNull(dem1_);
     requireNonNull(dem2_);

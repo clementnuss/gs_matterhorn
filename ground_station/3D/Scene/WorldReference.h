@@ -38,7 +38,7 @@ public:
         return reference + (meters / (arcWestEastDistance_ * GridConstants::SAMPLES_PER_DEGREE));
     }
 
-    QVector3D worldPosAt(const LatLon &point, const ContinuousElevationModel *const model) const {
+    QVector3D worldPosAt(const LatLon &point, std::shared_ptr<const ContinuousElevationModel> &model) const {
         QVector2D v = translationFromOrigin(point);
         return {
                 v.x(),

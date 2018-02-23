@@ -3,9 +3,9 @@
 #include <iostream>
 #include <3D/Scene/WorldReference.h>
 
-ContinuousElevationModel::ContinuousElevationModel(const IDiscreteElevationModel *const discreteModel,
-                                                   const WorldReference *const worldRef) : discreteModel_{
-        discreteModel}, worldRef_{worldRef} {
+ContinuousElevationModel::ContinuousElevationModel(std::unique_ptr<const IDiscreteElevationModel> discreteModel,
+                                                   std::shared_ptr<const WorldReference> worldRef) : discreteModel_{
+        std::move(discreteModel)}, worldRef_{std::move(worldRef)} {
 }
 
 float ContinuousElevationModel::elevationAt(const LatLon &latLon) const {
