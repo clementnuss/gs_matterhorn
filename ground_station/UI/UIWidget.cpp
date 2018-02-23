@@ -132,9 +132,12 @@ void GSMainwindow::receiveEventData(const EventPacket event) {
 void GSMainwindow::receiveGPSData(const GPSPacket gpsData) {
 
     ui->gps_sats_value->setText(QString::number(gpsData.satsCount_));
-    ui->gps_hdop_value->setText(QString::number(gpsData.hdop_, 'f', UIConstants::PRECISION));
-    ui->gps_latitude_value->setText(QString::number(gpsData.latitude_, 'f', UIConstants::PRECISION_GPS));
-    ui->gps_longitude_value->setText(QString::number(gpsData.longitude_, 'f', UIConstants::PRECISION_GPS));
+
+    if (gpsData.isValid()) {
+        ui->gps_hdop_value->setText(QString::number(gpsData.hdop_, 'f', UIConstants::PRECISION));
+        ui->gps_latitude_value->setText(QString::number(gpsData.latitude_, 'f', UIConstants::PRECISION_GPS));
+        ui->gps_longitude_value->setText(QString::number(gpsData.longitude_, 'f', UIConstants::PRECISION_GPS));
+    }
 }
 
 
