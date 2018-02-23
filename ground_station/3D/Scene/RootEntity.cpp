@@ -73,15 +73,14 @@ void RootEntity::init() {
                            launchSitePos_});
 
     // Initialise simulated rocket trace
+    /*
     simTrace_ = new Line(this, QColor::fromRgb(0, 180, 0), true);
-
     std::string tracePath{"../../ground_station/data/simulated_trajectory.csv"};
     FileReader<QVector3D> traceReader{tracePath, posFromString};
-
     QVector<QVector3D> traceData = QVector<QVector3D>::fromStdVector(traceReader.readFile());
     addToEach(traceData, launchSitePos_);
     simTrace_->appendData(traceData);
-
+    */
 
     std::string meteoPath{"../../ground_station/MeteoData/meteo_payerne_test.txt"};
     splashDownPredictor_ = new SplashDownPredictor(meteoPath, this);
@@ -138,7 +137,6 @@ void RootEntity::updateFlightPosition(const Position pos) {
 }
 
 void RootEntity::resetTrace() {
-    std::cout << "Cleared trace" << std::endl;
     rocketTrace_->clearData();
 }
 
