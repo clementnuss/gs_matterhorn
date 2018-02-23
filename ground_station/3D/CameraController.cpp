@@ -91,6 +91,8 @@ void CameraController::handleKeyPress(Qt3DInput::QKeyEvent *event) {
         case Qt::Key_Space:
             switchObservable();
             break;
+        case Qt::Key_R:
+            emit resetPressed();
         default:
             break;
     }

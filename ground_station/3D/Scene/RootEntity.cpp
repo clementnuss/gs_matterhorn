@@ -137,6 +137,11 @@ void RootEntity::updateFlightPosition(const Position pos) {
     }
 }
 
+void RootEntity::resetTrace() {
+    std::cout << "Cleared trace" << std::endl;
+    rocketTrace_->clearData();
+}
+
 
 //TODO: delete ?
 void RootEntity::updateRocketTracker(QVector<QVector3D> &positions, const QVector3D &speed) {
@@ -206,4 +211,6 @@ void RootEntity::initCamera(Qt3DExtras::Qt3DWindow *view) {
     connect(camera_, &Qt3DRender::QCamera::viewMatrixChanged, compass, &Compass::update);
     connect(view, &Qt3DExtras::Qt3DWindow::widthChanged, compass, &Compass::updateHorizontalOffset);
     connect(view, &Qt3DExtras::Qt3DWindow::heightChanged, compass, &Compass::updateVerticalOffset);
+
+    connect(cameraController_, &CameraController::resetPressed, this, &RootEntity::resetTrace);
 }

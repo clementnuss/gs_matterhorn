@@ -79,6 +79,10 @@ public:
 
     void switchObservable();
 
+signals:
+
+    void resetPressed();
+
 public slots:
 
     void handleKeyPress(Qt3DInput::QKeyEvent *event);

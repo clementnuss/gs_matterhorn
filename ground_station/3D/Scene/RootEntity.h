@@ -27,6 +27,8 @@ public slots:
 
     void updateFlightPosition(const Position pos);
 
+    void resetTrace();
+
 signals:
 
     void addInfoString(const QString &);
