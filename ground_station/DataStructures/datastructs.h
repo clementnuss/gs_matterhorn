@@ -94,7 +94,8 @@ struct GPSPacket : TimedData, ILoggable, IDeserializable {
     string toString() const override {
         stringstream ss;
 
-        ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << satsCount_
+        ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << timestamp_
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << (int) satsCount_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << hdop_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << latitude_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << longitude_
@@ -129,7 +130,7 @@ struct Data3D : ILoggable {
         return ss.str();
     }
 
-    double norm() const{
+    double norm() const {
         return std::sqrt(x_ * x_ + y_ * y_ + z_ * z_);
     }
 
@@ -157,14 +158,14 @@ struct Data3D : ILoggable {
 
 struct SensorsPacket : TimedData, ILoggable, IDeserializable {
     SensorsPacket() : TimedData{0},
-                         altitude_{0},
-                         acceleration_{},
-                         magnetometer_{},
-                         gyroscope_{},
-                         pressure_{0},
-                         temperature_{0},
-                         air_speed_{0},
-                         sequenceNumber_{0} {};
+                      altitude_{0},
+                      acceleration_{},
+                      magnetometer_{},
+                      gyroscope_{},
+                      pressure_{0},
+                      temperature_{0},
+                      air_speed_{0},
+                      sequenceNumber_{0} {};
 
     SensorsPacket(uint32_t t, double altitude, Data3D acceleration,
                   Data3D magnetometer, Data3D gyroscope,

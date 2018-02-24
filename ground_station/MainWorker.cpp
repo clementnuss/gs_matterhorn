@@ -225,13 +225,13 @@ void Worker::displayGPSData(GPSPacket &gp) {
 
     if (gp.timestamp_ != lastGPSTimestamp_) {
         lastGPSTimestamp_ = gp.timestamp_;
-        lastComputedPosition_.latLon = {gp.latitude_, gp.longitude_};
-        emit gpsDataReady(gp);
-
-
+        if (gp.isValid()) {
+            lastComputedPosition_.latLon = {gp.latitude_, gp.longitude_};
 #if USE_3D_MODULE
-        emit flightPositionReady(lastComputedPosition_);
+            emit flightPositionReady(lastComputedPosition_);
 #endif
+        }
+        emit gpsDataReady(gp);
     }
 }
 
@@ -240,7 +240,7 @@ void Worker::displayGPSData(GPSPacket &gp) {
  */
 void Worker::updateLoggingStatus() {
 
-    if (loggingEnabled_){
+    if (loggingEnabled_) {
         gpsLogger_.close();
         sensorsLogger_.close();
         eventsLogger_.close();

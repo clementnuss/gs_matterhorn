@@ -9,13 +9,13 @@
 #include <3D/CoordinateUtils.h>
 
 #define DEBUG false
-#define USE_TRACKING false
-#define USE_3D_MODULE true
+#define USE_TRACKING true
+#define USE_3D_MODULE false
 #define TEST3D true
 
 static const LatLon ORIGIN_3D_MODULE = {47.214, 9.004};
 static const LatLon LAUNCH_SITE_LATLON = ORIGIN_3D_MODULE;
-static const LatLon GS_LATLON = {47.204, 9.004};
+static const LatLon GS_LATLON = {47.213, 9.004};
 static const std::string DEM_PATH_1 = "../../ground_station/data/N47E008.hgt";
 static const std::string DEM_PATH_2 = "../../ground_station/data/N47E009.hgt";
 static const GeoPoint DEM_TL_1{{47, 0, 0},
@@ -103,10 +103,10 @@ namespace SensorConstants {
     static float currentLocationTemperature = 1.6f;
      */
 
-    static float adjustedSeaLevelPressure = 1028.6;
-    static float launchAltitude = 408.3;
-    static float trackingAltitude = 409;
-    static float distanceToLaunchSite = 0.9;
+    static float adjustedSeaLevelPressure = 1015.6;
+    static float launchAltitude = 430.3;
+    static float trackingAltitude = 430;
+    static float distanceToLaunchSite = 50;
 
 }
 
