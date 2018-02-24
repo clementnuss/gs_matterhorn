@@ -13,9 +13,9 @@
 #define USE_3D_MODULE true
 #define TEST3D true
 
-static const LatLon ORIGIN_3D_MODULE = {46.518732, 6.564058};
+static const LatLon ORIGIN_3D_MODULE = {47.214, 9.004};
 static const LatLon LAUNCH_SITE_LATLON = ORIGIN_3D_MODULE;
-static const LatLon GS_LATLON = {46.518742, 6.564068};
+static const LatLon GS_LATLON = {47.204, 9.004};
 static const std::string DEM_PATH_1 = "../../ground_station/data/N47E008.hgt";
 static const std::string DEM_PATH_2 = "../../ground_station/data/N47E009.hgt";
 static const GeoPoint DEM_TL_1{{47, 0, 0},
