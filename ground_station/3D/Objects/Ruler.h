@@ -6,6 +6,7 @@
 #include <Qt3DCore/QEntity>
 #include <3D/Line/Line.h>
 #include <3D/Billboards/Text3D.h>
+#include <3D/Billboards/Tracker.h>
 
 class Ruler : public Qt3DCore::QEntity {
 Q_OBJECT
