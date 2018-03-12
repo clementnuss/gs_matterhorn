@@ -33,7 +33,10 @@ public:
 
 private:
     boost::filesystem::path path_;
-    vector<SensorsPacket> readings_;
+    vector<GPSPacket> gpsReadings_;
+    vector<GPSPacket>::const_iterator gpsEndReadingsIter_;
+
+    vector<SensorsPacket> sensorsReadings_;
     vector<SensorsPacket>::const_iterator endReadingsIter_;
     vector<SensorsPacket>::const_iterator frontReadingsIter_;
     chrono::system_clock::time_point lastPlaybackTime_;

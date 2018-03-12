@@ -130,8 +130,9 @@ void Worker::mainRoutine() {
     lastIteration_ = chrono::system_clock::now();
     checkLinkStatuses();
 
-    vector<EventPacket> eventsData = telemetryHandler_->pollEventsData();
+    //Sensor data needs to be polled first!
     vector<SensorsPacket> sensorsData = telemetryHandler_->pollSensorsData();
+    vector<EventPacket> eventsData = telemetryHandler_->pollEventsData();
     vector<GPSPacket> gpsData = telemetryHandler_->pollGPSData();
 
     chrono::system_clock::time_point now = chrono::system_clock::now();

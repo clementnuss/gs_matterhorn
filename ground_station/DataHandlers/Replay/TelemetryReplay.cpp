@@ -11,7 +11,8 @@ using namespace boost::filesystem;
  * @param path location of the file/directory to read.
  */
 TelemetryReplay::TelemetryReplay(const string &path) :
-        path_{path}, readings_{}, lastPlaybackTime_{}, endReadingsIter_{}, frontReadingsIter_{}, playbackSpeed_{1},
+        path_{path}, sensorsReadings_{}, lastPlaybackTime_{}, endReadingsIter_{}, frontReadingsIter_{},
+        playbackSpeed_{1},
         playbackReversed_{}, lastTimeStamp_{0} {}
 
 void TelemetryReplay::startup() {
@@ -30,12 +31,18 @@ void TelemetryReplay::startup() {
         }
     }
 
-    if (readings_.empty()) {
+    if (sensorsReadings_.empty()) {
         //Add a blank reading to prevent the UI from crashing
         SensorsPacket r{};
-        readings_.push_back(r);
+        sensorsReadings_.push_back(r);
         resetPlayback();
         throw (std::runtime_error("No reading has been found in the path: \n" + path_.string()));
+    }
+
+    if (gpsReadings_.empty()) {
+        GPSPacket g{};
+        gpsReadings_.push_back(g);
+        cout << "No GPS reading for this replay" << endl;
     }
 
     resetPlayback();
@@ -43,6 +50,21 @@ void TelemetryReplay::startup() {
 
 vector<EventPacket> TelemetryReplay::pollEventsData() {
     return vector<EventPacket>();
+}
+
+std::vector<GPSPacket> TelemetryReplay::pollGPSData() {
+    vector<GPSPacket> vec{};
+
+    if (!playbackReversed_) {
+        while ((*gpsEndReadingsIter_).timestamp_ < lastTimeStamp_) {
+            if (gpsEndReadingsIter_ == gpsReadings_.end()) {
+                break;
+            }
+            vec.push_back(*gpsEndReadingsIter_++);
+        }
+    }
+
+    return vec;
 }
 
 vector<SensorsPacket> TelemetryReplay::pollSensorsData() {
@@ -58,7 +80,7 @@ vector<SensorsPacket> TelemetryReplay::pollSensorsData() {
                 UIConstants::GRAPH_MEMORY_USECS - adjustedTime;
         auto newFrontPosition = frontReadingsIter_;
         while ((*newFrontPosition).timestamp_ > adjustedFrontTime) {
-            if (newFrontPosition == readings_.begin()) {
+            if (newFrontPosition == sensorsReadings_.begin()) {
                 break;
             }
             newFrontPosition--;
@@ -70,7 +92,8 @@ vector<SensorsPacket> TelemetryReplay::pollSensorsData() {
 
         double adjustedLastTime = (double) lastTimeStamp_ - adjustedTime;
         auto newEndReadingsPosition = endReadingsIter_;
-        while (newEndReadingsPosition != readings_.begin() && (*newEndReadingsPosition).timestamp_ > adjustedLastTime) {
+        while (newEndReadingsPosition != sensorsReadings_.begin() &&
+               (*newEndReadingsPosition).timestamp_ > adjustedLastTime) {
             newEndReadingsPosition--;
         }
 
@@ -83,7 +106,7 @@ vector<SensorsPacket> TelemetryReplay::pollSensorsData() {
     } else {
         adjustedTime += lastTimeStamp_;
         while ((*endReadingsIter_).timestamp_ < adjustedTime) {
-            if (endReadingsIter_ == readings_.end()) {
+            if (endReadingsIter_ == sensorsReadings_.end()) {
                 break;
             }
             vec.push_back(*endReadingsIter_++);
@@ -98,7 +121,7 @@ vector<SensorsPacket> TelemetryReplay::pollSensorsData() {
         if ((*endReadingsIter_).timestamp_ >= UIConstants::GRAPH_MEMORY_USECS) /* Test that we don't have overflow*/{
             while (((*endReadingsIter_).timestamp_ - UIConstants::GRAPH_MEMORY_USECS) >
                    (*frontReadingsIter_).timestamp_) {
-                /*if (frontReadingsIter_ == readings_.end()){
+                /*if (frontReadingsIter_ == sensorsReadings_.end()){
                     break;
                 }*/
                 frontReadingsIter_++;
@@ -119,37 +142,54 @@ void TelemetryReplay::parseFile(boost::filesystem::path p) {
         boost::split(values, reading, boost::is_any_of("\t ,"),
                      boost::algorithm::token_compress_mode_type::token_compress_on);
 
-        if (values.size() != 15) {
+        if (values.size() == 15) {
+            try {
+                auto it = values.begin();
+                uint32_t seqNumber = std::stoul(*it++);
+                uint32_t timestamp = std::stoul(*it++);
+                double altitude = std::stod(*it++);
+                double air_speed = std::stod(*it++);
+                double pressure = std::stod(*it++);
+                double temperature = std::stod(*it++);
+                double ax = std::stod(*it++);
+                double ay = std::stod(*it++);
+                double az = std::stod(*it++);
+                double gx = std::stod(*it++);
+                double gy = std::stod(*it++);
+                double gz = std::stod(*it++);
+                double mx = std::stod(*it++);
+                double my = std::stod(*it++);
+                double mz = std::stod(*it++);
+
+                SensorsPacket r{
+                        timestamp, altitude, Data3D{ax, ay, az}, Data3D{mx, my, mz}, Data3D{gx, gy, gz},
+                        pressure, temperature, air_speed, seqNumber};
+                sensorsReadings_.push_back(std::move(r));
+
+            } catch (std::logic_error &e) {
+                cout << "\tunable to decode this reading:\n\t" << reading;
+            }
+        } else if (values.size() == 7) {
+            try {
+                auto it = values.begin();
+                it++; //uint32_t seqNumber = std::stoul(*); // Invalid
+                uint32_t timestamp = std::stoul(*it++);
+                auto satsCount = static_cast<uint8_t>(std::stoul(*it++));
+                auto hdop = static_cast<float>(std::stod(*it++));
+                auto latitude = static_cast<float>(std::stod(*it++));
+                auto longitude = static_cast<float>(std::stod(*it++));
+                auto altitude = static_cast<float>(std::stod(*it++));
+
+                GPSPacket g{timestamp, satsCount, hdop, latitude, longitude, altitude};
+                gpsReadings_.push_back(std::move(g));
+
+            } catch (std::logic_error &e) {
+                cout << "\tunable to decode this reading:\n\t" << reading;
+            }
+        } else {
             cout << "\tInvalid reading, only " << values.size() << " values on the line:" << endl;
             cout << "\t" << reading << endl;
             continue;
-        }
-        try {
-
-            auto it = values.begin();
-            uint32_t seqNumber = std::stoul(*it++);
-            uint32_t timestamp = std::stoul(*it++);
-            double altitude = std::stod(*it++);
-            double air_speed = std::stod(*it++);
-            double pressure = std::stod(*it++);
-            double temperature = std::stod(*it++);
-            double ax = std::stod(*it++);
-            double ay = std::stod(*it++);
-            double az = std::stod(*it++);
-            double gx = std::stod(*it++);
-            double gy = std::stod(*it++);
-            double gz = std::stod(*it++);
-            double mx = std::stod(*it++);
-            double my = std::stod(*it++);
-            double mz = std::stod(*it++);
-
-            SensorsPacket r{
-                    timestamp, altitude, Data3D{ax, ay, az}, Data3D{mx, my, mz}, Data3D{gx, gy, gz},
-                    pressure, temperature, air_speed, seqNumber};
-            readings_.push_back(std::move(r));
-
-        } catch (std::logic_error &e) {
-            cout << "\tunable to decode this reading:\n\t" << reading;
         }
     }
     ifs.close();
@@ -162,17 +202,18 @@ void TelemetryReplay::updatePlaybackSpeed(double newPlaybackSpeed) {
 void TelemetryReplay::resetPlayback() {
     playbackSpeed_ = 1;
     setPlaybackReversed(false);
-    frontReadingsIter_ = readings_.begin();
-    endReadingsIter_ = readings_.begin();
+    frontReadingsIter_ = sensorsReadings_.begin();
+    endReadingsIter_ = sensorsReadings_.begin();
+    gpsEndReadingsIter_ = gpsReadings_.begin();
     lastPlaybackTime_ = std::chrono::system_clock::now();
-    lastTimeStamp_ = readings_.front().timestamp_;
+    lastTimeStamp_ = sensorsReadings_.front().timestamp_;
 }
 
 bool TelemetryReplay::endOfPlayback() {
     if (playbackReversed_) {
-        return endReadingsIter_ == readings_.begin();
+        return endReadingsIter_ == sensorsReadings_.begin();
     } else {
-        return endReadingsIter_ == readings_.end();
+        return endReadingsIter_ == sensorsReadings_.end();
     }
 }
 
@@ -184,7 +225,4 @@ bool TelemetryReplay::isReplayHandler() {
     return true;
 }
 
-vector<GPSPacket> TelemetryReplay::pollGPSData() {
-    return vector<GPSPacket>();
-}
 
