@@ -110,7 +110,7 @@ void CameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::I
 
 
     // Mouse input
-    if (state.rightMouseButtonActive) {
+    if (state.rightMouseButtonActive | state.shiftKeyActive ) {
         if (state.leftMouseButtonActive) {
             viewingDistance_ = clampViewingDistance(viewingDistance_ + state.ryAxisValue * 300 * linearSpeed() * dt);
         } else {
