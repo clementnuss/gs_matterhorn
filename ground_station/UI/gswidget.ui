@@ -6,16 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-       <width>1024</width>
-       <height>768</height>
+    <width>1024</width>
+    <height>768</height>
    </rect>
   </property>
-     <property name="minimumSize">
-         <size>
-             <width>0</width>
-             <height>0</height>
-         </size>
-     </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
   <property name="palette">
    <palette>
     <active>
@@ -62,8 +62,8 @@
    </property>
    <property name="minimumSize">
     <size>
-        <width>0</width>
-        <height>0</height>
+     <width>0</width>
+     <height>0</height>
     </size>
    </property>
    <property name="palette">
@@ -143,7 +143,7 @@
        <enum>QLayout::SetNoConstraint</enum>
       </property>
       <item>
-          <layout class="QHBoxLayout" name="horizontalLayout" stretch="40,20,16">
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="40,20,16">
         <property name="sizeConstraint">
          <enum>QLayout::SetNoConstraint</enum>
         </property>
@@ -169,7 +169,8 @@
           </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <family>Segoe UI</family>
+            <pointsize>10</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -181,10 +182,10 @@
            <item>
             <layout class="QGridLayout" name="gridLayout" rowstretch="3,3,3" columnstretch="1,1">
              <property name="leftMargin">
-              <number>10</number>
+              <number>0</number>
              </property>
              <property name="topMargin">
-              <number>10</number>
+              <number>0</number>
              </property>
              <property name="horizontalSpacing">
               <number>20</number>
@@ -206,6 +207,12 @@
                  <height>16000</height>
                 </size>
                </property>
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
                <property name="autoFillBackground">
                 <bool>false</bool>
                </property>
@@ -225,15 +232,22 @@
                 <number>2</number>
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
                 <item>
                  <widget class="QLabel" name="telemetry_altitude">
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
                    </font>
                   </property>
                   <property name="text">
-                   <string>ALT.</string>
+                   <string>ALT</string>
                   </property>
                  </widget>
                 </item>
@@ -241,7 +255,8 @@
                  <widget class="QLabel" name="telemetry_altitude_value">
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -259,7 +274,8 @@
                  <widget class="QLabel" name="telemetry_altitude_units">
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -272,6 +288,12 @@
              </item>
              <item row="0" column="1">
               <widget class="QFrame" name="frame_5">
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
                <property name="frameShape">
                 <enum>QFrame::StyledPanel</enum>
                </property>
@@ -279,11 +301,18 @@
                 <enum>QFrame::Plain</enum>
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
                 <item>
                  <widget class="QLabel" name="telemetry_pressure">
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -295,7 +324,8 @@
                  <widget class="QLabel" name="telemetry_pressure_value">
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -310,7 +340,8 @@
                  <widget class="QLabel" name="telemetry_pressure_units">
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -329,6 +360,12 @@
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
                <property name="frameShape">
                 <enum>QFrame::StyledPanel</enum>
                </property>
@@ -342,11 +379,18 @@
                 <number>2</number>
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
                 <item>
                  <widget class="QLabel" name="telemetry_speed">
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -358,7 +402,8 @@
                  <widget class="QLabel" name="telemetry_speed_value">
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -373,7 +418,8 @@
                  <widget class="QLabel" name="telemetry_speed_units">
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -386,6 +432,12 @@
              </item>
              <item row="1" column="1">
               <widget class="QFrame" name="frame_6">
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
                <property name="frameShape">
                 <enum>QFrame::StyledPanel</enum>
                </property>
@@ -393,15 +445,22 @@
                 <enum>QFrame::Plain</enum>
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_8">
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
                 <item>
                  <widget class="QLabel" name="telemetry_temperature">
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
                    </font>
                   </property>
                   <property name="text">
-                   <string>TEMP.</string>
+                   <string>TEMP</string>
                   </property>
                  </widget>
                 </item>
@@ -409,7 +468,8 @@
                  <widget class="QLabel" name="telemetry_temperature_value">
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -424,7 +484,8 @@
                  <widget class="QLabel" name="telemetry_temperature_units">
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -443,6 +504,12 @@
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
                <property name="frameShape">
                 <enum>QFrame::StyledPanel</enum>
                </property>
@@ -450,15 +517,22 @@
                 <enum>QFrame::Plain</enum>
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_7">
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
                 <item>
                  <widget class="QLabel" name="telemetry_acceleration">
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
                    </font>
                   </property>
                   <property name="text">
-                   <string>ACCEL.</string>
+                   <string>ACCEL</string>
                   </property>
                  </widget>
                 </item>
@@ -466,7 +540,8 @@
                  <widget class="QLabel" name="telemetry_acceleration_value">
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -481,11 +556,15 @@
                  <widget class="QLabel" name="telemetry_acceleration_units">
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
                    </font>
                   </property>
                   <property name="text">
                    <string>g</string>
+                  </property>
+                  <property name="margin">
+                   <number>0</number>
                   </property>
                  </widget>
                 </item>
@@ -494,6 +573,12 @@
              </item>
              <item row="2" column="1">
               <widget class="QFrame" name="frame_7">
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
                <property name="frameShape">
                 <enum>QFrame::StyledPanel</enum>
                </property>
@@ -501,11 +586,18 @@
                 <enum>QFrame::Plain</enum>
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_9">
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
                 <item>
                  <widget class="QLabel" name="telemetry_ypr">
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -515,6 +607,12 @@
                 </item>
                 <item>
                  <widget class="QLabel" name="telemetry_yaw_value">
+                  <property name="font">
+                   <font>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
+                   </font>
+                  </property>
                   <property name="text">
                    <string>0.0</string>
                   </property>
@@ -525,6 +623,12 @@
                 </item>
                 <item>
                  <widget class="QLabel" name="telemetry_pitch_value">
+                  <property name="font">
+                   <font>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
+                   </font>
+                  </property>
                   <property name="text">
                    <string>0.0</string>
                   </property>
@@ -535,6 +639,12 @@
                 </item>
                 <item>
                  <widget class="QLabel" name="telemetry_roll_value">
+                  <property name="font">
+                   <font>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
+                   </font>
+                  </property>
                   <property name="text">
                    <string>0.0</string>
                   </property>
@@ -547,7 +657,8 @@
                  <widget class="QLabel" name="telemetry_ypr_units">
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <family>Segoe UI</family>
+                    <pointsize>8</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -564,138 +675,256 @@
          </widget>
         </item>
         <item>
-            <widget class="QGroupBox" name="groupBox">
+         <widget class="QGroupBox" name="groupBox">
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="title">
+           <string>GPS</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_9">
+           <property name="spacing">
+            <number>3</number>
+           </property>
+           <property name="leftMargin">
+            <number>7</number>
+           </property>
+           <property name="topMargin">
+            <number>11</number>
+           </property>
+           <property name="rightMargin">
+            <number>7</number>
+           </property>
+           <property name="bottomMargin">
+            <number>11</number>
+           </property>
+           <item>
+            <widget class="QFrame" name="frame_8">
+             <property name="font">
+              <font>
+               <family>Segoe UI</family>
+               <pointsize>8</pointsize>
+              </font>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_18">
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="gps_sats">
                 <property name="font">
-                    <font>
-                        <pointsize>12</pointsize>
-                        <weight>75</weight>
-                        <bold>true</bold>
-                    </font>
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>8</pointsize>
+                 </font>
                 </property>
-                <property name="title">
-                    <string>GPS</string>
+                <property name="text">
+                 <string>SATS</string>
                 </property>
-                <layout class="QVBoxLayout" name="verticalLayout_9">
-                    <item>
-                        <widget class="QFrame" name="frame_8">
-                            <property name="frameShape">
-                                <enum>QFrame::StyledPanel</enum>
-                            </property>
-                            <property name="frameShadow">
-                                <enum>QFrame::Plain</enum>
-                            </property>
-                            <layout class="QHBoxLayout" name="horizontalLayout_18">
-                                <item>
-                                    <widget class="QLabel" name="gps_sats">
-                                        <property name="text">
-                                            <string>SATS</string>
-                                        </property>
-                                    </widget>
-                                </item>
-                                <item>
-                                    <widget class="QLabel" name="gps_sats_value">
-                                        <property name="text">
-                                            <string>0</string>
-                                        </property>
-                                    </widget>
-                                </item>
-                                <item>
-                                    <widget class="QLabel" name="gps_hdop">
-                                        <property name="text">
-                                            <string>HDOP</string>
-                                        </property>
-                                        <property name="alignment">
-                                            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                                        </property>
-                                    </widget>
-                                </item>
-                                <item>
-                                    <widget class="QLabel" name="gps_hdop_value">
-                                        <property name="text">
-                                            <string>0</string>
-                                        </property>
-                                        <property name="alignment">
-                                            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                                        </property>
-                                    </widget>
-                                </item>
-                            </layout>
-                        </widget>
-                    </item>
-                    <item>
-                        <widget class="QFrame" name="frame_9">
-                            <property name="frameShape">
-                                <enum>QFrame::StyledPanel</enum>
-                            </property>
-                            <property name="frameShadow">
-                                <enum>QFrame::Plain</enum>
-                            </property>
-                            <layout class="QHBoxLayout" name="horizontalLayout_19">
-                                <item>
-                                    <widget class="QLabel" name="gps_latitude">
-                                        <property name="text">
-                                            <string>Lat.</string>
-                                        </property>
-                                    </widget>
-                                </item>
-                                <item>
-                                    <widget class="QLabel" name="gps_latitude_value">
-                                        <property name="text">
-                                            <string>0.0</string>
-                                        </property>
-                                        <property name="alignment">
-                                            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                                        </property>
-                                    </widget>
-                                </item>
-                                <item>
-                                    <widget class="QLabel" name="gps_latitude_units">
-                                        <property name="text">
-                                            <string>°</string>
-                                        </property>
-                                    </widget>
-                                </item>
-                            </layout>
-                        </widget>
-                    </item>
-                    <item>
-                        <widget class="QFrame" name="frame_11">
-                            <property name="frameShape">
-                                <enum>QFrame::StyledPanel</enum>
-                            </property>
-                            <property name="frameShadow">
-                                <enum>QFrame::Plain</enum>
-                            </property>
-                            <layout class="QHBoxLayout" name="horizontalLayout_17">
-                                <item>
-                                    <widget class="QLabel" name="gps_longitude">
-                                        <property name="text">
-                                            <string>Lon.</string>
-                                        </property>
-                                    </widget>
-                                </item>
-                                <item>
-                                    <widget class="QLabel" name="gps_longitude_value">
-                                        <property name="text">
-                                            <string>0.0</string>
-                                        </property>
-                                        <property name="alignment">
-                                            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                                        </property>
-                                    </widget>
-                                </item>
-                                <item>
-                                    <widget class="QLabel" name="gps_longitude_units">
-                                        <property name="text">
-                                            <string>°</string>
-                                        </property>
-                                    </widget>
-                                </item>
-                            </layout>
-                        </widget>
-                    </item>
-                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="gps_sats_value">
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>0</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="gps_hdop">
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>HDOP</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="gps_hdop_value">
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>0</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
+           </item>
+           <item>
+            <widget class="QFrame" name="frame_9">
+             <property name="font">
+              <font>
+               <family>Segoe UI</family>
+               <pointsize>8</pointsize>
+              </font>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_19">
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="gps_latitude">
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>LAT</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="gps_latitude_value">
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>0.0</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="gps_latitude_units">
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>°</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFrame" name="frame_11">
+             <property name="font">
+              <font>
+               <family>Segoe UI</family>
+               <pointsize>8</pointsize>
+              </font>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_17">
+              <property name="spacing">
+               <number>7</number>
+              </property>
+              <property name="leftMargin">
+               <number>11</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="gps_longitude">
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>LON</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="gps_longitude_value">
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>0.0</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="gps_longitude_units">
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>°</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </item>
         <item>
          <widget class="QGroupBox" name="ground_group">
@@ -713,21 +942,22 @@
           </property>
           <property name="font">
            <font>
-            <family>MS Shell Dlg 2</family>
-            <pointsize>12</pointsize>
+            <family>Segoe UI</family>
+            <pointsize>10</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
           <property name="title">
-           <string>GROUND STATION STATUS</string>
+           <string>GS STATUS</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_2" columnstretch="2,0,3">
            <item row="0" column="2">
             <widget class="QLabel" name="ground_time">
              <property name="font">
               <font>
-               <pointsize>14</pointsize>
+               <family>Segoe UI</family>
+               <pointsize>8</pointsize>
               </font>
              </property>
              <property name="layoutDirection">
@@ -747,7 +977,8 @@
               <widget class="QLabel" name="ground_pressure_value">
                <property name="font">
                 <font>
-                 <pointsize>12</pointsize>
+                 <family>Segoe UI</family>
+                 <pointsize>8</pointsize>
                 </font>
                </property>
                <property name="text">
@@ -762,7 +993,8 @@
               <widget class="QLabel" name="ground_pressure_units">
                <property name="font">
                 <font>
-                 <pointsize>12</pointsize>
+                 <family>Segoe UI</family>
+                 <pointsize>8</pointsize>
                 </font>
                </property>
                <property name="text">
@@ -778,7 +1010,8 @@
               <widget class="QLabel" name="ground_temperature_value">
                <property name="font">
                 <font>
-                 <pointsize>12</pointsize>
+                 <family>Segoe UI</family>
+                 <pointsize>8</pointsize>
                 </font>
                </property>
                <property name="text">
@@ -793,7 +1026,8 @@
               <widget class="QLabel" name="ground_temperature_units">
                <property name="font">
                 <font>
-                 <pointsize>12</pointsize>
+                 <family>Segoe UI</family>
+                 <pointsize>8</pointsize>
                 </font>
                </property>
                <property name="text">
@@ -811,9 +1045,42 @@
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-                <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,0">
+             <property name="font">
+              <font>
+               <family>Segoe UI</family>
+               <pointsize>8</pointsize>
+              </font>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,0">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>7</number>
+              </property>
               <item>
                <widget class="QLabel" name="status_logging">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>25</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
                 <property name="autoFillBackground">
                  <bool>true</bool>
                 </property>
@@ -823,13 +1090,28 @@
                 <property name="text">
                  <string>Logging</string>
                 </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
                 <property name="margin">
-                 <number>5</number>
+                 <number>0</number>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QLabel" name="status_battery">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>25</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
                 <property name="autoFillBackground">
                  <bool>true</bool>
                 </property>
@@ -839,13 +1121,28 @@
                 <property name="text">
                  <string>Battery</string>
                 </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
                 <property name="margin">
-                 <number>5</number>
+                 <number>0</number>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QLabel" name="status_radio1">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>25</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
                 <property name="autoFillBackground">
                  <bool>true</bool>
                 </property>
@@ -855,13 +1152,28 @@
                 <property name="text">
                  <string>Radio I</string>
                 </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
                 <property name="margin">
-                 <number>5</number>
+                 <number>0</number>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QLabel" name="status_radio2">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>25</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
                 <property name="autoFillBackground">
                  <bool>true</bool>
                 </property>
@@ -871,13 +1183,28 @@
                 <property name="text">
                  <string>Radio II</string>
                 </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
                 <property name="margin">
-                 <number>5</number>
+                 <number>0</number>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QLabel" name="status_video">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>25</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>8</pointsize>
+                 </font>
+                </property>
                 <property name="autoFillBackground">
                  <bool>true</bool>
                 </property>
@@ -887,8 +1214,11 @@
                 <property name="text">
                  <string>Video</string>
                 </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
                 <property name="margin">
-                 <number>5</number>
+                 <number>0</number>
                 </property>
                </widget>
               </item>
@@ -901,7 +1231,10 @@
        </layout>
       </item>
       <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="40,1">
+       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="40">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
          <widget class="QFrame" name="frame">
           <property name="minimumSize">
@@ -909,6 +1242,11 @@
             <width>20</width>
             <height>0</height>
            </size>
+          </property>
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+           </font>
           </property>
           <property name="frameShape">
            <enum>QFrame::NoFrame</enum>
@@ -920,10 +1258,27 @@
            <number>1</number>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_7">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
            <item>
             <widget class="QFrame" name="time_unfolding_control">
              <property name="enabled">
               <bool>true</bool>
+             </property>
+             <property name="font">
+              <font>
+               <family>Segoe UI</family>
+              </font>
              </property>
              <property name="autoFillBackground">
               <bool>false</bool>
@@ -935,6 +1290,12 @@
               <enum>QFrame::Raised</enum>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="0,2">
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
               <item>
                <widget class="QLabel" name="time_unfolding_mode">
                 <property name="sizePolicy">
@@ -945,7 +1306,8 @@
                 </property>
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <family>Segoe UI</family>
+                  <pointsize>10</pointsize>
                   <weight>75</weight>
                   <italic>false</italic>
                   <bold>true</bold>
@@ -958,6 +1320,11 @@
               </item>
               <item>
                <widget class="QFrame" name="replay_controls">
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                 </font>
+                </property>
                 <property name="frameShape">
                  <enum>QFrame::StyledPanel</enum>
                 </property>
@@ -965,8 +1332,21 @@
                  <enum>QFrame::Raised</enum>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="0,0,0,0,0,0">
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
                  <item>
                   <widget class="QToolButton" name="time_unfolding_reset">
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
                    <property name="text">
                     <string>Restart</string>
                    </property>
@@ -976,31 +1356,53 @@
                   <widget class="QToolButton" name="time_unfolding_reverse_time">
                    <property name="font">
                     <font>
+                     <family>Segoe UI</family>
+                     <weight>75</weight>
+                     <bold>true</bold>
                      <strikeout>false</strikeout>
                      <kerning>true</kerning>
                     </font>
                    </property>
                    <property name="text">
-                    <string>Reverse time</string>
+                    <string>Reverse</string>
                    </property>
                   </widget>
                  </item>
                  <item>
                   <widget class="QToolButton" name="time_unfolding_decrease">
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
                    <property name="text">
-                    <string>Decrease speed</string>
+                    <string>Speed -</string>
                    </property>
                   </widget>
                  </item>
                  <item>
                   <widget class="QToolButton" name="time_unfolding_increase">
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
                    <property name="text">
-                    <string>Increase speed</string>
+                    <string>Speed +</string>
                    </property>
                   </widget>
                  </item>
                  <item>
                   <widget class="QLabel" name="time_unfolding_current_speed">
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                    </font>
+                   </property>
                    <property name="text">
                     <string>1</string>
                    </property>
@@ -1008,6 +1410,11 @@
                  </item>
                  <item>
                   <widget class="QSlider" name="horizontalSlider">
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                    </font>
+                   </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
                    </property>
@@ -1021,14 +1428,19 @@
            </item>
            <item>
             <widget class="QStackedWidget" name="stackedWidget">
+             <property name="font">
+              <font>
+               <family>Segoe UI</family>
+              </font>
+             </property>
              <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
+              <enum>QFrame::NoFrame</enum>
              </property>
              <property name="frameShadow">
               <enum>QFrame::Plain</enum>
              </property>
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="Graphs">
               <property name="sizePolicy">
@@ -1038,6 +1450,21 @@
                </sizepolicy>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,100">
                  <property name="spacing">
@@ -1135,6 +1562,11 @@
                        </disabled>
                       </palette>
                      </property>
+                     <property name="font">
+                      <font>
+                       <family>Segoe UI</family>
+                      </font>
+                     </property>
                      <property name="autoFillBackground">
                       <bool>true</bool>
                      </property>
@@ -1161,7 +1593,11 @@
                        <widget class="QLabel" name="grap_shift_tip">
                         <property name="font">
                          <font>
-                          <pointsize>10</pointsize>
+                          <family>Segoe UI</family>
+                          <pointsize>8</pointsize>
+                          <weight>50</weight>
+                          <italic>false</italic>
+                          <bold>false</bold>
                          </font>
                         </property>
                         <property name="text">
@@ -1171,6 +1607,11 @@
                       </item>
                       <item>
                        <spacer name="horizontalSpacer">
+                        <property name="font">
+                         <font>
+                          <family>Segoe UI</family>
+                         </font>
+                        </property>
                         <property name="orientation">
                          <enum>Qt::Horizontal</enum>
                         </property>
@@ -1196,8 +1637,21 @@
                           <height>16777215</height>
                          </size>
                         </property>
+                        <property name="font">
+                         <font>
+                          <family>Segoe UI</family>
+                          <weight>75</weight>
+                          <bold>true</bold>
+                         </font>
+                        </property>
                         <property name="text">
                          <string>Clear labels</string>
+                        </property>
+                        <property name="iconSize">
+                         <size>
+                          <width>15</width>
+                          <height>15</height>
+                         </size>
                         </property>
                         <property name="flat">
                          <bool>false</bool>
@@ -1206,8 +1660,21 @@
                       </item>
                       <item>
                        <widget class="QPushButton" name="graph_sync_button">
+                        <property name="font">
+                         <font>
+                          <family>Segoe UI</family>
+                          <weight>75</weight>
+                          <bold>true</bold>
+                         </font>
+                        </property>
                         <property name="text">
                          <string>Synchronise axes</string>
+                        </property>
+                        <property name="iconSize">
+                         <size>
+                          <width>15</width>
+                          <height>15</height>
+                         </size>
                         </property>
                         <property name="checkable">
                          <bool>true</bool>
@@ -1225,8 +1692,21 @@
                           <height>16777215</height>
                          </size>
                         </property>
+                        <property name="font">
+                         <font>
+                          <family>Segoe UI</family>
+                          <weight>75</weight>
+                          <bold>true</bold>
+                         </font>
+                        </property>
                         <property name="text">
                          <string>Auto Play</string>
+                        </property>
+                        <property name="iconSize">
+                         <size>
+                          <width>15</width>
+                          <height>15</height>
+                         </size>
                         </property>
                         <property name="checkable">
                          <bool>true</bool>
@@ -1245,7 +1725,12 @@
                   </layout>
                  </item>
                  <item>
-                     <widget class="QFrame" name="main_deck">
+                  <widget class="QFrame" name="main_deck">
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                    </font>
+                   </property>
                    <property name="frameShape">
                     <enum>QFrame::StyledPanel</enum>
                    </property>
@@ -1255,123 +1740,119 @@
                    <property name="lineWidth">
                     <number>2</number>
                    </property>
-                         <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="4,1">
-                             <item>
-                                 <widget class="QFrame" name="plot_container">
-                                     <property name="frameShape">
-                                         <enum>QFrame::StyledPanel</enum>
-                                     </property>
-                                     <property name="frameShadow">
-                                         <enum>QFrame::Raised</enum>
-                                     </property>
-                                 </widget>
-                             </item>
-                             <item>
-                                 <widget class="QScrollArea" name="scrollArea">
-                                     <property name="frameShape">
-                                         <enum>QFrame::NoFrame</enum>
-                                     </property>
-                                     <property name="widgetResizable">
-                                         <bool>true</bool>
-                                     </property>
-                                     <widget class="QWidget" name="scrollAreaWidgetContents">
-                                         <property name="geometry">
-                                             <rect>
-                                                 <x>0</x>
-                                                 <y>0</y>
-                                                 <width>134</width>
-                                                 <height>140</height>
-                                             </rect>
-                                         </property>
-                                         <layout class="QVBoxLayout" name="verticalLayout_6">
-                                             <item>
-                                                 <widget class="QLabel" name="label">
-                                                     <property name="font">
-                                                         <font>
-                                                             <pointsize>12</pointsize>
-                                                             <weight>75</weight>
-                                                             <bold>true</bold>
-                                                         </font>
-                                                     </property>
-                                                     <property name="text">
-                                                         <string>EVENT LOG</string>
-                                                     </property>
-                                                 </widget>
-                                             </item>
-                                             <item>
-                                                 <widget class="QPlainTextEdit" name="event_log">
-                                                     <property name="font">
-                                                         <font>
-                                                             <pointsize>10</pointsize>
-                                                         </font>
-                                                     </property>
-                                                     <property name="readOnly">
-                                                         <bool>true</bool>
-                                                     </property>
-                                                 </widget>
-                                             </item>
-                                         </layout>
-                                     </widget>
-                                 </widget>
-                             </item>
-                         </layout>
+                   <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="4,1">
+                    <item>
+                     <widget class="QFrame" name="plot_container">
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                       </font>
+                      </property>
+                      <property name="frameShape">
+                       <enum>QFrame::StyledPanel</enum>
+                      </property>
+                      <property name="frameShadow">
+                       <enum>QFrame::Raised</enum>
+                      </property>
                      </widget>
+                    </item>
+                    <item>
+                     <widget class="QScrollArea" name="scrollArea">
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                       </font>
+                      </property>
+                      <property name="frameShape">
+                       <enum>QFrame::NoFrame</enum>
+                      </property>
+                      <property name="widgetResizable">
+                       <bool>true</bool>
+                      </property>
+                      <widget class="QWidget" name="scrollAreaWidgetContents">
+                       <property name="geometry">
+                        <rect>
+                         <x>0</x>
+                         <y>0</y>
+                         <width>193</width>
+                         <height>433</height>
+                        </rect>
+                       </property>
+                       <layout class="QVBoxLayout" name="verticalLayout_6">
+                        <item>
+                         <widget class="QLabel" name="label">
+                          <property name="font">
+                           <font>
+                            <family>Segoe UI</family>
+                            <pointsize>10</pointsize>
+                            <weight>75</weight>
+                            <bold>true</bold>
+                           </font>
+                          </property>
+                          <property name="text">
+                           <string>EVENT LOG</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QPlainTextEdit" name="event_log">
+                          <property name="font">
+                           <font>
+                            <family>Segoe UI</family>
+                            <pointsize>8</pointsize>
+                           </font>
+                          </property>
+                          <property name="readOnly">
+                           <bool>true</bool>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
                  </item>
                 </layout>
                </item>
               </layout>
              </widget>
-                <widget class="QWidget" name="visualisation_3D">
-                    <property name="minimumSize">
-                        <size>
-                            <width>1428</width>
-                            <height>0</height>
-                        </size>
-                    </property>
-                    <layout class="QVBoxLayout" name="verticalLayout_8">
-                        <item>
-                            <layout class="QHBoxLayout" name="visualisation_3D_layout">
-                                <item>
-                                    <widget class="QPlainTextEdit" name="visualisation_info_textedit">
-                                        <property name="font">
-                                            <font>
-                                                <family>Consolas</family>
-                                                <pointsize>12</pointsize>
-                                            </font>
-                                        </property>
-                                        <property name="readOnly">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="plainText">
-                                            <string notr="true"/>
-                                        </property>
-                                    </widget>
-                                </item>
-                            </layout>
-                        </item>
-                    </layout>
-                </widget>
+             <widget class="QWidget" name="visualisation_3D">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_8">
+               <item>
+                <layout class="QHBoxLayout" name="visualisation_3D_layout">
+                 <item>
+                  <widget class="QPlainTextEdit" name="visualisation_info_textedit">
+                   <property name="font">
+                    <font>
+                     <family>Consolas</family>
+                     <pointsize>8</pointsize>
+                    </font>
+                   </property>
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                   <property name="plainText">
+                    <string notr="true"/>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
             </widget>
            </item>
           </layout>
          </widget>
         </item>
-              <item>
-                  <spacer name="horizontalSpacer_3">
-                      <property name="orientation">
-                          <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeType">
-                          <enum>QSizePolicy::Fixed</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                          <size>
-                              <width>15</width>
-                              <height>20</height>
-                          </size>
-                      </property>
-                  </spacer>
-              </item>
        </layout>
       </item>
      </layout>
@@ -1383,13 +1864,25 @@
     <rect>
      <x>0</x>
      <y>0</y>
-        <width>1024</width>
-     <height>26</height>
+     <width>1024</width>
+     <height>23</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
    <widget class="QMenu" name="menuMODE">
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
     <property name="title">
-     <string>MODE</string>
+     <string>Mode</string>
     </property>
     <addaction name="actionREAL_TIME"/>
     <addaction name="actionREPLAY_select_file"/>
@@ -1398,12 +1891,22 @@
   </widget>
   <action name="actionREAL_TIME">
    <property name="text">
-    <string>REAL-TIME</string>
+    <string>Real-time</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+    </font>
    </property>
   </action>
   <action name="actionREPLAY_select_file">
    <property name="text">
-    <string>REPLAY (select file)</string>
+    <string>Replay (select file)</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+    </font>
    </property>
   </action>
  </widget>

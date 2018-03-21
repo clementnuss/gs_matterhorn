@@ -64,6 +64,8 @@ namespace TimeConstants {
 }
 
 namespace UIConstants {
+    static constexpr int TEXT_POINT_SIZE = 8;
+
     static constexpr int PRECISION = 2;
     static constexpr int PRECISION_GPS = 6;
 

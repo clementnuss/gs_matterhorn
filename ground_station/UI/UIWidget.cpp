@@ -356,7 +356,7 @@ void GSMainwindow::setupPlots(QCustomPlot *plot, QString title, QColor color, bo
     // TODO: check if needed on RaspberryPi3
     //customPlot->setOpenGl(true);
 
-    QFont labelFont = QFont("sans", 10, QFont::Bold);
+    QFont labelFont = QFont("Segoe UI", UIConstants::TEXT_POINT_SIZE, QFont::Bold);
 
     auto axisRect = new QCPAxisRect(plot);
 
@@ -366,8 +366,7 @@ void GSMainwindow::setupPlots(QCustomPlot *plot, QString title, QColor color, bo
 
     plot->plotLayout()->addElement(0, 0, axisRect);
 
-    QFont font;
-    font.setPointSize(12);
+    QFont font{"Segoe UI", UIConstants::TEXT_POINT_SIZE};
     axisRect->axis(QCPAxis::atLeft, 0)->setTickLabelFont(font);
     axisRect->axis(QCPAxis::atBottom, 0)->setTickLabelFont(font);
 
@@ -413,7 +412,7 @@ void GSMainwindow::graphClicked(QCPAbstractPlottable *plottable, int dataIndex) 
     textLabel->position->setTypeY(QCPItemPosition::ptAxisRectRatio);
     textLabel->position->setCoords(dataKey, 0.0); // place position at center/top of axis rect
 
-    textLabel->setFont(QFont(font().family(), 8)); // make font a bit larger
+    textLabel->setFont(QFont("Segoe UI", UIConstants::TEXT_POINT_SIZE)); // make font a bit larger
     textLabel->setText(message);
 
     // add the arrow:
