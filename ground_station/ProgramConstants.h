@@ -41,6 +41,7 @@ namespace FileConstants {
 
 namespace PrintConstants {
     static constexpr int PRECISION = 4;
+    static constexpr int PRECISION_GPS = 6;
     static constexpr int FIELD_WIDTH = 12;
     static constexpr char DELIMITER = ' ';
 }

@@ -609,6 +609,8 @@ bool GSMainwindow::event(QEvent *event) {
         } else if (ke->key() == Qt::Key_Control) {
             ui->stackedWidget->setCurrentIndex((ui->stackedWidget->currentIndex() + 1) % ui->stackedWidget->count());
             return true;
+        } else if (ke->key() == Qt::Key_F11) {
+            (this->isFullScreen()) ? this->showNormal() : this->showFullScreen();
         }
 #if TEST3D
         else if (ke->key() == Qt::Key_S) {

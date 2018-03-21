@@ -97,8 +97,8 @@ struct GPSPacket : TimedData, ILoggable, IDeserializable {
         ss << setw(FIELD_WIDTH) << setfill(DELIMITER) << timestamp_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << (int) satsCount_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << hdop_
-           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << latitude_
-           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << longitude_
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION_GPS) << fixed << latitude_
+           << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION_GPS) << fixed << longitude_
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << altitude_;
 
         return ss.str();
