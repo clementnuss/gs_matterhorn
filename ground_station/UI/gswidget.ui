@@ -485,7 +485,7 @@
                    </font>
                   </property>
                   <property name="text">
-                   <string>m/s²</string>
+                   <string>g</string>
                   </property>
                  </widget>
                 </item>
