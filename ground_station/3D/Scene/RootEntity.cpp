@@ -88,7 +88,7 @@ void RootEntity::init() {
     simTrace_->appendData(traceData);
     */
 
-    std::string meteoPath{"../../ground_station/MeteoData/meteo_payerne_test.txt"};
+    std::string meteoPath{"./MeteoData/meteo_payerne_test.txt"};
     splashDownPredictor_ = new SplashDownPredictor(meteoPath, this);
 
     new OpenGL3DAxes(this);

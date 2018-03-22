@@ -14,8 +14,8 @@ TelemetryReplay::TelemetryReplay(const string &path) :
         path_{path}, sensorsReadings_{}, lastPlaybackTime_{}, endReadingsIter_{}, frontReadingsIter_{},
         playbackSpeed_{1},
         playbackReversed_{}, lastTimeStamp_{0} {
-	
-	std::locale::global(std::locale("en_US.UTF-8"));
+
+    std::locale(std::cout.getloc(), new std::numpunct<char>{'.'});
 }
 
 void TelemetryReplay::startup() {
@@ -164,8 +164,6 @@ void TelemetryReplay::parseFile(boost::filesystem::path p) {
                 double my = std::stod(*it++);
                 double mz = std::stod(*it++);
 
-		std::cout.precision(20);
-                cout << altitude << endl;
                 SensorsPacket r{
                         timestamp, altitude, Data3D{ax, ay, az}, Data3D{mx, my, mz}, Data3D{gx, gy, gz},
                         pressure, temperature, air_speed, seqNumber};

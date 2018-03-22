@@ -293,7 +293,7 @@ void GSMainwindow::highlightInfoString(int lineNumber) {
 }
 
 void GSMainwindow::setup3DModule() {
-    std::string tracePath{"../../ground_station/data/simulated_trajectory.csv"};
+    std::string tracePath{"./SimulationData/simulated_trajectory.csv"};
     FileReader<QVector3D> traceReader{tracePath, posFromString};
 
     traceData_ = QVector<QVector3D>::fromStdVector(traceReader.readFile());

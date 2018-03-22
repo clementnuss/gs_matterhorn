@@ -16,8 +16,8 @@
 static const LatLon ORIGIN_3D_MODULE = {47.214, 9.004};
 static const LatLon LAUNCH_SITE_LATLON = ORIGIN_3D_MODULE;
 static const LatLon GS_LATLON = {47.213571, 9.004855};
-static const std::string DEM_PATH_1 = "../../ground_station/data/N47E008.hgt";
-static const std::string DEM_PATH_2 = "../../ground_station/data/N47E009.hgt";
+static const std::string DEM_PATH_1 = "./DEM/N47E008.hgt";
+static const std::string DEM_PATH_2 = "./DEM/N47E009.hgt";
 static const GeoPoint DEM_TL_1{{47, 0, 0},
                                {8,  0, 0}};
 static const GeoPoint DEM_TL_2{{47, 0, 0},
