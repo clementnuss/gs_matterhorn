@@ -13,7 +13,10 @@ using namespace boost::filesystem;
 TelemetryReplay::TelemetryReplay(const string &path) :
         path_{path}, sensorsReadings_{}, lastPlaybackTime_{}, endReadingsIter_{}, frontReadingsIter_{},
         playbackSpeed_{1},
-        playbackReversed_{}, lastTimeStamp_{0} {}
+        playbackReversed_{}, lastTimeStamp_{0} {
+	
+	std::locale::global(std::locale("en_US.UTF-8"));
+}
 
 void TelemetryReplay::startup() {
     if (exists(path_)) {
@@ -139,7 +142,7 @@ void TelemetryReplay::parseFile(boost::filesystem::path p) {
     string reading;
     while (getline(ifs, reading)) {
         std::vector<std::string> values;
-        boost::split(values, reading, boost::is_any_of("\t ,"),
+        boost::split(values, reading, boost::is_any_of("\t "),
                      boost::algorithm::token_compress_mode_type::token_compress_on);
 
         if (values.size() == 15) {
@@ -161,6 +164,8 @@ void TelemetryReplay::parseFile(boost::filesystem::path p) {
                 double my = std::stod(*it++);
                 double mz = std::stod(*it++);
 
+		std::cout.precision(20);
+                cout << altitude << endl;
                 SensorsPacket r{
                         timestamp, altitude, Data3D{ax, ay, az}, Data3D{mx, my, mz}, Data3D{gx, gy, gz},
                         pressure, temperature, air_speed, seqNumber};
