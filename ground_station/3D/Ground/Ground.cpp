@@ -1,13 +1,12 @@
 
 #include <stdexcept>
 #include <iostream>
+#include <3D/TextureManagerSingleton.h>
 #include "Ground.h"
 
 
-Ground::Ground(Qt3DCore::QNode *parent,
-               std::shared_ptr<const ContinuousElevationModel> model,
-               std::shared_ptr<const WorldReference> worldRef,
-               int sideLength) :
+Ground::Ground(Qt3DCore::QNode *parent, std::shared_ptr<const ContinuousElevationModel> model,
+               std::shared_ptr<const WorldReference> worldRef, int sideLength, QString textureBaseName) :
         sideLength_{(sideLength / 2) * 2}, // Enforce side length to be even
         halfSideLength_{sideLength / 2},
         extentFromOrigin_{GridConstants::GRID_LENGTH_IN_METERS * sideLength_ / 2},
@@ -35,7 +34,15 @@ Ground::Ground(Qt3DCore::QNode *parent,
             //Compute world offset
             QVector2D tileOffset{dLat, dLon};
 
-            tiles_.emplace_back(std::make_unique<GroundTile>(parent, tileOffset, tileOrigin, model, worldRef));
+            if (!textureBaseName.isEmpty()) {
+                QString s{"-" + QString::number(j + halfSideLength_) + "-" + QString::number(i + halfSideLength_) +
+                          ".jpg"};
+                tiles_.emplace_back(
+                        std::make_unique<GroundTile>(parent, tileOffset, tileOrigin, model, worldRef,
+                                                     textureBaseName + s));
+            } else {
+                tiles_.emplace_back(std::make_unique<GroundTile>(parent, tileOffset, tileOrigin, model, worldRef));
+            }
         }
     }
 

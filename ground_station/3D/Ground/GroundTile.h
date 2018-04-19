@@ -16,7 +16,7 @@ public:
                         const LatLon &topLeftLatLon,
                         std::shared_ptr<const ContinuousElevationModel> model,
                         std::shared_ptr<const WorldReference> worldRef,
-                        const int textureID = -1);
+                        const QString texturePath = "");
 
     float vertexHeightAt(int i, int j) const;
 

@@ -12,10 +12,8 @@ class Ground {
 
 public:
 
-    explicit Ground(Qt3DCore::QNode *parent,
-                    std::shared_ptr<const ContinuousElevationModel> model,
-                    std::shared_ptr<const WorldReference> worldRef,
-                    int sideLength);
+    explicit Ground(Qt3DCore::QNode *parent, std::shared_ptr<const ContinuousElevationModel> model,
+                    std::shared_ptr<const WorldReference> worldRef, int sideLength, QString textureBaseName = "");
 
     float groundElevationAt(int worldX, int worldZ) const;
 

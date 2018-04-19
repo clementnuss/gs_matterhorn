@@ -293,10 +293,10 @@ void GSMainwindow::highlightInfoString(int lineNumber) {
 }
 
 void GSMainwindow::setup3DModule() {
-    std::string tracePath{"./SimulationData/simulated_trajectory.csv"};
-    FileReader<QVector3D> traceReader{tracePath, posFromString};
+    //std::string tracePath{"./SimulationData/simulated_trajectory.csv"};
+    //FileReader<QVector3D> traceReader{tracePath, posFromString};
 
-    traceData_ = QVector<QVector3D>::fromStdVector(traceReader.readFile());
+    //traceData_ = QVector<QVector3D>::fromStdVector(traceReader.readFile());
 
     auto *view = new Qt3DExtras::Qt3DWindow();
     QWidget *container = QWidget::createWindowContainer(view);

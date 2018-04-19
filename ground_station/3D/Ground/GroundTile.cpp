@@ -3,6 +3,7 @@
 
 #include <Qt3DRender/QEffect>
 #include <Qt3DRender/QMaterial>
+#include <3D/TextureManagerSingleton.h>
 
 /**
  * 1000x1000 units terrain surface. Correspond to meters
@@ -14,7 +15,7 @@ GroundTile::GroundTile(Qt3DCore::QNode *parent,
                        const LatLon &topLeftLatLon,
                        std::shared_ptr<const ContinuousElevationModel> model,
                        std::shared_ptr<const WorldReference> worldRef,
-                       const int textureID) :
+                       const QString texturePath) :
         Qt3DCore::QEntity(parent),
         transform_{new Qt3DCore::QTransform()},
         mesh_{new GridMesh(
@@ -41,7 +42,7 @@ GroundTile::GroundTile(Qt3DCore::QNode *parent,
     shaderProgram->setVertexShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/terrain.vert"}));
     shaderProgram->setFragmentShaderCode(
             shaderProgram->loadSource(
-                    textureID != -1 ? QUrl{"qrc:/shaders/terrain.frag"} : QUrl{"qrc:/shaders/terrain_notex.frag"}
+                    !texturePath.isEmpty() ? QUrl{"qrc:/shaders/terrain.frag"} : QUrl{"qrc:/shaders/terrain_notex.frag"}
             ));
 
     auto *renderPass = new Qt3DRender::QRenderPass();
@@ -67,16 +68,10 @@ GroundTile::GroundTile(Qt3DCore::QNode *parent,
     auto *material = new Qt3DRender::QMaterial();
     material->setEffect(effect);
 
-    if (textureID != -1) {
+    if (!texturePath.isEmpty()) {
         auto *diffuseParam = new Qt3DRender::QParameter();
-
-        QString s{"qrc:3D/textures/terrain/tex_"};
-        s += textureID;
-        s += ".jpg";
-
-        auto *diffuseTexture = loadTextureImage(QUrl{s});
         diffuseParam->setName(QStringLiteral("diffuseTexture"));
-        diffuseParam->setValue(QVariant::fromValue(diffuseTexture));
+        diffuseParam->setValue(QVariant::fromValue(TextureManagerSingleton::getInstance().getTexture(texturePath)));
         material->addParameter(diffuseParam);
     }
 

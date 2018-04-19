@@ -14,8 +14,8 @@ namespace OpenGLConstants {
     static constexpr int MAX_LINE_DATAPOINTS = 100000;
     static constexpr int RULER_SPACING = 250;
     static constexpr int RULER_MAX_HEIGHT = 5000;
-    static const QVector3D ABOVE = QVector3D(0, 1, 0);
-    static const QVector3D ABOVE_CENTER_LABEL = QVector3D(-3.2, 3, 0);
+    static const QVector3D ABOVE = QVector3D(0, 0.5, 0);
+    static const QVector3D ABOVE_CENTER_LABEL = QVector3D(-3.2, 2, 0);
     static const QVector3D LEFT_LEGEND_TEXT_OFFSET = QVector3D(-10, 1, 0);
     static const QVector3D RIGHT_1 = QVector3D(1, 0, 0);
     static const QVector3D RIGHT_2 = QVector3D(2, 0, 0);
@@ -32,8 +32,8 @@ namespace RocketConstants {
 }
 
 namespace UI3DConstants {
-    static constexpr float TRACKER_SIZE = 20.0f;
-    static constexpr float MARKER_SCALE = 1.5f;
+    static constexpr float TRACKER_SIZE = 10.0f;
+    static constexpr float MARKER_SCALE = 0.75f;
     static constexpr float WIND_REPORT_MAX = 3500.0f;
     static constexpr float WIND_REPORT_INTERVAL = 100.0f;
     static constexpr int WIND_REPORT_N_LINES = static_cast<int>(WIND_REPORT_MAX / WIND_REPORT_INTERVAL);
@@ -54,14 +54,14 @@ namespace CameraConstants {
     static constexpr float INTERPOLATION_STRENGTH = 0.1f;
     static constexpr float INTERPOLATION_THRESHOLD = 0.0001f;
     static constexpr float VIEWING_DISTANCE_MIN = 300.0f;
-    static constexpr float VIEWING_DISTANCE_MAX = 10000.0f;
-    static constexpr float VIEWING_DISTANCE_DEFAULT = 5000.0f;
+    static constexpr float VIEWING_DISTANCE_MAX = 4000.0f;
+    static constexpr float VIEWING_DISTANCE_DEFAULT = 600.0f;
     static constexpr float AZIMUTH_STEP = 0.785398f; // 45 degrees
     static constexpr float POLAR_STEP = 0.261799f; // 15 degrees
     static constexpr float POLAR_MIN = 0.261799f;
     static constexpr float POLAR_MAX = 2.87979f;
     static constexpr float ANIMATION_DURATION = 400.0f;
-    static constexpr float LINEAR_SPEED = 100.0f;
+    static constexpr float LINEAR_SPEED = 20.0f;
     static constexpr float LOOK_SPEED = 3.0f;
 }
 
@@ -72,7 +72,7 @@ namespace GridConstants {
     static constexpr int SAMPLES_PER_DEGREE = 3600;
     static constexpr int SAMPLES_PER_MINUTE = 60;
     static constexpr int GRID_RESOLUTION = 101;
-    static constexpr int GRID_LENGTH_IN_METERS = 10000;
+    static constexpr int GRID_LENGTH_IN_METERS = 1250;
     static constexpr int HIGHLIGHT_AREA_IN_METERS = 200;
     static constexpr int HIGHLIGHT_AREA_RESOLUTION = 2;
 }

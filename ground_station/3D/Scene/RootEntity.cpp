@@ -66,7 +66,7 @@ void RootEntity::init() {
     launchSitePos_ = worldRef_->worldPosAt(launchSiteLatLon, elevationModel_);
     cameraController_->setCameraViewCenter(launchSitePos_);
 
-    ground_ = new Ground(this, elevationModel_, worldRef_, 2);
+    ground_ = new Ground(this, elevationModel_, worldRef_, 2, QStringLiteral("qrc:/3D/textures/terrain/payerne"));
 
     auto *gs = new GroundStation(worldRef_->worldPosAt(gsLatLon, elevationModel_), TextureConstants::DOUBLE_DOWN_ARROW,
                                  camera_, this);

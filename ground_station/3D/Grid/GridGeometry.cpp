@@ -12,7 +12,7 @@ QByteArray GridGeometry::createPlaneVertexData(
     Q_ASSERT(gridResolution_ >= 2);
 
     const int nVerts = gridResolution_ * gridResolution_;
-    float vertSpacing = sideLength_ / (gridResolution_ - 1);
+    float vertSpacing = static_cast<float>(sideLength_) / static_cast<float>(gridResolution_ - 1);
 
     // Populate a buffer with the interleaved per-vertex data with
     // vec3 pos, vec2 texCoord, vec3 normal, vec4 tangent
