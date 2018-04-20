@@ -5,9 +5,15 @@
 
 /*
  *  [TIMESTAMP | ACC | GYRO | MAG | TEMP | PRES | PITOT]    Field name
- *       4        9     9      9     4      4       2       Size in bytes 32
+ *       4        6     6      6     4      4       2       Size in bytes 32
  */
 const PayloadType PayloadType::TELEMETRY{CommunicationsConstants::TELEMETRY_TYPE, 32};
+
+/*
+ *  [TIMESTAMP | ACC | EULER | TEMP | PRES | PITOT]    Field name
+ *       4       12    12      4      4       0        Size in bytes 36
+ */
+const PayloadType PayloadType::TELEMETRY_ERT18{CommunicationsConstants::TELEMETRY_ERT18_TYPE, 36};
 
 /*
  *  [TIMESTAMP | EVENT CODE]                                Field name

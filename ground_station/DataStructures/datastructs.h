@@ -160,7 +160,7 @@ struct SensorsPacket : TimedData, ILoggable, IDeserializable {
     SensorsPacket() : TimedData{0},
                       altitude_{0},
                       acceleration_{},
-                      magnetometer_{},
+                      eulerAngles_{},
                       gyroscope_{},
                       pressure_{0},
                       temperature_{0},
@@ -173,7 +173,7 @@ struct SensorsPacket : TimedData, ILoggable, IDeserializable {
             TimedData{t},
             altitude_{altitude},
             acceleration_{acceleration},
-            magnetometer_{magnetometer},
+            eulerAngles_{magnetometer},
             gyroscope_{gyroscope},
             pressure_{pressure},
             temperature_{temperature},
@@ -185,7 +185,7 @@ struct SensorsPacket : TimedData, ILoggable, IDeserializable {
     ~SensorsPacket() override = default;
 
     Data3D acceleration_;
-    Data3D magnetometer_;
+    Data3D eulerAngles_;
     Data3D gyroscope_;
     double altitude_;
     double pressure_;
@@ -206,7 +206,7 @@ struct SensorsPacket : TimedData, ILoggable, IDeserializable {
            << setw(FIELD_WIDTH) << setfill(DELIMITER) << setprecision(PRECISION) << fixed << temperature_
            << acceleration_.toString()
            << gyroscope_.toString()
-           << magnetometer_.toString();
+           << eulerAngles_.toString();
 
         return ss.str();
     }
@@ -217,7 +217,7 @@ struct SensorsPacket : TimedData, ILoggable, IDeserializable {
         temperature_ += rhs.temperature_;
         altitude_ += rhs.altitude_;
         acceleration_ += rhs.acceleration_;
-        magnetometer_ += rhs.magnetometer_;
+        eulerAngles_ += rhs.eulerAngles_;
         gyroscope_ += rhs.gyroscope_;
     }
 
@@ -228,7 +228,7 @@ struct SensorsPacket : TimedData, ILoggable, IDeserializable {
         temperature_ *= coeff;
         altitude_ *= coeff;
         acceleration_ *= coeff;
-        magnetometer_ *= coeff;
+        eulerAngles_ *= coeff;
         gyroscope_ *= coeff;
     }
 

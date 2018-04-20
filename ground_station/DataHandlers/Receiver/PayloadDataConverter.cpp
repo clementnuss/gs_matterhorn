@@ -11,7 +11,55 @@
  * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
  * @return A Telemetry struct
  */
+SensorsPacket PayloadDataConverter::toERT18SensorsPacket(const std::vector<uint8_t> &payloadBuffer) {
+    assert(payloadBuffer.size() == PayloadType::TELEMETRY_ERT18.length());
 
+    auto it = payloadBuffer.begin();
+
+    auto measurement_time = 1000 * parse32<uint32_t>(it); //millis
+
+    float_cast ax = {.uint32 = parse32<uint32_t>(it)};
+    float_cast ay = {.uint32 = parse32<uint32_t>(it)};
+    float_cast az = {.uint32 = parse32<uint32_t>(it)};
+
+    float_cast eulerX = {.uint32 = parse32<uint32_t>(it)};
+    float_cast eulerY = {.uint32 = parse32<uint32_t>(it)};
+    float_cast eulerZ = {.uint32 = parse32<uint32_t>(it)};
+
+    float_cast temperature = {.uint32 = parse32<uint32_t>(it)};
+    float_cast pressure = {.uint32 = parse32<uint32_t>(it)};
+    float pressure_hPa = pressure.fl;
+
+    // more info here: https://barani.biz/apps/sea-level-pressure/
+    /*
+    double adjustedSeaLevelPressure = SensorConstants::currentLocationReferenceHPa * pow(
+            (1 - (0.0065 * SensorConstants::currentLocationHeight) /
+                 (SensorConstants::currentLocationTemperature + 0.006 * SensorConstants::currentLocationHeight +
+                  273.15)), -5.257);
+      */
+
+    //TODO: factorize functions and test independently
+    double altitude = altitudeFromPressure(pressure_hPa);
+
+//    double air_speed = airSpeedFromPitotPressure(pitotPressure);
+
+    return {measurement_time,
+            altitude,
+            {ax.fl, ay.fl, az.fl},
+            {eulerX.fl, eulerY.fl, eulerZ.fl},
+            {0, 0, 0},
+            pressure_hPa,
+            temperature.fl,
+            NAN,
+            0};
+}
+
+/**
+ * Builds a Telemetry struct given a sequence of bytes
+ *
+ * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
+ * @return A Telemetry struct
+ */
 SensorsPacket PayloadDataConverter::toSensorsPacket(const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::TELEMETRY.length());
 
@@ -145,5 +193,5 @@ GPSPacket PayloadDataConverter::toGPSPacket(const vector<uint8_t> &payloadBuffer
             hdop.fl,
             lat.fl,
             lon.fl,
-                alt / 100.0f};
+            alt / 100.0f};
 }

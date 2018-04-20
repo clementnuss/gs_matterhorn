@@ -155,6 +155,8 @@ void RadioReceiver::unpackPayload() {
         case CommunicationsConstants::GPS_TYPE:
             gpsDataQueue_.push(PayloadDataConverter::toGPSPacket(d.payloadData_));
             break;
+        case CommunicationsConstants::TELEMETRY_ERT18_TYPE:
+            sensorsDataQueue_.push(PayloadDataConverter::toERT18SensorsPacket(d.payloadData_));
         default:
             break;
     }

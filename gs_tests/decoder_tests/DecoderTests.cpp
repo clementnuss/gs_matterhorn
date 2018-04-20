@@ -255,9 +255,9 @@ static void parseAndTestTelemetryPacket(Decoder &decoder, vector<uint8_t> &datag
     EXPECT_NEAR(gyroReading.x_, data.gyroscope_.x_, epsilon);
     EXPECT_NEAR(gyroReading.y_, data.gyroscope_.y_, epsilon);
     EXPECT_NEAR(gyroReading.z_, data.gyroscope_.z_, epsilon);
-    EXPECT_NEAR(magReading.x_, data.magnetometer_.x_, epsilon);
-    EXPECT_NEAR(magReading.y_, data.magnetometer_.y_, epsilon);
-    EXPECT_NEAR(magReading.z_, data.magnetometer_.z_, epsilon);
+    EXPECT_NEAR(magReading.x_, data.eulerAngles_.x_, epsilon);
+    EXPECT_NEAR(magReading.y_, data.eulerAngles_.y_, epsilon);
+    EXPECT_NEAR(magReading.z_, data.eulerAngles_.z_, epsilon);
     EXPECT_NEAR(temp, data.temperature_, epsilon);
     EXPECT_NEAR(pres / 100.0f, data.pressure_, epsilon);
     EXPECT_NEAR(altitudeFromPressure(pres / 100.0f), data.altitude_, epsilon);

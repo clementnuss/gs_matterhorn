@@ -12,7 +12,6 @@
 class TelemetryHandler : public IDataHandler<SensorsPacket> {
 
 public:
-    //TODO: move port and baud rate from derived class to here
     virtual void startup() = 0;
 
     /**
@@ -20,6 +19,12 @@ public:
      * @return The events received by this TelemetryHandler since the last call to the function
      */
     virtual std::vector<EventPacket> pollEventsData() = 0;
+
+    /**
+     *
+     * @return The sensors data received by this TelemetryHandler since the last call to the function
+     */
+    virtual std::vector<SensorsPacket> pollSensorsData() = 0;
 
     /**
      *

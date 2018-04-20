@@ -94,9 +94,9 @@ void GSMainwindow::receiveSensorData(const SensorsPacket t) {
     ui->telemetry_acceleration_value->setText(QString::number(t.acceleration_.norm(), 'f', UIConstants::PRECISION));
     ui->telemetry_pressure_value->setText(QString::number(t.pressure_, 'f', UIConstants::PRECISION));
     ui->telemetry_temperature_value->setText(QString::number(t.temperature_, 'f', UIConstants::PRECISION));
-    ui->telemetry_yaw_value->setText(QString::number(t.magnetometer_.x_, 'f', UIConstants::PRECISION));
-    ui->telemetry_pitch_value->setText(QString::number(t.magnetometer_.y_, 'f', UIConstants::PRECISION));
-    ui->telemetry_roll_value->setText(QString::number(t.magnetometer_.z_, 'f', UIConstants::PRECISION));
+    ui->telemetry_yaw_value->setText(QString::number(t.eulerAngles_.x_, 'f', UIConstants::PRECISION));
+    ui->telemetry_pitch_value->setText(QString::number(t.eulerAngles_.y_, 'f', UIConstants::PRECISION));
+    ui->telemetry_roll_value->setText(QString::number(t.eulerAngles_.z_, 'f', UIConstants::PRECISION));
 }
 
 
