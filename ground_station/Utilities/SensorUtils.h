@@ -4,9 +4,11 @@
 
 #include <ProgramConstants.h>
 #include <cmath>
+#include <ConfigParser/ConfigParser.h>
 
 static double altitudeFromPressure(float pressure_hPa) {
-    return 44330 * (1.0 - pow(pressure_hPa / SensorConstants::adjustedSeaLevelPressure, 0.1903));
+    return 44330 *
+           (1.0 - pow(pressure_hPa / ConfSingleton::instance().get("adjustedSeaLevelPressure", 1000.0f), 0.1903));
 }
 
 static double airSpeedFromPitotPressure(uint16_t pitotPressure) {

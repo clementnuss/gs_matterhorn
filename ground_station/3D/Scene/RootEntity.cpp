@@ -9,6 +9,7 @@
 #include <3D/ForwardRenderer/LayerManager.h>
 #include <3D/Objects/Compass.h>
 #include <3D/Grid/CompositeElevationModel.h>
+#include <ConfigParser/ConfigParser.h>
 #include "RootEntity.h"
 
 static void addToEach(QVector<QVector3D> &v, QVector3D v3d) {
@@ -36,7 +37,10 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         lastComputedPosition_{0, 0, 0},
         previousComputedPosition_{0, 0, 0},
         registeredEvents_{},
-        worldRef_{std::make_shared<const WorldReference>(ORIGIN_3D_MODULE)},
+        worldRef_{std::make_shared<const WorldReference>(LatLon {
+                ConfSingleton::instance().get("origin.lat", 0.0),
+                ConfSingleton::instance().get("origin.lon", 0.0)
+        })},
         elevationModel_{nullptr} {
 
     initRenderSettings(view);
@@ -61,8 +65,16 @@ void RootEntity::init() {
 
     elevationModel_ = std::make_shared<const ContinuousElevationModel>(std::move(compositeModel), worldRef_);
 
-    LatLon gsLatLon = GS_LATLON;
-    LatLon launchSiteLatLon = LAUNCH_SITE_LATLON;
+    LatLon gsLatLon = {
+            ConfSingleton::instance().get("gs.lat", 0.0),
+            ConfSingleton::instance().get("gs.lon", 0.0)
+    };
+
+    LatLon launchSiteLatLon = {
+            ConfSingleton::instance().get("launchsite.lat", 0.0),
+            ConfSingleton::instance().get("launchsite.lon", 0.0)
+    };
+
     launchSitePos_ = worldRef_->worldPosAt(launchSiteLatLon, elevationModel_);
     cameraController_->setCameraViewCenter(launchSitePos_);
 

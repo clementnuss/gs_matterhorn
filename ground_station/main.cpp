@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
     qRegisterMetaType<GraphFeature>("GraphFeature");
     qRegisterMetaType<HandlerStatus>("HandlerStatus");
 
-    ConfigParserSingleton::getInstance().loadConfig("config.json");
+    ConfSingleton::instance().loadConfig("config.json");
 
     Application app{argc, argv};
     app.run();

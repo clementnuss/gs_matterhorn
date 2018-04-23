@@ -6,10 +6,10 @@
 #include <boost/property_tree/json_parser.hpp>
 
 
-class ConfigParserSingleton {
+class ConfSingleton {
 public:
-    static ConfigParserSingleton &getInstance() {
-        static ConfigParserSingleton instance;
+    static ConfSingleton &instance() {
+        static ConfSingleton instance;
         return instance;
     }
 
@@ -24,7 +24,7 @@ public:
     }
 
     template<class T>
-    T getValue(const std::string &propertyName, const T &defaultValue) {
+    T get(const std::string &propertyName, const T &defaultValue) {
         return pt.get(propertyName, defaultValue);
     }
 
@@ -38,15 +38,15 @@ public:
     }
 
 private:
-    explicit ConfigParserSingleton() : pt{} {}
+    explicit ConfSingleton() : pt{} {}
 
     boost::property_tree::ptree pt;
 
 public:
 
-    ConfigParserSingleton(ConfigParserSingleton const &) = delete;
+    ConfSingleton(ConfSingleton const &) = delete;
 
-    void operator=(ConfigParserSingleton const &)  = delete;
+    void operator=(ConfSingleton const &)  = delete;
 };
 
 
