@@ -1,4 +1,5 @@
 #include <Application.h>
+#include <ConfigParser/ConfigParser.h>
 
 
 int main(int argc, char **argv) {
@@ -9,6 +10,8 @@ int main(int argc, char **argv) {
     qRegisterMetaType<vector<EventPacket>>("vector<RocketEvent>&");
     qRegisterMetaType<GraphFeature>("GraphFeature");
     qRegisterMetaType<HandlerStatus>("HandlerStatus");
+
+    ConfigParserSingleton::getInstance().loadConfig("config.json");
 
     Application app{argc, argv};
     app.run();
