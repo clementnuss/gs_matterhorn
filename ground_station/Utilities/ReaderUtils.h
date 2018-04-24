@@ -29,7 +29,7 @@ static QVector3D posFromString(const std::string &str) {
         z = std::stof(*it++);
 
     } catch (std::logic_error &e) {
-        std::cout << "\tunable to decode this reading:\n\t" << str;
+        //std::cout << "\tunable to decode this reading:\n\t" << str;
     }
 
     return {x, z, y};
@@ -61,7 +61,7 @@ static WindPrediction windPredictionFromString(const std::string &str) {
 
 
     } catch (std::logic_error &e) {
-        std::cout << "\tunable to decode this reading:\n\t" << s;
+        //std::cout << "\tunable to decode this reading:\n\t" << s;
     }
 
     return prediction;

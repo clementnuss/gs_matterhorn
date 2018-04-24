@@ -46,7 +46,7 @@ Ground::Ground(Qt3DCore::QNode *parent, std::shared_ptr<const ContinuousElevatio
         }
     }
 
-    std::cout << tiles_.size() << std::endl;
+    //std::cout << tiles_.size() << std::endl;
 
 }
 

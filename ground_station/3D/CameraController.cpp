@@ -58,8 +58,8 @@ void CameraController::switchObservable() {
     azimuthalAngle_ = wrapAngle(azimuthalAngle_);
     newAzimuthalAngle = wrapAngle(newAzimuthalAngle);
 
-    std::cout << "azimuth: " << azimuthalAngle_ << " new azimuth: " << newAzimuthalAngle << "angular dist "
-              << angularDistance(azimuthalAngle_, newAzimuthalAngle) << std::endl;
+    /*std::cout << "azimuth: " << azimuthalAngle_ << " new azimuth: " << newAzimuthalAngle << "angular dist "
+              << angularDistance(azimuthalAngle_, newAzimuthalAngle) << std::endl;*/
 
     // Adjust polar angle
     animators_.push_back(std::make_shared<FloatInterpolator>(
@@ -85,7 +85,7 @@ void CameraController::switchObservable() {
 
 void CameraController::handleKeyPress(Qt3DInput::QKeyEvent *event) {
 
-    std::cout << "Qt3D captured: " << event->key() << "\n";
+    //std::cout << "Qt3D captured: " << event->key() << "\n";
 
     switch (event->key()) {
         case Qt::Key_Space:
