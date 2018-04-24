@@ -3,6 +3,7 @@
 #define GS_MATTERHORN_COMPOSITEELEVATIONMODEL_H
 
 
+#include <vector>
 #include "DiscreteElevationModel.h"
 #include "IDiscreteElevationModel.h"
 
@@ -14,6 +15,8 @@ public:
     float elevationAt(int latitudeIndex, int longitudeIndex) const override;
 
     Interval2D extent() const;
+
+    static std::unique_ptr<const IDiscreteElevationModel> buildModel(const std::vector<std::string> &paths);
 
 private:
     std::unique_ptr<const IDiscreteElevationModel> dem1_;

@@ -50,18 +50,8 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 void RootEntity::init() {
 
 
-    std::unique_ptr<const DiscreteElevationModel> discreteModel1 = std::make_unique<const DiscreteElevationModel>(
-            DEM_PATH_1,
-            DEM_TL_1
-    );
-    std::unique_ptr<const DiscreteElevationModel> discreteModel2 = std::make_unique<const DiscreteElevationModel>(
-            DEM_PATH_2,
-            DEM_TL_2
-    );
-    std::unique_ptr<const CompositeElevationModel> compositeModel = std::make_unique<const CompositeElevationModel>(
-            std::move(discreteModel1),
-            std::move(discreteModel2)
-    );
+    std::unique_ptr<const IDiscreteElevationModel> compositeModel = CompositeElevationModel::buildModel(
+            ConfSingleton::instance().getList<std::string>("dems"));
 
     elevationModel_ = std::make_shared<const ContinuousElevationModel>(std::move(compositeModel), worldRef_);
 

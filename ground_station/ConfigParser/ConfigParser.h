@@ -4,6 +4,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/filesystem.hpp>
 
 
 class ConfSingleton {
@@ -33,7 +34,10 @@ public:
             pt.clear();
         }
 
-        //TODO: check existence of config file first
+        if (!boost::filesystem::exists(configPath)) {
+            throw std::invalid_argument("Config file path is incorrect !");
+        }
+
         boost::property_tree::read_json(configPath, pt);
     }
 

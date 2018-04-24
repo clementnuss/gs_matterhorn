@@ -13,15 +13,46 @@ CompositeElevationModel::CompositeElevationModel(
     extent_ = dem1_->extent().unionWith(dem2_->extent());
 }
 
-Interval2D CompositeElevationModel::extent() const {
+Interval2D
+CompositeElevationModel::extent() const {
     return extent_;
 }
 
-float CompositeElevationModel::elevationAt(int latitudeIndex, int longitudeIndex) const {
+float
+CompositeElevationModel::elevationAt(int latitudeIndex, int longitudeIndex) const {
     if (!extent_.contains(latitudeIndex, longitudeIndex)) {
         throw std::invalid_argument("The specified latitude and/or longitude "
                                             "index is not contained in this composite elevation model");
     }
     return (dem1_->extent().contains(latitudeIndex, longitudeIndex) ? dem1_ : dem2_)->elevationAt(latitudeIndex,
                                                                                                   longitudeIndex);
+}
+
+
+std::unique_ptr<const IDiscreteElevationModel>
+CompositeElevationModel::buildModel(const std::vector<std::string> &paths) {
+
+    if (paths.size() < 1) {
+        throw std::invalid_argument("No paths were provided to build the digital elevation model");
+    }
+
+    std::unique_ptr<const IDiscreteElevationModel> discreteModel = std::make_unique<const DiscreteElevationModel>(
+            paths[0],
+            IDiscreteElevationModel::topLeftFrom(paths[0])
+    );
+
+    for (size_t i = 1; i < paths.size(); i++) {
+        std::unique_ptr<const DiscreteElevationModel> d = std::make_unique<const DiscreteElevationModel>(
+                paths[i],
+                IDiscreteElevationModel::topLeftFrom(paths[i])
+        );
+
+        discreteModel = std::make_unique<const CompositeElevationModel>(
+                std::move(d),
+                std::move(discreteModel)
+        );
+    }
+
+
+    return discreteModel;
 }
