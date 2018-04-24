@@ -17,5 +17,7 @@
   "dems": [
     "./DEM/N46E006.hgt",
     "./DEM/N46E007.hgt"
-  ]
+  ],
+  "commonTexturePath": "qrc:/3D/textures/terrain/payerne",
+  "meteoFile": "./MeteoData/meteo_payerne_test.txt"
 }

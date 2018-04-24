@@ -68,7 +68,12 @@ void RootEntity::init() {
     launchSitePos_ = worldRef_->worldPosAt(launchSiteLatLon, elevationModel_);
     cameraController_->setCameraViewCenter(launchSitePos_);
 
-    ground_ = new Ground(this, elevationModel_, worldRef_, 2, QStringLiteral("qrc:/3D/textures/terrain/payerne"));
+    ground_ = new Ground(
+            this,
+            elevationModel_,
+            worldRef_,
+            2,
+            QString::fromStdString(ConfSingleton::instance().get("commonTexturePath", std::string{""})));
 
     auto *gs = new GroundStation(worldRef_->worldPosAt(gsLatLon, elevationModel_), TextureConstants::DOUBLE_DOWN_ARROW,
                                  camera_, this);
@@ -90,7 +95,7 @@ void RootEntity::init() {
     simTrace_->appendData(traceData);
     */
 
-    std::string meteoPath{"./MeteoData/meteo_payerne_test.txt"};
+    std::string meteoPath = ConfSingleton::instance().get("meteoFile", std::string{""});
     splashDownPredictor_ = new SplashDownPredictor(meteoPath, this);
 
     new OpenGL3DAxes(this);
