@@ -170,3 +170,7 @@ RadioReceiver::~RadioReceiver() {
 bool RadioReceiver::isReplayHandler() {
     return false;
 }
+
+void RadioReceiver::sendCommand(const uint8_t *command, size_t size) {
+    serialPort_.write(command, size);
+}

@@ -627,6 +627,10 @@ bool GSMainwindow::event(QEvent *event) {
             this->registerEvent(EventPacket(0, 0, ""));
         } else if (ke->key() == Qt::Key_T) {
             emit toggleTracking();
+        } else if (ke->key() == Qt::Key_H) {
+            emit sendCommand(14);
+        } else if (ke->key() == Qt::Key_G) {
+            emit sendCommand(22);
         }
 #endif
 

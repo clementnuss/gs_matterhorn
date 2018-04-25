@@ -13,6 +13,7 @@
 #include "Loggers/FileLogger.h"
 
 class GSMainwindow;
+
 using namespace std;
 
 class Worker : public QObject {
@@ -46,6 +47,8 @@ public slots:
 
     void reversePlayback(bool);
 
+    void transmitCommand(int);
+
 signals:
 
     void loggingStatusReady(bool);
@@ -71,11 +74,11 @@ private:
 
     void checkLinkStatuses();
 
-    void displaySensorData(SensorsPacket&);
+    void displaySensorData(SensorsPacket &);
 
-    void displayEventData(EventPacket&);
+    void displayEventData(EventPacket &);
 
-    void displayGPSData(GPSPacket&);
+    void displayGPSData(GPSPacket &);
 
     bool trackingEnabled_{false};
     bool loggingEnabled_;

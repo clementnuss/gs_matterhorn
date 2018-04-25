@@ -117,7 +117,13 @@ void Application::connectSlotsAndSignals() {
     QObject::connect(worker_,
                      &Worker::resetUIState,
                      &gsMainWindow_,
-                     &GSMainwindow::resetUIState);}
+                     &GSMainwindow::resetUIState);
+
+    QObject::connect(&gsMainWindow_,
+                     &GSMainwindow::sendCommand,
+                     worker_,
+                     &Worker::transmitCommand);
+}
 
 
 Application::~Application() {

@@ -31,6 +31,11 @@ public:
 
     bool isReplayHandler() override;
 
+    void sendCommand(const uint8_t*, size_t) override {
+
+    }
+
+
 private:
     boost::filesystem::path path_;
     vector<GPSPacket> gpsReadings_;

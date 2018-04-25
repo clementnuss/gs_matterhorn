@@ -100,6 +100,8 @@ public slots:
 
 signals:
 
+    void sendCommand(int);
+
     void toggleLogging();
 
     void toggleTracking();
