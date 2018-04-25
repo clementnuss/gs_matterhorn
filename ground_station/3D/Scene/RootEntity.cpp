@@ -9,6 +9,7 @@
 #include <3D/ForwardRenderer/LayerManager.h>
 #include <3D/Objects/Compass.h>
 #include <3D/Grid/CompositeElevationModel.h>
+#include <ConfigParser/ConfigParser.h>
 #include "RootEntity.h"
 
 static void addToEach(QVector<QVector3D> &v, QVector3D v3d) {
@@ -36,7 +37,10 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         lastComputedPosition_{0, 0, 0},
         previousComputedPosition_{0, 0, 0},
         registeredEvents_{},
-        worldRef_{std::make_shared<const WorldReference>(ORIGIN_3D_MODULE)},
+        worldRef_{std::make_shared<const WorldReference>(LatLon {
+                ConfSingleton::instance().get("origin.lat", 0.0),
+                ConfSingleton::instance().get("origin.lon", 0.0)
+        })},
         elevationModel_{nullptr} {
 
     initRenderSettings(view);
@@ -46,27 +50,30 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 void RootEntity::init() {
 
 
-    std::unique_ptr<const DiscreteElevationModel> discreteModel1 = std::make_unique<const DiscreteElevationModel>(
-            DEM_PATH_1,
-            DEM_TL_1
-    );
-    std::unique_ptr<const DiscreteElevationModel> discreteModel2 = std::make_unique<const DiscreteElevationModel>(
-            DEM_PATH_2,
-            DEM_TL_2
-    );
-    std::unique_ptr<const CompositeElevationModel> compositeModel = std::make_unique<const CompositeElevationModel>(
-            std::move(discreteModel1),
-            std::move(discreteModel2)
-    );
+    std::unique_ptr<const IDiscreteElevationModel> compositeModel = CompositeElevationModel::buildModel(
+            ConfSingleton::instance().getList<std::string>("dems"));
 
     elevationModel_ = std::make_shared<const ContinuousElevationModel>(std::move(compositeModel), worldRef_);
 
-    LatLon gsLatLon = GS_LATLON;
-    LatLon launchSiteLatLon = LAUNCH_SITE_LATLON;
+    LatLon gsLatLon = {
+            ConfSingleton::instance().get("gs.lat", 0.0),
+            ConfSingleton::instance().get("gs.lon", 0.0)
+    };
+
+    LatLon launchSiteLatLon = {
+            ConfSingleton::instance().get("launchsite.lat", 0.0),
+            ConfSingleton::instance().get("launchsite.lon", 0.0)
+    };
+
     launchSitePos_ = worldRef_->worldPosAt(launchSiteLatLon, elevationModel_);
     cameraController_->setCameraViewCenter(launchSitePos_);
 
-    ground_ = new Ground(this, elevationModel_, worldRef_, 2, QStringLiteral("qrc:/3D/textures/terrain/payerne"));
+    ground_ = new Ground(
+            this,
+            elevationModel_,
+            worldRef_,
+            2,
+            QString::fromStdString(ConfSingleton::instance().get("commonTexturePath", std::string{""})));
 
     auto *gs = new GroundStation(worldRef_->worldPosAt(gsLatLon, elevationModel_), TextureConstants::DOUBLE_DOWN_ARROW,
                                  camera_, this);
@@ -88,7 +95,7 @@ void RootEntity::init() {
     simTrace_->appendData(traceData);
     */
 
-    std::string meteoPath{"./MeteoData/meteo_payerne_test.txt"};
+    std::string meteoPath = ConfSingleton::instance().get("meteoFile", std::string{""});
     splashDownPredictor_ = new SplashDownPredictor(meteoPath, this);
 
     new OpenGL3DAxes(this);

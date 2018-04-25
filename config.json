@@ -1,0 +1,23 @@
+{
+  "origin": {
+    "lat": 46.83850,
+    "lon": 6.89931
+  },
+  "gs": {
+    "lat": 46.837704,
+    "lon": 6.898836
+  },
+  "launchsite": {
+    "lat": 46.838176,
+    "lon": 6.899335,
+    "distance": 50.0,
+    "altitude": 430.0,
+    "adjustedSeaLevelPressure": 1015.6
+  },
+  "dems": [
+    "./DEM/N46E006.hgt",
+    "./DEM/N46E007.hgt"
+  ],
+  "commonTexturePath": "qrc:/3D/textures/terrain/payerne",
+  "meteoFile": "./MeteoData/meteo_payerne_test.txt"
+}

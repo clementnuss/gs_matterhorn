@@ -4,6 +4,7 @@
 #include <3DTests/IntervalTests.h>
 #include <3DTests/GroundTests.h>
 #include <3DTests/ElevationModelTests.h>
+#include "ConfigParserTests.h"
 #include "DummyTests.h"
 #include "GsMainwindowTests.h"
 
@@ -21,6 +22,7 @@ int main(int argc, char **argv) {
     ASSERT_TEST(new IntervalTests());
     ASSERT_TEST(new GroundTests());
     ASSERT_TEST(new ElevationModelTests());
+    ASSERT_TEST(new ConfigParserTests());
 
     return status;
 }

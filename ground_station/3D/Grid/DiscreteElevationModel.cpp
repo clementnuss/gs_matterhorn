@@ -16,7 +16,7 @@ DiscreteElevationModel::DiscreteElevationModel(const std::string &filePath, cons
             hgtFile_.open(filePath);
             hgtData_ = reinterpret_cast<const uint16_t *>(hgtFile_.data());
             uint16_t v = hgtData_[0] >> 8 | hgtData_[0] << 8;
-            std::cout << v << " ";
+            //std::cout << v << " ";
 
 /*
             for(int i=0; i < numberOfElements; i++){

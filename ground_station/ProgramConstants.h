@@ -13,16 +13,14 @@
 #define USE_3D_MODULE true
 #define TEST3D true
 
-static const LatLon ORIGIN_3D_MODULE = {46.83850, 6.89931};
-static const LatLon LAUNCH_SITE_LATLON = {46.838176, 6.899335};
-static const LatLon GS_LATLON = {46.837704, 6.898836};
-static const std::string DEM_PATH_1 = "./DEM/N46E006.hgt";
-static const std::string DEM_PATH_2 = "./DEM/N46E007.hgt";
+/*
+//static const std::string DEM_PATH_1 = "./DEM/N46E006.hgt";
+//static const std::string DEM_PATH_2 = "./DEM/N46E007.hgt";
 //TODO: make progeam automatically extract topleft values from .hgt file names
 static const GeoPoint DEM_TL_1{{46, 0, 0},
                                {6,  0, 0}};
 static const GeoPoint DEM_TL_2{{46, 0, 0},
-                               {7,  0, 0}};
+                               {7,  0, 0}};*/
 
 namespace UnitsConstants {
     static constexpr float KNOTS_TO_MS = 0.514444;
@@ -38,6 +36,7 @@ namespace PredictorConstants {
 
 namespace FileConstants {
     static constexpr int WIND_PREDICTIONS_HEADER_LINES_COUNT = 4;
+    static constexpr int HGT_FILENAME_LENGTH_MIN = 7;
 }
 
 namespace PrintConstants {
@@ -107,10 +106,10 @@ namespace SensorConstants {
     static float currentLocationTemperature = 1.6f;
      */
 
-    static float adjustedSeaLevelPressure = 1015.6;
-    static float launchAltitude = 430.3;
-    static float trackingAltitude = 430;
-    static float distanceToLaunchSite = 50;
+    //static float adjustedSeaLevelPressure = 1015.6;
+    //static float launchAltitude = 430.3;
+    //static float trackingAltitude = 430;
+    //static float distanceToLaunchSite = 50;
 
 }
 
