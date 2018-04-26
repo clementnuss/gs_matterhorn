@@ -6,7 +6,7 @@
 #include <3D/3DVisualisationConstants.h>
 #include "Ruler.h"
 
-Ruler::Ruler(QVector3D &measurePos, Qt3DRender::QCamera *camera, const QString &tickTexture,
+Ruler::Ruler(QVector3D measurePos, Qt3DRender::QCamera *camera, const QString &tickTexture,
              Qt3DCore::QNode *parent) :
         QEntity(parent),
         transform_{new Qt3DCore::QTransform()},

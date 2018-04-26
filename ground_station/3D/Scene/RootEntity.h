@@ -27,6 +27,8 @@ public slots:
 
     void updateFlightPosition(const Position pos);
 
+    void updatePayloadPosition(const Position pos);
+
     void resetTrace();
 
 signals:
@@ -61,7 +63,9 @@ private:
     Qt3DRender::QCamera *camera_;
     QVector3D launchSitePos_;
     Tracker *rocketTracker_;
+    Tracker *payloadTracker_;
     Line *rocketTrace_;
+    Line *payloadTrace_;
     Line *simTrace_;
     Ruler *rocketRuler_;
 

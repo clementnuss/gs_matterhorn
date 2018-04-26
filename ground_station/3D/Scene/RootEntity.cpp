@@ -23,7 +23,9 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         cameraController_{new CameraController(this)},
         camera_{view->camera()},
         rocketTracker_{nullptr},
+        payloadTracker_{nullptr},
         rocketTrace_{nullptr},
+        payloadTrace_{nullptr},
         simTrace_{nullptr},
         rocketRuler_{nullptr},
         splashDownPredictor_{nullptr},
@@ -49,12 +51,15 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
 void RootEntity::init() {
 
+    // Display 3D module origin
+    new OpenGL3DAxes(this);
 
+    // Build digital representation of launch site
     std::unique_ptr<const IDiscreteElevationModel> compositeModel = CompositeElevationModel::buildModel(
             ConfSingleton::instance().getList<std::string>("dems"));
-
     elevationModel_ = std::make_shared<const ContinuousElevationModel>(std::move(compositeModel), worldRef_);
 
+    // Read and build positions from config file
     LatLon gsLatLon = {
             ConfSingleton::instance().get("gs.lat", 0.0),
             ConfSingleton::instance().get("gs.lon", 0.0)
@@ -66,8 +71,6 @@ void RootEntity::init() {
     };
 
     launchSitePos_ = worldRef_->worldPosAt(launchSiteLatLon, elevationModel_);
-    cameraController_->setCameraViewCenter(launchSitePos_);
-
     ground_ = new Ground(
             this,
             elevationModel_,
@@ -75,15 +78,21 @@ void RootEntity::init() {
             2,
             QString::fromStdString(ConfSingleton::instance().get("commonTexturePath", std::string{""})));
 
+    // Initialize tracker objects, they are used to visualize moving objects in the 3D representation
+    rocketTracker_ = new Tracker(launchSitePos_, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
+                                 TextType::BOLD, this, OpenGLConstants::ABOVE_MARKER_OFFSET,
+                                 OpenGLConstants::ABOVE_CENTER_LABEL);
+    rocketTrace_ = new Line(this, QColor::fromRgb(255, 255, 255), false);
+    rocketTrace_->setData({launchSitePos_, launchSitePos_});
+
+    payloadTracker_ = new Tracker(launchSitePos_, camera_, TextureConstants::CARET_DOWN, QStringLiteral("PAYLOAD"),
+                                  TextType::LEGEND, this, OpenGLConstants::ABOVE_MARKER_OFFSET,
+                                  OpenGLConstants::ABOVE_RIGHT_LABEL);
+    payloadTrace_ = new Line(this, QColor::fromRgb(255, 159, 0), false);
+    payloadTrace_->setData({launchSitePos_, launchSitePos_});
+
     auto *gs = new GroundStation(worldRef_->worldPosAt(gsLatLon, elevationModel_), TextureConstants::DOUBLE_DOWN_ARROW,
                                  camera_, this);
-
-    rocketTracker_ = new Tracker(launchSitePos_, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
-                                 TextType::BOLD, this, OpenGLConstants::ABOVE, OpenGLConstants::ABOVE_CENTER_LABEL);
-
-    rocketTrace_ = new Line(this, QColor::fromRgb(255, 255, 255), false);
-    rocketTrace_->setData({launchSitePos_,
-                           launchSitePos_});
 
     // Initialise simulated rocket trace
     /*
@@ -97,12 +106,12 @@ void RootEntity::init() {
 
     std::string meteoPath = ConfSingleton::instance().get("meteoFile", std::string{""});
     splashDownPredictor_ = new SplashDownPredictor(meteoPath, this);
+    rocketRuler_ = new Ruler(QVector3D{0, 0, 0}, camera_, TextureConstants::CARET_LEFT, this);
 
-    new OpenGL3DAxes(this);
-    QVector3D initialPos{0, 0, 0};
-    rocketRuler_ = new Ruler(initialPos, camera_, TextureConstants::CARET_LEFT, this);
-
+    // Setup dynamic camera parameters
+    cameraController_->setCameraViewCenter(launchSitePos_);
     cameraController_->registerObservable(rocketTracker_);
+    cameraController_->registerObservable(payloadTracker_);
     cameraController_->registerObservable(gs);
 
     reportWindData();
@@ -147,6 +156,15 @@ void RootEntity::updateFlightPosition(const Position pos) {
                 UI3DConstants::WIND_REPORT_N_LINES -
                 static_cast<int>(lastComputedPosition_.y() / UI3DConstants::WIND_REPORT_INTERVAL));
     }
+}
+
+void RootEntity::updatePayloadPosition(const Position pos) {
+
+    QVector2D horizontalWorldPos = worldRef_->translationFromOrigin(pos.latLon);
+    QVector3D pos3D = {horizontalWorldPos.x(), static_cast<float>(pos.altitude), horizontalWorldPos.y()};
+
+    rocketTracker_->updatePosition(pos3D);
+    rocketTrace_->appendData(pos3D);
 }
 
 void RootEntity::resetTrace() {

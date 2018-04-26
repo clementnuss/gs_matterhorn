@@ -41,8 +41,12 @@ void Application::connectSlotsAndSignals() {
                      &Worker::flightPositionReady,
                      gsMainWindow_.get3DModule(),
                      &RootEntity::updateFlightPosition);
-#endif
 
+    QObject::connect(worker_,
+                     &Worker::payloadPositionReady,
+                     gsMainWindow_.get3DModule(),
+                     &RootEntity::updatePayloadPosition);
+#endif
 
     QObject::connect(worker_,
                      &Worker::sensorsDataReady,

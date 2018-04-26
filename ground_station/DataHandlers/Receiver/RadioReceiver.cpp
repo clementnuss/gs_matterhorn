@@ -12,8 +12,8 @@
  * @param baudRate
  * @param io
  */
-RadioReceiver::RadioReceiver(string portAddress)
-        : byteDecoder_{}, devicePort_{std::move(portAddress)}, serialPort_{}, thread_{},
+RadioReceiver::RadioReceiver(string hardwareID)
+        : byteDecoder_{}, devicePort_{}, serialPort_{}, thread_{},
           recvBuffer_{}, sensorsDataQueue_{100}, eventsDataQueue_{100}, controlDataQueue_{100}, gpsDataQueue_{100},
           bytesLogger_{LogConstants::BYTES_LOG_PATH} {
 
@@ -23,20 +23,18 @@ RadioReceiver::RadioReceiver(string portAddress)
         auto iter = devices_found.begin();
         while (iter != devices_found.end()) {
             serial::PortInfo device = *iter++;
-            /*printf("(%s, %s, %s)\n",
-                   device.port.c_str(), device.description.c_str(), device.hardware_id.c_str());*/
-            if (device.hardware_id == "FTDIBUS\\COMPORT&VID_0403&PID_6015") {
+            printf("(%s, %s, %s)\n",
+                   device.port.c_str(), device.description.c_str(), device.hardware_id.c_str());
+            if (device.hardware_id == hardwareID) {
                 devicePort_ = device.port;
             }
         }
 
-
         if (devicePort_.empty()) {
-            devicePort_ = devices_found.front().port;
-            std::cout << "The first port of the list will be used, with address: " << devicePort_ << std::endl;
+            throw std::invalid_argument("Could not find serial port with hardware id: " + hardwareID);
         }
     } else {
-        std::cerr << "No Serial port available!" << std::endl;
+        std::cerr << "No Serial port available, telemetry acquisition will not work." << std::endl;
     }
 
 

@@ -17,29 +17,35 @@ using namespace std;
  */
 Worker::Worker(GSMainwindow *gsMainwindow) :
         loggingEnabled_{false},
-        sensorsLogger_{LogConstants::WORKER_TELEMETRY_LOG_PATH},
-        eventsLogger_{LogConstants::WORKER_EVENTS_LOG_PATH},
-        gpsLogger_{LogConstants::WORKER_GPS_LOG_PATH},
+        sensorsLogger900_{LogConstants::WORKER_TELEMETRY_ROCKET_LOG_PATH},
+        eventsLogger900_{LogConstants::WORKER_EVENTS_ROCKET_LOG_PATH},
+        gpsLogger900_{LogConstants::WORKER_GPS_ROCKET_LOG_PATH},
+        sensorsLogger433_{LogConstants::WORKER_TELEMETRY_PAYLOAD_LOG_PATH},
+        eventsLogger433_{LogConstants::WORKER_EVENTS_PAYLOAD_LOG_PATH},
+        gpsLogger433_{LogConstants::WORKER_GPS_PAYLOAD_LOG_PATH},
         lastNumericalValuesUpdate_{chrono::system_clock::now()},
         lastIteration_{chrono::system_clock::now()},
+        lastGPSTimestamp_{0},
+        lastPayloadGPSTimestamp_{0},
         timeOfLastLinkCheck_{chrono::system_clock::now()},
         timeOfLastReceivedTelemetry_{chrono::system_clock::now()},
         millisBetweenLastTwoPackets_{0},
         replayMode_{false},
         updateHandler_{false},
         lastComputedPosition_{},
-        telemetryHandler_{} {
+        telemetryHandler900MHz_{},
+        telemetryHandler433MHz_{} {
 
     gsMainwindow->setRealTimeMode();
     TelemetryHandler *handler;
     try {
-        handler = new RadioReceiver("");
-        handler->startup();
+        telemetryHandler900MHz_ = std::make_unique<RadioReceiver>("FTDIBUS\\COMPORT&VID_0403&PID_6015");
+        telemetryHandler433MHz_ = std::make_unique<RadioReceiver>("FTDIBUS\\COMPORT&VID_0403&PID_s6015");
+        telemetryHandler900MHz_->startup();
+        telemetryHandler433MHz_->startup();
     } catch (std::runtime_error &e) {
-        std::cerr << "Error when starting the initial radio receiver handler:\n" << e.what();
+        std::cerr << "Unable to start radio receiver handler:\n" << e.what();
     }
-
-    telemetryHandler_ = unique_ptr<TelemetryHandler>{handler};
 
 #if USE_TRACKING
     vector<serial::PortInfo> devices_found = serial::list_ports();
@@ -99,9 +105,9 @@ void Worker::run() {
             timeOfLastReceivedTelemetry_ = chrono::system_clock::now();
 
 
-            telemetryHandler_.swap(newHandler_);
+            telemetryHandler900MHz_.swap(newHandler_);
             newHandler_ = nullptr;
-            if (telemetryHandler_->isReplayHandler()) {
+            if (telemetryHandler900MHz_->isReplayHandler()) {
                 replayMode_ = true;
             }
             emit resetUIState();
@@ -113,9 +119,9 @@ void Worker::run() {
 
     }
 
-    std::cout << "The worker has finished" << std::endl;
-    sensorsLogger_.close();
-    eventsLogger_.close();
+    std::cout << "The worker finished" << std::endl;
+    sensorsLogger900_.close();
+    eventsLogger900_.close();
 }
 
 /**
@@ -129,25 +135,46 @@ void Worker::mainRoutine() {
     }
     lastIteration_ = chrono::system_clock::now();
     checkLinkStatuses();
+    processDataFlows();
 
+    QCoreApplication::sendPostedEvents(this);
+    QCoreApplication::processEvents();
+}
+
+/**
+ *
+ */
+void Worker::processDataFlows() {
     //Sensor data needs to be polled first!
-    vector<SensorsPacket> sensorsData = telemetryHandler_->pollSensorsData();
-    vector<EventPacket> eventsData = telemetryHandler_->pollEventsData();
-    vector<GPSPacket> gpsData = telemetryHandler_->pollGPSData();
+    vector <SensorsPacket> sensorsData900 = telemetryHandler900MHz_->pollSensorsData();
+    vector <EventPacket> eventsData900 = telemetryHandler900MHz_->pollEventsData();
+    vector <GPSPacket> gpsData900 = telemetryHandler900MHz_->pollGPSData();
+
+    vector <SensorsPacket> sensorsData433 = telemetryHandler433MHz_->pollSensorsData();
+    vector <EventPacket> eventsData433 = telemetryHandler433MHz_->pollEventsData();
+    vector <GPSPacket> gpsData433 = telemetryHandler433MHz_->pollGPSData();
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
 
+    //TODO: implement more elegantly to reduce amount of code
     if (loggingEnabled_) {
-        sensorsLogger_.registerData(
-                std::vector<std::reference_wrapper<ILoggable>>(begin(sensorsData), end(sensorsData)));
-        eventsLogger_.registerData(
-                std::vector<std::reference_wrapper<ILoggable>>(begin(eventsData), end(eventsData)));
-        gpsLogger_.registerData(
-                std::vector<std::reference_wrapper<ILoggable>>(begin(gpsData), end(gpsData)));
+        sensorsLogger900_.registerData(
+                std::vector<std::reference_wrapper<ILoggable>>(begin(sensorsData900), end(sensorsData900)));
+        eventsLogger900_.registerData(
+                std::vector<std::reference_wrapper<ILoggable>>(begin(eventsData900), end(eventsData900)));
+        gpsLogger900_.registerData(
+                std::vector<std::reference_wrapper<ILoggable>>(begin(gpsData900), end(gpsData900)));
+
+        sensorsLogger433_.registerData(
+                std::vector<std::reference_wrapper<ILoggable>>(begin(sensorsData433), end(sensorsData433)));
+        eventsLogger433_.registerData(
+                std::vector<std::reference_wrapper<ILoggable>>(begin(eventsData433), end(eventsData433)));
+        gpsLogger433_.registerData(
+                std::vector<std::reference_wrapper<ILoggable>>(begin(gpsData433), end(gpsData433)));
     }
 
-    if (!sensorsData.empty()) {
-        SensorsPacket &lastSensorValue = *--sensorsData.end();
+    if (!sensorsData900.empty()) {
+        SensorsPacket &lastSensorValue = *--sensorsData900.end();
 
 #ifdef USE_TRACKING
         moveTrackingSystem(lastSensorValue.altitude_);
@@ -158,13 +185,13 @@ void Worker::mainRoutine() {
         timeOfLastReceivedTelemetry_ = now;
         displaySensorData(lastSensorValue);
 
-        QVector<QCPGraphData> altitudeDataBuffer = extractGraphData(sensorsData, altitudeFromReading);
-        QVector<QCPGraphData> accelDataBuffer = extractGraphData(sensorsData, accelerationFromReading);
+        QVector<QCPGraphData> altitudeDataBuffer = extractGraphData(sensorsData900, altitudeFromReading);
+        QVector<QCPGraphData> accelDataBuffer = extractGraphData(sensorsData900, accelerationFromReading);
         emit graphDataReady(altitudeDataBuffer, GraphFeature::FEATURE1);
         emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
     } else {
         if (replayMode_) {
-            auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler_.get());
+            auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler900MHz_.get());
             if (!telemReplay->endOfPlayback()) {
                 QVector<QCPGraphData> empty;
                 emit graphDataReady(empty, GraphFeature::Count);
@@ -175,17 +202,26 @@ void Worker::mainRoutine() {
         }
     }
 
-    for (auto &d : eventsData) {
+    for (auto &d : eventsData900) {
         displayEventData(d);
     }
 
-    for (auto &d : gpsData) {
-        displayGPSData(d);
+    for (auto &d : gpsData900) {
+        displayGPSData(d, false);
     }
-
-    QCoreApplication::sendPostedEvents(this);
-    QCoreApplication::processEvents();
 }
+
+
+void Worker::logData() {
+
+
+}
+
+
+void Worker::fusionData() {
+
+}
+
 
 /**
  * Emits to the UI the latest sensors data. If the interval between two calls to this function is lower
@@ -222,17 +258,31 @@ void Worker::displayEventData(EventPacket &ep) {
  *
  * @param gp The GPSPacket to be displayed.
  */
-void Worker::displayGPSData(GPSPacket &gp) {
+void Worker::displayGPSData(GPSPacket &gp, bool isRocket) {
 
-    if (gp.timestamp_ != lastGPSTimestamp_) {
-        lastGPSTimestamp_ = gp.timestamp_;
-        if (gp.isValid()) {
-            lastComputedPosition_.latLon = {gp.latitude_, gp.longitude_};
+    if (isRocket) {
+
+        if (gp.timestamp_ != lastGPSTimestamp_) {
+            lastGPSTimestamp_ = gp.timestamp_;
+            if (gp.isValid()) {
+                lastComputedPosition_.latLon = {gp.latitude_, gp.longitude_};
 #if USE_3D_MODULE
-            emit flightPositionReady(lastComputedPosition_);
+                emit flightPositionReady(lastComputedPosition_);
 #endif
+            }
+            emit gpsDataReady(gp);
         }
-        emit gpsDataReady(gp);
+    } else {
+        if (gp.timestamp_ != lastPayloadGPSTimestamp_) {
+            lastPayloadGPSTimestamp_ = gp.timestamp_;
+            if (gp.isValid()) {
+                lastComputedPayloadPosition_.latLon = {gp.latitude_, gp.longitude_};
+#if USE_3D_MODULE
+                emit payloadPositionReady(lastComputedPosition_);
+#endif
+            }
+        }
+        //TODO: emit gps data
     }
 }
 
@@ -242,9 +292,9 @@ void Worker::displayGPSData(GPSPacket &gp) {
 void Worker::updateLoggingStatus() {
 
     if (loggingEnabled_) {
-        gpsLogger_.close();
-        sensorsLogger_.close();
-        eventsLogger_.close();
+        gpsLogger900_.close();
+        sensorsLogger900_.close();
+        eventsLogger900_.close();
     }
 
     loggingEnabled_ = !loggingEnabled_;
@@ -322,19 +372,19 @@ Worker::extractGraphData(vector<SensorsPacket> &data, QCPGraphData (*extractionF
 
 void Worker::updatePlaybackSpeed(double newSpeed) {
     assert(replayMode_);
-    auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler_.get());
+    auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler900MHz_.get());
     telemReplay->updatePlaybackSpeed(newSpeed);
 }
 
 void Worker::resetPlayback() {
     assert(replayMode_);
-    auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler_.get());
+    auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler900MHz_.get());
     telemReplay->resetPlayback();
 }
 
 void Worker::reversePlayback(bool reversed) {
     assert(replayMode_);
-    auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler_.get());
+    auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler900MHz_.get());
     telemReplay->setPlaybackReversed(reversed);
 }
 
@@ -343,12 +393,12 @@ void Worker::transmitCommand(int command) {
         uint8_t xBeeCommand[] = {0x7E, 0x00, 0x1B, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF,
                                  0xFE, 0x00, 0x43, 0x55, 0x55, 0x55, 0x55, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                  0x00, 0x14, 0x35};
-        telemetryHandler_->sendCommand(xBeeCommand, sizeof(xBeeCommand));
+        telemetryHandler900MHz_->sendCommand(xBeeCommand, sizeof(xBeeCommand));
     } else if (command == 22) {
         uint8_t xBeeCommand[] = {0x7E, 0x00, 0x1B, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF,
                                  0xFE, 0x00, 0x43, 0x55, 0x55, 0x55, 0x55, 0x22, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                  0x00, 0x22, 0x19};
-        telemetryHandler_->sendCommand(xBeeCommand, sizeof(xBeeCommand));
+        telemetryHandler900MHz_->sendCommand(xBeeCommand, sizeof(xBeeCommand));
     }
 }
 

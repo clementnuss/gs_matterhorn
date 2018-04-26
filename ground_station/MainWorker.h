@@ -61,6 +61,8 @@ signals:
 
     void flightPositionReady(Position);
 
+    void payloadPositionReady(Position);
+
     void graphDataReady(QVector<QCPGraphData> &, GraphFeature);
 
     void linkStatusReady(HandlerStatus);
@@ -74,11 +76,17 @@ private:
 
     void checkLinkStatuses();
 
+    void processDataFlows();
+
+    void logData();
+
+    void fusionData();
+
     void displaySensorData(SensorsPacket &);
 
     void displayEventData(EventPacket &);
 
-    void displayGPSData(GPSPacket &);
+    void displayGPSData(GPSPacket &, bool isRocket);
 
     bool trackingEnabled_{false};
     bool loggingEnabled_;
@@ -92,14 +100,20 @@ private:
 #endif
 
 
-    unique_ptr<TelemetryHandler> telemetryHandler_;
+    unique_ptr<TelemetryHandler> telemetryHandler900MHz_;
+    unique_ptr<TelemetryHandler> telemetryHandler433MHz_;
     unique_ptr<TelemetryHandler> newHandler_;
-    FileLogger sensorsLogger_;
-    FileLogger eventsLogger_;
-    FileLogger gpsLogger_;
+    FileLogger sensorsLogger900_;
+    FileLogger eventsLogger900_;
+    FileLogger gpsLogger900_;
+    FileLogger sensorsLogger433_;
+    FileLogger eventsLogger433_;
+    FileLogger gpsLogger433_;
     uint32_t lastEventTimestamp_;
     uint32_t lastGPSTimestamp_;
+    uint32_t lastPayloadGPSTimestamp_;
     Position lastComputedPosition_;
+    Position lastComputedPayloadPosition_;
     chrono::system_clock::time_point lastNumericalValuesUpdate_;
     chrono::system_clock::time_point lastIteration_;
     chrono::system_clock::time_point timeOfLastLinkCheck_;

@@ -12,7 +12,7 @@ class Ruler : public Qt3DCore::QEntity {
 Q_OBJECT
 
 public:
-    Ruler(QVector3D &measurePos, Qt3DRender::QCamera *camera, const QString &tickTexture,
+    Ruler(QVector3D measurePos, Qt3DRender::QCamera *camera, const QString &tickTexture,
           Qt3DCore::QNode *parent);
 
     void updatePosition(const QVector3D &newPos);
