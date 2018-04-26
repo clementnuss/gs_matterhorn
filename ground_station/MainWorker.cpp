@@ -38,8 +38,10 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
 
     gsMainwindow->setRealTimeMode();
     try {
-        telemetryHandler900MHz_ = std::make_unique<RadioReceiver>("FTDIBUS\\COMPORT&VID_0403&PID_6015");
-        telemetryHandler433MHz_ = std::make_unique<RadioReceiver>("FTDIBUS\\COMPORT&VID_0403&PID_s6015");
+        // Xbee FTDIBUS\COMPORT&VID_0403&PID_6015
+        // Adafruit USB\VID_1A86&PID_7523&REV_0263
+        telemetryHandler900MHz_ = std::make_unique<RadioReceiver>("");
+        telemetryHandler433MHz_ = std::make_unique<RadioReceiver>("USB\\VID_1A86&PID_7523&REV_0263");
         telemetryHandler900MHz_->startup();
         telemetryHandler433MHz_->startup();
     } catch (std::runtime_error &e) {

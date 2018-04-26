@@ -17,6 +17,9 @@ RadioReceiver::RadioReceiver(string hardwareID)
           recvBuffer_{}, sensorsDataQueue_{100}, eventsDataQueue_{100}, controlDataQueue_{100}, gpsDataQueue_{100},
           bytesLogger_{LogConstants::BYTES_LOG_PATH} {
 
+    if (hardwareID.empty())
+        return;
+
     vector<serial::PortInfo> devices_found = serial::list_ports();
     if (!devices_found.empty()) {
 //        std::cout << "Serial port list: " << std::endl;
