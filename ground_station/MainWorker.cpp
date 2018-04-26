@@ -37,7 +37,6 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
         telemetryHandler433MHz_{} {
 
     gsMainwindow->setRealTimeMode();
-    TelemetryHandler *handler;
     try {
         telemetryHandler900MHz_ = std::make_unique<RadioReceiver>("FTDIBUS\\COMPORT&VID_0403&PID_6015");
         telemetryHandler433MHz_ = std::make_unique<RadioReceiver>("FTDIBUS\\COMPORT&VID_0403&PID_s6015");
@@ -85,14 +84,16 @@ Worker::~Worker() {
  * Emits all statuses boolean. This should be used once the UI has loaded to initialise
  * the different status color markers.
  */
-void Worker::emitAllStatuses() {
+void
+Worker::emitAllStatuses() {
     emit loggingStatusReady(loggingEnabled_);
 }
 
 /**
  * Entry point of the executing thread
  */
-void Worker::run() {
+void
+Worker::run() {
 
     while (!(QThread::currentThread()->isInterruptionRequested())) {
         if (updateHandler_.load()) {
@@ -127,7 +128,8 @@ void Worker::run() {
 /**
  * Work loop
  */
-void Worker::mainRoutine() {
+void
+Worker::mainRoutine() {
     //TODO: adapt sleep time so as to have proper framerate
     auto elapsed = msecsBetween(lastIteration_, chrono::system_clock::now());
     if (elapsed < UIConstants::REFRESH_RATE) {
@@ -144,15 +146,16 @@ void Worker::mainRoutine() {
 /**
  *
  */
-void Worker::processDataFlows() {
+void
+Worker::processDataFlows() {
     //Sensor data needs to be polled first!
-    vector <SensorsPacket> sensorsData900 = telemetryHandler900MHz_->pollSensorsData();
-    vector <EventPacket> eventsData900 = telemetryHandler900MHz_->pollEventsData();
-    vector <GPSPacket> gpsData900 = telemetryHandler900MHz_->pollGPSData();
+    vector<SensorsPacket> sensorsData900 = telemetryHandler900MHz_->pollSensorsData();
+    vector<EventPacket> eventsData900 = telemetryHandler900MHz_->pollEventsData();
+    vector<GPSPacket> gpsData900 = telemetryHandler900MHz_->pollGPSData();
 
-    vector <SensorsPacket> sensorsData433 = telemetryHandler433MHz_->pollSensorsData();
-    vector <EventPacket> eventsData433 = telemetryHandler433MHz_->pollEventsData();
-    vector <GPSPacket> gpsData433 = telemetryHandler433MHz_->pollGPSData();
+    vector<SensorsPacket> sensorsData433 = telemetryHandler433MHz_->pollSensorsData();
+    vector<EventPacket> eventsData433 = telemetryHandler433MHz_->pollEventsData();
+    vector<GPSPacket> gpsData433 = telemetryHandler433MHz_->pollGPSData();
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
 
@@ -212,13 +215,15 @@ void Worker::processDataFlows() {
 }
 
 
-void Worker::logData() {
+void
+Worker::logData() {
 
 
 }
 
 
-void Worker::fusionData() {
+void
+Worker::fusionData() {
 
 }
 
@@ -229,7 +234,8 @@ void Worker::fusionData() {
  *
  * @param sp The SensorPacket to be displayed.
  */
-void Worker::displaySensorData(SensorsPacket &sp) {
+void
+Worker::displaySensorData(SensorsPacket &sp) {
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
     long long elapsedMillis = msecsBetween(lastNumericalValuesUpdate_, now);
@@ -245,7 +251,8 @@ void Worker::displaySensorData(SensorsPacket &sp) {
  *
  * @param ep The EventPacket to be displayed.
  */
-void Worker::displayEventData(EventPacket &ep) {
+void
+Worker::displayEventData(EventPacket &ep) {
 
     if (ep.timestamp_ != lastEventTimestamp_) {
         lastEventTimestamp_ = ep.timestamp_;
@@ -258,7 +265,8 @@ void Worker::displayEventData(EventPacket &ep) {
  *
  * @param gp The GPSPacket to be displayed.
  */
-void Worker::displayGPSData(GPSPacket &gp, bool isRocket) {
+void
+Worker::displayGPSData(GPSPacket &gp, bool isRocket) {
 
     if (isRocket) {
 
@@ -289,7 +297,8 @@ void Worker::displayGPSData(GPSPacket &gp, bool isRocket) {
 /**
  * Emits a boolean to the UI indicating the current status of the logger.
  */
-void Worker::updateLoggingStatus() {
+void
+Worker::updateLoggingStatus() {
 
     if (loggingEnabled_) {
         gpsLogger900_.close();
@@ -303,7 +312,8 @@ void Worker::updateLoggingStatus() {
 }
 
 
-void Worker::toggleTracking() {
+void
+Worker::toggleTracking() {
     trackingEnabled_ = !trackingEnabled_;
 
 #if USE_TRACKING
@@ -322,7 +332,8 @@ void Worker::toggleTracking() {
 /**
  * Determine the status of the communication based on the quantity of data received during the past second.
  */
-void Worker::checkLinkStatuses() {
+void
+Worker::checkLinkStatuses() {
     chrono::system_clock::time_point now = chrono::system_clock::now();
     long long elapsedMillis = msecsBetween(timeOfLastLinkCheck_, now);
 
@@ -370,25 +381,29 @@ Worker::extractGraphData(vector<SensorsPacket> &data, QCPGraphData (*extractionF
     return v;
 }
 
-void Worker::updatePlaybackSpeed(double newSpeed) {
+void
+Worker::updatePlaybackSpeed(double newSpeed) {
     assert(replayMode_);
     auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler900MHz_.get());
     telemReplay->updatePlaybackSpeed(newSpeed);
 }
 
-void Worker::resetPlayback() {
+void
+Worker::resetPlayback() {
     assert(replayMode_);
     auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler900MHz_.get());
     telemReplay->resetPlayback();
 }
 
-void Worker::reversePlayback(bool reversed) {
+void
+Worker::reversePlayback(bool reversed) {
     assert(replayMode_);
     auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler900MHz_.get());
     telemReplay->setPlaybackReversed(reversed);
 }
 
-void Worker::transmitCommand(int command) {
+void
+Worker::transmitCommand(int command) {
     if (command == 14) {
         uint8_t xBeeCommand[] = {0x7E, 0x00, 0x1B, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF,
                                  0xFE, 0x00, 0x43, 0x55, 0x55, 0x55, 0x55, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -405,7 +420,8 @@ void Worker::transmitCommand(int command) {
 //TODO: determine whether a non working handler should be used or not
 
 
-void Worker::defineReplayMode(const QString &parameters) {
+void
+Worker::defineReplayMode(const QString &parameters) {
     TelemetryHandler *handler = nullptr;
     try {
         handler = new TelemetryReplay(parameters.toStdString());
@@ -418,7 +434,8 @@ void Worker::defineReplayMode(const QString &parameters) {
 }
 
 
-void Worker::defineRealtimeMode(const QString &parameters) {
+void
+Worker::defineRealtimeMode(const QString &parameters) {
     TelemetryHandler *handler = nullptr;
     try {
         handler = new RadioReceiver(parameters.toStdString());
@@ -430,7 +447,8 @@ void Worker::defineRealtimeMode(const QString &parameters) {
     updateHandler_.store(true);
 }
 
-void Worker::moveTrackingSystem(double currentAltitude) {
+void
+Worker::moveTrackingSystem(double currentAltitude) {
 #if USE_TRACKING
 
     altitudeBuffer_.push_back(currentAltitude);

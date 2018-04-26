@@ -22,7 +22,7 @@ public slots:
 
     QVector3D getPosition();
 
-    Qt3DCore::QTransform *getTransform();
+    Qt3DCore::QTransform *getTransform() override;
 
 private:
     Marker *marker_;

@@ -5,7 +5,8 @@
 #include "GridGeometry.h"
 
 
-QByteArray GridGeometry::createPlaneVertexData(
+QByteArray
+GridGeometry::createPlaneVertexData(
         const std::function<float(int, int)> &heightSampler,
         const std::function<QVector3D(int, int)> &normalSampler) {
     Q_ASSERT(sideLength_ > 0.0f);
@@ -20,7 +21,7 @@ QByteArray GridGeometry::createPlaneVertexData(
     const quint32 stride = elementSize * sizeof(float);
     QByteArray bufferBytes;
     bufferBytes.resize(stride * nVerts);
-    float *fptr = reinterpret_cast<float *>(bufferBytes.data());
+    auto *fptr = reinterpret_cast<float *>(bufferBytes.data());
 
     const float x0 = 0.0f;
     const float z0 = 0.0f;
@@ -65,14 +66,15 @@ QByteArray GridGeometry::createPlaneVertexData(
     return bufferBytes;
 }
 
-QByteArray GridGeometry::createPlaneIndexData() {
+QByteArray
+GridGeometry::createPlaneIndexData() {
     // Create the index data. 2 triangles per rectangular face
     const int faces = 2 * (gridResolution_ - 1) * (gridResolution_ - 1);
     const int indices = 3 * faces;
     Q_ASSERT(indices < std::numeric_limits<quint16>::max());
     QByteArray indexBytes;
     indexBytes.resize(indices * sizeof(quint16));
-    quint16 *indexPtr = reinterpret_cast<quint16 *>(indexBytes.data());
+    auto *indexPtr = reinterpret_cast<quint16 *>(indexBytes.data());
 
     // Iterate over z
     for (int j = 0; j < gridResolution_ - 1; ++j) {
@@ -169,13 +171,15 @@ GridGeometry::GridGeometry(Qt3DCore::QNode *parent,
     this->addAttribute(indexAttribute_);
 }
 
-void GridGeometry::resampleVertices(const std::function<float(int, int)> &heightSampler,
-                                    const std::function<QVector3D(int, int)> &normalSampler) {
+void
+GridGeometry::resampleVertices(const std::function<float(int, int)> &heightSampler,
+                               const std::function<QVector3D(int, int)> &normalSampler) {
     vertexBuffer_->setData(createPlaneVertexData(heightSampler, normalSampler));
 }
 
 
-float GridGeometry::vertexHeightAt(int i, int j) const {
+float
+GridGeometry::vertexHeightAt(int i, int j) const {
     if (!(
             0 <= i && i < gridResolution_
             &&

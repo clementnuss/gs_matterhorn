@@ -32,7 +32,7 @@ public:
 
     vector<GPSPacket> pollGPSData() override;
 
-    void sendCommand(const uint8_t*, size_t) override;
+    void sendCommand(const uint8_t *, size_t) override;
 
     bool isReplayHandler() override;
 

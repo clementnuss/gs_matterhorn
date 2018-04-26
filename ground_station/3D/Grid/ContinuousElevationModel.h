@@ -16,6 +16,7 @@ public:
     float elevationAt(const LatLon &latLon) const;
 
     QVector3D slopeAt(const LatLon &latLon) const;
+
     float elevationSample(const int latitudeIndex, const int longitudeIndex) const;
 
     QVector3D slopeSample(const int latitudeIndex, const int longitudeIndex) const;

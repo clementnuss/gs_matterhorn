@@ -75,7 +75,8 @@ Line::Line(Qt3DCore::QNode *parent, QColor &&color, bool isStatic) : Qt3DCore::Q
 }
 
 
-void Line::setData(const QVector<QVector3D> &positions) {
+void
+Line::setData(const QVector<QVector3D> &positions) {
 
     QByteArray ba;
     ba.resize(positions.size() * sizeof(VBOData));
@@ -93,7 +94,8 @@ void Line::setData(const QVector<QVector3D> &positions) {
     enforceLineResolution();
 }
 
-void Line::clearData() {
+void
+Line::clearData() {
 
     if (lineData_.size() > 1) {
         lineData_.remove(0, lineData_.size() - 1);
@@ -101,7 +103,8 @@ void Line::clearData() {
     }
 }
 
-void Line::appendData(const QVector3D position) {
+void
+Line::appendData(const QVector3D position) {
 
     lineData_.push_back(position);
 
@@ -128,7 +131,8 @@ void Line::appendData(const QVector3D position) {
     enforceLineResolution();
 }
 
-void Line::appendData(const QVector<QVector3D> &positions) {
+void
+Line::appendData(const QVector<QVector3D> &positions) {
 
     lineData_ += positions;
 
@@ -154,7 +158,8 @@ void Line::appendData(const QVector<QVector3D> &positions) {
 }
 
 
-void Line::enforceLineResolution() {
+void
+Line::enforceLineResolution() {
 
     if (lineData_.size() > OpenGLConstants::MAX_LINE_DATAPOINTS) {
         lineData_.remove(0, lineData_.size() - OpenGLConstants::MAX_LINE_DATAPOINTS);

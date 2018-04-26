@@ -2,7 +2,6 @@
 #include <cassert>
 #include <iostream>
 #include <Utilities/TimeUtils.h>
-#include <QtGui/QtGui>
 #include "TelemetrySimulator.h"
 
 using namespace std;
@@ -19,7 +18,8 @@ TelemetrySimulator::TelemetrySimulator() : timeOfLastPolledData{chrono::system_c
                                            simulatorStatus{HandlerStatus::NOMINAL} {
 }
 
-vector<SensorsPacket> TelemetrySimulator::pollSensorsData() {
+vector<SensorsPacket>
+TelemetrySimulator::pollSensorsData() {
 
     vector<SensorsPacket> generatedVector = generateTelemetryVector();
     chrono::system_clock::time_point now = chrono::system_clock::now();
@@ -54,7 +54,8 @@ vector<SensorsPacket> TelemetrySimulator::pollSensorsData() {
     return vector<SensorsPacket>();
 }
 
-vector<EventPacket> TelemetrySimulator::pollEventsData() {
+vector<EventPacket>
+TelemetrySimulator::pollEventsData() {
     vector<EventPacket> v;
 
     if ((qrand() / static_cast<double>(RAND_MAX)) * EVENT_PROBABILITY_INTERVAL <= 1) {
@@ -66,7 +67,8 @@ vector<EventPacket> TelemetrySimulator::pollEventsData() {
     return v;
 }
 
-vector<GPSPacket> TelemetrySimulator::pollGPSData() {
+vector<GPSPacket>
+TelemetrySimulator::pollGPSData() {
 
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
     vector<GPSPacket> generatedVector{};
@@ -95,15 +97,18 @@ vector<GPSPacket> TelemetrySimulator::pollGPSData() {
     return generatedVector;
 }
 
-void TelemetrySimulator::setVariableRate(bool enable) {
+void
+TelemetrySimulator::setVariableRate(bool enable) {
     variableRate = enable;
 }
 
-void TelemetrySimulator::startup() {
+void
+TelemetrySimulator::startup() {
 
 }
 
-const vector<SensorsPacket> TelemetrySimulator::generateTelemetryVector() {
+const vector<SensorsPacket>
+TelemetrySimulator::generateTelemetryVector() {
     auto vlength = static_cast<size_t>(
             qrand() / static_cast<double>(RAND_MAX) * MAX_RANDOM_VECTOR_LENGTH + 1);
     vector<SensorsPacket> v;
@@ -115,7 +120,8 @@ const vector<SensorsPacket> TelemetrySimulator::generateTelemetryVector() {
     return v;
 }
 
-const SensorsPacket TelemetrySimulator::generateTelemetry() {
+const SensorsPacket
+TelemetrySimulator::generateTelemetry() {
 
     long long int msecs = msecsBetween(timeOfInitialization, chrono::system_clock::now());
     double keysec = msecs / 1000.0;
@@ -146,7 +152,8 @@ const SensorsPacket TelemetrySimulator::generateTelemetry() {
     };
 }
 
-EventPacket TelemetrySimulator::generateEvent() {
+EventPacket
+TelemetrySimulator::generateEvent() {
 
     // Select an event randomly
     auto code = static_cast<int>(round(
@@ -158,7 +165,8 @@ EventPacket TelemetrySimulator::generateEvent() {
 }
 
 
-void TelemetrySimulator::updateHandlerStatus() {
+void
+TelemetrySimulator::updateHandlerStatus() {
     chrono::system_clock::time_point now = chrono::system_clock::now();
     long long seconds =
             chrono::duration_cast<chrono::milliseconds>(now.time_since_epoch()).count() / TimeConstants::MSECS_IN_SEC;
@@ -173,6 +181,7 @@ void TelemetrySimulator::updateHandlerStatus() {
     }
 }
 
-bool TelemetrySimulator::isReplayHandler() {
+bool
+TelemetrySimulator::isReplayHandler() {
     return false;
 }

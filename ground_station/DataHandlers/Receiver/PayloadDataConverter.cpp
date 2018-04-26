@@ -11,7 +11,8 @@
  * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
  * @return A Telemetry struct
  */
-SensorsPacket PayloadDataConverter::toERT18SensorsPacket(const std::vector<uint8_t> &payloadBuffer) {
+SensorsPacket
+PayloadDataConverter::toERT18SensorsPacket(const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::TELEMETRY_ERT18.length());
 
     auto it = payloadBuffer.begin();
@@ -60,7 +61,8 @@ SensorsPacket PayloadDataConverter::toERT18SensorsPacket(const std::vector<uint8
  * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
  * @return A Telemetry struct
  */
-SensorsPacket PayloadDataConverter::toSensorsPacket(const std::vector<uint8_t> &payloadBuffer) {
+SensorsPacket
+PayloadDataConverter::toSensorsPacket(const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::TELEMETRY.length());
 
     auto it = payloadBuffer.begin();
@@ -115,7 +117,8 @@ SensorsPacket PayloadDataConverter::toSensorsPacket(const std::vector<uint8_t> &
  * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
  * @return An Event struct
  */
-EventPacket PayloadDataConverter::toEventPacket(const std::vector<uint8_t> &payloadBuffer) {
+EventPacket
+PayloadDataConverter::toEventPacket(const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::EVENT.length());
 
     auto it = payloadBuffer.begin();
@@ -143,7 +146,8 @@ EventPacket PayloadDataConverter::toEventPacket(const std::vector<uint8_t> &payl
  * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
  * @return A Control struct
  */
-ControlPacket PayloadDataConverter::toControlPacket(const std::vector<uint8_t> &payloadBuffer) {
+ControlPacket
+PayloadDataConverter::toControlPacket(const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::CONTROL.length());
 
     auto it = payloadBuffer.begin();
@@ -174,7 +178,8 @@ ControlPacket PayloadDataConverter::toControlPacket(const std::vector<uint8_t> &
  * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
  * @return A GPS struct
  */
-GPSPacket PayloadDataConverter::toGPSPacket(const vector<uint8_t> &payloadBuffer) {
+GPSPacket
+PayloadDataConverter::toGPSPacket(const vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::GPS.length());
 
     auto it = payloadBuffer.begin();

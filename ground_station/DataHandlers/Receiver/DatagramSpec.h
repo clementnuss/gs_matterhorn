@@ -24,6 +24,7 @@ enum class DecodingState {
 
 struct Datagram {
     Datagram() : sequenceNumber_{0}, payloadType_{nullptr}, payloadData_{}, complete{false} {}
+
     uint32_t sequenceNumber_;
     const PayloadType *payloadType_;
     std::vector<uint8_t> payloadData_;

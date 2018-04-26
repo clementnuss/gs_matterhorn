@@ -21,8 +21,8 @@ Ground::Ground(Qt3DCore::QNode *parent, std::shared_ptr<const ContinuousElevatio
 
         for (int j = -halfSideLength_; j < halfSideLength_; j++) {
 
-            float dLat = static_cast<float>(-i * GridConstants::GRID_LENGTH_IN_METERS);
-            float dLon = static_cast<float>(j * GridConstants::GRID_LENGTH_IN_METERS);
+            auto dLat = static_cast<float>(-i * GridConstants::GRID_LENGTH_IN_METERS);
+            auto dLon = static_cast<float>(j * GridConstants::GRID_LENGTH_IN_METERS);
 
             //Compute corresponding top-left latitude and longitude coordinates
             LatLon tileOrigin = worldRef->latLonFromPointAndDistance(
@@ -50,7 +50,8 @@ Ground::Ground(Qt3DCore::QNode *parent, std::shared_ptr<const ContinuousElevatio
 
 }
 
-float Ground::groundElevationAt(int worldX, int worldZ) const {
+float
+Ground::groundElevationAt(int worldX, int worldZ) const {
 
     if (isBetween(-extentFromOrigin_, extentFromOrigin_, worldX)
         &&
@@ -73,7 +74,7 @@ float Ground::groundElevationAt(int worldX, int worldZ) const {
         int vi = vx / (GridConstants::GRID_RESOLUTION - 1);
         int vj = vy / (GridConstants::GRID_RESOLUTION - 1);
 
-        return tiles_[tileIndex].get()->vertexHeightAt(vi, vj);
+        return tiles_[tileIndex]->vertexHeightAt(vi, vj);
     } else {
         return 0.0f;
     }

@@ -14,7 +14,7 @@ public:
 
     float elevationAt(int latitudeIndex, int longitudeIndex) const override;
 
-    Interval2D extent() const;
+    Interval2D extent() const override;
 
     static std::unique_ptr<const IDiscreteElevationModel> buildModel(const std::vector<std::string> &paths);
 

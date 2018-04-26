@@ -25,7 +25,8 @@ struct Position {
     double altitude;
 };
 
-static GeoPoint latLonToGeoPoint(const LatLon &latLon) {
+static GeoPoint
+latLonToGeoPoint(const LatLon &latLon) {
 
     GeoAngle latitude{};
     GeoAngle longitude{};

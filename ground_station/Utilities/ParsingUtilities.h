@@ -11,7 +11,8 @@
  * @return A 16-bit numeric value of type T
  */
 template<typename T>
-static T parse8(vector<uint8_t>::const_iterator &it) {
+static T
+parse8(vector<uint8_t>::const_iterator &it) {
     return static_cast<T>(*(it++));
 }
 
@@ -25,7 +26,8 @@ static T parse8(vector<uint8_t>::const_iterator &it) {
  * @return A 16-bit numeric value of type T
  */
 template<typename T>
-static T parse16(vector<uint8_t>::const_iterator &it) {
+static T
+parse16(vector<uint8_t>::const_iterator &it) {
     return static_cast<T>(*(it++) << 8) | *(it++);
 }
 
@@ -39,7 +41,8 @@ static T parse16(vector<uint8_t>::const_iterator &it) {
  * @return A 32-bit numeric value of type T
  */
 template<typename T>
-static T parse32(vector<uint8_t>::const_iterator &it) {
+static T
+parse32(vector<uint8_t>::const_iterator &it) {
     return static_cast<T>(*(it++) << 24) | (*(it++) << 16) | (*(it++) << 8) | *(it++);
 }
 

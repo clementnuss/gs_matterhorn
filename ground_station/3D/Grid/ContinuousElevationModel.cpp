@@ -8,7 +8,8 @@ ContinuousElevationModel::ContinuousElevationModel(std::unique_ptr<const IDiscre
         std::move(discreteModel)}, worldRef_{std::move(worldRef)} {
 }
 
-float ContinuousElevationModel::elevationAt(const LatLon &latLon) const {
+float
+ContinuousElevationModel::elevationAt(const LatLon &latLon) const {
 
     GeoPoint geoPoint = latLonToGeoPoint(latLon);
 
@@ -28,7 +29,8 @@ float ContinuousElevationModel::elevationAt(const LatLon &latLon) const {
     return static_cast<float>(elevation);
 }
 
-QVector3D ContinuousElevationModel::slopeAt(const LatLon &latLon) const {
+QVector3D
+ContinuousElevationModel::slopeAt(const LatLon &latLon) const {
 
     GeoPoint geoPoint = latLonToGeoPoint(latLon);
 
@@ -48,13 +50,15 @@ QVector3D ContinuousElevationModel::slopeAt(const LatLon &latLon) const {
     return slopeSample(latSWi, lonSWi);
 }
 
-float ContinuousElevationModel::elevationSample(const int latitudeIndex, const int longitudeIndex) const {
+float
+ContinuousElevationModel::elevationSample(const int latitudeIndex, const int longitudeIndex) const {
 
     return discreteModel_->extent().contains(latitudeIndex, longitudeIndex) ?
            discreteModel_->elevationAt(latitudeIndex, longitudeIndex) : 0;
 }
 
-QVector3D ContinuousElevationModel::slopeSample(const int latitudeIndex, const int longitudeIndex) const {
+QVector3D
+ContinuousElevationModel::slopeSample(const int latitudeIndex, const int longitudeIndex) const {
     double e = elevationSample(latitudeIndex, longitudeIndex);
 
     double arcN = worldRef_->oneSecondArcLengthNS();

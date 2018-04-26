@@ -54,12 +54,14 @@ RadioReceiver::RadioReceiver(string hardwareID)
     recvBuffer_ = new uint8_t[BUFFER_SIZE];
 }
 
-void RadioReceiver::startup() {
+void
+RadioReceiver::startup() {
     openSerialPort();
     thread_ = boost::thread{boost::bind(&RadioReceiver::readSerialPort, this)};
 }
 
-void RadioReceiver::openSerialPort() {
+void
+RadioReceiver::openSerialPort() {
 
     std::cout << "Opening serial port " << devicePort_ << " at " << CommunicationsConstants::TELEMETRY_BAUD_RATE
               << " bauds/s" << std::endl;
@@ -77,25 +79,30 @@ void RadioReceiver::openSerialPort() {
 }
 
 template<class S>
-static std::vector<S> consumeQueue(boost::lockfree::spsc_queue<S> *queue) {
+static std::vector<S>
+consumeQueue(boost::lockfree::spsc_queue<S> *queue) {
     std::vector<S> recipient{};
     queue->consume_all([&recipient](S s) { recipient.push_back(s); });
     return recipient;
 };
 
-std::vector<SensorsPacket> RadioReceiver::pollSensorsData() {
+std::vector<SensorsPacket>
+RadioReceiver::pollSensorsData() {
     return consumeQueue(&sensorsDataQueue_);
 }
 
-std::vector<EventPacket> RadioReceiver::pollEventsData() {
+std::vector<EventPacket>
+RadioReceiver::pollEventsData() {
     return consumeQueue(&eventsDataQueue_);
 }
 
-std::vector<GPSPacket> RadioReceiver::pollGPSData() {
+std::vector<GPSPacket>
+RadioReceiver::pollGPSData() {
     return consumeQueue(&gpsDataQueue_);
 }
 
-void RadioReceiver::readSerialPort() {
+void
+RadioReceiver::readSerialPort() {
     size_t bytesAvailable = 0;
     bool terminate = false;
     while (!terminate) {
@@ -114,7 +121,8 @@ void RadioReceiver::readSerialPort() {
 
 }
 
-void RadioReceiver::handleReceive(std::size_t bytesTransferred) {
+void
+RadioReceiver::handleReceive(std::size_t bytesTransferred) {
 
     vector<uint8_t> bytes{};
 
@@ -132,12 +140,13 @@ void RadioReceiver::handleReceive(std::size_t bytesTransferred) {
 
     BytesReading bytesReading{chrono::system_clock::now(), bytes};
     vector<reference_wrapper<ILoggable>> bytesReadingVector{};
-    bytesReadingVector.push_back(bytesReading);
+    bytesReadingVector.emplace_back(bytesReading);
     bytesLogger_.registerData(bytesReadingVector);
 
 }
 
-void RadioReceiver::unpackPayload() {
+void
+RadioReceiver::unpackPayload() {
     Datagram d = byteDecoder_.retrieveDatagram();
 
     switch (d.payloadType_->code()) {
@@ -165,10 +174,12 @@ RadioReceiver::~RadioReceiver() {
     serialPort_.close();
 }
 
-bool RadioReceiver::isReplayHandler() {
+bool
+RadioReceiver::isReplayHandler() {
     return false;
 }
 
-void RadioReceiver::sendCommand(const uint8_t *command, size_t size) {
+void
+RadioReceiver::sendCommand(const uint8_t *command, size_t size) {
     serialPort_.write(command, size);
 }

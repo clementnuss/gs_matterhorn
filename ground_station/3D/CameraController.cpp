@@ -21,10 +21,10 @@ CameraController::CameraController(Qt3DCore::QNode *parent)
     keyboardHandler_->setFocus(true);
 }
 
-CameraController::~CameraController() {
-}
+CameraController::~CameraController() = default;
 
-void CameraController::registerObservable(IObservable *o) {
+void
+CameraController::registerObservable(IObservable *o) {
     observables_.emplace_back(o);
 
     if (observables_.size() == 1) {
@@ -32,11 +32,13 @@ void CameraController::registerObservable(IObservable *o) {
     }
 }
 
-void CameraController::unregisterObservable(IObservable *o) {
+void
+CameraController::unregisterObservable(IObservable *o) {
     observables_.remove(o);
 }
 
-void CameraController::switchObservable() {
+void
+CameraController::switchObservable() {
 
     if (observables_.empty())
         return;
@@ -83,7 +85,8 @@ void CameraController::switchObservable() {
 
 }
 
-void CameraController::handleKeyPress(Qt3DInput::QKeyEvent *event) {
+void
+CameraController::handleKeyPress(Qt3DInput::QKeyEvent *event) {
 
     //std::cout << "Qt3D captured: " << event->key() << "\n";
 
@@ -99,7 +102,8 @@ void CameraController::handleKeyPress(Qt3DInput::QKeyEvent *event) {
 }
 
 
-void CameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::InputState &state, float dt) {
+void
+CameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::InputState &state, float dt) {
 
 
     Qt3DRender::QCamera *cam = camera();
@@ -110,7 +114,7 @@ void CameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::I
 
 
     // Mouse input
-    if (state.rightMouseButtonActive | state.shiftKeyActive ) {
+    if (state.rightMouseButtonActive | state.shiftKeyActive) {
         if (state.leftMouseButtonActive) {
             viewingDistance_ = clampViewingDistance(viewingDistance_ + state.ryAxisValue * 300 * linearSpeed() * dt);
         } else {
@@ -172,7 +176,8 @@ void CameraController::moveCamera(const Qt3DExtras::QAbstractCameraController::I
     placeCamera();
 }
 
-void CameraController::placeCamera() {
+void
+CameraController::placeCamera() {
 
     if (animators_.empty()) {
         azimuthalAngle_ = wrapAngle(azimuthalAngle_);
@@ -192,7 +197,8 @@ void CameraController::placeCamera() {
 }
 
 
-void CameraController::updateAnimators() {
+void
+CameraController::updateAnimators() {
 
     for (const auto &animator : animators_)
         animator->updateTarget();
@@ -205,7 +211,8 @@ void CameraController::updateAnimators() {
 }
 
 
-void CameraController::setCameraViewCenter(const QVector3D &newViewCenter) {
+void
+CameraController::setCameraViewCenter(const QVector3D &newViewCenter) {
     viewCenter_ = newViewCenter;
 
 }

@@ -5,7 +5,8 @@
 Application::Application(int &argc, char **argv) : qApplication_{argc, argv}, gsMainWindow_{}, workerThread_{} {
 }
 
-void Application::run() {
+void
+Application::run() {
     worker_ = new Worker(&gsMainWindow_);
     worker_->moveToThread(&workerThread_);
 
@@ -16,7 +17,8 @@ void Application::run() {
 
 }
 
-int Application::exec() {
+int
+Application::exec() {
     workerThread_.start();
 
     gsMainWindow_.show();
@@ -24,7 +26,8 @@ int Application::exec() {
     qApplication_.exec();
 }
 
-void Application::connectSlotsAndSignals() {
+void
+Application::connectSlotsAndSignals() {
     qRegisterMetaType<SensorsPacket>("SensorsPacket");
     qRegisterMetaType<GPSPacket>("GPSPacket");
     qRegisterMetaType<EventPacket>("EventPacket");

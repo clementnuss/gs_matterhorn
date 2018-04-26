@@ -14,7 +14,8 @@ FileLogger::~FileLogger() {
     close();
 }
 
-void FileLogger::close() {
+void
+FileLogger::close() {
     cout << "\nFlushing file logger @ " << path_ << endl;
     if (bufferIndex_ != 0) {
         writeFile();
@@ -22,7 +23,8 @@ void FileLogger::close() {
     }
 }
 
-void FileLogger::registerData(const vector<reference_wrapper<ILoggable>> &data) {
+void
+FileLogger::registerData(const vector<reference_wrapper<ILoggable>> &data) {
 
     for (const auto loggable : data) {
 
@@ -37,7 +39,8 @@ void FileLogger::registerData(const vector<reference_wrapper<ILoggable>> &data) 
     }
 }
 
-void FileLogger::registerString(const std::string s) {
+void
+FileLogger::registerString(const std::string s) {
 
     if (bufferIndex_ >= bufferSize) {
         cout << "\n Writing log file.." << endl;
@@ -50,7 +53,8 @@ void FileLogger::registerString(const std::string s) {
 
 }
 
-void FileLogger::writeFile() {
+void
+FileLogger::writeFile() {
 
     array<string, bufferSize> a = buffer;
     thread t(&FileLogger::writeRoutine, a, bufferIndex_, path_, id_++);
@@ -58,7 +62,8 @@ void FileLogger::writeFile() {
     t.detach();
 }
 
-void FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex, std::string path, size_t id) {
+void
+FileLogger::writeRoutine(array<string, bufferSize> a, size_t tailIndex, std::string path, size_t id) {
 
     assert(tailIndex >= 1);
 

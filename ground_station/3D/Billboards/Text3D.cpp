@@ -74,7 +74,8 @@ Text3D::Text3D(QString text, TextType textType, Qt3DRender::QCamera *camera, con
             this, &Text3D::updateTransform);
 }
 
-void Text3D::updateTransform() {
+void
+Text3D::updateTransform() {
     QMatrix4x4 t{};
     // Make it face camera since default is like laying flat on ground
     t.translate(offset_);

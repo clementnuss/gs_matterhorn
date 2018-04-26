@@ -2,7 +2,6 @@
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 #include <Utilities/TimeUtils.h>
-#include <QtWidgets/QFileDialog>
 
 using namespace boost::filesystem;
 
@@ -18,7 +17,8 @@ TelemetryReplay::TelemetryReplay(const string &path) :
     std::locale(std::cout.getloc(), new std::numpunct<char>{'.'});
 }
 
-void TelemetryReplay::startup() {
+void
+TelemetryReplay::startup() {
     if (exists(path_)) {
         if (is_directory(path_.parent_path())) {
             path_ = path_.parent_path();
@@ -51,11 +51,13 @@ void TelemetryReplay::startup() {
     resetPlayback();
 }
 
-vector<EventPacket> TelemetryReplay::pollEventsData() {
+vector<EventPacket>
+TelemetryReplay::pollEventsData() {
     return vector<EventPacket>();
 }
 
-std::vector<GPSPacket> TelemetryReplay::pollGPSData() {
+std::vector<GPSPacket>
+TelemetryReplay::pollGPSData() {
     vector<GPSPacket> vec{};
 
     if (!playbackReversed_) {
@@ -70,7 +72,8 @@ std::vector<GPSPacket> TelemetryReplay::pollGPSData() {
     return vec;
 }
 
-vector<SensorsPacket> TelemetryReplay::pollSensorsData() {
+vector<SensorsPacket>
+TelemetryReplay::pollSensorsData() {
     vector<SensorsPacket> vec{};
     auto localLastPlaybackTime = std::chrono::system_clock::now();
     double adjustedTime = usecsBetween(lastPlaybackTime_, localLastPlaybackTime);
@@ -135,7 +138,8 @@ vector<SensorsPacket> TelemetryReplay::pollSensorsData() {
     return vec;
 }
 
-void TelemetryReplay::parseFile(boost::filesystem::path p) {
+void
+TelemetryReplay::parseFile(boost::filesystem::path p) {
     boost::filesystem::ifstream ifs{p, ios::in};
     cout << "Parsing telemetry file " << p.string() << endl;
 
@@ -198,11 +202,13 @@ void TelemetryReplay::parseFile(boost::filesystem::path p) {
     ifs.close();
 }
 
-void TelemetryReplay::updatePlaybackSpeed(double newPlaybackSpeed) {
+void
+TelemetryReplay::updatePlaybackSpeed(double newPlaybackSpeed) {
     playbackSpeed_ = newPlaybackSpeed;
 }
 
-void TelemetryReplay::resetPlayback() {
+void
+TelemetryReplay::resetPlayback() {
     playbackSpeed_ = 1;
     setPlaybackReversed(false);
     frontReadingsIter_ = sensorsReadings_.begin();
@@ -212,7 +218,8 @@ void TelemetryReplay::resetPlayback() {
     lastTimeStamp_ = sensorsReadings_.front().timestamp_;
 }
 
-bool TelemetryReplay::endOfPlayback() {
+bool
+TelemetryReplay::endOfPlayback() {
     if (playbackReversed_) {
         return endReadingsIter_ == sensorsReadings_.begin();
     } else {
@@ -220,11 +227,13 @@ bool TelemetryReplay::endOfPlayback() {
     }
 }
 
-void TelemetryReplay::setPlaybackReversed(bool reversed) {
+void
+TelemetryReplay::setPlaybackReversed(bool reversed) {
     playbackReversed_ = reversed;
 }
 
-bool TelemetryReplay::isReplayHandler() {
+bool
+TelemetryReplay::isReplayHandler() {
     return true;
 }
 

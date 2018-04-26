@@ -1,5 +1,6 @@
 #ifndef GS_MATTERHORN_ROOTENTITY_H
 #define GS_MATTERHORN_ROOTENTITY_H
+
 #include <Qt3DExtras/Qt3DWindow>
 
 #include <Qt3DExtras/QOrbitCameraController>

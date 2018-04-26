@@ -9,7 +9,8 @@
 #include <DataStructures/datastructs.h>
 #include <DataStructures/WindData.h>
 
-static QVector3D posFromString(const std::string &str) {
+static QVector3D
+posFromString(const std::string &str) {
 
     float x = 0, y = 0, z = 0;
 
@@ -35,7 +36,8 @@ static QVector3D posFromString(const std::string &str) {
     return {x, z, y};
 }
 
-static WindPrediction windPredictionFromString(const std::string &str) {
+static WindPrediction
+windPredictionFromString(const std::string &str) {
     WindPrediction prediction{};
 
     std::string s = boost::trim_left_copy(str);

@@ -6,14 +6,16 @@
 #include <memory>
 
 template<class T>
-static void requireNonNull(T *ptr) {
+static void
+requireNonNull(T *ptr) {
     if (ptr == nullptr) {
         throw std::invalid_argument("Pointer was null");
     }
 }
 
 template<class T>
-static void requireNonNull(std::unique_ptr<const T> &ptr) {
+static void
+requireNonNull(std::unique_ptr<const T> &ptr) {
     if (ptr == nullptr) {
         throw std::invalid_argument("Pointer was null");
     }

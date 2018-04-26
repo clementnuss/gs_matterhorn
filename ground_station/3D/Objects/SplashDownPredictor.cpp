@@ -18,7 +18,8 @@ SplashDownPredictor::SplashDownPredictor(std::string &path, Qt3DCore::QNode *par
     status_.acceleration = {0, 0, 0};
 }
 
-QVector3D SplashDownPredictor::getTouchdownCoordinates(Ground *const ground) const {
+QVector3D
+SplashDownPredictor::getTouchdownCoordinates(Ground *const ground) const {
 
     for (const QVector3D *it = trajectory_.end() - 1; it != trajectory_.begin(); it--) {
         float x = it->x();
@@ -37,19 +38,23 @@ QVector3D SplashDownPredictor::getTouchdownCoordinates(Ground *const ground) con
     return {0, 0, 0};
 }
 
-void SplashDownPredictor::updatePos(const QVector3D &pos) {
+void
+SplashDownPredictor::updatePos(const QVector3D &pos) {
     status_.position = pos;
 }
 
-void SplashDownPredictor::updateSpeed(const QVector3D &speed) {
+void
+SplashDownPredictor::updateSpeed(const QVector3D &speed) {
     status_.speed = status_.speed * SplashDownPredictor::LEAKY_FACTOR + speed * (1 - SplashDownPredictor::LEAKY_FACTOR);
 }
 
-void SplashDownPredictor::recomputePrediction() {
-    trajectory_ = predictionStrategy_.get()->predictTrajectory(status_, windData_);
+void
+SplashDownPredictor::recomputePrediction() {
+    trajectory_ = predictionStrategy_->predictTrajectory(status_, windData_);
     this->trajectoryLine_->setData(trajectory_);
 }
 
-const WindData * SplashDownPredictor::windData() {
+const WindData *
+SplashDownPredictor::windData() {
     return &windData_;
 }

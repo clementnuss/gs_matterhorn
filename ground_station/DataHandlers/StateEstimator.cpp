@@ -10,12 +10,14 @@ StateEstimator::StateEstimator(TelemetryHandler *underlyingHandler) :
     }
 }
 
-void StateEstimator::startup() {
+void
+StateEstimator::startup() {
     handler_->startup();
 
 }
 
-vector<EventPacket> StateEstimator::pollEventsData() {
+vector<EventPacket>
+StateEstimator::pollEventsData() {
     auto polledEvents = handler_->pollEventsData();
     if (!pendingDetectedRocketEvents_.empty()) {
         polledEvents.insert(polledEvents.end(),
@@ -25,7 +27,8 @@ vector<EventPacket> StateEstimator::pollEventsData() {
     return polledEvents;
 }
 
-vector<SensorsPacket> StateEstimator::pollSensorsData() {
+vector<SensorsPacket>
+StateEstimator::pollSensorsData() {
     auto polledData = handler_->pollSensorsData();
     vector<SensorsPacket> smoothedReadings;
 
@@ -38,31 +41,37 @@ vector<SensorsPacket> StateEstimator::pollSensorsData() {
     return smoothedReadings;
 }
 
-bool StateEstimator::isReplayHandler() {
+bool
+StateEstimator::isReplayHandler() {
     return (replayHandler_ != nullptr);
 }
 
-void StateEstimator::updatePlaybackSpeed(double speed) {
+void
+StateEstimator::updatePlaybackSpeed(double speed) {
     assert (isReplayHandler());
     replayHandler_->updatePlaybackSpeed(speed);
 }
 
-void StateEstimator::setPlaybackReversed(bool reversed) {
+void
+StateEstimator::setPlaybackReversed(bool reversed) {
     assert (isReplayHandler());
     replayHandler_->setPlaybackReversed(reversed);
 }
 
-void StateEstimator::resetPlayback() {
+void
+StateEstimator::resetPlayback() {
     assert (isReplayHandler());
     replayHandler_->resetPlayback();
 }
 
-bool StateEstimator::endOfPlayback() {
+bool
+StateEstimator::endOfPlayback() {
     assert (isReplayHandler());
     return replayHandler_->endOfPlayback();
 }
 
-SensorsPacket StateEstimator::computeMA(const SensorsPacket &r) {
+SensorsPacket
+StateEstimator::computeMA(const SensorsPacket &r) {
     SensorsPacket movAverage;
     readingsBuffer_.push_back(r);
 
@@ -77,7 +86,8 @@ SensorsPacket StateEstimator::computeMA(const SensorsPacket &r) {
     return movAverage;
 }
 
-void StateEstimator::computeState(const SensorsPacket &r) {
+void
+StateEstimator::computeState(const SensorsPacket &r) {
     switch (currentState_) {
         case READY: {
             if (r.acceleration_.norm() > ACCELERATION_THRESHOLD) {
@@ -123,6 +133,7 @@ void StateEstimator::computeState(const SensorsPacket &r) {
     }
 }
 
-vector<GPSPacket> StateEstimator::pollGPSData() {
+vector<GPSPacket>
+StateEstimator::pollGPSData() {
     return vector<GPSPacket>();
 }

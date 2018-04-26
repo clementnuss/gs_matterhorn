@@ -17,8 +17,11 @@ public:
     SplashDownPredictor(std::string &path, Qt3DCore::QNode *parent);
 
     QVector3D getTouchdownCoordinates(Ground *const ground) const;
+
     void updatePos(const QVector3D &pos);
+
     void updateSpeed(const QVector3D &speed);
+
     void recomputePrediction();
 
     const WindData *windData();

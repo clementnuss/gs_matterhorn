@@ -12,7 +12,8 @@
 #include <ConfigParser/ConfigParser.h>
 #include "RootEntity.h"
 
-static void addToEach(QVector<QVector3D> &v, QVector3D v3d) {
+static void
+addToEach(QVector<QVector3D> &v, QVector3D v3d) {
     for (size_t i = 0; i < v.size(); i++) {
         v[i] += v3d;
     }
@@ -49,7 +50,8 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
     initCamera(view);
 }
 
-void RootEntity::init() {
+void
+RootEntity::init() {
 
     // Display 3D module origin
     new OpenGL3DAxes(this);
@@ -117,7 +119,8 @@ void RootEntity::init() {
     reportWindData();
 }
 
-void RootEntity::reportWindData() {
+void
+RootEntity::reportWindData() {
 
     windData_ = splashDownPredictor_->windData();
 
@@ -132,7 +135,8 @@ void RootEntity::reportWindData() {
 
 }
 
-void RootEntity::updateFlightPosition(const Position pos) {
+void
+RootEntity::updateFlightPosition(const Position pos) {
 
     QVector2D horizontalWorldPos = worldRef_->translationFromOrigin(pos.latLon);
     previousComputedPosition_ = lastComputedPosition_;
@@ -158,7 +162,8 @@ void RootEntity::updateFlightPosition(const Position pos) {
     }
 }
 
-void RootEntity::updatePayloadPosition(const Position pos) {
+void
+RootEntity::updatePayloadPosition(const Position pos) {
 
     QVector2D horizontalWorldPos = worldRef_->translationFromOrigin(pos.latLon);
     QVector3D pos3D = {horizontalWorldPos.x(), static_cast<float>(pos.altitude), horizontalWorldPos.y()};
@@ -167,13 +172,15 @@ void RootEntity::updatePayloadPosition(const Position pos) {
     rocketTrace_->appendData(pos3D);
 }
 
-void RootEntity::resetTrace() {
+void
+RootEntity::resetTrace() {
     rocketTrace_->clearData();
 }
 
 
 //TODO: delete ?
-void RootEntity::updateRocketTracker(QVector<QVector3D> &positions, const QVector3D &speed) {
+void
+RootEntity::updateRocketTracker(QVector<QVector3D> &positions, const QVector3D &speed) {
 
     static QVector3D accumulatedBias{0, 0, 0};
 
@@ -197,7 +204,8 @@ void RootEntity::updateRocketTracker(QVector<QVector3D> &positions, const QVecto
             UI3DConstants::WIND_REPORT_N_LINES - static_cast<int>(lastPos.y() / UI3DConstants::WIND_REPORT_INTERVAL));
 }
 
-void RootEntity::registerEvent(const EventPacket &event) {
+void
+RootEntity::registerEvent(const EventPacket &event) {
 
     //TODO: invalid event are already checked for in decoding function
     if (RocketEventConstants::EVENT_CODES.find(event.code_) == RocketEventConstants::EVENT_CODES.end()) {
@@ -216,7 +224,8 @@ void RootEntity::registerEvent(const EventPacket &event) {
 }
 
 
-void RootEntity::initRenderSettings(Qt3DExtras::Qt3DWindow *view) {
+void
+RootEntity::initRenderSettings(Qt3DExtras::Qt3DWindow *view) {
     auto *renderSettings = new Qt3DRender::QRenderSettings();
     auto *forwardRenderer = new ForwardRenderer(view, renderSettings);
     renderSettings->setActiveFrameGraph(forwardRenderer);
@@ -224,7 +233,8 @@ void RootEntity::initRenderSettings(Qt3DExtras::Qt3DWindow *view) {
     this->addComponent(LayerManager::getInstance().getLayer(LayerType::VISIBLE));
 }
 
-void RootEntity::initCamera(Qt3DExtras::Qt3DWindow *view) {
+void
+RootEntity::initCamera(Qt3DExtras::Qt3DWindow *view) {
     cameraController_->setCamera(camera_);
     cameraController_->setLinearSpeed(CameraConstants::LINEAR_SPEED);
     cameraController_->setLookSpeed(CameraConstants::LOOK_SPEED);

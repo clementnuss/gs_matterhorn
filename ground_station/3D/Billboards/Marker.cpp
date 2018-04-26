@@ -75,7 +75,8 @@ Marker::Marker(const QString &texture,
             this, &Marker::updateTransform);
 }
 
-void Marker::updateTransform() {
+void
+Marker::updateTransform() {
     QMatrix4x4 t{};
     // Make it face camera since default is like laying flat on ground
     t.translate(offset_);

@@ -15,7 +15,6 @@ DiscreteElevationModel::DiscreteElevationModel(const std::string &filePath, cons
 
             hgtFile_.open(filePath);
             hgtData_ = reinterpret_cast<const uint16_t *>(hgtFile_.data());
-            uint16_t v = hgtData_[0] >> 8 | hgtData_[0] << 8;
             //std::cout << v << " ";
 
 /*
@@ -47,7 +46,8 @@ DiscreteElevationModel::DiscreteElevationModel(const std::string &filePath, cons
     };
 }
 
-float DiscreteElevationModel::elevationAt(int latitudeIndex, int longitudeIndex) const {
+float
+DiscreteElevationModel::elevationAt(int latitudeIndex, int longitudeIndex) const {
 
     if (!extent_.contains(latitudeIndex, longitudeIndex)) {
         throw std::invalid_argument("Specified indices are not contained in the discrete elevation model");
@@ -61,11 +61,13 @@ float DiscreteElevationModel::elevationAt(int latitudeIndex, int longitudeIndex)
     return d;
 }
 
-Interval2D DiscreteElevationModel::extent() const {
+Interval2D
+DiscreteElevationModel::extent() const {
     return extent_;
 }
 
-double DiscreteElevationModel::geoAngleToIndex(const GeoAngle &geoAngle) {
+double
+DiscreteElevationModel::geoAngleToIndex(const GeoAngle &geoAngle) {
     return geoAngle.degrees * GridConstants::SAMPLES_PER_DEGREE + geoAngle.minutes * GridConstants::SAMPLES_PER_MINUTE +
            geoAngle.seconds;
 }

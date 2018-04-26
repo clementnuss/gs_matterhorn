@@ -32,7 +32,7 @@ CompositeElevationModel::elevationAt(int latitudeIndex, int longitudeIndex) cons
 std::unique_ptr<const IDiscreteElevationModel>
 CompositeElevationModel::buildModel(const std::vector<std::string> &paths) {
 
-    if (paths.size() < 1) {
+    if (paths.empty()) {
         throw std::invalid_argument("No paths were provided to build the digital elevation model");
     }
 

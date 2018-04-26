@@ -13,7 +13,8 @@ Decoder::Decoder() : byteBuffer_{}, checksumAccumulator_{}, currentState_{INITIA
                      logger_{LogConstants::DECODER_LOG_PATH}, startupTime_{std::chrono::system_clock::now()},
                      action_{&Decoder::seekHeader} {}
 
-bool Decoder::processByte(uint8_t byte) {
+bool
+Decoder::processByte(uint8_t byte) {
     assert(!datagramReady());
 
     (this->*action_)(byte);
@@ -21,7 +22,8 @@ bool Decoder::processByte(uint8_t byte) {
     return this->datagramReady();
 }
 
-bool Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
+bool
+Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
     assert(headerBuffer.size() == HEADER_SIZE);
 
     uint32_t seqNum = 0;
@@ -55,11 +57,13 @@ bool Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
     };
 }
 
-bool Decoder::datagramReady() {
+bool
+Decoder::datagramReady() {
     return currentDatagram_.complete;
 }
 
-Datagram Decoder::retrieveDatagram() {
+Datagram
+Decoder::retrieveDatagram() {
     assert(datagramReady());
 
     Datagram r = currentDatagram_;
@@ -68,14 +72,16 @@ Datagram Decoder::retrieveDatagram() {
     return r;
 }
 
-void Decoder::jumpToNextState() {
+void
+Decoder::jumpToNextState() {
     auto pair = STATES_TABLE.at(currentState_);
 
     currentState_ = pair.first;
     action_ = pair.second;
 }
 
-void Decoder::resetMachine() {
+void
+Decoder::resetMachine() {
     byteBuffer_.clear();
     checksumAccumulator_.clear();
     currentDatagram_ = Datagram();
@@ -83,7 +89,8 @@ void Decoder::resetMachine() {
     action_ = &Decoder::seekHeader;
 }
 
-void Decoder::seekHeader(uint8_t byte) {
+void
+Decoder::seekHeader(uint8_t byte) {
     assertBufferSmallerThan(PREAMBLE_SIZE);
 
     if (byte == HEADER_PREAMBLE_FLAG) {
@@ -98,7 +105,8 @@ void Decoder::seekHeader(uint8_t byte) {
     }
 }
 
-void Decoder::accumulateHeader(uint8_t byte) {
+void
+Decoder::accumulateHeader(uint8_t byte) {
     assertBufferSmallerThan(HEADER_SIZE);
 
     byteBuffer_.push_back(byte);
@@ -117,7 +125,8 @@ void Decoder::accumulateHeader(uint8_t byte) {
     }
 }
 
-void Decoder::seekControlFlag(uint8_t byte) {
+void
+Decoder::seekControlFlag(uint8_t byte) {
     assert(byteBuffer_.empty());
 
     if (byte == CONTROL_FLAG) {
@@ -128,7 +137,8 @@ void Decoder::seekControlFlag(uint8_t byte) {
     }
 }
 
-void Decoder::accumulatePayload(uint8_t byte) {
+void
+Decoder::accumulatePayload(uint8_t byte) {
     assertBufferSmallerThan(currentDatagram_.payloadType_->length());
 
     byteBuffer_.push_back(byte);
@@ -141,7 +151,8 @@ void Decoder::accumulatePayload(uint8_t byte) {
     }
 }
 
-void Decoder::accumulateChecksum(uint8_t byte) {
+void
+Decoder::accumulateChecksum(uint8_t byte) {
     assertBufferSmallerThan(CHECKSUM_SIZE);
 
     byteBuffer_.push_back(byte);
@@ -155,7 +166,8 @@ void Decoder::accumulateChecksum(uint8_t byte) {
     }
 }
 
-bool Decoder::validatePayload() {
+bool
+Decoder::validatePayload() {
 
     assert(byteBuffer_.size() == CHECKSUM_SIZE);
 
@@ -187,10 +199,12 @@ bool Decoder::validatePayload() {
     }
 }
 
-void Decoder::assertBufferSmallerThan(size_t bound) {
+void
+Decoder::assertBufferSmallerThan(size_t bound) {
     assert(0 <= byteBuffer_.size() && byteBuffer_.size() < bound);
 }
 
-DecodingState Decoder::currentState() const {
+DecodingState
+Decoder::currentState() const {
     return currentState_;
 }

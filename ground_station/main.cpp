@@ -2,7 +2,8 @@
 #include <ConfigParser/ConfigParser.h>
 
 
-int main(int argc, char **argv) {
+int
+main(int argc, char **argv) {
 
     qRegisterMetaType<SensorsPacket>("TelemetryReading");
     qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>&");

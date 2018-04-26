@@ -25,18 +25,21 @@ Compass::Compass(Qt3DCore::QNode *parent, Qt3DRender::QCamera *cam) :
     this->addComponent(transform_);
 }
 
-void Compass::updateHorizontalOffset(int w) {
+void
+Compass::updateHorizontalOffset(int w) {
     w_ = w;
     update();
 }
 
-void Compass::updateVerticalOffset(int h) {
+void
+Compass::updateVerticalOffset(int h) {
     h_ = h;
 
     update();
 }
 
-void Compass::update() {
+void
+Compass::update() {
 
     QVector3D rightVector = QVector3D::crossProduct(
             camera_->viewVector().normalized(),

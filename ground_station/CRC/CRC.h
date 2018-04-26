@@ -344,7 +344,8 @@ private:
     @return CRC lookup table
 */
 template<typename CRCType, crcpp_uint16 CRCWidth>
-inline CRC::Table<CRCType, CRCWidth> CRC::Parameters<CRCType, CRCWidth>::MakeTable() const {
+inline CRC::Table<CRCType, CRCWidth>
+CRC::Parameters<CRCType, CRCWidth>::MakeTable() const {
     // This should take advantage of RVO and optimize out the copy.
     return CRC::Table<CRCType, CRCWidth>(*this);
 }
@@ -356,7 +357,8 @@ inline CRC::Table<CRCType, CRCWidth> CRC::Parameters<CRCType, CRCWidth>::MakeTab
     @tparam CRCWidth Number of bits in the CRC
 */
 template<typename CRCType, crcpp_uint16 CRCWidth>
-inline CRC::Table<CRCType, CRCWidth>::Table(const Parameters<CRCType, CRCWidth> &parameters) :
+inline
+CRC::Table<CRCType, CRCWidth>::Table(const Parameters<CRCType, CRCWidth> &parameters) :
         parameters(parameters) {
     InitTable();
 }
@@ -383,7 +385,8 @@ inline CRC::Table<CRCType, CRCWidth>::Table(Parameters<CRCType, CRCWidth> && par
     @return CRC parameters
 */
 template<typename CRCType, crcpp_uint16 CRCWidth>
-inline const CRC::Parameters<CRCType, CRCWidth> &CRC::Table<CRCType, CRCWidth>::GetParameters() const {
+inline const CRC::Parameters<CRCType, CRCWidth> &
+CRC::Table<CRCType, CRCWidth>::GetParameters() const {
     return parameters;
 }
 
@@ -394,7 +397,8 @@ inline const CRC::Parameters<CRCType, CRCWidth> &CRC::Table<CRCType, CRCWidth>::
     @return CRC table
 */
 template<typename CRCType, crcpp_uint16 CRCWidth>
-inline const CRCType *CRC::Table<CRCType, CRCWidth>::GetTable() const {
+inline const CRCType *
+CRC::Table<CRCType, CRCWidth>::GetTable() const {
     return table;
 }
 
@@ -406,7 +410,8 @@ inline const CRCType *CRC::Table<CRCType, CRCWidth>::GetTable() const {
     @return CRC table entry
 */
 template<typename CRCType, crcpp_uint16 CRCWidth>
-inline CRCType CRC::Table<CRCType, CRCWidth>::operator[](unsigned char index) const {
+inline CRCType
+CRC::Table<CRCType, CRCWidth>::operator[](unsigned char index) const {
     return table[index];
 }
 
@@ -416,7 +421,8 @@ inline CRCType CRC::Table<CRCType, CRCWidth>::operator[](unsigned char index) co
     @tparam CRCWidth Number of bits in the CRC
 */
 template<typename CRCType, crcpp_uint16 CRCWidth>
-inline void CRC::Table<CRCType, CRCWidth>::InitTable() {
+inline void
+CRC::Table<CRCType, CRCWidth>::InitTable() {
     // For masking off the bits for the CRC (in the event that the number of bits in CRCType is larger than CRCWidth)
     static crcpp_constexpr CRCType BIT_MASK((CRCType(1) << (CRCWidth - CRCType(1))) |
                                             ((CRCType(1) << (CRCWidth - CRCType(1))) - CRCType(1)));
@@ -455,7 +461,8 @@ inline void CRC::Table<CRCType, CRCWidth>::InitTable() {
     @return CRC
 */
 template<typename CRCType, crcpp_uint16 CRCWidth>
-inline CRCType CRC::Calculate(const void *data, crcpp_size size, const Parameters<CRCType, CRCWidth> &parameters) {
+inline CRCType
+CRC::Calculate(const void *data, crcpp_size size, const Parameters<CRCType, CRCWidth> &parameters) {
     CRCType remainder = CalculateRemainder(data, size, parameters, parameters.initialValue);
 
     // No need to mask the remainder here; the mask will be applied in the Finalize() function.
@@ -499,7 +506,8 @@ CRC::Calculate(const void *data, crcpp_size size, const Parameters<CRCType, CRCW
     @return CRC
 */
 template<typename CRCType, crcpp_uint16 CRCWidth>
-inline CRCType CRC::Calculate(const void *data, crcpp_size size, const Table<CRCType, CRCWidth> &lookupTable) {
+inline CRCType
+CRC::Calculate(const void *data, crcpp_size size, const Table<CRCType, CRCWidth> &lookupTable) {
     const Parameters<CRCType, CRCWidth> &parameters = lookupTable.GetParameters();
 
     CRCType remainder = CalculateRemainder(data, size, lookupTable, parameters.initialValue);
@@ -545,7 +553,8 @@ CRC::Calculate(const void *data, crcpp_size size, const Table<CRCType, CRCWidth>
     @return Reflected value
 */
 template<typename IntegerType>
-inline IntegerType CRC::Reflect(IntegerType value, crcpp_uint16 numBits) {
+inline IntegerType
+CRC::Reflect(IntegerType value, crcpp_uint16 numBits) {
     IntegerType reversedValue(0);
 
     for (crcpp_uint16 i = 0; i < numBits; ++i) {
@@ -566,7 +575,8 @@ inline IntegerType CRC::Reflect(IntegerType value, crcpp_uint16 numBits) {
     @return Final CRC
 */
 template<typename CRCType, crcpp_uint16 CRCWidth>
-inline CRCType CRC::Finalize(CRCType remainder, CRCType finalXOR, bool reflectOutput) {
+inline CRCType
+CRC::Finalize(CRCType remainder, CRCType finalXOR, bool reflectOutput) {
     // For masking off the bits for the CRC (in the event that the number of bits in CRCType is larger than CRCWidth)
     static crcpp_constexpr CRCType BIT_MASK = (CRCType(1) << (CRCWidth - CRCType(1))) |
                                               ((CRCType(1) << (CRCWidth - CRCType(1))) - CRCType(1));
@@ -596,7 +606,8 @@ inline CRCType CRC::Finalize(CRCType remainder, CRCType finalXOR, bool reflectOu
     @return Un-finalized CRC remainder
 */
 template<typename CRCType, crcpp_uint16 CRCWidth>
-inline CRCType CRC::UndoFinalize(CRCType crc, CRCType finalXOR, bool reflectOutput) {
+inline CRCType
+CRC::UndoFinalize(CRCType crc, CRCType finalXOR, bool reflectOutput) {
     // For masking off the bits for the CRC (in the event that the number of bits in CRCType is larger than CRCWidth)
     static crcpp_constexpr CRCType BIT_MASK = (CRCType(1) << (CRCWidth - CRCType(1))) |
                                               ((CRCType(1) << (CRCWidth - CRCType(1))) - CRCType(1));
@@ -618,9 +629,10 @@ inline CRCType CRC::UndoFinalize(CRCType crc, CRCType finalXOR, bool reflectOutp
     @return CRC remainder
 */
 template<typename CRCType, crcpp_uint16 CRCWidth>
-CRCType CRC::CalculateRemainderFromTable(const uint8_t byte, const uint16_t* lookupTable,
-                                         const Parameters<CRCType, CRCWidth> &parameters,
-                                         CRCType remainder) {
+CRCType
+CRC::CalculateRemainderFromTable(const uint8_t byte, const uint16_t *lookupTable,
+                                 const Parameters<CRCType, CRCWidth> &parameters,
+                                 CRCType remainder) {
     /*
     static crcpp_constexpr CRCType SHIFT(CRCWidth - CHAR_BIT);
 */
@@ -751,8 +763,9 @@ CRC::CalculateRemainder(const void *data, crcpp_size size, const Parameters<CRCT
     @return CRC remainder
 */
 template<typename CRCType, crcpp_uint16 CRCWidth>
-inline CRCType CRC::CalculateRemainder(const void *data, crcpp_size size, const Table<CRCType, CRCWidth> &lookupTable,
-                                       CRCType remainder) {
+inline CRCType
+CRC::CalculateRemainder(const void *data, crcpp_size size, const Table<CRCType, CRCWidth> &lookupTable,
+                        CRCType remainder) {
     const unsigned char *current = reinterpret_cast<const unsigned char *>(data);
 
     if (lookupTable.GetParameters().reflectInput) {
@@ -803,7 +816,8 @@ inline CRCType CRC::CalculateRemainder(const void *data, crcpp_size size, const 
     @return Non-negative compile-time expression
 */
 template<typename IntegerType>
-inline crcpp_constexpr IntegerType CRC::BoundedConstexprValue(IntegerType x) {
+inline crcpp_constexpr IntegerType
+CRC::BoundedConstexprValue(IntegerType x) {
     return (x < IntegerType(0)) ? IntegerType(0) : x;
 }
 
@@ -965,7 +979,8 @@ inline const CRC::Parameters<crcpp_uint8, 7> & CRC::CRC_7()
         - check value    = 0xF4
     @return CRC-8 SMBus parameters
 */
-inline const CRC::Parameters<crcpp_uint8, 8> &CRC::CRC_8() {
+inline const CRC::Parameters<crcpp_uint8, 8> &
+CRC::CRC_8() {
     static const Parameters<crcpp_uint8, 8> parameters = {0x07, 0x00, 0x00, false, false};
     return parameters;
 }
@@ -1200,7 +1215,8 @@ inline const CRC::Parameters<crcpp_uint16, 15> & CRC::CRC_15_MPT1327()
         - check value    = 0xBB3D
     @return CRC-16 ARC parameters
 */
-inline const CRC::Parameters<crcpp_uint16, 16> &CRC::CRC_16_ARC() {
+inline const CRC::Parameters<crcpp_uint16, 16> &
+CRC::CRC_16_ARC() {
     static const Parameters<crcpp_uint16, 16> parameters = {0x8005, 0x0000, 0x0000, true, true};
     return parameters;
 }
@@ -1217,7 +1233,8 @@ inline const CRC::Parameters<crcpp_uint16, 16> &CRC::CRC_16_ARC() {
         - check value    = 0xFEE8
     @return CRC-16 BUYPASS parameters
 */
-inline const CRC::Parameters<crcpp_uint16, 16> &CRC::CRC_16_BUYPASS() {
+inline const CRC::Parameters<crcpp_uint16, 16> &
+CRC::CRC_16_BUYPASS() {
     static const Parameters<crcpp_uint16, 16> parameters = {0x8005, 0x0000, 0x0000, false, false};
     return parameters;
 }
@@ -1234,7 +1251,8 @@ inline const CRC::Parameters<crcpp_uint16, 16> &CRC::CRC_16_BUYPASS() {
         - check value    = 0x29B1
     @return CRC-16 CCITT FALSE parameters
 */
-inline const CRC::Parameters<crcpp_uint16, 16> &CRC::CRC_16_CCITTFALSE() {
+inline const CRC::Parameters<crcpp_uint16, 16> &
+CRC::CRC_16_CCITTFALSE() {
     static const Parameters<crcpp_uint16, 16> parameters = {0x1021, 0xFFFF, 0x0000, false, false};
     return parameters;
 }
@@ -1325,7 +1343,8 @@ inline const CRC::Parameters<crcpp_uint16, 16> & CRC::CRC_16_DNP()
         - check value    = 0xD64E
     @return CRC-16 GENIBUS parameters
 */
-inline const CRC::Parameters<crcpp_uint16, 16> &CRC::CRC_16_GENIBUS() {
+inline const CRC::Parameters<crcpp_uint16, 16> &
+CRC::CRC_16_GENIBUS() {
     static const Parameters<crcpp_uint16, 16> parameters = {0x1021, 0xFFFF, 0xFFFF, false, false};
     return parameters;
 }
@@ -1342,7 +1361,8 @@ inline const CRC::Parameters<crcpp_uint16, 16> &CRC::CRC_16_GENIBUS() {
         - check value    = 0x2189
     @return CRC-16 KERMIT parameters
 */
-inline const CRC::Parameters<crcpp_uint16, 16> &CRC::CRC_16_KERMIT() {
+inline const CRC::Parameters<crcpp_uint16, 16> &
+CRC::CRC_16_KERMIT() {
     static const Parameters<crcpp_uint16, 16> parameters = {0x1021, 0x0000, 0x0000, true, true};
     return parameters;
 }
@@ -1433,7 +1453,8 @@ inline const CRC::Parameters<crcpp_uint16, 16> & CRC::CRC_16_USB()
         - check value    = 0x906E
     @return CRC-16 X-25 parameters
 */
-inline const CRC::Parameters<crcpp_uint16, 16> &CRC::CRC_16_X25() {
+inline const CRC::Parameters<crcpp_uint16, 16> &
+CRC::CRC_16_X25() {
     static const Parameters<crcpp_uint16, 16> parameters = {0x1021, 0xFFFF, 0xFFFF, true, true};
     return parameters;
 }
@@ -1450,7 +1471,8 @@ inline const CRC::Parameters<crcpp_uint16, 16> &CRC::CRC_16_X25() {
         - check value    = 0x31C3
     @return CRC-16 XMODEM parameters
 */
-inline const CRC::Parameters<crcpp_uint16, 16> &CRC::CRC_16_XMODEM() {
+inline const CRC::Parameters<crcpp_uint16, 16> &
+CRC::CRC_16_XMODEM() {
     static const Parameters<crcpp_uint16, 16> parameters = {0x1021, 0x0000, 0x0000, false, false};
     return parameters;
 }
@@ -1577,7 +1599,8 @@ inline const CRC::Parameters<crcpp_uint32, 30> & CRC::CRC_30()
         - check value    = 0xCBF43926
     @return CRC-32 parameters
 */
-inline const CRC::Parameters<crcpp_uint32, 32> &CRC::CRC_32() {
+inline const CRC::Parameters<crcpp_uint32, 32> &
+CRC::CRC_32() {
     static const Parameters<crcpp_uint32, 32> parameters = {0x04C11DB7, 0xFFFFFFFF, 0xFFFFFFFF, true, true};
     return parameters;
 }
@@ -1594,7 +1617,8 @@ inline const CRC::Parameters<crcpp_uint32, 32> &CRC::CRC_32() {
         - check value    = 0xFC891918
     @return CRC-32 BZIP2 parameters
 */
-inline const CRC::Parameters<crcpp_uint32, 32> &CRC::CRC_32_BZIP2() {
+inline const CRC::Parameters<crcpp_uint32, 32> &
+CRC::CRC_32_BZIP2() {
     static const Parameters<crcpp_uint32, 32> parameters = {0x04C11DB7, 0xFFFFFFFF, 0xFFFFFFFF, false, false};
     return parameters;
 }
@@ -1631,7 +1655,8 @@ inline const CRC::Parameters<crcpp_uint32, 32> & CRC::CRC_32_C()
         - check value    = 0x0376E6E7
     @return CRC-32 MPEG-2 parameters
 */
-inline const CRC::Parameters<crcpp_uint32, 32> &CRC::CRC_32_MPEG2() {
+inline const CRC::Parameters<crcpp_uint32, 32> &
+CRC::CRC_32_MPEG2() {
     static const Parameters<crcpp_uint32, 32> parameters = {0x04C11DB7, 0xFFFFFFFF, 0x00000000, false, false};
     return parameters;
 }
@@ -1648,7 +1673,8 @@ inline const CRC::Parameters<crcpp_uint32, 32> &CRC::CRC_32_MPEG2() {
         - check value    = 0x765E7680
     @return CRC-32 POSIX parameters
 */
-inline const CRC::Parameters<crcpp_uint32, 32> &CRC::CRC_32_POSIX() {
+inline const CRC::Parameters<crcpp_uint32, 32> &
+CRC::CRC_32_POSIX() {
     static const Parameters<crcpp_uint32, 32> parameters = {0x04C11DB7, 0x00000000, 0xFFFFFFFF, false, false};
     return parameters;
 }

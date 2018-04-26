@@ -25,7 +25,8 @@ GroundStation::GroundStation(QVector3D position, const QString &texture, Qt3DRen
                 {-8, 1.25, 0});
 }
 
-Qt3DCore::QTransform *GroundStation::getTransform() {
+Qt3DCore::QTransform *
+GroundStation::getTransform() {
     return transform_;
 }
 

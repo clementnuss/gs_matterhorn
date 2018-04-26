@@ -13,6 +13,7 @@ public:
                            Qt3DCore::QNode *parent);
 
     Qt3DCore::QTransform *getTransform() override;
+
 public slots:
 
 private:

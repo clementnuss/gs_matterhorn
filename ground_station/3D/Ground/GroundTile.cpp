@@ -81,6 +81,7 @@ GroundTile::GroundTile(Qt3DCore::QNode *parent,
     this->addComponent(material);
 }
 
-float GroundTile::vertexHeightAt(int i, int j) const {
+float
+GroundTile::vertexHeightAt(int i, int j) const {
     return mesh_->vertexHeightAt(i, j);
 }

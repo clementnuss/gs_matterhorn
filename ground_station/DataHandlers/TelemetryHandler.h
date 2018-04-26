@@ -32,7 +32,7 @@ public:
      */
     virtual std::vector<GPSPacket> pollGPSData() = 0;
 
-    virtual void sendCommand(const uint8_t*, size_t) = 0;
+    virtual void sendCommand(const uint8_t *, size_t) = 0;
 
     virtual bool isReplayHandler()= 0;
 

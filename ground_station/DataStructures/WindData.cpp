@@ -2,15 +2,15 @@
 #include <Utilities/ReaderUtils.h>
 #include <3D/Utils.h>
 
-std::pair<float, float> vectorToPair(const QVector2D &v) {
-    float y = v.y();
-    float x = v.x();
+std::pair<float, float>
+vectorToPair(const QVector2D &v) {
     float speed = v.length();
     float angle = toDegrees(std::atan2(v.y(), v.x()));
     return {speed, angle};
 };
 
-WindData WindData::fromFile(const std::string &predictionsPath) {
+WindData
+WindData::fromFile(const std::string &predictionsPath) {
     FileReader<WindPrediction> predictionReader{predictionsPath, windPredictionFromString};
     return WindData(predictionReader.readFile());
 }
@@ -27,11 +27,13 @@ WindData::WindData(std::vector<WindPrediction> &&preds) {
     }
 }
 
-QVector2D WindData::operator[](const float &altitude) const {
+QVector2D
+WindData::operator[](const float &altitude) const {
     return (windTable_.find(altitude) != windTable_.end()) ? windTable_(altitude) : QVector2D{0, 0};
 }
 
-std::pair<float, float> WindData::speedAndAngleForAltitude(const float &altitude) const {
+std::pair<float, float>
+WindData::speedAndAngleForAltitude(const float &altitude) const {
     return (windTable_.find(altitude) != windTable_.end()) ? vectorToPair(windTable_(altitude))
                                                            : std::make_pair<float, float>(0, 0);
 };
@@ -43,7 +45,8 @@ std::pair<float, float> WindData::speedAndAngleForAltitude(const float &altitude
  * @param windDirection Wind direction in degrees relative to North, clockwise
  * @return A QVector2D representing the wind speed on each OpenGL axis
  */
-QVector2D WindData::dataToWindVector(const float &windSpeed, const float &windDirection) {
+QVector2D
+WindData::dataToWindVector(const float &windSpeed, const float &windDirection) {
 
     // OpenGL x axis is aligned with north. Direction angles are specified relative to north, going clockwise
     double rads = ((M_PI / 180) * windDirection);

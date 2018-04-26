@@ -2,17 +2,20 @@
 #define GS_MATTERHORN_GRAPHUTILS_H
 
 
-QCPGraphData accelerationFromReading(SensorsPacket reading) {
+QCPGraphData
+accelerationFromReading(SensorsPacket reading) {
     return {reading.timestamp_ / 1'000'000.0, reading.acceleration_.norm()};
 }
 
 
-QCPGraphData altitudeFromReading(SensorsPacket reading) {
+QCPGraphData
+altitudeFromReading(SensorsPacket reading) {
     return {reading.timestamp_ / 1'000'000.0, reading.altitude_};
 }
 
 
-QCPGraphData speedFromReading(SensorsPacket reading) {
+QCPGraphData
+speedFromReading(SensorsPacket reading) {
 //    return {static_cast<double>(reading.timestamp), reading.speed.value};
     return {reading.timestamp_ / 1'000'000.0, -1};
 }

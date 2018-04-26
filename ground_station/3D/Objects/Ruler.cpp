@@ -26,14 +26,16 @@ Ruler::Ruler(QVector3D measurePos, Qt3DRender::QCamera *camera, const QString &t
 }
 
 
-void Ruler::updatePosition(const QVector3D &newPos) {
+void
+Ruler::updatePosition(const QVector3D &newPos) {
     measurePos_ = newPos;
     transform_->setTranslation({measurePos_.x(), 0, measurePos_.z()});
     redraw();
 }
 
 
-void Ruler::redraw() {
+void
+Ruler::redraw() {
     rulerAxis_->setData({{0, measurePos_.y(), 0},
                          {0, 0,               0}});
 
@@ -47,7 +49,8 @@ void Ruler::redraw() {
 
 }
 
-void Ruler::initLabels(Qt3DRender::QCamera *camera, const QString &tickTexture) {
+void
+Ruler::initLabels(Qt3DRender::QCamera *camera, const QString &tickTexture) {
 
     for (int i = OpenGLConstants::RULER_SPACING;
          i <= OpenGLConstants::RULER_MAX_HEIGHT;

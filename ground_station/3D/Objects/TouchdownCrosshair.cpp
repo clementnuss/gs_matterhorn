@@ -16,7 +16,8 @@ TouchdownCrosshair::TouchdownCrosshair(const QVector3D &position, Qt3DRender::QC
     updatePosition(position);
 }
 
-void TouchdownCrosshair::updatePosition(QVector3D newPosition) {
+void
+TouchdownCrosshair::updatePosition(QVector3D newPosition) {
     QMatrix4x4 m{};
     m.translate(newPosition + QVector3D{0, 10, 0});
     m.scale(UI3DConstants::TRACKER_SIZE, UI3DConstants::TRACKER_SIZE, UI3DConstants::TRACKER_SIZE);
@@ -24,10 +25,12 @@ void TouchdownCrosshair::updatePosition(QVector3D newPosition) {
     transform_->setMatrix(m);
 }
 
-QVector3D TouchdownCrosshair::getPosition() {
+QVector3D
+TouchdownCrosshair::getPosition() {
     return transform_->translation();
 }
 
-Qt3DCore::QTransform *TouchdownCrosshair::getTransform() {
+Qt3DCore::QTransform *
+TouchdownCrosshair::getTransform() {
     return transform_;
 }
