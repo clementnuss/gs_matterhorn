@@ -16,7 +16,7 @@ class OpenGL3DAxes : public Qt3DCore::QEntity {
 Q_OBJECT;
 
 public:
-    explicit OpenGL3DAxes(Qt3DCore::QNode *parent);
+    explicit OpenGL3DAxes(Qt3DCore::QNode *const parent);
 
 private:
     Line *xAxis_;

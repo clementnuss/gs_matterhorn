@@ -2,7 +2,7 @@
 #include <QtGui/QColor>
 #include "OpenGL3DAxes.h"
 
-OpenGL3DAxes::OpenGL3DAxes(Qt3DCore::QNode *parent) :
+OpenGL3DAxes::OpenGL3DAxes(Qt3DCore::QNode *const parent) :
         QEntity(parent),
         xAxis_{new Line(this, QColor::fromRgb(255, 0, 0), true)},
         yAxis_{new Line(this, QColor::fromRgb(0, 255, 0), true)},

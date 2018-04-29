@@ -12,14 +12,15 @@ class Ruler : public Qt3DCore::QEntity {
 Q_OBJECT
 
 public:
-    Ruler(float originHeight, QVector3D measurePos, Qt3DRender::QCamera *camera, const QString &tickTexture, Qt3DCore::QNode *parent);
+    Ruler(const float &originHeight, const QVector3D &measurePos, const Qt3DRender::QCamera *const camera, const QString &tickTexture,
+          Qt3DCore::QNode *const parent);
 
     void updatePosition(const QVector3D &newPos);
 
 private:
     void redraw();
 
-    void initLabels(Qt3DRender::QCamera *camera, const QString &tickTexture);
+    void initLabels(const Qt3DRender::QCamera *const camera, const QString &tickTexture);
 
     float originHeight_;
     Qt3DCore::QTransform *transform_;

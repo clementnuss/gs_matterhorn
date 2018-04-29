@@ -4,8 +4,8 @@
 #include <Qt3DCore/QTransform>
 #include "Tracker.h"
 
-Tracker::Tracker(QVector3D position, Qt3DRender::QCamera *camera, const QString &iconTextureName, QString text,
-                 TextType textType, Qt3DCore::QNode *parent, const QVector3D &markerOffset, const QVector3D &textOffset)
+Tracker::Tracker(const QVector3D &position, const Qt3DRender::QCamera *const camera, const QString &iconTextureName, const QString &text,
+                 TextType textType, Qt3DCore::QNode *const parent, const QVector3D &markerOffset, const QVector3D &textOffset)
         : Qt3DCore::QEntity(parent),
           transform_{new Qt3DCore::QTransform()},
           markerOffset_{markerOffset},
@@ -35,6 +35,6 @@ Tracker::getPosition() {
 }
 
 Qt3DCore::QTransform *
-Tracker::getTransform() {
+Tracker::getObjectTransform() const {
     return transform_;
 }

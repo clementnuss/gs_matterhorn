@@ -6,7 +6,7 @@
 
 class IObservable {
 public :
-    virtual Qt3DCore::QTransform *getTransform() = 0;
+    virtual Qt3DCore::QTransform *getObjectTransform() const = 0;
 };
 
 #endif //GS_MATTERHORN_IOBSERVABLE_H

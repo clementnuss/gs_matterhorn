@@ -6,7 +6,8 @@
 #include <3D/3DVisualisationConstants.h>
 #include "Ruler.h"
 
-Ruler::Ruler(float originHeight, QVector3D measurePos, Qt3DRender::QCamera *camera, const QString &tickTexture, Qt3DCore::QNode *parent) :
+Ruler::Ruler(const float &originHeight, const QVector3D &measurePos, const Qt3DRender::QCamera *const camera, const QString &tickTexture,
+             Qt3DCore::QNode *const parent) :
         QEntity(parent),
         originHeight_{originHeight},
         transform_{new Qt3DCore::QTransform()},
@@ -50,7 +51,7 @@ Ruler::redraw() {
 }
 
 void
-Ruler::initLabels(Qt3DRender::QCamera *camera, const QString &tickTexture) {
+Ruler::initLabels(const Qt3DRender::QCamera *const camera, const QString &tickTexture) {
 
     for (int i = OpenGLConstants::RULER_SPACING + static_cast<int>(originHeight_);
          i <= OpenGLConstants::RULER_MAX_HEIGHT + static_cast<int>(originHeight_);

@@ -13,7 +13,7 @@ class Compass : public Qt3DCore::QEntity {
 Q_OBJECT;
 
 public:
-    explicit Compass(Qt3DCore::QNode *parent, Qt3DRender::QCamera *cam);
+    explicit Compass(Qt3DCore::QNode *const parent, const Qt3DRender::QCamera *const cam);
 
 public slots:
 
@@ -26,7 +26,7 @@ public slots:
 private:
     float w_;
     float h_;
-    Qt3DRender::QCamera *camera_;
+    const Qt3DRender::QCamera *const camera_;
     Qt3DRender::QMesh *mesh_;
     Qt3DExtras::QTextureMaterial *material_;
     Qt3DCore::QTransform *transform_;

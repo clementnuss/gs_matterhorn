@@ -49,7 +49,7 @@ CameraController::switchObservable() {
         observableIt_ = observables_.begin();
     }
 
-    QVector3D observablePos = (*observableIt_)->getTransform()->translation();
+    QVector3D observablePos = (*observableIt_)->getObjectTransform()->translation();
     QVector3D obsToCam = camera()->position() - observablePos;
     obsToCam = viewingDistance_ * obsToCam.normalized();
 
@@ -184,9 +184,8 @@ CameraController::placeCamera() {
     }
 
     if (observableIt_ != observables_.end()) {
-        viewCenter_ += ((*observableIt_)->getTransform()->translation() - viewCenter_) * 0.1;
+        viewCenter_ += ((*observableIt_)->getObjectTransform()->translation() - viewCenter_) * 0.1;
     }
-
 
     float x = viewingDistance_ * std::sin(polarAngle_) * std::cos(azimuthalAngle_);
     float z = viewingDistance_ * std::sin(polarAngle_) * std::sin(azimuthalAngle_);

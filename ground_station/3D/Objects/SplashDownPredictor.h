@@ -14,7 +14,7 @@
 
 class SplashDownPredictor {
 public:
-    SplashDownPredictor(std::string &path, Qt3DCore::QNode *parent);
+    SplashDownPredictor(const std::string &path, Qt3DCore::QNode *const parent);
 
     QVector3D getTouchdownCoordinates(Ground *const ground) const;
 

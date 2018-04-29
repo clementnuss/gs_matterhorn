@@ -7,7 +7,7 @@
 #include "SplashDownPredictor.h"
 
 
-SplashDownPredictor::SplashDownPredictor(std::string &path, Qt3DCore::QNode *parent) :
+SplashDownPredictor::SplashDownPredictor(const std::string &path, Qt3DCore::QNode *const parent) :
         predictionStrategy_{std::make_unique<AdaptiveSpeedPredictionStrategy>()},
         status_{},
         trajectory_{},

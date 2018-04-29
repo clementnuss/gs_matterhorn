@@ -2,7 +2,7 @@
 #include <3D/3DVisualisationConstants.h>
 #include "TouchdownCrosshair.h"
 
-TouchdownCrosshair::TouchdownCrosshair(const QVector3D &position, Qt3DRender::QCamera *camera, Qt3DCore::QNode *parent)
+TouchdownCrosshair::TouchdownCrosshair(const QVector3D &position, const Qt3DRender::QCamera *const camera, Qt3DCore::QNode *const parent)
         : Qt3DCore::QEntity(parent),
           transform_{new Qt3DCore::QTransform()},
           marker_{nullptr},
@@ -31,6 +31,6 @@ TouchdownCrosshair::getPosition() {
 }
 
 Qt3DCore::QTransform *
-TouchdownCrosshair::getTransform() {
+TouchdownCrosshair::getObjectTransform() const {
     return transform_;
 }

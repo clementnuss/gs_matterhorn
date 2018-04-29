@@ -6,7 +6,7 @@
 #include "Compass.h"
 
 
-Compass::Compass(Qt3DCore::QNode *parent, Qt3DRender::QCamera *cam) :
+Compass::Compass(Qt3DCore::QNode *const parent, const Qt3DRender::QCamera *const cam) :
         QEntity(parent),
         camera_{cam},
         mesh_{new Qt3DRender::QMesh()},

@@ -13,10 +13,10 @@
 const QVector3D Marker::basePosition_{0, 0, 0};
 
 Marker::Marker(const QString &texture,
-               float width, float height,
-               QVector3D offset,
-               Qt3DRender::QCamera *camera,
-               Qt3DCore::QNode *parent)
+               const float &width, const float &height,
+               const QVector3D &offset,
+               const Qt3DRender::QCamera *const camera,
+               Qt3DCore::QNode *const parent)
         : Qt3DCore::QEntity(parent),
           camera_{camera}, offset_{offset}, transform_{new Qt3DCore::QTransform()} {
     // Build effect

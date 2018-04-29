@@ -14,17 +14,17 @@
 const QVector3D Text3D::basePosition_{0, 0, 0};
 
 //TODO: Implement common class for billboards
-//TODO: change shader name to uniform color shader
-Text3D::Text3D(QString text, TextType textType, Qt3DRender::QCamera *camera, const QVector3D &offsetToParent,
-               Qt3DCore::QNode *parent) :
+Text3D::Text3D(const QString &text, TextType textType, const Qt3DRender::QCamera *const camera, const QVector3D &offsetToParent, Qt3DCore::QNode *const parent)
+        :
         QEntity(parent),
         transform_{new Qt3DCore::QTransform()},
         camera_{camera},
         offset_{offsetToParent} {
+
     // Build effect
     auto *shaderProgram = new Qt3DRender::QShaderProgram();
-    shaderProgram->setVertexShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/line.vert"}));
-    shaderProgram->setFragmentShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/line.frag"}));
+    shaderProgram->setVertexShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/uniformColor.vert"}));
+    shaderProgram->setFragmentShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/uniformColor.frag"}));
 
     auto *renderPass = new Qt3DRender::QRenderPass();
 

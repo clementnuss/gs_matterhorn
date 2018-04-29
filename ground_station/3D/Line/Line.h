@@ -20,7 +20,7 @@ struct VBOData {
 class Line : public Qt3DCore::QEntity {
 Q_OBJECT
 public:
-    explicit Line(Qt3DCore::QNode *parent, QColor &&col, bool isStatic = false);
+    explicit Line(Qt3DCore::QNode *const parent, const QColor &&col, const bool &isStatic = false);
 
     void setData(const QVector<QVector3D> &positions);
 

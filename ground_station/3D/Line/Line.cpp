@@ -13,20 +13,20 @@
 #include "Line.h"
 
 
-Line::Line(Qt3DCore::QNode *parent, QColor &&color, bool isStatic) : Qt3DCore::QEntity(parent),
-                                                                     geometryRenderer_{
+Line::Line(Qt3DCore::QNode *const parent, const QColor &&color, const bool &isStatic) : Qt3DCore::QEntity(parent),
+                                                                                        geometryRenderer_{
                                                                              new Qt3DRender::QGeometryRenderer()},
-                                                                     geometry_{new Qt3DRender::QGeometry()},
-                                                                     attribute_{new Qt3DRender::QAttribute()},
-                                                                     drawBuffer_{new Qt3DRender::QBuffer(
+                                                                                        geometry_{new Qt3DRender::QGeometry()},
+                                                                                        attribute_{new Qt3DRender::QAttribute()},
+                                                                                        drawBuffer_{new Qt3DRender::QBuffer(
                                                                              Qt3DRender::QBuffer::VertexBuffer)},
-                                                                     drawBufferCount_{0},
-                                                                     lineData_{} {
+                                                                                        drawBufferCount_{0},
+                                                                                        lineData_{} {
 
     // Build effect
     auto *shaderProgram = new Qt3DRender::QShaderProgram();
-    shaderProgram->setVertexShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/line.vert"}));
-    shaderProgram->setFragmentShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/line.frag"}));
+    shaderProgram->setVertexShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/uniformColor.vert"}));
+    shaderProgram->setFragmentShaderCode(shaderProgram->loadSource(QUrl{"qrc:/shaders/uniformColor.frag"}));
 
     auto *renderPass = new Qt3DRender::QRenderPass();
 

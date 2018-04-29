@@ -1,10 +1,10 @@
 #include <QtGui/QFont>
 #include <QtGui/QFontMetrics>
 #include <Qt3DCore/QTransform>
-#include <3D/Utils.h>
-#include <3D/Billboards/Marker.h>
-#include <3D/Billboards/Tracker.h>
-#include <3D/ForwardRenderer/LayerManager.h>
+#include "3D/Utils.h"
+#include "3D/Billboards/Marker.h"
+#include "3D/Billboards/Tracker.h"
+#include "3D/ForwardRenderer/LayerManager.h"
 #include "GroundStation.h"
 
 GroundStation::GroundStation(QVector3D position, const QString &texture, Qt3DRender::QCamera *camera,
@@ -26,7 +26,7 @@ GroundStation::GroundStation(QVector3D position, const QString &texture, Qt3DRen
 }
 
 Qt3DCore::QTransform *
-GroundStation::getTransform() {
+GroundStation::getObjectTransform() const {
     return transform_;
 }
 

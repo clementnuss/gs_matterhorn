@@ -12,8 +12,8 @@
 class Tracker : public Qt3DCore::QEntity, public IObservable {
 Q_OBJECT
 public:
-    explicit Tracker(QVector3D position, Qt3DRender::QCamera *camera, const QString &iconTextureName, QString text,
-                     TextType textType, Qt3DCore::QNode *parent, const QVector3D &markerOffset,
+    explicit Tracker(const QVector3D &position, const Qt3DRender::QCamera *const camera, const QString &iconTextureName, const QString &text,
+                     TextType textType, Qt3DCore::QNode *const parent, const QVector3D &markerOffset,
                      const QVector3D &textOffset);
 
 public slots:
@@ -22,7 +22,7 @@ public slots:
 
     QVector3D getPosition();
 
-    Qt3DCore::QTransform *getTransform() override;
+    Qt3DCore::QTransform *getObjectTransform() const override;
 
 private:
     Marker *marker_;

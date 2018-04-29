@@ -14,7 +14,7 @@ class TouchdownCrosshair : public Qt3DCore::QEntity, public IObservable {
 Q_OBJECT
 
 public:
-    explicit TouchdownCrosshair(const QVector3D &position, Qt3DRender::QCamera *camera, Qt3DCore::QNode *parent);
+    explicit TouchdownCrosshair(const QVector3D &position, const Qt3DRender::QCamera *const camera, Qt3DCore::QNode *const parent);
 
 public slots:
 
@@ -22,7 +22,7 @@ public slots:
 
     QVector3D getPosition();
 
-    Qt3DCore::QTransform *getTransform() override;
+    Qt3DCore::QTransform *getObjectTransform() const override;
 
 private:
     FlatBillboard *marker_;
