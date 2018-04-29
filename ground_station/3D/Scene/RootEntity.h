@@ -49,6 +49,7 @@ private:
     std::shared_ptr<const WorldReference> worldRef_;
     std::shared_ptr<const ContinuousElevationModel> elevationModel_;
 
+    float groundAltitude_;
     float lastReportedAltitude_;
     float lastReportedXCoord_;
     float lastReportedYCoord_;

@@ -130,30 +130,36 @@ private:
 
     void highlightLine(int, bool, QTextCursor &cursor);
 
+    void changeToReplayModeAction();
+
+    void changeToRealTimeModeAction();
+
+    double groundAltitude_;
     int prevInfoHighlight_;
-    QCustomPlot *plot1_;
-    QCustomPlot *plot2_;
-    QCPMarginGroup plotMargin_;
-    std::vector<QCustomPlot *> plotVector_;
     QTimer clockTimer;
-    chrono::system_clock::time_point lastGraphUpdate_;
-    std::vector<std::tuple<QCPAbstractItem *, QCPAbstractItem *>> userItems_;
+
+    // Playback
     bool autoPlay_;
     bool replayMode_;
     bool playbackReversed_;
     double lastRemoteTime_;
     double replayPlaybackSpeed_;
+
+    // QCustomPlot
+    const QFlags<QCP::Interaction> interactionItemsOnly_ = QCP::iSelectItems;
+    const QFlags<QCP::Interaction> interactionsAll_ = QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems;
+    std::vector<std::tuple<QCPAbstractItem *, QCPAbstractItem *>> userItems_;
+    QCustomPlot *plot1_;
+    QCustomPlot *plot2_;
+    std::vector<QCustomPlot *> plotVector_;
+    QCPMarginGroup plotMargin_;
+    chrono::system_clock::time_point lastGraphUpdate_;
+
+    // 3D Module
     Line *currentTrace_;
     RootEntity *rootEntity3D_;
     QTime animationTriggerTime_;
     QVector<QVector3D> traceData_;
-
-    const QFlags<QCP::Interaction> interactionItemsOnly_ = QCP::iSelectItems;
-    const QFlags<QCP::Interaction> interactionsAll_ = QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems;
-
-    void changeToReplayModeAction();
-
-    void changeToRealTimeModeAction();
 };
 
 #endif // GSWIDGET_H

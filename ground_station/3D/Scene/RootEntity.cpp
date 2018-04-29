@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <3D/GroundStation/GroundStation.h>
 #include <3D/Billboards/Tracker.h>
 #include <3D/ForwardRenderer/ForwardRenderer.h>
@@ -11,6 +12,7 @@
 #include <3D/Grid/CompositeElevationModel.h>
 #include <ConfigParser/ConfigParser.h>
 #include "RootEntity.h"
+#include "Utilities/MathUtils.h"
 
 static void
 addToEach(QVector<QVector3D> &v, QVector3D v3d) {
@@ -32,6 +34,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         splashDownPredictor_{nullptr},
         ground_{nullptr},
         windData_{nullptr},
+        groundAltitude_{ConfSingleton::instance().get("launchsite.altitude", 0.0f)},
         lastReportedAltitude_{0},
         lastReportedXCoord_{0},
         lastReportedYCoord_{0},
@@ -108,7 +111,7 @@ RootEntity::init() {
 
     std::string meteoPath = ConfSingleton::instance().get("meteoFile", std::string{""});
     splashDownPredictor_ = new SplashDownPredictor(meteoPath, this);
-    rocketRuler_ = new Ruler(QVector3D{0, 0, 0}, camera_, TextureConstants::CARET_LEFT, this);
+    rocketRuler_ = new Ruler(groundAltitude_, QVector3D{0, 0, 0}, camera_, TextureConstants::CARET_LEFT, this);
 
     // Setup dynamic camera parameters
     cameraController_->setCameraViewCenter(launchSitePos_);
@@ -128,8 +131,8 @@ RootEntity::reportWindData() {
         std::stringstream ss;
         std::pair<float, float> speedAndAngle = windData_->speedAndAngleForAltitude(i);
         ss << std::setw(7) << std::setfill(' ') << i << "m"
-           << std::setw(7) << std::setfill(' ') << std::setprecision(2) << std::fixed << speedAndAngle.first << "m/s"
-           << std::setw(8) << std::setfill(' ') << std::setprecision(2) << std::fixed << speedAndAngle.second << "°\n";
+                << std::setw(7) << std::setfill(' ') << std::setprecision(2) << std::fixed << speedAndAngle.first << "m/s"
+                << std::setw(8) << std::setfill(' ') << std::setprecision(2) << std::fixed << speedAndAngle.second << "°\n";
         emit addInfoString(QString::fromStdString(ss.str()));
     }
 
@@ -156,9 +159,14 @@ RootEntity::updateFlightPosition(const Position pos) {
         splashDownPredictor_->recomputePrediction();
 
 
-        emit updateHighlightInfoString(
-                UI3DConstants::WIND_REPORT_N_LINES -
-                static_cast<int>(lastComputedPosition_.y() / UI3DConstants::WIND_REPORT_INTERVAL));
+        int windDataEntryIndex = UI3DConstants::WIND_REPORT_N_LINES -
+                                 static_cast<int>(
+                                         (lastComputedPosition_.y() - groundAltitude_) / UI3DConstants::WIND_REPORT_INTERVAL
+                                 );
+
+        windDataEntryIndex = clamp(windDataEntryIndex, 0, UI3DConstants::WIND_REPORT_N_LINES);
+
+        emit updateHighlightInfoString(windDataEntryIndex);
     }
 }
 
@@ -178,7 +186,7 @@ RootEntity::resetTrace() {
 }
 
 
-//TODO: delete ?
+//TODO: delete ? -> when replay is available to 3d module
 void
 RootEntity::updateRocketTracker(QVector<QVector3D> &positions, const QVector3D &speed) {
 
@@ -200,8 +208,14 @@ RootEntity::updateRocketTracker(QVector<QVector3D> &positions, const QVector3D &
 
     //touchdownCrosshair_->updatePosition(splashDownPredictor_->getTouchdownCoordinates(ground_));
 
-    emit updateHighlightInfoString(
-            UI3DConstants::WIND_REPORT_N_LINES - static_cast<int>(lastPos.y() / UI3DConstants::WIND_REPORT_INTERVAL));
+    int windDataEntryIndex = UI3DConstants::WIND_REPORT_N_LINES -
+                             static_cast<int>(
+                                     (lastPos.y() - groundAltitude_) / UI3DConstants::WIND_REPORT_INTERVAL
+                             );
+
+    windDataEntryIndex = clamp(windDataEntryIndex, 0, UI3DConstants::WIND_REPORT_N_LINES);
+
+    emit updateHighlightInfoString(windDataEntryIndex);
 }
 
 void

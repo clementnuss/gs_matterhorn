@@ -270,6 +270,7 @@ Worker::displayEventData(EventPacket &ep) {
 void
 Worker::displayGPSData(GPSPacket &gp, bool isRocket) {
 
+
     if (isRocket) {
 
         if (gp.timestamp_ != lastGPSTimestamp_) {

@@ -6,9 +6,9 @@
 #include <3D/3DVisualisationConstants.h>
 #include "Ruler.h"
 
-Ruler::Ruler(QVector3D measurePos, Qt3DRender::QCamera *camera, const QString &tickTexture,
-             Qt3DCore::QNode *parent) :
+Ruler::Ruler(float originHeight, QVector3D measurePos, Qt3DRender::QCamera *camera, const QString &tickTexture, Qt3DCore::QNode *parent) :
         QEntity(parent),
+        originHeight_{originHeight},
         transform_{new Qt3DCore::QTransform()},
         measurePos_{measurePos},
         ticksVector_{},
@@ -16,7 +16,7 @@ Ruler::Ruler(QVector3D measurePos, Qt3DRender::QCamera *camera, const QString &t
         rulerAxis_{new Line(this, QColor::fromRgb(255, 255, 255))} {
 
     rulerAxis_->appendData({0, measurePos_.y(), 0});
-    rulerAxis_->appendData({0, 0, 0});
+    rulerAxis_->appendData({0, originHeight_, 0});
     transform_->setTranslation({measurePos_.x(), 0, measurePos_.z()});
 
     this->addComponent(transform_);
@@ -37,7 +37,7 @@ Ruler::updatePosition(const QVector3D &newPos) {
 void
 Ruler::redraw() {
     rulerAxis_->setData({{0, measurePos_.y(), 0},
-                         {0, 0,               0}});
+                         {0, originHeight_,   0}});
 
     for (auto *tracker : tickLabels_) {
         if (tracker->getPosition().y() < measurePos_.y()) {
@@ -52,12 +52,17 @@ Ruler::redraw() {
 void
 Ruler::initLabels(Qt3DRender::QCamera *camera, const QString &tickTexture) {
 
-    for (int i = OpenGLConstants::RULER_SPACING;
-         i <= OpenGLConstants::RULER_MAX_HEIGHT;
+    for (int i = OpenGLConstants::RULER_SPACING + static_cast<int>(originHeight_);
+         i <= OpenGLConstants::RULER_MAX_HEIGHT + static_cast<int>(originHeight_);
          i += OpenGLConstants::RULER_SPACING) {
+
+        if (i < originHeight_) {
+            continue;
+        }
+
         tickLabels_.push_back(
                 new Tracker({0, static_cast<float>(i), 0}, camera, tickTexture,
-                            QString::number(i) + QStringLiteral(" m"), TextType::BOLD,
+                            QString::number(i - originHeight_) + QStringLiteral(" m"), TextType::BOLD,
                             this,
                             OpenGLConstants::RIGHT_TICK, OpenGLConstants::RIGHT_LABEL)
         );

@@ -13,14 +13,6 @@
 #define USE_3D_MODULE true
 #define TEST3D true
 
-/*
-//static const std::string DEM_PATH_1 = "./DEM/N46E006.hgt";
-//static const std::string DEM_PATH_2 = "./DEM/N46E007.hgt";
-//TODO: make progeam automatically extract topleft values from .hgt file names
-static const GeoPoint DEM_TL_1{{46, 0, 0},
-                               {6,  0, 0}};
-static const GeoPoint DEM_TL_2{{46, 0, 0},
-                               {7,  0, 0}};*/
 
 namespace UnitsConstants {
     static constexpr float KNOTS_TO_MS = 0.514444;

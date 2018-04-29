@@ -1,8 +1,9 @@
+#include <Qt3DInput/QInputAspect>
 #include "UIWidget.h"
 #include "UI/Colors.h"
 #include "Readers/FileReader.h"
-#include <Qt3DInput/QInputAspect>
-#include <Utilities/ReaderUtils.h>
+#include "Utilities/ReaderUtils.h"
+#include "ConfigParser/ConfigParser.h"
 
 /**
  * GSMainwindow is the main user interface class. It communicate through Qt SLOTS system with the
@@ -24,6 +25,7 @@ GSMainwindow::GSMainwindow() :
         autoPlay_{true},
         replayMode_{false},
         replayPlaybackSpeed_{1},
+        groundAltitude_{ConfSingleton::instance().get("launchsite.altitude", 0.0)},
         prevInfoHighlight_{0},
         playbackReversed_{false},
         traceData_{} {
@@ -92,7 +94,10 @@ GSMainwindow::updateTime() {
  */
 void
 GSMainwindow::receiveSensorData(const SensorsPacket t) {
-    ui->telemetry_altitude_value->setText(QString::number(t.altitude_, 'f', UIConstants::PRECISION));
+
+    // Want to display altitude relative to ground
+    ui->telemetry_altitude_value->setText(QString::number(std::max(0.0, t.altitude_ - groundAltitude_), 'f', UIConstants::PRECISION));
+
     ui->telemetry_speed_value->setText(QString::number(t.air_speed_, 'f', UIConstants::PRECISION));
     ui->telemetry_acceleration_value->setText(QString::number(t.acceleration_.norm(), 'f', UIConstants::PRECISION));
     ui->telemetry_pressure_value->setText(QString::number(t.pressure_, 'f', UIConstants::PRECISION));
@@ -116,12 +121,12 @@ GSMainwindow::receiveEventData(const EventPacket event) {
 
     stringstream ss;
     ss << "At "
-       << setw(TimeConstants::SECS_AND_MINS_WIDTH) << setfill('0') << minutes % TimeConstants::MINUTES_IN_HOUR
-       << ":"
-       << setw(TimeConstants::SECS_AND_MINS_WIDTH) << setfill('0') << seconds % TimeConstants::SECS_IN_MINUTE
-       << ":"
-       << setw(TimeConstants::MSECS_WIDTH) << setfill('0') << event.timestamp_ % TimeConstants::MSECS_IN_SEC
-       << "    " << (event.description_);
+            << setw(TimeConstants::SECS_AND_MINS_WIDTH) << setfill('0') << minutes % TimeConstants::MINUTES_IN_HOUR
+            << ":"
+            << setw(TimeConstants::SECS_AND_MINS_WIDTH) << setfill('0') << seconds % TimeConstants::SECS_IN_MINUTE
+            << ":"
+            << setw(TimeConstants::MSECS_WIDTH) << setfill('0') << event.timestamp_ % TimeConstants::MSECS_IN_SEC
+            << "    " << (event.description_);
 
     ui->event_log->appendPlainText(QString::fromStdString(ss.str()));
 
@@ -308,10 +313,12 @@ GSMainwindow::highlightInfoString(int lineNumber) {
 
 void
 GSMainwindow::setup3DModule() {
-    //std::string tracePath{"./SimulationData/simulated_trajectory.csv"};
-    //FileReader<QVector3D> traceReader{tracePath, posFromString};
+    #if TEST3D
+    std::string tracePath{"./SimulationData/simulated_trajectory.csv"};
+    FileReader<QVector3D> traceReader{tracePath, posFromString};
 
-    //traceData_ = QVector<QVector3D>::fromStdVector(traceReader.readFile());
+    traceData_ = QVector<QVector3D>::fromStdVector(traceReader.readFile());
+    #endif
 
     auto *view = new Qt3DExtras::Qt3DWindow();
     QWidget *container = QWidget::createWindowContainer(view);
@@ -651,6 +658,7 @@ GSMainwindow::event(QEvent *event) {
 
             if (!triggered) {
                 triggered = true;
+                std::cout << "Trigger simulated launch" << std::endl;
                 auto *launchTimer = new QTimer();
                 launchTimer->start(std::lround((RocketConstants::SIMULATION_DT) * 1000));
                 animationTriggerTime_ = QTime::currentTime();
