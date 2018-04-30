@@ -40,8 +40,8 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
         // Adafruit USB\VID_1A86&PID_7523&REV_0263
         telemetryHandler900MHz_ = std::make_unique<RadioReceiver>("");
         telemetryHandler433MHz_ = std::make_unique<RadioReceiver>("USB\\VID_1A86&PID_7523&REV_0263");
-        telemetryHandler900MHz_->startup();
         telemetryHandler433MHz_->startup();
+        telemetryHandler900MHz_->startup();
     } catch (std::runtime_error &e) {
         std::cerr << "Unable to start radio receiver handler:\n" << e.what();
     }
@@ -122,7 +122,11 @@ Worker::run() {
 
     std::cout << "The worker finished" << std::endl;
     sensorsLogger900_.close();
+    gpsLogger900_.close();
     eventsLogger900_.close();
+    sensorsLogger433_.close();
+    gpsLogger433_.close();
+    eventsLogger433_.close();
 }
 
 /**
@@ -212,6 +216,10 @@ Worker::processDataFlows() {
     for (auto &d : gpsData900) {
         displayGPSData(d, FlyableType::ROCKET);
     }
+
+    for (auto &d : gpsData433) {
+        displayGPSData(d, FlyableType::PAYLOAD);
+    }
 }
 
 
@@ -281,7 +289,6 @@ Worker::displayGPSData(GPSPacket &gp, FlyableType t) {
 #endif
                 }
 
-                emit gpsDataReady(gp, t);
             }
 
             break;
@@ -297,10 +304,11 @@ Worker::displayGPSData(GPSPacket &gp, FlyableType t) {
 #endif
                 }
             }
-            //TODO: emit gps data
 
             break;
     }
+
+    emit gpsDataReady(gp, t);
 }
 
 /**
@@ -313,6 +321,10 @@ Worker::updateLoggingStatus() {
         gpsLogger900_.close();
         sensorsLogger900_.close();
         eventsLogger900_.close();
+
+        gpsLogger433_.close();
+        sensorsLogger433_.close();
+        eventsLogger433_.close();
     }
 
     loggingEnabled_ = !loggingEnabled_;

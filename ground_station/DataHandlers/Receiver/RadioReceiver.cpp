@@ -17,8 +17,10 @@ RadioReceiver::RadioReceiver(string hardwareID)
           recvBuffer_{}, sensorsDataQueue_{100}, eventsDataQueue_{100}, controlDataQueue_{100}, gpsDataQueue_{100},
           bytesLogger_{LogConstants::BYTES_LOG_PATH} {
 
-    if (hardwareID.empty())
+    if (hardwareID.empty()) {
+        std::cerr << "Empty serial port specified, telemetry acquisition will not work." << std::endl;
         return;
+    }
 
     vector<serial::PortInfo> devices_found = serial::list_ports();
     if (!devices_found.empty()) {
