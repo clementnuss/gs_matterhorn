@@ -12,6 +12,9 @@
 class TelemetryHandler : public IDataHandler<SensorsPacket> {
 
 public:
+
+    virtual ~TelemetryHandler() {};
+
     virtual void startup() = 0;
 
     /**

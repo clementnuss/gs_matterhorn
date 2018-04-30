@@ -12,10 +12,10 @@
  * @param baudRate
  * @param io
  */
-RadioReceiver::RadioReceiver(string hardwareID)
-        : byteDecoder_{}, devicePort_{}, serialPort_{}, thread_{},
+RadioReceiver::RadioReceiver(const string &hardwareID, const string &logTitle)
+        : byteDecoder_{logTitle}, devicePort_{}, serialPort_{}, thread_{},
           recvBuffer_{}, sensorsDataQueue_{100}, eventsDataQueue_{100}, controlDataQueue_{100}, gpsDataQueue_{100},
-          bytesLogger_{LogConstants::BYTES_LOG_PATH} {
+          bytesLogger_{LogConstants::BYTES_LOG_PATH + logTitle} {
 
     if (hardwareID.empty()) {
         std::cerr << "Empty serial port specified, telemetry acquisition will not work." << std::endl;
@@ -176,6 +176,7 @@ RadioReceiver::unpackPayload() {
 
 
 RadioReceiver::~RadioReceiver() {
+    std::cout << "Closing radio receiver" << std::endl;
     serialPort_.close();
 }
 

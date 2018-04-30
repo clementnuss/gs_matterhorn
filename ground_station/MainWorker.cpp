@@ -21,7 +21,8 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
         sensorsLogger433_{LogConstants::WORKER_TELEMETRY_PAYLOAD_LOG_PATH},
         eventsLogger433_{LogConstants::WORKER_EVENTS_PAYLOAD_LOG_PATH},
         gpsLogger433_{LogConstants::WORKER_GPS_PAYLOAD_LOG_PATH},
-        lastNumericalValuesUpdate_{chrono::system_clock::now()},
+        lastNumericalValuesUpdateRocket_{chrono::system_clock::now()},
+        lastNumericalValuesUpdatePayload_{chrono::system_clock::now()},
         lastIteration_{chrono::system_clock::now()},
         lastGPSTimestamp_{0},
         lastPayloadGPSTimestamp_{0},
@@ -37,12 +38,18 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
     gsMainwindow->setRealTimeMode();
     try {
         // Xbee FTDIBUS\COMPORT&VID_0403&PID_6015
-        // Adafruit USB\VID_1A86&PID_7523&REV_0263
-        telemetryHandler900MHz_ = std::make_unique<RadioReceiver>("FTDIBUS\\COMPORT&VID_0403&PID_6015");
-        telemetryHandler433MHz_ = std::make_unique<RadioReceiver>("USB\\VID_1A86&PID_7523&REV_0263");
-        telemetryHandler433MHz_->startup();
+        // Serial USB\VID_067B&PID_2303&REV_0300
+        telemetryHandler900MHz_ = std::make_unique<RadioReceiver>("USB\\VID_067B&PID_2303&REV_0300", "_900Mhz");
         telemetryHandler900MHz_->startup();
-    } catch (std::runtime_error &e) {
+    } catch (const std::runtime_error &e) {
+        std::cerr << "Unable to start radio receiver handler:\n" << e.what();
+    }
+
+    try {
+        // Adafruit USB\VID_1A86&PID_7523&REV_0263
+        telemetryHandler433MHz_ = std::make_unique<RadioReceiver>("", "_433MHz");
+        telemetryHandler433MHz_->startup();
+    } catch (const std::runtime_error &e) {
         std::cerr << "Unable to start radio receiver handler:\n" << e.what();
     }
 
@@ -77,7 +84,7 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
 }
 
 Worker::~Worker() {
-    std::cout << "Destroying worker thread" << std::endl;
+    std::cout << "Destroying worker instance" << std::endl;
 }
 
 /**
@@ -100,7 +107,7 @@ Worker::run() {
             loggingEnabled_ = false;
             replayMode_ = false;
             millisBetweenLastTwoPackets_ = 0;
-            lastNumericalValuesUpdate_ = chrono::system_clock::now();
+            lastNumericalValuesUpdateRocket_ = chrono::system_clock::now();
             lastIteration_ = chrono::system_clock::now();
             timeOfLastLinkCheck_ = chrono::system_clock::now();
             timeOfLastReceivedTelemetry_ = chrono::system_clock::now();
@@ -120,13 +127,7 @@ Worker::run() {
 
     }
 
-    std::cout << "The worker finished" << std::endl;
-    sensorsLogger900_.close();
-    gpsLogger900_.close();
-    eventsLogger900_.close();
-    sensorsLogger433_.close();
-    gpsLogger433_.close();
-    eventsLogger433_.close();
+    std::cout << "The worker thread was interrupted" << std::endl;
 }
 
 /**
@@ -251,11 +252,19 @@ void
 Worker::displaySensorData(SensorsPacket &sp, FlyableType t) {
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
-    long long elapsedMillis = msecsBetween(lastNumericalValuesUpdate_, now);
 
-    if (elapsedMillis > UIConstants::NUMERICAL_SENSORS_VALUES_REFRESH_RATE) {
-        lastNumericalValuesUpdate_ = now;
-        emit sensorsDataReady(sp, t);
+    switch (t) {
+        case FlyableType::ROCKET:
+            if (msecsBetween(lastNumericalValuesUpdateRocket_, now) > UIConstants::NUMERICAL_SENSORS_VALUES_REFRESH_RATE)
+                lastNumericalValuesUpdateRocket_ = now;
+            emit sensorsDataReady(sp, t);
+            return;
+
+        case FlyableType::PAYLOAD:
+            if (msecsBetween(lastNumericalValuesUpdatePayload_, now) > UIConstants::NUMERICAL_SENSORS_VALUES_REFRESH_RATE)
+                lastNumericalValuesUpdatePayload_ = now;
+            emit sensorsDataReady(sp, t);
+            return;
     }
 }
 
@@ -464,7 +473,7 @@ void
 Worker::defineRealtimeMode(const QString &parameters) {
     TelemetryHandler *handler = nullptr;
     try {
-        handler = new RadioReceiver(parameters.toStdString());
+        handler = new RadioReceiver(parameters.toStdString(), "");
         handler->startup();
     } catch (std::runtime_error &e) {
         std::cerr << "Error when starting RadioReceiver handler:\n" << e.what();

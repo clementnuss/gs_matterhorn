@@ -39,6 +39,9 @@ Application::connectSlotsAndSignals() {
     qRegisterMetaType<Position>("Position");
     qRegisterMetaType<FlyableType>("FlyableType");
 
+    // Call worker destructor, cleaning up all resources
+    QObject::connect(&qApplication_, &QApplication::aboutToQuit, worker_, &Worker::deleteLater);
+
     //TODO: change those preprocessor commands for global variables
 #if USE_3D_MODULE
     QObject::connect(worker_,

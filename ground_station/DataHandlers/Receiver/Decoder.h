@@ -16,7 +16,7 @@ class Decoder {
 
 public:
 
-    Decoder();
+    Decoder(const string &logTitle);
 
     /**
      * Register an incoming byte as input to the decoder

@@ -9,9 +9,9 @@
 const std::map<DecodingState, std::pair<DecodingState, void (Decoder::*)(
         uint8_t)>> Decoder::STATES_TABLE = Decoder::createStatesMap();
 
-Decoder::Decoder() : byteBuffer_{}, checksumAccumulator_{}, currentState_{INITIAL_STATE}, currentDatagram_{},
-                     logger_{LogConstants::DECODER_LOG_PATH}, startupTime_{std::chrono::system_clock::now()},
-                     action_{&Decoder::seekHeader} {}
+Decoder::Decoder(const string &logTitle) : byteBuffer_{}, checksumAccumulator_{}, currentState_{INITIAL_STATE}, currentDatagram_{},
+                                           logger_{LogConstants::DECODER_LOG_PATH + logTitle}, startupTime_{std::chrono::system_clock::now()},
+                                           action_{&Decoder::seekHeader} {}
 
 bool
 Decoder::processByte(uint8_t byte) {

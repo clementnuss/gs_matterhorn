@@ -270,7 +270,8 @@ static void parseAndTestTelemetryPacket(Decoder &decoder, vector<uint8_t> &datag
 // ------------------------------------------------ Unit tests ------------------------------------------------------ //
 TEST(DecoderTests, singleTelemetryPacket) {
 
-    Decoder decoder{};
+    Decoder decoder{}
+    (<#initializer#>);
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
@@ -301,7 +302,8 @@ TEST(DecoderTests, singleTelemetryPacket) {
 }
 
 TEST(DecoderTests, multipleTelemetryPackets) {
-    Decoder decoder{};
+    Decoder decoder{}
+    (<#initializer#>);
     srand(0);
     constexpr size_t measureCount = 10000;
 
@@ -351,7 +353,8 @@ TEST(DecoderTests, multipleTelemetryPackets) {
 }
 
 TEST(DecoderTests, singleEventPacket) {
-    Decoder decoder{};
+    Decoder decoder{}
+    (<#initializer#>);
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
@@ -374,7 +377,8 @@ TEST(DecoderTests, multipleEventPackets) {
 
     size_t measureCount = 256 * 5;
 
-    Decoder decoder{};
+    Decoder decoder{}
+    (<#initializer#>);
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
@@ -406,7 +410,8 @@ TEST(DecoderTests, multipleEventPackets) {
 
 TEST(DecoderTests, singleControlPacket) {
 
-    Decoder decoder{};
+    Decoder decoder{}
+    (<#initializer#>);
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
@@ -432,7 +437,8 @@ TEST(DecoderTests, singleControlPacket) {
 TEST(DecoderTests, multipleControlPackets) {
     size_t measureCount = 256 * 5;
 
-    Decoder decoder{};
+    Decoder decoder{}
+    (<#initializer#>);
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
@@ -470,7 +476,8 @@ TEST(DecoderTests, multipleControlPackets) {
 
 TEST(DecoderTests, singleGPSPacket) {
 
-    Decoder decoder{};
+    Decoder decoder{}
+    (<#initializer#>);
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
@@ -502,7 +509,8 @@ TEST(DecoderTests, singleGPSPacket) {
 TEST(DecoderTests, multipleGPSPackets) {
     size_t measureCount = 256 * 5;
 
-    Decoder decoder{};
+    Decoder decoder{}
+    (<#initializer#>);
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
@@ -540,7 +548,8 @@ TEST(DecoderTests, multipleGPSPackets) {
 TEST(DecoderTests, resistsToRandomByteSequence) {
     srand(0);
     const size_t randomTestSequenceLength = 10000;
-    Decoder decoder{};
+    Decoder decoder{}
+    (<#initializer#>);
 
     for (int i = 0; i < randomTestSequenceLength; i++) {
         if (decoder.processByte(static_cast<uint8_t>(rand() % 256))) {
@@ -555,7 +564,8 @@ TEST(DecoderTests, resistsToRandomHeader) {
     vector<uint8_t> byteSeq{};
     const size_t datagramLength = 1000;
     const size_t datagramCounts = 1000;
-    Decoder decoder{};
+    Decoder decoder{}
+    (<#initializer#>);
 
     for (int i = 0; i < datagramCounts; i++) {
         feedWithValidPreamble(decoder);
@@ -573,7 +583,8 @@ TEST(DecoderTests, resistsToRandomPayloads) {
     vector<uint8_t> byteSeq{};
     const size_t datagramLength = 1000;
     const size_t datagramCounts = 10000;
-    Decoder decoder{};
+    Decoder decoder{}
+    (<#initializer#>);
 
     for (int i = 0; i < datagramCounts; i++) {
 
@@ -600,7 +611,8 @@ TEST(DecoderTests, resistsToRandomPayloads) {
 
 TEST(DecoderTests, missingControlFlagResetsMachine) {
     srand(0);
-    Decoder decoder{};
+    Decoder decoder{}
+    (<#initializer#>);
 
     for (int b = 0; b <= UINT8_MAX; b++) {
         if (b == CONTROL_FLAG) {
@@ -623,7 +635,8 @@ TEST(DecoderTests, missingControlFlagResetsMachine) {
 }
 
 TEST(DecoderTests, wrongChecksumDropsPacket) {
-    Decoder decoder{};
+    Decoder decoder{}
+    (<#initializer#>);
 
     vector<uint8_t> datagram = createDatagram(1410, 999, -1, 2, -3, 4, -5, 6, -7, 8, -9, 12.34, 56.78, 0);
     vector<uint8_t> validDatagram = datagram;

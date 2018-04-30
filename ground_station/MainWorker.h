@@ -116,7 +116,8 @@ private:
     uint32_t lastPayloadGPSTimestamp_;
     Position lastComputedPosition_;
     Position lastComputedPayloadPosition_;
-    chrono::system_clock::time_point lastNumericalValuesUpdate_;
+    chrono::system_clock::time_point lastNumericalValuesUpdateRocket_;
+    chrono::system_clock::time_point lastNumericalValuesUpdatePayload_;
     chrono::system_clock::time_point lastIteration_;
     chrono::system_clock::time_point timeOfLastLinkCheck_;
     chrono::system_clock::time_point timeOfLastReceivedTelemetry_;

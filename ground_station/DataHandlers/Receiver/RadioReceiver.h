@@ -1,18 +1,18 @@
 #ifndef GS_MATTERHORN_RADIORECEIVER_H
 #define GS_MATTERHORN_RADIORECEIVER_H
 
-#include <DataHandlers/TelemetryHandler.h>
-#include "Decoder.h"
 #include <boost/thread/thread.hpp>
 #include <boost/array.hpp>
 #include <boost/lockfree/spsc_queue.hpp>
 #include <utility>
-#include <Loggers/FileLogger.h>
 #include <serial/serial.h>
+#include "DataHandlers/TelemetryHandler.h"
+#include "Loggers/FileLogger.h"
+#include "Decoder.h"
 
 /**
  * A telemetry handler which receives data by the mean of a serial port connected to
- * a transciever
+ * a transceiver
  */
 class RadioReceiver : public TelemetryHandler {
 
@@ -20,7 +20,7 @@ class RadioReceiver : public TelemetryHandler {
 
 public:
 
-    explicit RadioReceiver(std::string);
+    explicit RadioReceiver(const string &, const string &logTitle);
 
     ~RadioReceiver() override;
 

@@ -21,7 +21,7 @@ public:
 
     IDataHandler() {}
 
-    virtual ~IDataHandler() {}
+    virtual ~IDataHandler() {};
 
     /**
      *

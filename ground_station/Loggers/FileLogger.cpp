@@ -16,7 +16,7 @@ FileLogger::~FileLogger() {
 
 void
 FileLogger::close() {
-    cout << "\nFlushing file logger @ " << path_ << endl;
+    cout << "Flushing file logger @ " << path_ << endl;
     if (bufferIndex_ != 0) {
         writeFile();
         bufferIndex_ = 0;
