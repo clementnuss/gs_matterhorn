@@ -9,8 +9,10 @@
 #include <serial/serial.h>
 #include <boost/circular_buffer.hpp>
 #include <3D/CoordinateUtils.h>
+#include <UI/UIWidget.h>
 #include "UI/GraphFeature.h"
 #include "Loggers/FileLogger.h"
+#include "Flyable.h"
 
 class GSMainwindow;
 
@@ -53,11 +55,11 @@ signals:
 
     void loggingStatusReady(bool);
 
-    void sensorsDataReady(SensorsPacket);
+    void sensorsDataReady(SensorsPacket, FlyableType);
 
     void eventDataReady(EventPacket);
 
-    void gpsDataReady(GPSPacket);
+    void gpsDataReady(GPSPacket, FlyableType);
 
     void flightPositionReady(Position);
 
@@ -86,7 +88,7 @@ private:
 
     void displayEventData(EventPacket &);
 
-    void displayGPSData(GPSPacket &, bool isRocket);
+    void displayGPSData(GPSPacket &, FlyableType t);
 
     bool trackingEnabled_{false};
     bool loggingEnabled_;

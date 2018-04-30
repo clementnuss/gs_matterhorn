@@ -37,6 +37,7 @@ Application::connectSlotsAndSignals() {
     qRegisterMetaType<GraphFeature>("GraphFeature");
     qRegisterMetaType<HandlerStatus>("HandlerStatus");
     qRegisterMetaType<Position>("Position");
+    qRegisterMetaType<FlyableType>("FlyableType");
 
     //TODO: change those preprocessor commands for global variables
 #if USE_3D_MODULE

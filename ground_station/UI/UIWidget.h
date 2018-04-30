@@ -11,11 +11,13 @@
 #include <ui_gswidget.h>
 #include "MainWorker.h"
 #include "ProgramConstants.h"
+#include "Flyable.h"
+#include "UI/GraphFeature.h"
+
 
 namespace Ui {
     class GSMainwindow;
 }
-
 
 class GSMainwindow : public QMainWindow {
 Q_OBJECT
@@ -39,11 +41,11 @@ public:
 public slots:
 
     /* TELEMETRY-RELATED SLOTS */
-    void receiveSensorData(const SensorsPacket);
+    void receiveSensorData(SensorsPacket, FlyableType);
 
-    void receiveEventData(const EventPacket);
+    void receiveEventData(EventPacket);
 
-    void receiveGPSData(const GPSPacket);
+    void receiveGPSData(GPSPacket, FlyableType);
 
     void receiveGraphData(QVector<QCPGraphData> &, GraphFeature);
 

@@ -6,8 +6,6 @@
 #include <DataHandlers/StateEstimator.h>
 #include "MainWorker.h"
 #include "Utilities/GraphUtils.h"
-#include "Utilities/TimeUtils.h"
-#include "UI/UIWidget.h"
 
 using namespace std;
 
@@ -212,7 +210,7 @@ Worker::processDataFlows() {
     }
 
     for (auto &d : gpsData900) {
-        displayGPSData(d, false);
+        displayGPSData(d, FlyableType::ROCKET);
     }
 }
 
@@ -244,7 +242,7 @@ Worker::displaySensorData(SensorsPacket &sp) {
 
     if (elapsedMillis > UIConstants::NUMERICAL_SENSORS_VALUES_REFRESH_RATE) {
         lastNumericalValuesUpdate_ = now;
-        emit sensorsDataReady(sp);
+        emit sensorsDataReady(sp, FlyableType::ROCKET);
     }
 }
 
@@ -268,32 +266,40 @@ Worker::displayEventData(EventPacket &ep) {
  * @param gp The GPSPacket to be displayed.
  */
 void
-Worker::displayGPSData(GPSPacket &gp, bool isRocket) {
+Worker::displayGPSData(GPSPacket &gp, FlyableType t) {
 
 
-    if (isRocket) {
+    switch (t) {
+        case FlyableType::ROCKET:
 
-        if (gp.timestamp_ != lastGPSTimestamp_) {
-            lastGPSTimestamp_ = gp.timestamp_;
-            if (gp.isValid()) {
-                lastComputedPosition_.latLon = {gp.latitude_, gp.longitude_};
+            if (gp.timestamp_ != lastGPSTimestamp_) {
+                lastGPSTimestamp_ = gp.timestamp_;
+                if (gp.isValid()) {
+                    lastComputedPosition_.latLon = {gp.latitude_, gp.longitude_};
 #if USE_3D_MODULE
-                emit flightPositionReady(lastComputedPosition_);
+                    emit flightPositionReady(lastComputedPosition_);
 #endif
+                }
+
+                emit gpsDataReady(gp, t);
             }
-            emit gpsDataReady(gp);
-        }
-    } else {
-        if (gp.timestamp_ != lastPayloadGPSTimestamp_) {
-            lastPayloadGPSTimestamp_ = gp.timestamp_;
-            if (gp.isValid()) {
-                lastComputedPayloadPosition_.latLon = {gp.latitude_, gp.longitude_};
+
+            break;
+
+        case FlyableType::PAYLOAD:
+
+            if (gp.timestamp_ != lastPayloadGPSTimestamp_) {
+                lastPayloadGPSTimestamp_ = gp.timestamp_;
+                if (gp.isValid()) {
+                    lastComputedPayloadPosition_.latLon = {gp.latitude_, gp.longitude_};
 #if USE_3D_MODULE
-                emit payloadPositionReady(lastComputedPosition_);
+                    emit payloadPositionReady(lastComputedPosition_);
 #endif
+                }
             }
-        }
-        //TODO: emit gps data
+            //TODO: emit gps data
+
+            break;
     }
 }
 
