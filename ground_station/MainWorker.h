@@ -84,7 +84,7 @@ private:
 
     void fusionData();
 
-    void displaySensorData(SensorsPacket &);
+    void displaySensorData(SensorsPacket &, FlyableType t);
 
     void displayEventData(EventPacket &);
 

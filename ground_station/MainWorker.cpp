@@ -38,7 +38,7 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
     try {
         // Xbee FTDIBUS\COMPORT&VID_0403&PID_6015
         // Adafruit USB\VID_1A86&PID_7523&REV_0263
-        telemetryHandler900MHz_ = std::make_unique<RadioReceiver>("");
+        telemetryHandler900MHz_ = std::make_unique<RadioReceiver>("FTDIBUS\\COMPORT&VID_0403&PID_6015");
         telemetryHandler433MHz_ = std::make_unique<RadioReceiver>("USB\\VID_1A86&PID_7523&REV_0263");
         telemetryHandler433MHz_->startup();
         telemetryHandler900MHz_->startup();
@@ -180,8 +180,14 @@ Worker::processDataFlows() {
                 std::vector<std::reference_wrapper<ILoggable>>(begin(gpsData433), end(gpsData433)));
     }
 
+    if (!sensorsData433.empty()) {
+        SensorsPacket &lastSensorValue = *--sensorsData433.end();
+        displaySensorData(lastSensorValue, FlyableType::PAYLOAD);
+    }
+
     if (!sensorsData900.empty()) {
         SensorsPacket &lastSensorValue = *--sensorsData900.end();
+        displaySensorData(lastSensorValue, FlyableType::ROCKET);
 
 #ifdef USE_TRACKING
         moveTrackingSystem(lastSensorValue.altitude_);
@@ -190,7 +196,6 @@ Worker::processDataFlows() {
 
         millisBetweenLastTwoPackets_ = msecsBetween(timeOfLastReceivedTelemetry_, now);
         timeOfLastReceivedTelemetry_ = now;
-        displaySensorData(lastSensorValue);
 
         QVector<QCPGraphData> altitudeDataBuffer = extractGraphData(sensorsData900, altitudeFromReading);
         QVector<QCPGraphData> accelDataBuffer = extractGraphData(sensorsData900, accelerationFromReading);
@@ -243,14 +248,14 @@ Worker::fusionData() {
  * @param sp The SensorPacket to be displayed.
  */
 void
-Worker::displaySensorData(SensorsPacket &sp) {
+Worker::displaySensorData(SensorsPacket &sp, FlyableType t) {
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
     long long elapsedMillis = msecsBetween(lastNumericalValuesUpdate_, now);
 
     if (elapsedMillis > UIConstants::NUMERICAL_SENSORS_VALUES_REFRESH_RATE) {
         lastNumericalValuesUpdate_ = now;
-        emit sensorsDataReady(sp, FlyableType::ROCKET);
+        emit sensorsDataReady(sp, t);
     }
 }
 
@@ -300,7 +305,7 @@ Worker::displayGPSData(GPSPacket &gp, FlyableType t) {
                 if (gp.isValid()) {
                     lastComputedPayloadPosition_.latLon = {gp.latitude_, gp.longitude_};
 #if USE_3D_MODULE
-                    emit payloadPositionReady(lastComputedPosition_);
+                    emit payloadPositionReady(lastComputedPayloadPosition_);
 #endif
                 }
             }

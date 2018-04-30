@@ -5,7 +5,6 @@
 #include <3D/Objects/SplashDownPredictor.h>
 #include <3D/Objects/OpenGL3DAxes.h>
 #include <Utilities/ReaderUtils.h>
-#include <Readers/FileReader.h>
 #include <3D/Objects/Ruler.h>
 #include <3D/ForwardRenderer/LayerManager.h>
 #include <3D/Objects/Compass.h>
@@ -176,8 +175,8 @@ RootEntity::updatePayloadPosition(const Position pos) {
     QVector2D horizontalWorldPos = worldRef_->translationFromOrigin(pos.latLon);
     QVector3D pos3D = {horizontalWorldPos.x(), static_cast<float>(pos.altitude), horizontalWorldPos.y()};
 
-    rocketTracker_->updatePosition(pos3D);
-    rocketTrace_->appendData(pos3D);
+    payloadTracker_->updatePosition(pos3D);
+    payloadTrace_->appendData(pos3D);
 }
 
 void
