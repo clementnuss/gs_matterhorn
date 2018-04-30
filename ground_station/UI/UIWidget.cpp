@@ -321,6 +321,7 @@ GSMainwindow::setup3DModule() {
     #endif
 
     auto *view = new Qt3DExtras::Qt3DWindow();
+    view->setCursor(Qt::CursorShape::CrossCursor);
     QWidget *container = QWidget::createWindowContainer(view);
     container->setMinimumSize(QSize(200, 100));
 
