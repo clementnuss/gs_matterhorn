@@ -39,7 +39,7 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
     try {
         // Xbee FTDIBUS\COMPORT&VID_0403&PID_6015
         // Serial USB\VID_067B&PID_2303&REV_0300
-        telemetryHandler900MHz_ = std::make_unique<RadioReceiver>("USB\\VID_067B&PID_2303&REV_0300", "_900Mhz");
+        telemetryHandler900MHz_ = std::make_unique<RadioReceiver>("", "_900Mhz");
         telemetryHandler900MHz_->startup();
     } catch (const std::runtime_error &e) {
         std::cerr << "Unable to start radio receiver handler:\n" << e.what();
@@ -47,7 +47,7 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
 
     try {
         // Adafruit USB\VID_1A86&PID_7523&REV_0263
-        telemetryHandler433MHz_ = std::make_unique<RadioReceiver>("", "_433MHz");
+        telemetryHandler433MHz_ = std::make_unique<RadioReceiver>("USB\\VID_1A86&PID_7523&REV_0263", "_433MHz");
         telemetryHandler433MHz_->startup();
     } catch (const std::runtime_error &e) {
         std::cerr << "Unable to start radio receiver handler:\n" << e.what();
