@@ -110,8 +110,13 @@ void RadioReceiver::readSerialPort() {
             //TODO: Display warning message
         }
 
-        size_t bytesRead = serialPort_.read(recvBuffer_, bytesAvailable);
-        handleReceive(bytesRead);
+        try {
+            size_t bytesRead = serialPort_.read(recvBuffer_, bytesAvailable);
+            handleReceive(bytesRead);
+        } catch (const serial::SerialException &e) {
+            std::cerr << "Error while reading serial port " << devicePort_ << std::endl;
+            terminate = true;
+        }
     }
 
 }
