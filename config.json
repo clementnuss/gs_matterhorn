@@ -19,5 +19,9 @@
     "./DEM/N46E007.hgt"
   ],
   "commonTexturePath": "qrc:/3D/textures/terrain/payerne",
-  "meteoFile": "./MeteoData/meteo_payerne_test.txt"
+  "meteoFile": "./MeteoData/meteo_payerne_test.txt",
+  "receiverID": {
+    "900MHz": "FTDIBUS\\COMPORT&VID_0403&PID_6015",
+    "433MHz": "USB\\VID_1A86&PID_7523&REV_0263"
+  }
 }
