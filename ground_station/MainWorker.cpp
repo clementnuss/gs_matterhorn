@@ -72,7 +72,7 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
 }
 
 Worker::~Worker() {
-    std::cout << "Destroying worker thread" << std::endl;
+    std::cout << "Destroying worker instance" << std::endl;
 }
 
 /**
@@ -113,9 +113,7 @@ void Worker::run() {
 
     }
 
-    std::cout << "The worker has finished" << std::endl;
-    sensorsLogger_.close();
-    eventsLogger_.close();
+    std::cout << "The worker thread was interrupted" << std::endl;
 }
 
 /**
