@@ -111,21 +111,23 @@ RadioReceiver::readSerialPort() {
     size_t bytesAvailable = 0;
     bool terminate = false;
     while (!terminate) {
-        if ((bytesAvailable = serialPort_.available()) == 0) {
-            std::this_thread::sleep_for(chrono::milliseconds(7));
-            continue;
-        }
-        if (bytesAvailable > BUFFER_SIZE) {
-            bytesAvailable = BUFFER_SIZE; // We do not want to overflow the buffer.
-            //TODO: Display warning message
-        }
-
         try {
+            if ((bytesAvailable = serialPort_.available()) == 0) {
+                std::this_thread::sleep_for(chrono::milliseconds(7));
+                continue;
+            }
+            if (bytesAvailable > BUFFER_SIZE) {
+                bytesAvailable = BUFFER_SIZE; // We do not want to overflow the buffer.
+                //TODO: Display warning message
+            }
+
             size_t bytesRead = serialPort_.read(recvBuffer_, bytesAvailable);
             handleReceive(bytesRead);
-        } catch (const serial::SerialException &e) {
-            std::cerr << "Error while reading serial port " << devicePort_ << std::endl;
+        } catch (const serial::IOException &e) {
+            std::cerr << "IOException while reading serial port " << devicePort_ << std::endl;
             terminate = true;
+        } catch (const serial::SerialException &e) {
+            std::cerr << "SerialException while reading serial port" << devicePort_ << std::endl;
         }
     }
 
