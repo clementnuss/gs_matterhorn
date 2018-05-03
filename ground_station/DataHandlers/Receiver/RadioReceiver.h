@@ -56,6 +56,7 @@ private:
     boost::thread thread_;
     uint8_t *recvBuffer_;
     FileLogger bytesLogger_;
+    std::atomic_bool threadEnabled_;
     boost::lockfree::spsc_queue<SensorsPacket> sensorsDataQueue_;
     boost::lockfree::spsc_queue<EventPacket> eventsDataQueue_;
     boost::lockfree::spsc_queue<ControlPacket> controlDataQueue_;

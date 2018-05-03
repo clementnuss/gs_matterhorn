@@ -14,7 +14,9 @@
  */
 RadioReceiver::RadioReceiver(const string &hardwareID, const string &logTitle)
         : byteDecoder_{logTitle}, devicePort_{}, serialPort_{}, thread_{},
-          recvBuffer_{}, sensorsDataQueue_{100}, eventsDataQueue_{100}, controlDataQueue_{100}, gpsDataQueue_{100},
+          recvBuffer_{},
+          threadEnabled_{true},
+          sensorsDataQueue_{100}, eventsDataQueue_{100}, controlDataQueue_{100}, gpsDataQueue_{100},
           bytesLogger_{LogConstants::BYTES_LOG_PATH + logTitle} {
 
     if (hardwareID.empty()) {
@@ -109,8 +111,7 @@ RadioReceiver::pollGPSData() {
 void
 RadioReceiver::readSerialPort() {
     size_t bytesAvailable = 0;
-    bool terminate = false;
-    while (!terminate) {
+    while (threadEnabled_) {
         try {
             if ((bytesAvailable = serialPort_.available()) == 0) {
                 std::this_thread::sleep_for(chrono::milliseconds(7));
@@ -125,11 +126,14 @@ RadioReceiver::readSerialPort() {
             handleReceive(bytesRead);
         } catch (const serial::IOException &e) {
             std::cerr << "IOException while reading serial port " << devicePort_ << std::endl;
-            terminate = true;
+            return;
         } catch (const serial::SerialException &e) {
             std::cerr << "SerialException while reading serial port" << devicePort_ << std::endl;
+            return;
         }
     }
+
+    std::cout << "Closing radio receiver thread" << std::endl;
 
 }
 
@@ -184,6 +188,8 @@ RadioReceiver::unpackPayload() {
 
 RadioReceiver::~RadioReceiver() {
     std::cout << "Closing radio receiver" << std::endl;
+    threadEnabled_ = false;
+    thread_.join();
     serialPort_.close();
 }
 
