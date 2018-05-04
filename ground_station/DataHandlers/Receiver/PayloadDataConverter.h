@@ -17,15 +17,15 @@ typedef union {
 class PayloadDataConverter {
 
 public:
-    static SensorsPacket toSensorsPacket(const std::vector<uint8_t> &);
+    static SensorsPacket *toSensorsPacket(const std::vector<uint8_t> &);
 
-    static SensorsPacket toERT18SensorsPacket(const std::vector<uint8_t> &);
+    static SensorsPacket *toERT18SensorsPacket(const std::vector<uint8_t> &);
 
-    static EventPacket toEventPacket(const std::vector<uint8_t> &);
+    static EventPacket *toEventPacket(const std::vector<uint8_t> &);
 
-    static ControlPacket toControlPacket(const std::vector<uint8_t> &);
+    static ControlPacket *toControlPacket(const std::vector<uint8_t> &);
 
-    static GPSPacket toGPSPacket(const vector<uint8_t> &);
+    static GPSPacket *toGPSPacket(const vector<uint8_t> &);
 };
 
 

@@ -4,10 +4,10 @@
 
 #include <boost/filesystem.hpp>
 #include <chrono>
-#include "DataHandlers/TelemetryHandler.h"
+#include "DataHandlers/IReceiver.h"
 #include "ITelemetryReplayHandler.h"
 
-class TelemetryReplay : public TelemetryHandler, public ITelemetryReplayHandler {
+class TelemetryReplay : public IReceiver, public ITelemetryReplayHandler {
 
 public:
 
@@ -15,11 +15,11 @@ public:
 
     void startup() override;
 
-    vector<EventPacket> pollEventsData() override;
+    vector<EventPacket> pollEventsData();
 
-    vector<SensorsPacket> pollSensorsData() override;
+    vector<SensorsPacket> pollSensorsData();
 
-    vector<GPSPacket> pollGPSData() override;
+    vector<GPSPacket> pollGPSData();
 
     void updatePlaybackSpeed(double) override;
 
@@ -29,7 +29,7 @@ public:
 
     bool endOfPlayback() override;
 
-    bool isReplayHandler() override;
+    bool isReplayHandler();
 
     void sendCommand(const uint8_t *, size_t) override {
 

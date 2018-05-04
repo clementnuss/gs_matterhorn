@@ -6,7 +6,7 @@
 #include <boost/lockfree/spsc_queue.hpp>
 #include <utility>
 #include <serial/serial.h>
-#include "DataHandlers/TelemetryHandler.h"
+#include "DataHandlers/IReceiver.h"
 #include "Loggers/FileLogger.h"
 #include "Decoder.h"
 
@@ -14,7 +14,7 @@
  * A telemetry handler which receives data by the mean of a serial port connected to
  * a transceiver
  */
-class RadioReceiver : public TelemetryHandler {
+class RadioReceiver : public IReceiver {
 
     static constexpr uint32_t BUFFER_SIZE = 4096;
 
@@ -26,15 +26,11 @@ public:
 
     void startup() override;
 
-    vector<SensorsPacket> pollSensorsData() override;
-
-    vector<EventPacket> pollEventsData() override;
-
-    vector<GPSPacket> pollGPSData() override;
+    std::vector<std::unique_ptr<DataPacket>> pollData() override;
 
     void sendCommand(const uint8_t *, size_t) override;
 
-    bool isReplayHandler() override;
+    bool isReplayReceiver() override;
 
 private:
 
@@ -57,10 +53,7 @@ private:
     uint8_t *recvBuffer_;
     FileLogger bytesLogger_;
     std::atomic_bool threadEnabled_;
-    boost::lockfree::spsc_queue<SensorsPacket> sensorsDataQueue_;
-    boost::lockfree::spsc_queue<EventPacket> eventsDataQueue_;
-    boost::lockfree::spsc_queue<ControlPacket> controlDataQueue_;
-    boost::lockfree::spsc_queue<GPSPacket> gpsDataQueue_;
+    boost::lockfree::spsc_queue<DataPacket *> dataQueue_;
 
 };
 

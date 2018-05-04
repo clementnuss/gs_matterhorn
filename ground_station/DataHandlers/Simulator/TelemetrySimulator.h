@@ -2,7 +2,7 @@
 #ifndef GS_MATTERHORN_TELEMETRYSIMULATOR_H
 #define GS_MATTERHORN_TELEMETRYSIMULATOR_H
 
-#include "DataHandlers/TelemetryHandler.h"
+#include "DataHandlers/IReceiver.h"
 #include <chrono>
 
 using namespace std;
@@ -11,20 +11,20 @@ using namespace std;
  * Telemetry Simulator can be used in place of a TelemetryHandler to generate dummy telemetry data
  * for testing purposes.
  */
-class TelemetrySimulator : public TelemetryHandler {
+class TelemetrySimulator : public IReceiver {
 
 public:
     TelemetrySimulator();
 
     void startup() override;
 
-    vector<EventPacket> pollEventsData() override;
+    vector<EventPacket> pollEventsData();
 
-    vector<SensorsPacket> pollSensorsData() override;
+    vector<SensorsPacket> pollSensorsData();
 
-    bool isReplayHandler() override;
+    bool isReplayHandler();
 
-    vector<GPSPacket> pollGPSData() override;
+    vector<GPSPacket> pollGPSData();
 
     void setVariableRate(bool);
 

@@ -2,7 +2,7 @@
 #define GS_MATTERHORN_TELEMETRY_REPLAY_HANDLER_H
 
 
-#include "DataHandlers/TelemetryHandler.h"
+#include "DataHandlers/IReceiver.h"
 
 class ITelemetryReplayHandler {
 

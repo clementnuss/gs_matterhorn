@@ -18,26 +18,26 @@ struct IDeserializable {
     virtual bool isValid() const = 0;
 };
 
-struct TimedData {
-    TimedData() = default;
+struct DataPacket {
+    DataPacket() = default;
 
-    explicit TimedData(uint32_t timestamp) : timestamp_{timestamp} {}
+    explicit DataPacket(uint32_t timestamp) : timestamp_{timestamp} {}
 
     uint32_t timestamp_;
 };
 
 
-struct EventPacket : TimedData, ILoggable, IDeserializable {
+struct EventPacket : DataPacket, ILoggable, IDeserializable {
     EventPacket() = default;
 
     EventPacket(const EventPacket &that) = default;
 
     EventPacket(uint32_t timestamp, int code, const std::string &description) :
-            TimedData{timestamp}, code_{code}, description_{std::move(description)} {}
+            DataPacket{timestamp}, code_{code}, description_{std::move(description)} {}
 
     ~EventPacket() = default;
 
-    int code_;
+    int code_{};
     std::string description_;
 
     string toString() const override {
@@ -56,13 +56,13 @@ struct EventPacket : TimedData, ILoggable, IDeserializable {
     }
 };
 
-struct ControlPacket : TimedData, IDeserializable {
+struct ControlPacket : DataPacket, IDeserializable {
     ControlPacket() = default;
 
     ControlPacket(const ControlPacket &that) = default;
 
     ControlPacket(uint32_t timestamp, uint8_t partCode, uint16_t statusValue) :
-            TimedData{timestamp}, partCode_{partCode}, statusValue_{statusValue} {}
+            DataPacket{timestamp}, partCode_{partCode}, statusValue_{statusValue} {}
 
     uint8_t partCode_;
     uint16_t statusValue_;
@@ -72,13 +72,13 @@ struct ControlPacket : TimedData, IDeserializable {
     }
 };
 
-struct GPSPacket : TimedData, ILoggable, IDeserializable {
+struct GPSPacket : DataPacket, ILoggable, IDeserializable {
     GPSPacket() = default;
 
     GPSPacket(const GPSPacket &that) = default;
 
     GPSPacket(uint32_t timestamp, uint8_t satsCount, float hdop, float latitude, float longitude, float altitude) :
-            TimedData{timestamp},
+            DataPacket{timestamp},
             satsCount_{satsCount},
             hdop_{hdop},
             latitude_{latitude},
@@ -156,8 +156,8 @@ struct Data3D : ILoggable {
     }
 };
 
-struct SensorsPacket : TimedData, ILoggable, IDeserializable {
-    SensorsPacket() : TimedData{0},
+struct SensorsPacket : DataPacket, ILoggable, IDeserializable {
+    SensorsPacket() : DataPacket{0},
                       altitude_{0},
                       acceleration_{},
                       eulerAngles_{},
@@ -170,7 +170,7 @@ struct SensorsPacket : TimedData, ILoggable, IDeserializable {
     SensorsPacket(uint32_t t, double altitude, Data3D acceleration,
                   Data3D magnetometer, Data3D gyroscope,
                   double pressure, double temperature, double air_speed, uint32_t sequenceNumber) :
-            TimedData{t},
+            DataPacket{t},
             altitude_{altitude},
             acceleration_{acceleration},
             eulerAngles_{magnetometer},

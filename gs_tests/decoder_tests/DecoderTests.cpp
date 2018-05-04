@@ -1,4 +1,4 @@
-#include <DataHandlers/TelemetryHandler.h>
+#include <DataHandlers/IReceiver.h>
 #include <gtest/gtest.h>
 #include <DataHandlers/Receiver/Decoder.h>
 #include <Utilities/RandUtils.h>

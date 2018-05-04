@@ -16,7 +16,7 @@ RadioReceiver::RadioReceiver(const string &hardwareID, const string &logTitle)
         : byteDecoder_{logTitle}, devicePort_{}, serialPort_{}, thread_{},
           recvBuffer_{},
           threadEnabled_{true},
-          sensorsDataQueue_{100}, eventsDataQueue_{100}, controlDataQueue_{100}, gpsDataQueue_{100},
+          dataQueue_{100},
           bytesLogger_{LogConstants::BYTES_LOG_PATH + logTitle} {
 
     if (hardwareID.empty()) {
@@ -86,26 +86,23 @@ RadioReceiver::openSerialPort() {
 }
 
 template<class S>
-static std::vector<S>
-consumeQueue(boost::lockfree::spsc_queue<S> *queue) {
-    std::vector<S> recipient{};
-    queue->consume_all([&recipient](S s) { recipient.push_back(s); });
+static std::vector<std::unique_ptr<S>>
+consumeQueue(boost::lockfree::spsc_queue<S *> *queue) {
+
+    std::vector<std::unique_ptr<S>> recipient{};
+
+    queue->consume_all(
+            [&recipient](S *s) {
+                recipient.push_back(std::unique_ptr<S>(s));
+            }
+    );
+
     return recipient;
 };
 
-std::vector<SensorsPacket>
-RadioReceiver::pollSensorsData() {
-    return consumeQueue(&sensorsDataQueue_);
-}
-
-std::vector<EventPacket>
-RadioReceiver::pollEventsData() {
-    return consumeQueue(&eventsDataQueue_);
-}
-
-std::vector<GPSPacket>
-RadioReceiver::pollGPSData() {
-    return consumeQueue(&gpsDataQueue_);
+std::vector<std::unique_ptr<DataPacket>>
+RadioReceiver::pollData() {
+    return consumeQueue(&dataQueue_);
 }
 
 void
@@ -123,6 +120,7 @@ RadioReceiver::readSerialPort() {
             }
 
             size_t bytesRead = serialPort_.read(recvBuffer_, bytesAvailable);
+
             handleReceive(bytesRead);
         } catch (const serial::IOException &e) {
             std::cerr << "IOException while reading serial port " << devicePort_ << std::endl;
@@ -165,24 +163,29 @@ void
 RadioReceiver::unpackPayload() {
     Datagram d = byteDecoder_.retrieveDatagram();
 
+    std::unique_ptr<DataPacket> p;
+    std::function<DataPacket *(std::vector<uint8_t>)> conversionFunc;
+
     switch (d.payloadType_->code()) {
         case CommunicationsConstants::TELEMETRY_TYPE:
-            sensorsDataQueue_.push(PayloadDataConverter::toSensorsPacket(d.payloadData_));
+            conversionFunc = PayloadDataConverter::toSensorsPacket;
             break;
         case CommunicationsConstants::EVENT_TYPE:
-            eventsDataQueue_.push(PayloadDataConverter::toEventPacket(d.payloadData_));
+            conversionFunc = PayloadDataConverter::toEventPacket;
             break;
         case CommunicationsConstants::CONTROL_TYPE:
-            controlDataQueue_.push(PayloadDataConverter::toControlPacket(d.payloadData_));
+            conversionFunc = PayloadDataConverter::toControlPacket;
             break;
         case CommunicationsConstants::GPS_TYPE:
-            gpsDataQueue_.push(PayloadDataConverter::toGPSPacket(d.payloadData_));
+            conversionFunc = PayloadDataConverter::toGPSPacket;
             break;
         case CommunicationsConstants::TELEMETRY_ERT18_TYPE:
-            sensorsDataQueue_.push(PayloadDataConverter::toERT18SensorsPacket(d.payloadData_));
+            conversionFunc = PayloadDataConverter::toERT18SensorsPacket;
         default:
             break;
     }
+
+    dataQueue_.push(conversionFunc(d.payloadData_));
 }
 
 
@@ -193,12 +196,12 @@ RadioReceiver::~RadioReceiver() {
     serialPort_.close();
 }
 
-bool
-RadioReceiver::isReplayHandler() {
-    return false;
-}
-
 void
 RadioReceiver::sendCommand(const uint8_t *command, size_t size) {
     serialPort_.write(command, size);
+}
+
+bool
+RadioReceiver::isReplayReceiver() {
+    return false;
 }

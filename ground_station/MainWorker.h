@@ -3,7 +3,7 @@
 
 #include <QtWidgets/QWidget>
 #include <DataStructures/datastructs.h>
-#include <DataHandlers/TelemetryHandler.h>
+#include <DataHandlers/IReceiver.h>
 #include <qcustomplot.h>
 #include <chrono>
 #include <serial/serial.h>
@@ -102,9 +102,9 @@ private:
 #endif
 
 
-    unique_ptr<TelemetryHandler> telemetryHandler900MHz_;
-    unique_ptr<TelemetryHandler> telemetryHandler433MHz_;
-    unique_ptr<TelemetryHandler> newHandler_;
+    unique_ptr<IReceiver> telemetryHandler900MHz_;
+    unique_ptr<IReceiver> telemetryHandler433MHz_;
+    unique_ptr<IReceiver> newHandler_;
     FileLogger sensorsLogger900_;
     FileLogger eventsLogger900_;
     FileLogger gpsLogger900_;

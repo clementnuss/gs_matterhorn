@@ -11,7 +11,7 @@
  * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
  * @return A Telemetry struct
  */
-SensorsPacket
+SensorsPacket *
 PayloadDataConverter::toERT18SensorsPacket(const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::TELEMETRY_ERT18.length());
 
@@ -44,15 +44,15 @@ PayloadDataConverter::toERT18SensorsPacket(const std::vector<uint8_t> &payloadBu
 
 //    double air_speed = airSpeedFromPitotPressure(pitotPressure);
 
-    return {measurement_time,
-            altitude,
-            {ax.fl, ay.fl, az.fl},
-            {eulerX.fl, eulerY.fl, eulerZ.fl},
-            {0, 0, 0},
-            pressure_hPa,
-            temperature.fl,
-            NAN,
-            0};
+    return new SensorsPacket(measurement_time,
+                             altitude,
+                             Data3D{ax.fl, ay.fl, az.fl},
+                             Data3D{eulerX.fl, eulerY.fl, eulerZ.fl},
+                             Data3D {0, 0, 0},
+                             pressure_hPa,
+                             temperature.fl,
+                             0.0,
+                             uint8_t{0});
 }
 
 /**
@@ -61,7 +61,7 @@ PayloadDataConverter::toERT18SensorsPacket(const std::vector<uint8_t> &payloadBu
  * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
  * @return A Telemetry struct
  */
-SensorsPacket
+SensorsPacket *
 PayloadDataConverter::toSensorsPacket(const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::TELEMETRY.length());
 
@@ -100,15 +100,15 @@ PayloadDataConverter::toSensorsPacket(const std::vector<uint8_t> &payloadBuffer)
 
     double air_speed = airSpeedFromPitotPressure(pitotPressure);
 
-    return {measurement_time,
-            altitude,
-            {ax, ay, az},
-            {mx, my, mz},
-            {gx, gy, gz},
-            pressure_hPa,
-            temperature.fl,
-            air_speed,
-            0};
+    return new SensorsPacket(measurement_time,
+                             altitude,
+                             Data3D{ax, ay, az},
+                             Data3D{mx, my, mz},
+                             Data3D{gx, gy, gz},
+                             pressure_hPa,
+                             temperature.fl,
+                             air_speed,
+                             uint8_t{0});
 }
 
 /**
@@ -117,7 +117,7 @@ PayloadDataConverter::toSensorsPacket(const std::vector<uint8_t> &payloadBuffer)
  * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
  * @return An Event struct
  */
-EventPacket
+EventPacket *
 PayloadDataConverter::toEventPacket(const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::EVENT.length());
 
@@ -137,7 +137,7 @@ PayloadDataConverter::toEventPacket(const std::vector<uint8_t> &payloadBuffer) {
         r.code_ = RocketEventConstants::INVALID_EVENT_CODE;
     }
 
-    return r;
+    return new EventPacket(r);
 }
 
 /**
@@ -146,7 +146,7 @@ PayloadDataConverter::toEventPacket(const std::vector<uint8_t> &payloadBuffer) {
  * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
  * @return A Control struct
  */
-ControlPacket
+ControlPacket *
 PayloadDataConverter::toControlPacket(const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::CONTROL.length());
 
@@ -168,7 +168,7 @@ PayloadDataConverter::toControlPacket(const std::vector<uint8_t> &payloadBuffer)
         r.statusValue_ = ControlConstants::INVALID_STATUS_VALUE;
     }
 
-    return r;
+    return new ControlPacket(r);
 }
 
 
@@ -178,7 +178,7 @@ PayloadDataConverter::toControlPacket(const std::vector<uint8_t> &payloadBuffer)
  * @param payloadBuffer The sequence of bytes from which to build the Telemetry struct
  * @return A GPS struct
  */
-GPSPacket
+GPSPacket *
 PayloadDataConverter::toGPSPacket(const vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::GPS.length());
 
@@ -193,10 +193,10 @@ PayloadDataConverter::toGPSPacket(const vector<uint8_t> &payloadBuffer) {
     float_cast lon = {.uint32 = parse32<uint32_t>(it)};
     int32_t alt = parse32<int32_t>(it);
 
-    return {measurement_time,
-            satsCount,
-            hdop.fl,
-            lat.fl,
-            lon.fl,
-            alt / 100.0f};
+    return new GPSPacket(measurement_time,
+                         satsCount,
+                         hdop.fl,
+                         lat.fl,
+                         lon.fl,
+                         alt / 100.0f);
 }

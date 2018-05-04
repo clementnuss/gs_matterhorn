@@ -1,11 +1,11 @@
-#include <DataHandlers/TelemetryHandler.h>
+#include <DataHandlers/IReceiver.h>
 #include <DataHandlers/Simulator/TelemetrySimulator.h>
 #include "gtest/gtest.h"
 
 TEST(SimulatorsTests, simulatedTelemetryIsCorrect) {
 
     TelemetrySimulator ts;
-    TelemetryHandler &telemetryHandler = ts;
+    IReceiver &telemetryHandler = ts;
 
     for (int i = 0; i < 100; i++) {
         vector<SensorsPacket> data = ts.pollSensorsData();

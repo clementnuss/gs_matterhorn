@@ -3,10 +3,8 @@
 #include <DataHandlers/Simulator/TelemetrySimulator.h>
 #include <DataHandlers/Receiver/RadioReceiver.h>
 #include <DataHandlers/Replay/TelemetryReplay.h>
-#include <DataHandlers/StateEstimator.h>
 #include <ConfigParser/ConfigParser.h>
 #include "MainWorker.h"
-#include "Utilities/GraphUtils.h"
 
 using namespace std;
 
@@ -116,7 +114,7 @@ Worker::run() {
 
             telemetryHandler900MHz_.swap(newHandler_);
             newHandler_ = nullptr;
-            if (telemetryHandler900MHz_->isReplayHandler()) {
+            if (telemetryHandler900MHz_->isReplayReceiver()) {
                 replayMode_ = true;
             }
             emit resetUIState();
@@ -155,6 +153,8 @@ Worker::mainRoutine() {
 void
 Worker::processDataFlows() {
     //Sensor data needs to be polled first!
+
+    /*
     vector<SensorsPacket> sensorsData900 = telemetryHandler900MHz_->pollSensorsData();
     vector<EventPacket> eventsData900 = telemetryHandler900MHz_->pollEventsData();
     vector<GPSPacket> gpsData900 = telemetryHandler900MHz_->pollGPSData();
@@ -227,6 +227,7 @@ Worker::processDataFlows() {
     for (auto &d : gpsData433) {
         displayGPSData(d, FlyableType::PAYLOAD);
     }
+     */
 }
 
 
@@ -420,22 +421,22 @@ Worker::extractGraphData(vector<SensorsPacket> &data, QCPGraphData (*extractionF
 void
 Worker::updatePlaybackSpeed(double newSpeed) {
     assert(replayMode_);
-    auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler900MHz_.get());
-    telemReplay->updatePlaybackSpeed(newSpeed);
+    //auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler900MHz_.get());
+    //telemReplay->updatePlaybackSpeed(newSpeed);
 }
 
 void
 Worker::resetPlayback() {
     assert(replayMode_);
-    auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler900MHz_.get());
-    telemReplay->resetPlayback();
+    //auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler900MHz_.get());
+    //telemReplay->resetPlayback();
 }
 
 void
 Worker::reversePlayback(bool reversed) {
     assert(replayMode_);
-    auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler900MHz_.get());
-    telemReplay->setPlaybackReversed(reversed);
+    //auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler900MHz_.get());
+    //telemReplay->setPlaybackReversed(reversed);
 }
 
 void
@@ -458,29 +459,31 @@ Worker::transmitCommand(int command) {
 
 void
 Worker::defineReplayMode(const QString &parameters) {
-    TelemetryHandler *handler = nullptr;
-    try {
-        handler = new TelemetryReplay(parameters.toStdString());
-        handler->startup();
-    } catch (std::runtime_error &e) {
-        std::cerr << "Error when starting replay handler:\n" << e.what();
-    }
-    newHandler_ = unique_ptr<TelemetryHandler>{handler};
-    updateHandler_.store(true);
+    /* IReceiver *handler = nullptr;
+     try {
+         handler = new TelemetryReplay(parameters.toStdString());
+         handler->startup();
+     } catch (std::runtime_error &e) {
+         std::cerr << "Error when starting replay handler:\n" << e.what();
+     }
+     newHandler_ = unique_ptr<IReceiver>{handler};
+     updateHandler_.store(true);
+     */
 }
 
 
 void
 Worker::defineRealtimeMode(const QString &parameters) {
-    TelemetryHandler *handler = nullptr;
+    /*IReceiver *handler = nullptr;
     try {
         handler = new RadioReceiver(parameters.toStdString(), "");
         handler->startup();
     } catch (std::runtime_error &e) {
         std::cerr << "Error when starting RadioReceiver handler:\n" << e.what();
     }
-    newHandler_ = unique_ptr<TelemetryHandler>{handler};
+    newHandler_ = unique_ptr<IReceiver>{handler};
     updateHandler_.store(true);
+     */
 }
 
 void

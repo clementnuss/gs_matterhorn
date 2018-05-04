@@ -35,7 +35,11 @@ Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
 
     }
 
+    //TODO: change name to payloadInfo -> split into vehicleID and payloadtype
     uint8_t payloadType = headerBuffer[SEQUENCE_NUMBER_SIZE];
+
+    //uint8_t payloadInfo =
+    //uint8_t payloadType =
 
     if (PayloadType::TYPES_TABLE.count(payloadType) > 0) {
 
