@@ -50,11 +50,13 @@ private:
     DummyReceiver *primaryReceiver;
     DummyReceiver *backupReceiver;
     unsigned int limitLag;
+    std::vector<FlyableType> typeList;
 
 private slots:
 
     void initTestCase() {
         limitLag = 10;
+        typeList = {FlyableType::ROCKET, FlyableType::PAYLOAD};
     }
 
     void init() {
@@ -69,75 +71,86 @@ private slots:
         backupReceiver = dynamic_cast<DummyReceiver *>(&(*compositeReceiver->backupReceiver_));
     }
 
-    void simpleMergeStepIsCorrect() {
+    void monoVehicleSimpleMergeStepIsCorrect() {
 
-        primaryReceiver->registerPackets(makePacketVector(1, 4));
-        backupReceiver->registerPackets(makePacketVector(2, 4));
-        assertSequenceEquality(compositeReceiver->pollData(), {1, 2, 3, 4});
-
-    }
-
-    void alternatingMergeStepIsCorrect() {
-        std::vector<uint32_t> v;
-        for (uint32_t i = 1; i < 1000; i += 2) {
-            primaryReceiver->registerPackets(makePacketVector(i));
-            backupReceiver->registerPackets(makePacketVector(i + 1));
-            v.push_back(i);
-            v.push_back(i + 1);
+        for (auto flyableType : typeList) {
+            primaryReceiver->registerPackets(makePacketVector(1, 4, flyableType));
+            backupReceiver->registerPackets(makePacketVector(2, 4, flyableType));
+            assertSequenceEquality(compositeReceiver->pollData(), {1, 2, 3, 4});
         }
 
-        assertSequenceEquality(compositeReceiver->pollData(), v);
     }
 
-    void waitingMergeStepIsCorrect() {
 
-        primaryReceiver->registerPackets(makePacketVector(1));
-        backupReceiver->registerPackets(makePacketVector(1));
-        assertSequenceEquality(compositeReceiver->pollData(), {1});
+    void monoVehicleAlternatingMergeStepIsCorrect() {
 
-        backupReceiver->registerPackets(makePacketVector(2));
-        assertSequenceEquality(compositeReceiver->pollData(), {2});
+        for (auto flyableType : typeList) {
+            std::vector<uint32_t> v;
+            for (uint32_t i = 1; i < 1000; i += 2) {
+                primaryReceiver->registerPackets(makePacketVector(i, flyableType));
+                backupReceiver->registerPackets(makePacketVector(i + 1, flyableType));
+                v.push_back(i);
+                v.push_back(i + 1);
+            }
 
-        // Packet 3 gets lost
-        primaryReceiver->registerPackets(makePacketVector(4, 6));
-        assertSequenceEquality(compositeReceiver->pollData(), {});
-
-        // Feeding backup receiver allows retrieval, should assume 3 is list definitively
-        backupReceiver->registerPackets(makePacketVector(7, 8));
-        assertSequenceEquality(compositeReceiver->pollData(), {4, 5, 6, 7, 8});
-
+            assertSequenceEquality(compositeReceiver->pollData(), v);
+        }
     }
 
-    void lagIsLimited() {
-        primaryReceiver->registerPackets(makePacketVector(1));
-        assertSequenceEquality(compositeReceiver->pollData(), {1});
+    void monoVehicleWaitingMergeStepIsCorrect() {
 
-        // Packet 2 gets lost
-        primaryReceiver->registerPackets(makePacketVector(3, limitLag + 1));
+        for (auto flyableType : typeList) {
+            primaryReceiver->registerPackets(makePacketVector(1, flyableType));
+            backupReceiver->registerPackets(makePacketVector(1, flyableType));
+            assertSequenceEquality(compositeReceiver->pollData(), {1});
 
-        assertSequenceEquality(compositeReceiver->pollData(), {});
+            backupReceiver->registerPackets(makePacketVector(2, flyableType));
+            assertSequenceEquality(compositeReceiver->pollData(), {2});
 
-        // Adding new packet causes fast-forward
-        primaryReceiver->registerPackets(makePacketVector(12));
-        assertSequenceEquality(compositeReceiver->pollData(), {3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
+            // Packet 3 gets lost
+            primaryReceiver->registerPackets(makePacketVector(4, 6, flyableType));
+            assertSequenceEquality(compositeReceiver->pollData(), {});
+
+            // Feeding backup receiver allows retrieval, should assume 3 is list definitively
+            backupReceiver->registerPackets(makePacketVector(7, 8, flyableType));
+            assertSequenceEquality(compositeReceiver->pollData(), {4, 5, 6, 7, 8});
+        }
     }
 
-    void packetWithLowerSequenceNumberGetsDiscarded() {
-        // Test when only one receiver has data
-        primaryReceiver->registerPackets(makePacketVector(1, 5));
-        primaryReceiver->registerPackets(makePacketVector(2, 5));
-        primaryReceiver->registerPackets(makePacketVector(1, 4));
-        primaryReceiver->registerPackets(makePacketVector(5, 10));
-        primaryReceiver->registerPackets(makePacketVector(6, 8));
-        assertSequenceEquality(compositeReceiver->pollData(), {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+    void monoVehicleLagIsLimited() {
+        for (auto flyableType : typeList) {
+            primaryReceiver->registerPackets(makePacketVector(1, flyableType));
+            assertSequenceEquality(compositeReceiver->pollData(), {1});
 
-        // Test when both receiver have data
-        primaryReceiver->registerPackets(makePacketVector(11, 13));
-        primaryReceiver->registerPackets(makePacketVector(16, 19));
-        backupReceiver->registerPackets(makePacketVector(13, 15));
-        backupReceiver->registerPackets(makePacketVector(13, 18));
-        backupReceiver->registerPackets(makePacketVector(17, 20));
-        assertSequenceEquality(compositeReceiver->pollData(), {11, 12, 13, 14, 15, 16, 17, 18, 19, 20});
+            // Packet 2 gets lost
+            primaryReceiver->registerPackets(makePacketVector(3, limitLag + 1, flyableType));
+
+            assertSequenceEquality(compositeReceiver->pollData(), {});
+
+            // Adding new packet causes fast-forward
+            primaryReceiver->registerPackets(makePacketVector(12, flyableType));
+            assertSequenceEquality(compositeReceiver->pollData(), {3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
+        }
+    }
+
+    void monoVehiclePacketWithLowerSequenceNumberGetsDiscarded() {
+        for (auto flyableType : typeList) {
+            // Test when only one receiver has data
+            primaryReceiver->registerPackets(makePacketVector(1, 5, flyableType));
+            primaryReceiver->registerPackets(makePacketVector(2, 5, flyableType));
+            primaryReceiver->registerPackets(makePacketVector(1, 4, flyableType));
+            primaryReceiver->registerPackets(makePacketVector(5, 10, flyableType));
+            primaryReceiver->registerPackets(makePacketVector(6, 8, flyableType));
+            assertSequenceEquality(compositeReceiver->pollData(), {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+
+            // Test when both receiver have data
+            primaryReceiver->registerPackets(makePacketVector(11, 13, flyableType));
+            primaryReceiver->registerPackets(makePacketVector(16, 19, flyableType));
+            backupReceiver->registerPackets(makePacketVector(13, 15, flyableType));
+            backupReceiver->registerPackets(makePacketVector(13, 18, flyableType));
+            backupReceiver->registerPackets(makePacketVector(17, 20, flyableType));
+            assertSequenceEquality(compositeReceiver->pollData(), {11, 12, 13, 14, 15, 16, 17, 18, 19, 20});
+        }
     }
 };
 
