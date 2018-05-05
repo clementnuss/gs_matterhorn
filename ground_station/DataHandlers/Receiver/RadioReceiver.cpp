@@ -164,7 +164,7 @@ RadioReceiver::unpackPayload() {
     Datagram d = byteDecoder_.retrieveDatagram();
 
     std::unique_ptr<DataPacket> p;
-    std::function<DataPacket *(const PayloadType &, const uint32_t &, const std::vector<uint8_t> &)> conversionFunc;
+    std::function<DataPacket *(const FlyableType &, const uint32_t &, const std::vector<uint8_t> &)> conversionFunc;
 
     switch (d.payloadType_->code()) {
         case CommunicationsConstants::TELEMETRY_TYPE:
@@ -185,7 +185,7 @@ RadioReceiver::unpackPayload() {
             break;
     }
 
-    dataQueue_.push(conversionFunc((*d.payloadType_), d.sequenceNumber_, d.payloadData_));
+    dataQueue_.push(conversionFunc(d.flyableType_, d.sequenceNumber_, d.payloadData_));
 }
 
 

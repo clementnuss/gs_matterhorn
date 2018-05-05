@@ -24,7 +24,7 @@ void GsMainwindowTests::telemetryReadingCorrectlyDisplayed() {
     QCOMPARE(gsMainWindow_.ui->telemetry_speed_value->text().toStdString(), "0.0");
     QCOMPARE(gsMainWindow_.ui->telemetry_temperature_value->text().toStdString(), "0.0");
 
-    SensorsPacket r{1, 1234, 100.14, {1, 0, 0}, {1, 1, 1}, {1, 1, 1},
+    SensorsPacket r{1, 1234, FlyableType::ROCKET, 100.14, {1, 0, 0}, {1, 1, 1}, {1, 1, 1},
                     40.14, 25.086, 15.149};
     //gsMainWindow_.receiveSensorData(r);
 

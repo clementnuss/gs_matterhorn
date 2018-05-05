@@ -11,7 +11,7 @@
  * @return A Telemetry struct
  */
 SensorsPacket *
-PayloadDataConverter::toERT18SensorsPacket(const PayloadType &payloadType, const uint32_t &sequenceNumber, const std::vector<uint8_t> &payloadBuffer) {
+PayloadDataConverter::toERT18SensorsPacket(const FlyableType &flyableType, const uint32_t &sequenceNumber, const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::TELEMETRY_ERT18.length());
 
     auto it = payloadBuffer.begin();
@@ -45,6 +45,7 @@ PayloadDataConverter::toERT18SensorsPacket(const PayloadType &payloadType, const
 
     return new SensorsPacket(measurement_time,
                              sequenceNumber,
+                             flyableType,
                              altitude,
                              Data3D{ax.fl, ay.fl, az.fl},
                              Data3D{eulerX.fl, eulerY.fl, eulerZ.fl},
@@ -61,7 +62,7 @@ PayloadDataConverter::toERT18SensorsPacket(const PayloadType &payloadType, const
  * @return A Telemetry struct
  */
 SensorsPacket *
-PayloadDataConverter::toSensorsPacket(const PayloadType &payloadType, const uint32_t &sequenceNumber, const std::vector<uint8_t> &payloadBuffer) {
+PayloadDataConverter::toSensorsPacket(const FlyableType &flyableType, const uint32_t &sequenceNumber, const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::TELEMETRY.length());
 
     auto it = payloadBuffer.begin();
@@ -101,6 +102,7 @@ PayloadDataConverter::toSensorsPacket(const PayloadType &payloadType, const uint
 
     return new SensorsPacket(measurement_time,
                              sequenceNumber,
+                             flyableType,
                              altitude,
                              Data3D{ax, ay, az},
                              Data3D{mx, my, mz},
@@ -117,7 +119,7 @@ PayloadDataConverter::toSensorsPacket(const PayloadType &payloadType, const uint
  * @return An Event struct
  */
 EventPacket *
-PayloadDataConverter::toEventPacket(const PayloadType &payloadType, const uint32_t &sequenceNumber, const std::vector<uint8_t> &payloadBuffer) {
+PayloadDataConverter::toEventPacket(const FlyableType &flyableType, const uint32_t &sequenceNumber, const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::EVENT.length());
 
     auto it = payloadBuffer.begin();
@@ -146,7 +148,7 @@ PayloadDataConverter::toEventPacket(const PayloadType &payloadType, const uint32
  * @return A Control struct
  */
 ControlPacket *
-PayloadDataConverter::toControlPacket(const PayloadType &payloadType, const uint32_t &sequenceNumber, const std::vector<uint8_t> &payloadBuffer) {
+PayloadDataConverter::toControlPacket(const FlyableType &flyableType, const uint32_t &sequenceNumber, const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::CONTROL.length());
 
     auto it = payloadBuffer.begin();
@@ -178,7 +180,7 @@ PayloadDataConverter::toControlPacket(const PayloadType &payloadType, const uint
  * @return A GPS struct
  */
 GPSPacket *
-PayloadDataConverter::toGPSPacket(const PayloadType &payloadType, const uint32_t &sequenceNumber, const vector<uint8_t> &payloadBuffer) {
+PayloadDataConverter::toGPSPacket(const FlyableType &flyableType, const uint32_t &sequenceNumber, const vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::GPS.length());
 
     auto it = payloadBuffer.begin();
@@ -194,6 +196,7 @@ PayloadDataConverter::toGPSPacket(const PayloadType &payloadType, const uint32_t
 
     return new GPSPacket(measurement_time,
                          sequenceNumber,
+                         flyableType,
                          satsCount,
                          hdop.fl,
                          lat.fl,

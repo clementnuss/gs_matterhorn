@@ -8,23 +8,23 @@
 
 
 static std::vector<DataPacket>
-makePacketVector(uint32_t from, uint32_t to) {
+makePacketVector(uint32_t from, uint32_t to, FlyableType type = FlyableType::ROCKET) {
 
 
     std::vector<DataPacket> v{};
 
     for (uint32_t i = from; i < to + 1; i++) {
-        v.emplace_back(DataPacket{0, i});
+        v.emplace_back(DataPacket{0, i, type});
     }
 
     return v;
 }
 
 static std::vector<DataPacket>
-makePacketVector(uint32_t seqNum) {
+makePacketVector(uint32_t seqNum, FlyableType type = FlyableType::ROCKET) {
 
     std::vector<DataPacket> v{};
-    v.emplace_back(DataPacket{0, seqNum});
+    v.emplace_back(DataPacket{0, seqNum, type});
     return v;
 }
 

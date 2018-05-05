@@ -23,10 +23,11 @@ enum class DecodingState {
 };
 
 struct Datagram {
-    Datagram() : sequenceNumber_{0}, payloadType_{nullptr}, payloadData_{}, complete{false} {}
+    Datagram() : sequenceNumber_{0}, payloadType_{nullptr}, flyableType_{FlyableType::ROCKET}, payloadData_{}, complete{false} {}
 
     uint32_t sequenceNumber_;
     const PayloadType *payloadType_;
+    FlyableType flyableType_;
     std::vector<uint8_t> payloadData_;
     bool complete;
 };

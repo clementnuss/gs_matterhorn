@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <cmath>
 #include <utility>
+#include <Flyable.h>
 #include "ILoggable.h"
 #include "ProgramConstants.h"
 
@@ -21,12 +22,13 @@ struct IDeserializable {
 struct DataPacket {
     DataPacket() = default;
 
-    explicit DataPacket(uint32_t timestamp, uint32_t sequenceNumber) :
+    explicit DataPacket(uint32_t timestamp, uint32_t sequenceNumber, FlyableType flyableType) :
             timestamp_{timestamp},
             sequenceNumber_{sequenceNumber} {}
 
     uint32_t timestamp_;
     uint32_t sequenceNumber_;
+    FlyableType flyableType_;
 };
 
 
@@ -35,8 +37,9 @@ struct EventPacket : DataPacket, ILoggable, IDeserializable {
 
     EventPacket(const EventPacket &that) = default;
 
-    EventPacket(uint32_t timestamp, uint32_t sequenceNumber, int code, const std::string &description) :
-            DataPacket{timestamp, sequenceNumber}, code_{code}, description_{std::move(description)} {}
+    EventPacket(uint32_t timestamp, uint32_t sequenceNumber, FlyableType flyableType,
+                int code, const std::string &description) :
+            DataPacket{timestamp, sequenceNumber, flyableType}, code_{code}, description_{std::move(description)} {}
 
     ~EventPacket() = default;
 
@@ -64,8 +67,9 @@ struct ControlPacket : DataPacket, IDeserializable {
 
     ControlPacket(const ControlPacket &that) = default;
 
-    ControlPacket(uint32_t timestamp, uint32_t sequenceNumber, uint8_t partCode, uint16_t statusValue) :
-            DataPacket{timestamp, sequenceNumber}, partCode_{partCode}, statusValue_{statusValue} {}
+    ControlPacket(uint32_t timestamp, uint32_t sequenceNumber, FlyableType flyableType,
+                  uint8_t partCode, uint16_t statusValue) :
+            DataPacket{timestamp, sequenceNumber, flyableType}, partCode_{partCode}, statusValue_{statusValue} {}
 
     uint8_t partCode_;
     uint16_t statusValue_;
@@ -80,8 +84,9 @@ struct GPSPacket : DataPacket, ILoggable, IDeserializable {
 
     GPSPacket(const GPSPacket &that) = default;
 
-    GPSPacket(uint32_t timestamp, uint32_t sequenceNumber, uint8_t satsCount, float hdop, float latitude, float longitude, float altitude) :
-            DataPacket{timestamp, sequenceNumber},
+    GPSPacket(uint32_t timestamp, uint32_t sequenceNumber, FlyableType flyableType,
+              uint8_t satsCount, float hdop, float latitude, float longitude, float altitude) :
+            DataPacket{timestamp, sequenceNumber, flyableType},
             satsCount_{satsCount},
             hdop_{hdop},
             latitude_{latitude},
@@ -160,7 +165,7 @@ struct Data3D : ILoggable {
 };
 
 struct SensorsPacket : DataPacket, ILoggable, IDeserializable {
-    SensorsPacket() : DataPacket{0, 0},
+    SensorsPacket() : DataPacket{0, 0, FlyableType::ROCKET},
                       altitude_{0},
                       acceleration_{},
                       eulerAngles_{},
@@ -169,10 +174,11 @@ struct SensorsPacket : DataPacket, ILoggable, IDeserializable {
                       temperature_{0},
                       air_speed_{0} {};
 
-    SensorsPacket(uint32_t t, uint32_t sequenceNumber, double altitude, Data3D acceleration,
+    SensorsPacket(uint32_t timestamp, uint32_t sequenceNumber, FlyableType flyableType,
+                  double altitude, Data3D acceleration,
                   Data3D magnetometer, Data3D gyroscope,
                   double pressure, double temperature, double air_speed) :
-            DataPacket{t, sequenceNumber},
+            DataPacket{timestamp, sequenceNumber, flyableType},
             altitude_{altitude},
             acceleration_{acceleration},
             eulerAngles_{magnetometer},
