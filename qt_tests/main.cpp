@@ -2,10 +2,7 @@
 //
 
 #include <3DTests/IntervalTests.h>
-#include <3DTests/GroundTests.h>
-#include <3DTests/ElevationModelTests.h>
-#include "ConfigParserTests.h"
-#include "DummyTests.h"
+#include <ReceiverTests/CompositeReceiverTest.h>
 #include "GsMainwindowTests.h"
 
 int main(int argc, char **argv) {
@@ -17,12 +14,13 @@ int main(int argc, char **argv) {
 
     QApplication app(argc, argv);
 
-    ASSERT_TEST(new GsMainwindowTests());
+    /*ASSERT_TEST(new GsMainwindowTests());
     ASSERT_TEST(new DummyTests());
     ASSERT_TEST(new IntervalTests());
     ASSERT_TEST(new GroundTests());
     ASSERT_TEST(new ElevationModelTests());
-    ASSERT_TEST(new ConfigParserTests());
+    ASSERT_TEST(new ConfigParserTests());*/
+    ASSERT_TEST(new CompositeReceiverTests());
 
     return status;
 }

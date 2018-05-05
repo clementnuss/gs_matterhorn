@@ -26,7 +26,7 @@ public:
 
     void startup() override;
 
-    std::vector<std::unique_ptr<DataPacket>> pollData() override;
+    std::list<std::unique_ptr<DataPacket>> pollData() override;
 
     void sendCommand(const uint8_t *, size_t) override;
 

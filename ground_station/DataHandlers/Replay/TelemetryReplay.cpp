@@ -169,8 +169,8 @@ TelemetryReplay::parseFile(boost::filesystem::path p) {
                 double mz = std::stod(*it++);
 
                 SensorsPacket r{
-                        timestamp, altitude, Data3D{ax, ay, az}, Data3D{mx, my, mz}, Data3D{gx, gy, gz},
-                        pressure, temperature, air_speed, seqNumber};
+                        timestamp, seqNumber, altitude, Data3D{ax, ay, az}, Data3D{mx, my, mz}, Data3D{gx, gy, gz},
+                        pressure, temperature, air_speed};
                 sensorsReadings_.push_back(std::move(r));
 
             } catch (std::logic_error &e) {
@@ -187,7 +187,7 @@ TelemetryReplay::parseFile(boost::filesystem::path p) {
                 auto longitude = static_cast<float>(std::stod(*it++));
                 auto altitude = static_cast<float>(std::stod(*it++));
 
-                GPSPacket g{timestamp, satsCount, hdop, latitude, longitude, altitude};
+                GPSPacket g{timestamp, 0, satsCount, hdop, latitude, longitude, altitude};
                 gpsReadings_.push_back(std::move(g));
 
             } catch (std::logic_error &e) {

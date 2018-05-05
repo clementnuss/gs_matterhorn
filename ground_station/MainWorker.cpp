@@ -1,6 +1,5 @@
 #include <QThread>
 #include <iostream>
-#include <DataHandlers/Simulator/TelemetrySimulator.h>
 #include <DataHandlers/Receiver/RadioReceiver.h>
 #include <DataHandlers/Replay/TelemetryReplay.h>
 #include <ConfigParser/ConfigParser.h>
@@ -154,6 +153,13 @@ void
 Worker::processDataFlows() {
     //Sensor data needs to be polled first!
 
+    std::list<std::unique_ptr<DataPacket>> data900 = telemetryHandler900MHz_->pollData();
+
+    list<std::unique_ptr<DataPacket>>::const_iterator it = data900.begin();
+    while (it != data900.end()) {
+
+        std::cout << (*it++)->timestamp_ << std::endl;
+    }
     /*
     vector<SensorsPacket> sensorsData900 = telemetryHandler900MHz_->pollSensorsData();
     vector<EventPacket> eventsData900 = telemetryHandler900MHz_->pollEventsData();

@@ -703,7 +703,7 @@ GSMainwindow::event(QEvent *event) {
                 connect(launchTimer, &QTimer::timeout, this, &GSMainwindow::dummyAnimation);
             }
         } else if (ke->key() == Qt::Key_E) {
-            this->registerEvent(EventPacket(0, 0, ""));
+            this->registerEvent(EventPacket(0, 0, 0, ""));
         } else if (ke->key() == Qt::Key_T) {
             emit toggleTracking();
         } else if (ke->key() == Qt::Key_H) {
@@ -746,7 +746,7 @@ GSMainwindow::dummyAnimation() {
     if (i < traceData_.size()) {
 
         if (i == traceData_.size() - 1) {
-            rootEntity3D_->registerEvent({0, 40, ""});
+            rootEntity3D_->registerEvent({0, 0, 40, ""});
         }
 
         QVector3D speed{0, 0, 0};
@@ -757,7 +757,7 @@ GSMainwindow::dummyAnimation() {
             if (speedNorm > maxSpeed) {
                 maxSpeed = speedNorm;
             } else if (!maxV) {
-                rootEntity3D_->registerEvent({0, 30, ""});
+                rootEntity3D_->registerEvent({0, 0, 30, ""});
                 maxV = true;
             }
 

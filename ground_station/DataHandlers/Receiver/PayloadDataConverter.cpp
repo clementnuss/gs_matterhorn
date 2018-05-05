@@ -3,7 +3,6 @@
 #include <Utilities/SensorUtils.h>
 #include "PayloadDataConverter.h"
 #include "Utilities/ParsingUtilities.h"
-#include "DatagramSpec.h"
 
 /**
  * Builds a Telemetry struct given a sequence of bytes
@@ -12,7 +11,7 @@
  * @return A Telemetry struct
  */
 SensorsPacket *
-PayloadDataConverter::toERT18SensorsPacket(const std::vector<uint8_t> &payloadBuffer) {
+PayloadDataConverter::toERT18SensorsPacket(const PayloadType &payloadType, const uint32_t &sequenceNumber, const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::TELEMETRY_ERT18.length());
 
     auto it = payloadBuffer.begin();
@@ -45,14 +44,14 @@ PayloadDataConverter::toERT18SensorsPacket(const std::vector<uint8_t> &payloadBu
 //    double air_speed = airSpeedFromPitotPressure(pitotPressure);
 
     return new SensorsPacket(measurement_time,
+                             sequenceNumber,
                              altitude,
                              Data3D{ax.fl, ay.fl, az.fl},
                              Data3D{eulerX.fl, eulerY.fl, eulerZ.fl},
                              Data3D {0, 0, 0},
                              pressure_hPa,
                              temperature.fl,
-                             0.0,
-                             uint8_t{0});
+                             0.0);
 }
 
 /**
@@ -62,7 +61,7 @@ PayloadDataConverter::toERT18SensorsPacket(const std::vector<uint8_t> &payloadBu
  * @return A Telemetry struct
  */
 SensorsPacket *
-PayloadDataConverter::toSensorsPacket(const std::vector<uint8_t> &payloadBuffer) {
+PayloadDataConverter::toSensorsPacket(const PayloadType &payloadType, const uint32_t &sequenceNumber, const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::TELEMETRY.length());
 
     auto it = payloadBuffer.begin();
@@ -101,14 +100,14 @@ PayloadDataConverter::toSensorsPacket(const std::vector<uint8_t> &payloadBuffer)
     double air_speed = airSpeedFromPitotPressure(pitotPressure);
 
     return new SensorsPacket(measurement_time,
+                             sequenceNumber,
                              altitude,
                              Data3D{ax, ay, az},
                              Data3D{mx, my, mz},
                              Data3D{gx, gy, gz},
                              pressure_hPa,
                              temperature.fl,
-                             air_speed,
-                             uint8_t{0});
+                             air_speed);
 }
 
 /**
@@ -118,7 +117,7 @@ PayloadDataConverter::toSensorsPacket(const std::vector<uint8_t> &payloadBuffer)
  * @return An Event struct
  */
 EventPacket *
-PayloadDataConverter::toEventPacket(const std::vector<uint8_t> &payloadBuffer) {
+PayloadDataConverter::toEventPacket(const PayloadType &payloadType, const uint32_t &sequenceNumber, const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::EVENT.length());
 
     auto it = payloadBuffer.begin();
@@ -147,7 +146,7 @@ PayloadDataConverter::toEventPacket(const std::vector<uint8_t> &payloadBuffer) {
  * @return A Control struct
  */
 ControlPacket *
-PayloadDataConverter::toControlPacket(const std::vector<uint8_t> &payloadBuffer) {
+PayloadDataConverter::toControlPacket(const PayloadType &payloadType, const uint32_t &sequenceNumber, const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::CONTROL.length());
 
     auto it = payloadBuffer.begin();
@@ -179,7 +178,7 @@ PayloadDataConverter::toControlPacket(const std::vector<uint8_t> &payloadBuffer)
  * @return A GPS struct
  */
 GPSPacket *
-PayloadDataConverter::toGPSPacket(const vector<uint8_t> &payloadBuffer) {
+PayloadDataConverter::toGPSPacket(const PayloadType &payloadType, const uint32_t &sequenceNumber, const vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::GPS.length());
 
     auto it = payloadBuffer.begin();
@@ -194,6 +193,7 @@ PayloadDataConverter::toGPSPacket(const vector<uint8_t> &payloadBuffer) {
     int32_t alt = parse32<int32_t>(it);
 
     return new GPSPacket(measurement_time,
+                         sequenceNumber,
                          satsCount,
                          hdop.fl,
                          lat.fl,

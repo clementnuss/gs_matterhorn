@@ -21,7 +21,7 @@ public:
      *
      * @return The packets received by this IReceiver since the last call to the function
      */
-    virtual std::vector<std::unique_ptr<DataPacket>> pollData() = 0;
+    virtual std::list<std::unique_ptr<DataPacket>> pollData() = 0;
 
     virtual void sendCommand(const uint8_t *, size_t) = 0;
 

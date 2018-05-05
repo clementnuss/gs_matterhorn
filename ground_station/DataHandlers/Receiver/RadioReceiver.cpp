@@ -86,10 +86,10 @@ RadioReceiver::openSerialPort() {
 }
 
 template<class S>
-static std::vector<std::unique_ptr<S>>
+static std::list<std::unique_ptr<S>>
 consumeQueue(boost::lockfree::spsc_queue<S *> *queue) {
 
-    std::vector<std::unique_ptr<S>> recipient{};
+    std::list<std::unique_ptr<S>> recipient{};
 
     queue->consume_all(
             [&recipient](S *s) {
@@ -100,7 +100,7 @@ consumeQueue(boost::lockfree::spsc_queue<S *> *queue) {
     return recipient;
 };
 
-std::vector<std::unique_ptr<DataPacket>>
+std::list<std::unique_ptr<DataPacket>>
 RadioReceiver::pollData() {
     return consumeQueue(&dataQueue_);
 }
@@ -164,7 +164,7 @@ RadioReceiver::unpackPayload() {
     Datagram d = byteDecoder_.retrieveDatagram();
 
     std::unique_ptr<DataPacket> p;
-    std::function<DataPacket *(std::vector<uint8_t>)> conversionFunc;
+    std::function<DataPacket *(const PayloadType &, const uint32_t &, const std::vector<uint8_t> &)> conversionFunc;
 
     switch (d.payloadType_->code()) {
         case CommunicationsConstants::TELEMETRY_TYPE:
@@ -185,7 +185,7 @@ RadioReceiver::unpackPayload() {
             break;
     }
 
-    dataQueue_.push(conversionFunc(d.payloadData_));
+    dataQueue_.push(conversionFunc((*d.payloadType_), d.sequenceNumber_, d.payloadData_));
 }
 
 

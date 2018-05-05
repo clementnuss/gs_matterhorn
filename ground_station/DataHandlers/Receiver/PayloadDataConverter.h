@@ -5,6 +5,7 @@
 
 #include <DataStructures/datastructs.h>
 #include <vector>
+#include "PayloadType.h"
 
 static_assert(sizeof(float) == 4,
               "In order for the decoder to be able to cast floats to uint32 safely, sizeof(float) should return 4");
@@ -17,15 +18,15 @@ typedef union {
 class PayloadDataConverter {
 
 public:
-    static SensorsPacket *toSensorsPacket(const std::vector<uint8_t> &);
+    static SensorsPacket *toSensorsPacket(const PayloadType &, const uint32_t &, const std::vector<uint8_t> &);
 
-    static SensorsPacket *toERT18SensorsPacket(const std::vector<uint8_t> &);
+    static SensorsPacket *toERT18SensorsPacket(const PayloadType &, const uint32_t &, const std::vector<uint8_t> &);
 
-    static EventPacket *toEventPacket(const std::vector<uint8_t> &);
+    static EventPacket *toEventPacket(const PayloadType &, const uint32_t &, const std::vector<uint8_t> &);
 
-    static ControlPacket *toControlPacket(const std::vector<uint8_t> &);
+    static ControlPacket *toControlPacket(const PayloadType &, const uint32_t &, const std::vector<uint8_t> &);
 
-    static GPSPacket *toGPSPacket(const vector<uint8_t> &);
+    static GPSPacket *toGPSPacket(const PayloadType &, const uint32_t &, const vector<uint8_t> &);
 };
 
 
