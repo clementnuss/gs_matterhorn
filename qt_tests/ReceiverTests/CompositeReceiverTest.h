@@ -40,6 +40,19 @@ assertSequenceEquality(const std::list<std::unique_ptr<DataPacket>> &l, const st
     }
 }
 
+static void
+assertMultiSequenceEquality(const std::list<std::unique_ptr<DataPacket>> &l, const std::vector<std::pair<uint32_t, FlyableType>> &v) {
+
+    QCOMPARE(l.size(), v.size());
+
+    auto it = l.begin();
+
+    for (size_t i = 0; i < v.size(); i++) {
+        QCOMPARE((*it)->sequenceNumber_, v[i].first);
+        QCOMPARE((*it++)->flyableType_, v[i].second);
+    }
+}
+
 class CompositeReceiverTests : public QObject {
 
 Q_OBJECT
@@ -81,6 +94,21 @@ private slots:
 
     }
 
+    void multiVehicleSimpleMergeStepIsCorrect() {
+        primaryReceiver->registerPackets(makePacketVector(1, FlyableType::ROCKET));
+        backupReceiver->registerPackets(makePacketVector(2, FlyableType::ROCKET));
+        primaryReceiver->registerPackets(makePacketVector(1, FlyableType::PAYLOAD));
+        backupReceiver->registerPackets(makePacketVector(3, FlyableType::ROCKET));
+        backupReceiver->registerPackets(makePacketVector(2, FlyableType::PAYLOAD));
+        backupReceiver->registerPackets(makePacketVector(4, FlyableType::ROCKET));
+        assertMultiSequenceEquality(compositeReceiver->pollData(),
+                                    {{1, FlyableType::ROCKET},
+                                     {1, FlyableType::PAYLOAD},
+                                     {2, FlyableType::ROCKET},
+                                     {3, FlyableType::ROCKET},
+                                     {2, FlyableType::PAYLOAD},
+                                     {4, FlyableType::ROCKET}});
+    }
 
     void monoVehicleAlternatingMergeStepIsCorrect() {
 
@@ -97,6 +125,24 @@ private slots:
         }
     }
 
+    void multiVehicleAlternatingMergeStepIsCorrect() {
+
+        std::vector<std::pair<uint32_t, FlyableType>> v;
+        for (uint32_t i = 1; i < 1000; i += 2) {
+            primaryReceiver->registerPackets(makePacketVector(i, FlyableType::ROCKET));
+            backupReceiver->registerPackets(makePacketVector(i, FlyableType::PAYLOAD));
+            primaryReceiver->registerPackets(makePacketVector(i + 1, FlyableType::PAYLOAD));
+            backupReceiver->registerPackets(makePacketVector(i + 1, FlyableType::ROCKET));
+            v.push_back(std::make_pair(i, FlyableType::ROCKET));
+            v.push_back(std::make_pair(i, FlyableType::PAYLOAD));
+            v.push_back(std::make_pair(i + 1, FlyableType::PAYLOAD));
+            v.push_back(std::make_pair(i + 1, FlyableType::ROCKET));
+        }
+
+        assertMultiSequenceEquality(compositeReceiver->pollData(), v);
+
+    }
+
     void monoVehicleWaitingMergeStepIsCorrect() {
 
         for (auto flyableType : typeList) {
@@ -111,10 +157,36 @@ private slots:
             primaryReceiver->registerPackets(makePacketVector(4, 6, flyableType));
             assertSequenceEquality(compositeReceiver->pollData(), {});
 
-            // Feeding backup receiver allows retrieval, should assume 3 is list definitively
+            // Feeding backup receiver allows retrieval, should assume 3 is lost definitively
             backupReceiver->registerPackets(makePacketVector(7, 8, flyableType));
             assertSequenceEquality(compositeReceiver->pollData(), {4, 5, 6, 7, 8});
         }
+    }
+
+    void multiVehicleWaitingMergeStepIsCorrect() {
+
+        primaryReceiver->registerPackets(makePacketVector(1, FlyableType::ROCKET));
+        backupReceiver->registerPackets(makePacketVector(1, FlyableType::ROCKET));
+        assertSequenceEquality(compositeReceiver->pollData(), {1});
+
+        backupReceiver->registerPackets(makePacketVector(2, FlyableType::ROCKET));
+        assertSequenceEquality(compositeReceiver->pollData(), {2});
+
+        // Packet 3 gets lost
+        primaryReceiver->registerPackets(makePacketVector(4, 6, FlyableType::ROCKET));
+        assertSequenceEquality(compositeReceiver->pollData(), {});
+
+        // Feeding backup receiver allows retrieval, should assume 3 is lost definitively
+        backupReceiver->registerPackets(makePacketVector(1, 4, FlyableType::PAYLOAD));
+        assertMultiSequenceEquality(compositeReceiver->pollData(),
+                                    {{1, FlyableType::PAYLOAD},
+                                     {2, FlyableType::PAYLOAD},
+                                     {3, FlyableType::PAYLOAD},
+                                     {4, FlyableType::ROCKET},
+                                     {4, FlyableType::PAYLOAD},
+                                     {5, FlyableType::ROCKET},
+                                     {6, FlyableType::ROCKET}});
+
     }
 
     void monoVehicleLagIsLimited() {
@@ -131,6 +203,32 @@ private slots:
             primaryReceiver->registerPackets(makePacketVector(12, flyableType));
             assertSequenceEquality(compositeReceiver->pollData(), {3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
         }
+    }
+
+    void multiVehicleLagIsLimited() {
+        primaryReceiver->registerPackets(makePacketVector(1, FlyableType::ROCKET));
+        assertSequenceEquality(compositeReceiver->pollData(), {1});
+
+        // Packet 2 gets lost
+        primaryReceiver->registerPackets(makePacketVector(3, limitLag / 2 + 1, FlyableType::ROCKET));
+        primaryReceiver->registerPackets(makePacketVector(1, limitLag / 2, FlyableType::PAYLOAD));
+
+        assertSequenceEquality(compositeReceiver->pollData(), {});
+
+        // Adding new packet causes fast-forward
+        primaryReceiver->registerPackets(makePacketVector(7, FlyableType::ROCKET));
+        assertMultiSequenceEquality(compositeReceiver->pollData(),
+                                    {{3, FlyableType::ROCKET},
+                                     {4, FlyableType::ROCKET},
+                                     {5, FlyableType::ROCKET},
+                                     {6, FlyableType::ROCKET},
+                                     {1, FlyableType::PAYLOAD},
+                                     {2, FlyableType::PAYLOAD},
+                                     {3, FlyableType::PAYLOAD},
+                                     {4, FlyableType::PAYLOAD},
+                                     {5, FlyableType::PAYLOAD},
+                                     {7, FlyableType::ROCKET}});
+
     }
 
     void monoVehiclePacketWithLowerSequenceNumberGetsDiscarded() {
@@ -151,6 +249,30 @@ private slots:
             backupReceiver->registerPackets(makePacketVector(17, 20, flyableType));
             assertSequenceEquality(compositeReceiver->pollData(), {11, 12, 13, 14, 15, 16, 17, 18, 19, 20});
         }
+    }
+
+    void multiVehiclePacketWithLowerSequenceNumberGetsDiscarded() {
+
+        primaryReceiver->registerPackets(makePacketVector(1, 4, FlyableType::ROCKET));
+        primaryReceiver->registerPackets(makePacketVector(1, 4, FlyableType::PAYLOAD));
+        primaryReceiver->registerPackets(makePacketVector(1, 4, FlyableType::ROCKET));
+        primaryReceiver->registerPackets(makePacketVector(1, 4, FlyableType::PAYLOAD));
+        backupReceiver->registerPackets(makePacketVector(2, 5, FlyableType::ROCKET));
+        backupReceiver->registerPackets(makePacketVector(2, 5, FlyableType::PAYLOAD));
+        backupReceiver->registerPackets(makePacketVector(2, 5, FlyableType::ROCKET));
+        backupReceiver->registerPackets(makePacketVector(2, 5, FlyableType::PAYLOAD));
+        assertMultiSequenceEquality(compositeReceiver->pollData(),
+                                    {{1, FlyableType::ROCKET},
+                                     {2, FlyableType::ROCKET},
+                                     {3, FlyableType::ROCKET},
+                                     {4, FlyableType::ROCKET},
+                                     {1, FlyableType::PAYLOAD},
+                                     {2, FlyableType::PAYLOAD},
+                                     {3, FlyableType::PAYLOAD},
+                                     {4, FlyableType::PAYLOAD},
+                                     {5, FlyableType::ROCKET},
+                                     {5, FlyableType::PAYLOAD}});
+
     }
 };
 

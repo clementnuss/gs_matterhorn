@@ -46,8 +46,8 @@ CompositeReceiver::pollData() {
 }
 
 inline bool
-isNotFresh(std::list<std::unique_ptr<DataPacket>> *q, uint32_t index) {
-    return !q->empty() && q->front()->sequenceNumber_ < index;
+isNotFresh(std::list<std::unique_ptr<DataPacket>> *q, const uint32_t &index, const FlyableType &fType) {
+    return !q->empty() && q->front()->sequenceNumber_ < index && q->front()->flyableType_ == fType;
 }
 
 void
@@ -90,10 +90,10 @@ CompositeReceiver::mergePacketQueuesStep() {
         queueSelector->pop_front();
 
         // Trim both queues to remove potential duplicate packets
-        if (isNotFresh(&primaryQueue_, seqMap_[fType]))
+        if (isNotFresh(&primaryQueue_, seqMap_[fType], fType))
             primaryQueue_.pop_front();
 
-        if (isNotFresh(&backupQueue_, seqMap_[fType]))
+        if (isNotFresh(&backupQueue_, seqMap_[fType], fType))
             backupQueue_.pop_front();
 
     }
