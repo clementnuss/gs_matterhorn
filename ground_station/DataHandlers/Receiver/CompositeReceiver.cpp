@@ -39,6 +39,10 @@ CompositeReceiver::pollData() {
     return consumeAndMove(&mergeQueue_);
 }
 
+inline bool
+CompositeReceiver::isNotFresh(std::list<std::unique_ptr<DataPacket>> *q) {
+    return !q->empty() && q->front()->sequenceNumber_ < sequenceIndex_;
+}
 
 void
 CompositeReceiver::mergePacketQueuesStep() {
@@ -64,19 +68,24 @@ CompositeReceiver::mergePacketQueuesStep() {
         }
 
         // Update sequence index
-        sequenceIndex_ = (*elementSelector)->sequenceNumber_ + 1;
+        uint32_t seqNum = (*elementSelector)->sequenceNumber_;
 
-        // Add element to merge queue
-        mergeQueue_.push_back(std::move(*elementSelector));
+        // Only considers packets more recent that the last considered
+        if (seqNum >= sequenceIndex_) {
+            sequenceIndex_ = seqNum + 1;
+
+            // Add element to merge queue
+            mergeQueue_.push_back(std::move(*elementSelector));
+        }
 
         // Remove from selected queue
         queueSelector->pop_front();
 
         // Trim both queues to remove potential duplicate packets
-        if (!primaryQueue_.empty() && primaryQueue_.front()->sequenceNumber_ < sequenceIndex_)
+        if (isNotFresh(&primaryQueue_))
             primaryQueue_.pop_front();
 
-        if (!backupQueue_.empty() && backupQueue_.front()->sequenceNumber_ < sequenceIndex_)
+        if (isNotFresh(&backupQueue_))
             backupQueue_.pop_front();
 
     }
@@ -100,7 +109,8 @@ CompositeReceiver::mergePacketQueuesStep() {
         // Is the element the next element we are seeking ?
         if (elementSeqNum < sequenceIndex_) {
 
-            std::cerr << "The element sequence number was less than the index ! This should never be the case " << std::endl;
+            //std::cerr << "The element sequence number was less than the index, this means a packet arrived out of order ! " << std::endl;
+            queueSelector->pop_front();
 
         } else if (elementSeqNum == sequenceIndex_) {
 

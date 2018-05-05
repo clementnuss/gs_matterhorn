@@ -25,8 +25,9 @@ public:
 
 private:
     void mergePacketQueuesStep();
-
     void addToMergeQueueAndPop(std::unique_ptr<DataPacket> *, std::list<std::unique_ptr<DataPacket>> *);
+
+    bool isNotFresh(std::list<std::unique_ptr<DataPacket>> *);
 
 private:
     std::unique_ptr<IReceiver> primaryReceiver_;

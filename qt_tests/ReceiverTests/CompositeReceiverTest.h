@@ -79,7 +79,7 @@ private slots:
 
     void alternatingMergeStepIsCorrect() {
         std::vector<uint32_t> v;
-        for (uint32_t i = 0; i < 1000; i += 2) {
+        for (uint32_t i = 1; i < 1000; i += 2) {
             primaryReceiver->registerPackets(makePacketVector(i));
             backupReceiver->registerPackets(makePacketVector(i + 1));
             v.push_back(i);
@@ -123,7 +123,21 @@ private slots:
     }
 
     void packetWithLowerSequenceNumberGetsDiscarded() {
-        //TODO: implement
+        // Test when only one receiver has data
+        primaryReceiver->registerPackets(makePacketVector(1, 5));
+        primaryReceiver->registerPackets(makePacketVector(2, 5));
+        primaryReceiver->registerPackets(makePacketVector(1, 4));
+        primaryReceiver->registerPackets(makePacketVector(5, 10));
+        primaryReceiver->registerPackets(makePacketVector(6, 8));
+        assertSequenceEquality(compositeReceiver->pollData(), {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+
+        // Test when both receiver have data
+        primaryReceiver->registerPackets(makePacketVector(11, 13));
+        primaryReceiver->registerPackets(makePacketVector(16, 19));
+        backupReceiver->registerPackets(makePacketVector(13, 15));
+        backupReceiver->registerPackets(makePacketVector(13, 18));
+        backupReceiver->registerPackets(makePacketVector(17, 20));
+        assertSequenceEquality(compositeReceiver->pollData(), {11, 12, 13, 14, 15, 16, 17, 18, 19, 20});
     }
 };
 
