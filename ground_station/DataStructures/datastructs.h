@@ -24,7 +24,8 @@ struct DataPacket {
 
     explicit DataPacket(uint32_t timestamp, uint32_t sequenceNumber, FlyableType flyableType) :
             timestamp_{timestamp},
-            sequenceNumber_{sequenceNumber} {}
+            sequenceNumber_{sequenceNumber},
+            flyableType_{flyableType} {}
 
     uint32_t timestamp_;
     uint32_t sequenceNumber_;

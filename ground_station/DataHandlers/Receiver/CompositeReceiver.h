@@ -11,7 +11,7 @@ class CompositeReceiver : public IReceiver {
     friend class CompositeReceiverTests;
 
 public:
-    CompositeReceiver(std::unique_ptr<IReceiver>, std::unique_ptr<IReceiver>, const unsigned int);
+    CompositeReceiver(std::unique_ptr<IReceiver>, std::unique_ptr<IReceiver>, unsigned int);
 
     ~CompositeReceiver() override;
 
@@ -27,17 +27,15 @@ private:
     void mergePacketQueuesStep();
     void addToMergeQueueAndPop(std::unique_ptr<DataPacket> *, std::list<std::unique_ptr<DataPacket>> *);
 
-    bool isNotFresh(std::list<std::unique_ptr<DataPacket>> *);
-
 private:
     std::unique_ptr<IReceiver> primaryReceiver_;
     std::unique_ptr<IReceiver> backupReceiver_;
     std::list<std::unique_ptr<DataPacket>> primaryQueue_;
     std::list<std::unique_ptr<DataPacket>> backupQueue_;
     std::list<std::unique_ptr<DataPacket>> mergeQueue_;
+    std::map<FlyableType, uint32_t> seqMap_;
 
     const unsigned int limitLag_;
-    unsigned int sequenceIndex_;
 };
 
 

@@ -10,9 +10,15 @@ CompositeReceiver::CompositeReceiver(std::unique_ptr<IReceiver> primaryReceiver,
         backupQueue_{},
         mergeQueue_{},
         limitLag_{limitLag},
-        sequenceIndex_{1} {
+        seqMap_{} {
 
+    for (size_t i = 0; i < FlyableType::Count; i++) {
 
+        seqMap_.emplace(
+                std::make_pair(static_cast<FlyableType>(i), 1)
+        );
+
+    }
 }
 
 template<class T>
@@ -40,8 +46,8 @@ CompositeReceiver::pollData() {
 }
 
 inline bool
-CompositeReceiver::isNotFresh(std::list<std::unique_ptr<DataPacket>> *q) {
-    return !q->empty() && q->front()->sequenceNumber_ < sequenceIndex_;
+isNotFresh(std::list<std::unique_ptr<DataPacket>> *q, uint32_t index) {
+    return !q->empty() && q->front()->sequenceNumber_ < index;
 }
 
 void
@@ -67,12 +73,14 @@ CompositeReceiver::mergePacketQueuesStep() {
             queueSelector = &backupQueue_;
         }
 
+
         // Update sequence index
+        FlyableType fType = (*elementSelector)->flyableType_;
         uint32_t seqNum = (*elementSelector)->sequenceNumber_;
 
         // Only considers packets more recent that the last considered
-        if (seqNum >= sequenceIndex_) {
-            sequenceIndex_ = seqNum + 1;
+        if (seqNum >= seqMap_[fType]) {
+            seqMap_[fType] = seqNum + 1;
 
             // Add element to merge queue
             mergeQueue_.push_back(std::move(*elementSelector));
@@ -82,40 +90,41 @@ CompositeReceiver::mergePacketQueuesStep() {
         queueSelector->pop_front();
 
         // Trim both queues to remove potential duplicate packets
-        if (isNotFresh(&primaryQueue_))
+        if (isNotFresh(&primaryQueue_, seqMap_[fType]))
             primaryQueue_.pop_front();
 
-        if (isNotFresh(&backupQueue_))
+        if (isNotFresh(&backupQueue_, seqMap_[fType]))
             backupQueue_.pop_front();
 
     }
 
 
     // Check if at least one of the queues can be used
-    std::unique_ptr<DataPacket> *e{nullptr};
+    elementSelector = nullptr;
     uint32_t elementSeqNum{0};
 
     while (!primaryQueue_.empty() || !backupQueue_.empty()) {
         if (!primaryQueue_.empty()) {
-            e = &primaryQueue_.front();
+            elementSelector = &primaryQueue_.front();
             queueSelector = &primaryQueue_;
         } else if (!backupQueue_.empty()) {
-            e = &backupQueue_.front();
+            elementSelector = &backupQueue_.front();
             queueSelector = &backupQueue_;
         }
 
-        elementSeqNum = (*e)->sequenceNumber_;
+        FlyableType fType = (*elementSelector)->flyableType_;
+        elementSeqNum = (*elementSelector)->sequenceNumber_;
 
         // Is the element the next element we are seeking ?
-        if (elementSeqNum < sequenceIndex_) {
+        if (elementSeqNum < seqMap_[fType]) {
 
             //std::cerr << "The element sequence number was less than the index, this means a packet arrived out of order ! " << std::endl;
             queueSelector->pop_front();
 
-        } else if (elementSeqNum == sequenceIndex_) {
+        } else if (elementSeqNum == seqMap_[fType]) {
 
-            sequenceIndex_++;
-            addToMergeQueueAndPop(e, queueSelector);
+            seqMap_[fType]++;
+            addToMergeQueueAndPop(elementSelector, queueSelector);
 
         } else {
 
@@ -124,8 +133,8 @@ CompositeReceiver::mergePacketQueuesStep() {
                 return;
             } else {
                 //Otherwise we consider that packet to be lost and move forward
-                sequenceIndex_ = (*e)->sequenceNumber_ + 1;
-                addToMergeQueueAndPop(e, queueSelector);
+                seqMap_[fType] = (*elementSelector)->sequenceNumber_ + 1;
+                addToMergeQueueAndPop(elementSelector, queueSelector);
             }
         }
     };

@@ -3,7 +3,7 @@
 #define GS_MATTERHORN_FLYABLE_H
 
 enum FlyableType {
-    ROCKET, PAYLOAD
+    ROCKET, PAYLOAD, Count // Count should be last, used to keep track of # of elements
 };
 
 #endif //GS_MATTERHORN_FLYABLE_H
