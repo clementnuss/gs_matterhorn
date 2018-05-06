@@ -9,9 +9,10 @@
 #include <3D/CameraController.h>
 #include <3D/Billboards/Tracker.h>
 #include <3D/Objects/Ruler.h>
-#include <DataStructures/datastructs.h>
+#include <DataStructures/Datastructs.h>
 #include <3D/Objects/SplashDownPredictor.h>
 #include <3D/Objects/TouchdownCrosshair.h>
+#include "DataStructures/Datastructs.h"
 
 class RootEntity : public Qt3DCore::QEntity {
 Q_OBJECT

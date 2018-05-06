@@ -5,13 +5,13 @@
 #include <ConfigParser/ConfigParser.h>
 #include "MainWorker.h"
 
-using namespace std;
 
 /**
  *
  * @param telemetryHandler
  */
 Worker::Worker(GSMainwindow *gsMainwindow) :
+        packetDispatcher_{new PacketDispatcher_Nested()},
         loggingEnabled_{false},
         sensorsLogger900_{LogConstants::WORKER_TELEMETRY_ROCKET_LOG_PATH},
         eventsLogger900_{LogConstants::WORKER_EVENTS_ROCKET_LOG_PATH},
@@ -83,6 +83,7 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
 
 Worker::~Worker() {
     std::cout << "Destroying worker instance" << std::endl;
+    delete packetDispatcher_;
 }
 
 /**
@@ -159,6 +160,13 @@ Worker::processDataFlows() {
     while (it != data900.end()) {
 
         std::cout << (*it++)->timestamp_ << std::endl;
+    }
+
+    if (!data900.empty()) {
+        std::unique_ptr<DataPacket> &lastValue = *--data900.end();
+
+        DataPacket *tmp = lastValue.release();
+        tmp->dispatchTo(packetDispatcher_);
     }
     /*
     vector<SensorsPacket> sensorsData900 = telemetryHandler900MHz_->pollSensorsData();
@@ -257,21 +265,21 @@ Worker::fusionData() {
  * @param sp The SensorPacket to be displayed.
  */
 void
-Worker::displaySensorData(SensorsPacket &sp, FlyableType t) {
+Worker::displaySensorData(SensorsPacket &sp) {
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
 
-    switch (t) {
+    switch (sp.flyableType_) {
         case FlyableType::ROCKET:
             if (msecsBetween(lastNumericalValuesUpdateRocket_, now) > UIConstants::NUMERICAL_SENSORS_VALUES_REFRESH_RATE)
                 lastNumericalValuesUpdateRocket_ = now;
-            emit sensorsDataReady(sp, t);
+            emit sensorsDataReady(sp);
             return;
 
         case FlyableType::PAYLOAD:
             if (msecsBetween(lastNumericalValuesUpdatePayload_, now) > UIConstants::NUMERICAL_SENSORS_VALUES_REFRESH_RATE)
                 lastNumericalValuesUpdatePayload_ = now;
-            emit sensorsDataReady(sp, t);
+            emit sensorsDataReady(sp);
             return;
     }
 }
@@ -296,10 +304,10 @@ Worker::displayEventData(EventPacket &ep) {
  * @param gp The GPSPacket to be displayed.
  */
 void
-Worker::displayGPSData(GPSPacket &gp, FlyableType t) {
+Worker::displayGPSData(GPSPacket &gp) {
 
 
-    switch (t) {
+    switch (gp.flyableType_) {
         case FlyableType::ROCKET:
 
             if (gp.timestamp_ != lastGPSTimestamp_) {
@@ -330,7 +338,7 @@ Worker::displayGPSData(GPSPacket &gp, FlyableType t) {
             break;
     }
 
-    emit gpsDataReady(gp, t);
+    emit gpsDataReady(gp);
 }
 
 /**
@@ -531,4 +539,17 @@ Worker::moveTrackingSystem(double currentAltitude) {
     }
 
 #endif
+}
+
+
+void
+Worker::PacketDispatcher::dispatch(SensorsPacket *p) const {
+    std::cout << "Dispatched a sensors packet" << std::endl;
+    //emit Worker::sensorsDataReady(p);
+}
+
+void
+Worker::PacketDispatcher::dispatch(GPSPacket *p) const {
+    std::cout << "Dispatched a gps packet" << std::endl;
+    //emit Worker::gpsDataReady(p);
 }

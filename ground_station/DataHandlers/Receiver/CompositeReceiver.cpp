@@ -1,5 +1,5 @@
 
-#include <DataStructures/datastructs.h>
+#include <DataStructures/Datastructs.h>
 #include <iostream>
 #include "CompositeReceiver.h"
 

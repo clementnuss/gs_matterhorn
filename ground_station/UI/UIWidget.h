@@ -2,13 +2,14 @@
 #define GSWIDGET_H
 
 #include <QtWidgets/QWidget>
-#include <DataStructures/datastructs.h>
+#include <DataStructures/Datastructs.h>
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
 #include <Qt3DCore/QEntity>
 #include <3D/Line/Line.h>
 #include <3D/Scene/RootEntity.h>
 #include <ui_gswidget.h>
+#include <DataHandlers/IDataHandler.h>
 #include "MainWorker.h"
 #include "ProgramConstants.h"
 #include "Flyable.h"
@@ -41,11 +42,11 @@ public:
 public slots:
 
     /* TELEMETRY-RELATED SLOTS */
-    void receiveSensorData(SensorsPacket, FlyableType);
+    void receiveSensorData(const SensorsPacket *const);
 
-    void receiveEventData(EventPacket);
+    void receiveEventData(const EventPacket *const);
 
-    void receiveGPSData(GPSPacket, FlyableType);
+    void receiveGPSData(const GPSPacket *const);
 
     void receiveGraphData(QVector<QCPGraphData> &, GraphFeature);
 
@@ -155,7 +156,7 @@ private:
     QCustomPlot *plot2_;
     std::vector<QCustomPlot *> plotVector_;
     QCPMarginGroup plotMargin_;
-    chrono::system_clock::time_point lastGraphUpdate_;
+    std::chrono::system_clock::time_point lastGraphUpdate_;
 
     // 3D Module
     Line *currentTrace_;

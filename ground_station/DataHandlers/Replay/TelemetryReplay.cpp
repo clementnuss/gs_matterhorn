@@ -9,7 +9,7 @@ using namespace boost::filesystem;
  * Constructor for the TelemetryReplay class
  * @param path location of the file/directory to read.
  */
-TelemetryReplay::TelemetryReplay(const string &path) :
+TelemetryReplay::TelemetryReplay(const std::string &path) :
         path_{path}, sensorsReadings_{}, lastPlaybackTime_{}, endReadingsIter_{}, frontReadingsIter_{},
         playbackSpeed_{1},
         playbackReversed_{}, lastTimeStamp_{0} {
@@ -23,7 +23,7 @@ TelemetryReplay::startup() {
         if (is_directory(path_.parent_path())) {
             path_ = path_.parent_path();
         }
-        vector<path> directoryEntries;
+        std::vector<path> directoryEntries;
         copy(directory_iterator(path_), directory_iterator(), std::back_inserter(directoryEntries));
         sort(directoryEntries.begin(), directoryEntries.end());
 
@@ -45,20 +45,20 @@ TelemetryReplay::startup() {
     if (gpsReadings_.empty()) {
         GPSPacket g{};
         gpsReadings_.push_back(g);
-        cout << "No GPS reading for this replay" << endl;
+        std::cout << "No GPS reading for this replay" << endl;
     }
 
     resetPlayback();
 }
 
-vector<EventPacket>
+std::vector<EventPacket>
 TelemetryReplay::pollEventsData() {
-    return vector<EventPacket>();
+    return std::vector<EventPacket>();
 }
 
 std::vector<GPSPacket>
 TelemetryReplay::pollGPSData() {
-    vector<GPSPacket> vec{};
+    std::vector<GPSPacket> vec{};
 
     if (!playbackReversed_) {
         while ((*gpsEndReadingsIter_).timestamp_ < lastTimeStamp_) {
@@ -72,9 +72,9 @@ TelemetryReplay::pollGPSData() {
     return vec;
 }
 
-vector<SensorsPacket>
+std::vector<SensorsPacket>
 TelemetryReplay::pollSensorsData() {
-    vector<SensorsPacket> vec{};
+    std::vector<SensorsPacket> vec{};
     auto localLastPlaybackTime = std::chrono::system_clock::now();
     double adjustedTime = usecsBetween(lastPlaybackTime_, localLastPlaybackTime);
     adjustedTime *= playbackSpeed_;
@@ -140,10 +140,10 @@ TelemetryReplay::pollSensorsData() {
 
 void
 TelemetryReplay::parseFile(boost::filesystem::path p) {
-    boost::filesystem::ifstream ifs{p, ios::in};
-    cout << "Parsing telemetry file " << p.string() << endl;
+    boost::filesystem::ifstream ifs{p, std::ios::in};
+    std::cout << "Parsing telemetry file " << p.string() << endl;
 
-    string reading;
+    std::string reading;
     while (getline(ifs, reading)) {
         std::vector<std::string> values;
         boost::split(values, reading, boost::is_any_of("\t "),
@@ -175,7 +175,7 @@ TelemetryReplay::parseFile(boost::filesystem::path p) {
                 sensorsReadings_.push_back(std::move(r));
 
             } catch (std::logic_error &e) {
-                cout << "\tunable to decode this reading:\n\t" << reading;
+                std::cout << "\tunable to decode this reading:\n\t" << reading;
             }
         } else if (values.size() == 7) {
             try {
@@ -192,11 +192,11 @@ TelemetryReplay::parseFile(boost::filesystem::path p) {
                 gpsReadings_.push_back(std::move(g));
 
             } catch (std::logic_error &e) {
-                cout << "\tunable to decode this reading:\n\t" << reading;
+                std::cout << "\tunable to decode this reading:\n\t" << reading;
             }
         } else {
-            cout << "\tInvalid reading, only " << values.size() << " values on the line:" << endl;
-            cout << "\t" << reading << endl;
+            std::cout << "\tInvalid reading, only " << values.size() << " values on the line:" << endl;
+            std::cout << "\t" << reading << endl;
             continue;
         }
     }

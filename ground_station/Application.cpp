@@ -54,6 +54,11 @@ Application::connectSlotsAndSignals() {
                      &RootEntity::updatePayloadPosition);
 #endif
 
+    QObject::connect(&workerThread_,
+                     &QThread::started,
+                     worker_,
+                     &Worker::run);
+/*
     QObject::connect(worker_,
                      &Worker::sensorsDataReady,
                      &gsMainWindow_,
@@ -84,10 +89,7 @@ Application::connectSlotsAndSignals() {
                      &gsMainWindow_,
                      &GSMainwindow::receiveGraphData);
 
-    QObject::connect(&workerThread_,
-                     &QThread::started,
-                     worker_,
-                     &Worker::run);
+
 
     QObject::connect(&gsMainWindow_,
                      &GSMainwindow::toggleLogging,
@@ -133,6 +135,7 @@ Application::connectSlotsAndSignals() {
                      &GSMainwindow::sendCommand,
                      worker_,
                      &Worker::transmitCommand);
+                     */
 }
 
 

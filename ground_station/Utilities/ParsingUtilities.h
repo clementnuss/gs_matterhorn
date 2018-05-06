@@ -12,7 +12,7 @@
  */
 template<typename T>
 static T
-parse8(vector<uint8_t>::const_iterator &it) {
+parse8(std::vector<uint8_t>::const_iterator &it) {
     return static_cast<T>(*(it++));
 }
 
@@ -27,7 +27,7 @@ parse8(vector<uint8_t>::const_iterator &it) {
  */
 template<typename T>
 static T
-parse16(vector<uint8_t>::const_iterator &it) {
+parse16(std::vector<uint8_t>::const_iterator &it) {
     return static_cast<T>(*(it++) << 8) | *(it++);
 }
 
@@ -42,7 +42,7 @@ parse16(vector<uint8_t>::const_iterator &it) {
  */
 template<typename T>
 static T
-parse32(vector<uint8_t>::const_iterator &it) {
+parse32(std::vector<uint8_t>::const_iterator &it) {
     return static_cast<T>(*(it++) << 24) | (*(it++) << 16) | (*(it++) << 8) | *(it++);
 }
 

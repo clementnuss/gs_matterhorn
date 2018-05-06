@@ -6,20 +6,21 @@
 #include <chrono>
 #include "DataHandlers/IReceiver.h"
 #include "ITelemetryReplayHandler.h"
+#include "DataStructures/Datastructs.h"
 
 class TelemetryReplay : public IReceiver, public ITelemetryReplayHandler {
 
 public:
 
-    explicit TelemetryReplay(const string &);
+    explicit TelemetryReplay(const std::string &);
 
     void startup() override;
 
-    vector<EventPacket> pollEventsData();
+    std::vector<EventPacket> pollEventsData();
 
-    vector<SensorsPacket> pollSensorsData();
+    std::vector<SensorsPacket> pollSensorsData();
 
-    vector<GPSPacket> pollGPSData();
+    std::vector<GPSPacket> pollGPSData();
 
     void updatePlaybackSpeed(double) override;
 
@@ -38,13 +39,13 @@ public:
 
 private:
     boost::filesystem::path path_;
-    vector<GPSPacket> gpsReadings_;
-    vector<GPSPacket>::const_iterator gpsEndReadingsIter_;
+    std::vector<GPSPacket> gpsReadings_;
+    std::vector<GPSPacket>::const_iterator gpsEndReadingsIter_;
 
-    vector<SensorsPacket> sensorsReadings_;
-    vector<SensorsPacket>::const_iterator endReadingsIter_;
-    vector<SensorsPacket>::const_iterator frontReadingsIter_;
-    chrono::system_clock::time_point lastPlaybackTime_;
+    std::vector<SensorsPacket> sensorsReadings_;
+    std::vector<SensorsPacket>::const_iterator endReadingsIter_;
+    std::vector<SensorsPacket>::const_iterator frontReadingsIter_;
+    std::chrono::system_clock::time_point lastPlaybackTime_;
     uint32_t lastTimeStamp_;
     double playbackSpeed_;
     bool playbackReversed_;

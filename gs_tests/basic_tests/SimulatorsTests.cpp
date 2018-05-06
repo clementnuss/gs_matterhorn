@@ -1,6 +1,7 @@
 #include <DataHandlers/IReceiver.h>
 #include <DataHandlers/Simulator/TelemetrySimulator.h>
 #include "gtest/gtest.h"
+#include "Datastructs.h"
 
 TEST(SimulatorsTests, simulatedTelemetryIsCorrect) {
 

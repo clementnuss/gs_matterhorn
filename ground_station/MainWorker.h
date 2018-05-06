@@ -2,7 +2,7 @@
 #define MAINWORKER_H
 
 #include <QtWidgets/QWidget>
-#include <DataStructures/datastructs.h>
+#include <DataStructures/Datastructs.h>
 #include <DataHandlers/IReceiver.h>
 #include <qcustomplot.h>
 #include <chrono>
@@ -16,12 +16,21 @@
 
 class GSMainwindow;
 
-using namespace std;
+class PacketDispatcher_Nested;
 
 class Worker : public QObject {
 Q_OBJECT
 
 public:
+
+    class PacketDispatcher {
+    public:
+        virtual void dispatch(SensorsPacket *) const;
+
+        virtual void dispatch(GPSPacket *) const;
+    };
+
+
     explicit Worker(GSMainwindow *);
 
     ~Worker() override;
@@ -55,11 +64,11 @@ signals:
 
     void loggingStatusReady(bool);
 
-    void sensorsDataReady(SensorsPacket, FlyableType);
+    void sensorsDataReady(SensorsPacket);
 
     void eventDataReady(EventPacket);
 
-    void gpsDataReady(GPSPacket, FlyableType);
+    void gpsDataReady(GPSPacket);
 
     void flightPositionReady(Position);
 
@@ -84,11 +93,13 @@ private:
 
     void fusionData();
 
-    void displaySensorData(SensorsPacket &, FlyableType t);
+    void displaySensorData(SensorsPacket &);
 
     void displayEventData(EventPacket &);
 
-    void displayGPSData(GPSPacket &, FlyableType t);
+    void displayGPSData(GPSPacket &);
+
+    const PacketDispatcher_Nested *packetDispatcher_;
 
     bool trackingEnabled_{false};
     bool loggingEnabled_;
@@ -101,10 +112,9 @@ private:
     serial::Serial serialPort_{};
 #endif
 
-
-    unique_ptr<IReceiver> telemetryHandler900MHz_;
-    unique_ptr<IReceiver> telemetryHandler433MHz_;
-    unique_ptr<IReceiver> newHandler_;
+    std::unique_ptr<IReceiver> telemetryHandler900MHz_;
+    std::unique_ptr<IReceiver> telemetryHandler433MHz_;
+    std::unique_ptr<IReceiver> newHandler_;
     FileLogger sensorsLogger900_;
     FileLogger eventsLogger900_;
     FileLogger gpsLogger900_;
@@ -116,16 +126,22 @@ private:
     uint32_t lastPayloadGPSTimestamp_;
     Position lastComputedPosition_;
     Position lastComputedPayloadPosition_;
-    chrono::system_clock::time_point lastNumericalValuesUpdateRocket_;
-    chrono::system_clock::time_point lastNumericalValuesUpdatePayload_;
-    chrono::system_clock::time_point lastIteration_;
-    chrono::system_clock::time_point timeOfLastLinkCheck_;
-    chrono::system_clock::time_point timeOfLastReceivedTelemetry_;
+    std::chrono::system_clock::time_point lastNumericalValuesUpdateRocket_;
+    std::chrono::system_clock::time_point lastNumericalValuesUpdatePayload_;
+    std::chrono::system_clock::time_point lastIteration_;
+    std::chrono::system_clock::time_point timeOfLastLinkCheck_;
+    std::chrono::system_clock::time_point timeOfLastReceivedTelemetry_;
     long long int millisBetweenLastTwoPackets_;
 
-    QVector<QCPGraphData> extractGraphData(vector<SensorsPacket> &, QCPGraphData (*)(SensorsPacket));
+    QVector<QCPGraphData> extractGraphData(std::vector<SensorsPacket> &, QCPGraphData (*)(SensorsPacket));
 
     void moveTrackingSystem(double currentAltitude);
+};
+
+// Needed because of the C++ limitation in forward-declaring nested classes
+class PacketDispatcher_Nested : public Worker::PacketDispatcher {
+    // Inherits base constructor (PacketDispatcher)
+    using Worker::PacketDispatcher::PacketDispatcher;
 };
 
 #endif // WORKER_H

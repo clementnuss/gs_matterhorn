@@ -180,7 +180,7 @@ PayloadDataConverter::toControlPacket(const FlyableType &flyableType, const uint
  * @return A GPS struct
  */
 GPSPacket *
-PayloadDataConverter::toGPSPacket(const FlyableType &flyableType, const uint32_t &sequenceNumber, const vector<uint8_t> &payloadBuffer) {
+PayloadDataConverter::toGPSPacket(const FlyableType &flyableType, const uint32_t &sequenceNumber, const std::vector<uint8_t> &payloadBuffer) {
     assert(payloadBuffer.size() == PayloadType::GPS.length());
 
     auto it = payloadBuffer.begin();

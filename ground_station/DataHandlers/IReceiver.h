@@ -1,10 +1,8 @@
 #ifndef GS_MATTERHORN_IRECEIVER_H
 #define GS_MATTERHORN_IRECEIVER_H
 
+#include <DataStructures/Datastructs.h>
 
-#include <memory>
-#include "IDataHandler.h"
-#include "DataStructures/datastructs.h"
 
 /**
  * The IReceiver is the base class for telemetry-producing instances

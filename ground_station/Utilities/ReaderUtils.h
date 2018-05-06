@@ -6,7 +6,7 @@
 #include <QtGui/QVector3D>
 #include <boost/algorithm/string.hpp>
 #include <iostream>
-#include <DataStructures/datastructs.h>
+#include <DataStructures/Datastructs.h>
 #include <DataStructures/WindData.h>
 
 static QVector3D

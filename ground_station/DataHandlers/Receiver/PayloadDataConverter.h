@@ -3,7 +3,7 @@
 #define GS_MATTERHORN_FACTORIES_H
 
 
-#include <DataStructures/datastructs.h>
+#include <DataStructures/Datastructs.h>
 #include <vector>
 #include "PayloadType.h"
 
@@ -26,7 +26,7 @@ public:
 
     static ControlPacket *toControlPacket(const FlyableType &, const uint32_t &, const std::vector<uint8_t> &);
 
-    static GPSPacket *toGPSPacket(const FlyableType &, const uint32_t &, const vector<uint8_t> &);
+    static GPSPacket *toGPSPacket(const FlyableType &, const uint32_t &, const std::vector<uint8_t> &);
 };
 
 

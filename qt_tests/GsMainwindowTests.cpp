@@ -1,8 +1,9 @@
 
 #include <QtWidgets/QLineEdit>
-#include <DataStructures/datastructs.h>
+#include <DataStructures/Datastructs.h>
 #include <Application.h>
 #include "GsMainwindowTests.h"
+#include "Datastructs.h"
 
 void GsMainwindowTests::telemetryReadingCorrectlyDisplayed() {
     qRegisterMetaType<SensorsPacket>("TelemetryReading");

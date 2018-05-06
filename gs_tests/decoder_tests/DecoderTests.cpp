@@ -3,6 +3,7 @@
 #include <DataHandlers/Receiver/Decoder.h>
 #include <Utilities/RandUtils.h>
 #include <Utilities/SensorUtils.h>
+#include "Datastructs.h"
 
 static constexpr double epsilon = 1e-3;
 

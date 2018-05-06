@@ -3,7 +3,7 @@
 #define GS_MATTERHORN_PAYLOADTYPE_H
 
 
-#include <DataStructures/datastructs.h>
+#include <DataStructures/Datastructs.h>
 #include <memory>
 #include <vector>
 #include <map>

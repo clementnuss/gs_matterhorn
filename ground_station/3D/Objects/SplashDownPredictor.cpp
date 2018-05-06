@@ -1,6 +1,6 @@
 
 #include <ProgramConstants.h>
-#include <DataStructures/datastructs.h>
+#include <DataStructures/Datastructs.h>
 #include <Readers/FileReader.h>
 #include <Utilities/ReaderUtils.h>
 #include <3D/Ground/Ground.h>
