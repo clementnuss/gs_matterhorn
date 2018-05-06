@@ -25,13 +25,19 @@ public:
 
     class PacketDispatcher {
     public:
+        PacketDispatcher(const Worker *const container);
+
         virtual void dispatch(SensorsPacket *) const;
 
         virtual void dispatch(GPSPacket *) const;
+
+    private:
+        const Worker *const container_;
     };
 
 
-    explicit Worker(GSMainwindow *);
+    explicit Worker(GSMainwindow
+                    *);
 
     ~Worker() override;
 
@@ -64,11 +70,11 @@ signals:
 
     void loggingStatusReady(bool);
 
-    void sensorsDataReady(SensorsPacket);
+    void sensorsDataReady(SensorsPacket *) const;
 
-    void eventDataReady(EventPacket);
+    void eventDataReady(EventPacket *) const;
 
-    void gpsDataReady(GPSPacket);
+    void gpsDataReady(GPSPacket *) const;
 
     void flightPositionReady(Position);
 
@@ -93,11 +99,11 @@ private:
 
     void fusionData();
 
-    void displaySensorData(SensorsPacket &);
+    void displaySensorData(SensorsPacket *);
 
-    void displayEventData(EventPacket &);
+    void displayEventData(EventPacket *);
 
-    void displayGPSData(GPSPacket &);
+    void displayGPSData(GPSPacket *);
 
     const PacketDispatcher_Nested *packetDispatcher_;
 

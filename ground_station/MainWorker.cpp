@@ -11,7 +11,7 @@
  * @param telemetryHandler
  */
 Worker::Worker(GSMainwindow *gsMainwindow) :
-        packetDispatcher_{new PacketDispatcher_Nested()},
+        packetDispatcher_{new PacketDispatcher_Nested(this)},
         loggingEnabled_{false},
         sensorsLogger900_{LogConstants::WORKER_TELEMETRY_ROCKET_LOG_PATH},
         eventsLogger900_{LogConstants::WORKER_EVENTS_ROCKET_LOG_PATH},
@@ -157,14 +157,12 @@ Worker::processDataFlows() {
     std::list<std::unique_ptr<DataPacket>> data900 = telemetryHandler900MHz_->pollData();
 
     list<std::unique_ptr<DataPacket>>::const_iterator it = data900.begin();
-    while (it != data900.end()) {
 
-        std::cout << (*it++)->timestamp_ << std::endl;
-    }
 
     if (!data900.empty()) {
         std::unique_ptr<DataPacket> &lastValue = *--data900.end();
 
+        // Objects will be destroyed after usage in GUI thread
         DataPacket *tmp = lastValue.release();
         tmp->dispatchTo(packetDispatcher_);
     }
@@ -265,11 +263,11 @@ Worker::fusionData() {
  * @param sp The SensorPacket to be displayed.
  */
 void
-Worker::displaySensorData(SensorsPacket &sp) {
+Worker::displaySensorData(SensorsPacket *sp) {
 
     chrono::system_clock::time_point now = chrono::system_clock::now();
 
-    switch (sp.flyableType_) {
+    switch (sp->flyableType_) {
         case FlyableType::ROCKET:
             if (msecsBetween(lastNumericalValuesUpdateRocket_, now) > UIConstants::NUMERICAL_SENSORS_VALUES_REFRESH_RATE)
                 lastNumericalValuesUpdateRocket_ = now;
@@ -290,10 +288,10 @@ Worker::displaySensorData(SensorsPacket &sp) {
  * @param ep The EventPacket to be displayed.
  */
 void
-Worker::displayEventData(EventPacket &ep) {
+Worker::displayEventData(EventPacket *ep) {
 
-    if (ep.timestamp_ != lastEventTimestamp_) {
-        lastEventTimestamp_ = ep.timestamp_;
+    if (ep->timestamp_ != lastEventTimestamp_) {
+        lastEventTimestamp_ = ep->timestamp_;
         emit eventDataReady(ep);
     }
 }
@@ -304,16 +302,16 @@ Worker::displayEventData(EventPacket &ep) {
  * @param gp The GPSPacket to be displayed.
  */
 void
-Worker::displayGPSData(GPSPacket &gp) {
+Worker::displayGPSData(GPSPacket *gp) {
 
 
-    switch (gp.flyableType_) {
+    switch (gp->flyableType_) {
         case FlyableType::ROCKET:
 
-            if (gp.timestamp_ != lastGPSTimestamp_) {
-                lastGPSTimestamp_ = gp.timestamp_;
-                if (gp.isValid()) {
-                    lastComputedPosition_.latLon = {gp.latitude_, gp.longitude_};
+            if (gp->timestamp_ != lastGPSTimestamp_) {
+                lastGPSTimestamp_ = gp->timestamp_;
+                if (gp->isValid()) {
+                    lastComputedPosition_.latLon = {gp->latitude_, gp->longitude_};
 #if USE_3D_MODULE
                     emit flightPositionReady(lastComputedPosition_);
 #endif
@@ -325,10 +323,10 @@ Worker::displayGPSData(GPSPacket &gp) {
 
         case FlyableType::PAYLOAD:
 
-            if (gp.timestamp_ != lastPayloadGPSTimestamp_) {
-                lastPayloadGPSTimestamp_ = gp.timestamp_;
-                if (gp.isValid()) {
-                    lastComputedPayloadPosition_.latLon = {gp.latitude_, gp.longitude_};
+            if (gp->timestamp_ != lastPayloadGPSTimestamp_) {
+                lastPayloadGPSTimestamp_ = gp->timestamp_;
+                if (gp->isValid()) {
+                    lastComputedPayloadPosition_.latLon = {gp->latitude_, gp->longitude_};
 #if USE_3D_MODULE
                     emit payloadPositionReady(lastComputedPayloadPosition_);
 #endif
@@ -541,15 +539,17 @@ Worker::moveTrackingSystem(double currentAltitude) {
 #endif
 }
 
+Worker::PacketDispatcher::PacketDispatcher(const Worker *const container) : container_{container} {
+
+}
 
 void
 Worker::PacketDispatcher::dispatch(SensorsPacket *p) const {
-    std::cout << "Dispatched a sensors packet" << std::endl;
-    //emit Worker::sensorsDataReady(p);
+    emit container_->sensorsDataReady(p);
 }
 
 void
 Worker::PacketDispatcher::dispatch(GPSPacket *p) const {
     std::cout << "Dispatched a gps packet" << std::endl;
-    //emit Worker::gpsDataReady(p);
+    emit container_->gpsDataReady(p);
 }

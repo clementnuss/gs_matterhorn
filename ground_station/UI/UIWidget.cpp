@@ -90,7 +90,7 @@ GSMainwindow::updateTime() {
 /**
  * Qt SLOT for receiving telemetry data and displaying it
  *
- * @param sp The Telemetry object from which to extract data to update the display
+ * @param sp The Telemetry object from which to extract data to update the display.
  */
 void
 GSMainwindow::receiveSensorData(const SensorsPacket *const sp) {
