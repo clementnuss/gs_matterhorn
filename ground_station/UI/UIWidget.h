@@ -42,11 +42,11 @@ public:
 public slots:
 
     /* TELEMETRY-RELATED SLOTS */
-    void receiveSensorData(const SensorsPacket *const);
+    void receiveSensorData(const SensorsPacket);
 
-    void receiveEventData(const EventPacket *const);
+    void receiveEventData(const EventPacket);
 
-    void receiveGPSData(const GPSPacket *const);
+    void receiveGPSData(const GPSPacket);
 
     void receiveGraphData(QVector<QCPGraphData> &, GraphFeature);
 

@@ -16,28 +16,12 @@
 
 class GSMainwindow;
 
-class PacketDispatcher_Nested;
-
 class Worker : public QObject {
 Q_OBJECT
 
 public:
 
-    class PacketDispatcher {
-    public:
-        PacketDispatcher(const Worker *const container);
-
-        virtual void dispatch(SensorsPacket *) const;
-
-        virtual void dispatch(GPSPacket *) const;
-
-    private:
-        const Worker *const container_;
-    };
-
-
-    explicit Worker(GSMainwindow
-                    *);
+    explicit Worker(GSMainwindow *);
 
     ~Worker() override;
 
@@ -70,11 +54,17 @@ signals:
 
     void loggingStatusReady(bool);
 
-    void sensorsDataReady(SensorsPacket *) const;
+    void sensorsDataReady(SensorsPacket) const;
 
-    void eventDataReady(EventPacket *) const;
+    void eventDataReady(EventPacket) const;
 
-    void gpsDataReady(GPSPacket *) const;
+    void gpsDataReady(GPSPacket) const;
+
+    void dataPacketReady(SensorsPacket) const;
+
+    void dataPacketReady(EventPacket) const;
+
+    void dataPacketReady(GPSPacket) const;
 
     void flightPositionReady(Position);
 
@@ -93,19 +83,13 @@ private:
 
     void checkLinkStatuses();
 
-    void processDataFlows();
-
-    void logData();
-
-    void fusionData();
-
     void displaySensorData(SensorsPacket *);
 
     void displayEventData(EventPacket *);
 
     void displayGPSData(GPSPacket *);
 
-    const PacketDispatcher_Nested *packetDispatcher_;
+    PacketDispatcher *packetDispatcher_;
 
     bool trackingEnabled_{false};
     bool loggingEnabled_;
@@ -139,15 +123,9 @@ private:
     std::chrono::system_clock::time_point timeOfLastReceivedTelemetry_;
     long long int millisBetweenLastTwoPackets_;
 
-    QVector<QCPGraphData> extractGraphData(std::vector<SensorsPacket> &, QCPGraphData (*)(SensorsPacket));
 
     void moveTrackingSystem(double currentAltitude);
 };
 
-// Needed because of the C++ limitation in forward-declaring nested classes
-class PacketDispatcher_Nested : public Worker::PacketDispatcher {
-    // Inherits base constructor (PacketDispatcher)
-    using Worker::PacketDispatcher::PacketDispatcher;
-};
 
 #endif // WORKER_H

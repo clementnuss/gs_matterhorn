@@ -4,6 +4,7 @@
 #include <DataHandlers/Replay/TelemetryReplay.h>
 #include <ConfigParser/ConfigParser.h>
 #include "MainWorker.h"
+#include "PacketDispatcher.h"
 
 
 /**
@@ -11,7 +12,7 @@
  * @param telemetryHandler
  */
 Worker::Worker(GSMainwindow *gsMainwindow) :
-        packetDispatcher_{new PacketDispatcher_Nested(this)},
+        packetDispatcher_{new PacketDispatcher(this)},
         loggingEnabled_{false},
         sensorsLogger900_{LogConstants::WORKER_TELEMETRY_ROCKET_LOG_PATH},
         eventsLogger900_{LogConstants::WORKER_EVENTS_ROCKET_LOG_PATH},
@@ -141,203 +142,19 @@ Worker::mainRoutine() {
     }
     lastIteration_ = chrono::system_clock::now();
     checkLinkStatuses();
-    processDataFlows();
+
+    std::list<std::unique_ptr<DataPacket>> dataPackets = telemetryHandler900MHz_->pollData();
+    for (std::unique_ptr<DataPacket> &dp : dataPackets) {
+        dp.release()->dispatchWith(packetDispatcher_);
+    }
+
+    packetDispatcher_->processDataFlows();
 
     QCoreApplication::sendPostedEvents(this);
     QCoreApplication::processEvents();
 }
 
-/**
- *
- */
-void
-Worker::processDataFlows() {
-    //Sensor data needs to be polled first!
 
-    std::list<std::unique_ptr<DataPacket>> data900 = telemetryHandler900MHz_->pollData();
-
-    list<std::unique_ptr<DataPacket>>::const_iterator it = data900.begin();
-
-
-    if (!data900.empty()) {
-        std::unique_ptr<DataPacket> &lastValue = *--data900.end();
-
-        // Objects will be destroyed after usage in GUI thread
-        DataPacket *tmp = lastValue.release();
-        tmp->dispatchTo(packetDispatcher_);
-    }
-    /*
-    vector<SensorsPacket> sensorsData900 = telemetryHandler900MHz_->pollSensorsData();
-    vector<EventPacket> eventsData900 = telemetryHandler900MHz_->pollEventsData();
-    vector<GPSPacket> gpsData900 = telemetryHandler900MHz_->pollGPSData();
-
-    vector<SensorsPacket> sensorsData433 = telemetryHandler433MHz_->pollSensorsData();
-    vector<EventPacket> eventsData433 = telemetryHandler433MHz_->pollEventsData();
-    vector<GPSPacket> gpsData433 = telemetryHandler433MHz_->pollGPSData();
-
-    chrono::system_clock::time_point now = chrono::system_clock::now();
-
-    //TODO: implement more elegantly to reduce amount of code
-    if (loggingEnabled_) {
-        sensorsLogger900_.registerData(
-                std::vector<std::reference_wrapper<ILoggable>>(begin(sensorsData900), end(sensorsData900)));
-        eventsLogger900_.registerData(
-                std::vector<std::reference_wrapper<ILoggable>>(begin(eventsData900), end(eventsData900)));
-        gpsLogger900_.registerData(
-                std::vector<std::reference_wrapper<ILoggable>>(begin(gpsData900), end(gpsData900)));
-
-        sensorsLogger433_.registerData(
-                std::vector<std::reference_wrapper<ILoggable>>(begin(sensorsData433), end(sensorsData433)));
-        eventsLogger433_.registerData(
-                std::vector<std::reference_wrapper<ILoggable>>(begin(eventsData433), end(eventsData433)));
-        gpsLogger433_.registerData(
-                std::vector<std::reference_wrapper<ILoggable>>(begin(gpsData433), end(gpsData433)));
-    }
-
-    if (!sensorsData433.empty()) {
-        SensorsPacket &lastSensorValue = *--sensorsData433.end();
-        displaySensorData(lastSensorValue, FlyableType::PAYLOAD);
-    }
-
-    if (!sensorsData900.empty()) {
-        SensorsPacket &lastSensorValue = *--sensorsData900.end();
-        displaySensorData(lastSensorValue, FlyableType::ROCKET);
-
-#ifdef USE_TRACKING
-        moveTrackingSystem(lastSensorValue.altitude_);
-#endif
-        lastComputedPosition_.altitude = lastSensorValue.altitude_;
-
-        millisBetweenLastTwoPackets_ = msecsBetween(timeOfLastReceivedTelemetry_, now);
-        timeOfLastReceivedTelemetry_ = now;
-
-        QVector<QCPGraphData> altitudeDataBuffer = extractGraphData(sensorsData900, altitudeFromReading);
-        QVector<QCPGraphData> accelDataBuffer = extractGraphData(sensorsData900, accelerationFromReading);
-        emit graphDataReady(altitudeDataBuffer, GraphFeature::FEATURE1);
-        emit graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
-    } else {
-        if (replayMode_) {
-            auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler900MHz_.get());
-            if (!telemReplay->endOfPlayback()) {
-                QVector<QCPGraphData> empty;
-                emit graphDataReady(empty, GraphFeature::Count);
-            }
-        } else {
-            QVector<QCPGraphData> empty;
-            emit graphDataReady(empty, GraphFeature::Count);
-        }
-    }
-
-    for (auto &d : eventsData900) {
-        displayEventData(d);
-    }
-
-    for (auto &d : gpsData900) {
-        displayGPSData(d, FlyableType::ROCKET);
-    }
-
-    for (auto &d : gpsData433) {
-        displayGPSData(d, FlyableType::PAYLOAD);
-    }
-     */
-}
-
-
-void
-Worker::logData() {
-
-
-}
-
-
-void
-Worker::fusionData() {
-
-}
-
-
-/**
- * Emits to the UI the latest sensors data. If the interval between two calls to this function is lower
- * than the program constant regulating the UI sensors refresh rate then the function has no effect.
- *
- * @param sp The SensorPacket to be displayed.
- */
-void
-Worker::displaySensorData(SensorsPacket *sp) {
-
-    chrono::system_clock::time_point now = chrono::system_clock::now();
-
-    switch (sp->flyableType_) {
-        case FlyableType::ROCKET:
-            if (msecsBetween(lastNumericalValuesUpdateRocket_, now) > UIConstants::NUMERICAL_SENSORS_VALUES_REFRESH_RATE)
-                lastNumericalValuesUpdateRocket_ = now;
-            emit sensorsDataReady(sp);
-            return;
-
-        case FlyableType::PAYLOAD:
-            if (msecsBetween(lastNumericalValuesUpdatePayload_, now) > UIConstants::NUMERICAL_SENSORS_VALUES_REFRESH_RATE)
-                lastNumericalValuesUpdatePayload_ = now;
-            emit sensorsDataReady(sp);
-            return;
-    }
-}
-
-/**
- * Emits to the UI the latest event data. If the event has already been registered then the function has no effect.
- *
- * @param ep The EventPacket to be displayed.
- */
-void
-Worker::displayEventData(EventPacket *ep) {
-
-    if (ep->timestamp_ != lastEventTimestamp_) {
-        lastEventTimestamp_ = ep->timestamp_;
-        emit eventDataReady(ep);
-    }
-}
-
-/**
- * Emits to the UI the latest sensors data. If the gps data has already been registered then the function has no effect.
- *
- * @param gp The GPSPacket to be displayed.
- */
-void
-Worker::displayGPSData(GPSPacket *gp) {
-
-
-    switch (gp->flyableType_) {
-        case FlyableType::ROCKET:
-
-            if (gp->timestamp_ != lastGPSTimestamp_) {
-                lastGPSTimestamp_ = gp->timestamp_;
-                if (gp->isValid()) {
-                    lastComputedPosition_.latLon = {gp->latitude_, gp->longitude_};
-#if USE_3D_MODULE
-                    emit flightPositionReady(lastComputedPosition_);
-#endif
-                }
-
-            }
-
-            break;
-
-        case FlyableType::PAYLOAD:
-
-            if (gp->timestamp_ != lastPayloadGPSTimestamp_) {
-                lastPayloadGPSTimestamp_ = gp->timestamp_;
-                if (gp->isValid()) {
-                    lastComputedPayloadPosition_.latLon = {gp->latitude_, gp->longitude_};
-#if USE_3D_MODULE
-                    emit payloadPositionReady(lastComputedPayloadPosition_);
-#endif
-                }
-            }
-
-            break;
-    }
-
-    emit gpsDataReady(gp);
-}
 
 /**
  * Emits a boolean to the UI indicating the current status of the logger.
@@ -408,27 +225,7 @@ Worker::checkLinkStatuses() {
     }
 }
 
-/**
- *
- *
- * @param data A reference to a vector of telemetry structs.
- * @param extractionFct A helper function to convert the strucs to plottable objects (QCPGraphData).
- * @return A QVector of QCPGraphData.
- */
-QVector<QCPGraphData>
-Worker::extractGraphData(vector<SensorsPacket> &data, QCPGraphData (*extractionFct)(SensorsPacket)) {
-    QVector<QCPGraphData> v;
-    long long int lastTimestampSeen = 0;
 
-    for (SensorsPacket reading : data) {
-        if (abs(lastTimestampSeen - reading.timestamp_) > UIConstants::GRAPH_DATA_INTERVAL_USECS) {
-            v.append(extractionFct(reading));
-            lastTimestampSeen = reading.timestamp_;
-        }
-    }
-
-    return v;
-}
 
 void
 Worker::updatePlaybackSpeed(double newSpeed) {
@@ -539,17 +336,87 @@ Worker::moveTrackingSystem(double currentAltitude) {
 #endif
 }
 
-Worker::PacketDispatcher::PacketDispatcher(const Worker *const container) : container_{container} {
-
-}
-
+/**
+ * Emits to the UI the latest sensors data. If the interval between two calls to this function is lower
+ * than the program constant regulating the UI sensors refresh rate then the function has no effect.
+ *
+ * @param sp The SensorPacket to be displayed.
+ */
 void
-Worker::PacketDispatcher::dispatch(SensorsPacket *p) const {
-    emit container_->sensorsDataReady(p);
+Worker::displaySensorData(SensorsPacket *sp) {
+
+    /*chrono::system_clock::time_point now = chrono::system_clock::now();
+
+    switch (sp->flyableType_) {
+        case FlyableType::ROCKET:
+            if (msecsBetween(lastNumericalValuesUpdateRocket_, now) > UIConstants::NUMERICAL_SENSORS_VALUES_REFRESH_RATE)
+                lastNumericalValuesUpdateRocket_ = now;
+            emit sensorsDataReady(sp);
+            return;
+
+        case FlyableType::PAYLOAD:
+            if (msecsBetween(lastNumericalValuesUpdatePayload_, now) > UIConstants::NUMERICAL_SENSORS_VALUES_REFRESH_RATE)
+                lastNumericalValuesUpdatePayload_ = now;
+            emit sensorsDataReady(sp);
+            return;
+    }*/
 }
 
+/**
+ * Emits to the UI the latest event data. If the event has already been registered then the function has no effect.
+ *
+ * @param ep The EventPacket to be displayed.
+ */
 void
-Worker::PacketDispatcher::dispatch(GPSPacket *p) const {
-    std::cout << "Dispatched a gps packet" << std::endl;
-    emit container_->gpsDataReady(p);
+Worker::displayEventData(EventPacket *ep) {
+
+    /* if (ep->timestamp_ != lastEventTimestamp_) {
+         lastEventTimestamp_ = ep->timestamp_;
+         emit eventDataReady(ep);
+     }*/
 }
+
+/**
+ * Emits to the UI the latest sensors data. If the gps data has already been registered then the function has no effect.
+ *
+ * @param gp The GPSPacket to be displayed.
+ */
+void
+Worker::displayGPSData(GPSPacket *gp) {
+
+
+    /* switch (gp->flyableType_) {
+         case FlyableType::ROCKET:
+
+             if (gp->timestamp_ != lastGPSTimestamp_) {
+                 lastGPSTimestamp_ = gp->timestamp_;
+                 if (gp->isValid()) {
+                     lastComputedPosition_.latLon = {gp->latitude_, gp->longitude_};
+ #if USE_3D_MODULE
+                     emit flightPositionReady(lastComputedPosition_);
+ #endif
+                 }
+
+             }
+
+             break;
+
+         case FlyableType::PAYLOAD:
+
+             if (gp->timestamp_ != lastPayloadGPSTimestamp_) {
+                 lastPayloadGPSTimestamp_ = gp->timestamp_;
+                 if (gp->isValid()) {
+                     lastComputedPayloadPosition_.latLon = {gp->latitude_, gp->longitude_};
+ #if USE_3D_MODULE
+                     emit payloadPositionReady(lastComputedPayloadPosition_);
+ #endif
+                 }
+             }
+
+             break;
+     }
+
+     emit gpsDataReady(gp);
+     */
+}
+

@@ -13,7 +13,7 @@
 using namespace PrintConstants;
 
 // Needed because of the C++ limitation in forward-declaring nested classes
-class PacketDispatcher_Nested;
+class PacketDispatcher;
 
 struct IDeserializable {
     virtual ~IDeserializable() = default;
@@ -26,7 +26,7 @@ struct DataPacket {
 
     explicit DataPacket(uint32_t timestamp, uint32_t sequenceNumber, FlyableType flyableType);
 
-    virtual void dispatchTo(const PacketDispatcher_Nested *);
+    virtual void dispatchWith(PacketDispatcher *);
 
     uint32_t timestamp_;
     uint32_t sequenceNumber_;
@@ -43,7 +43,7 @@ struct EventPacket : DataPacket, ILoggable, IDeserializable {
     int code_{};
     std::string description_;
 
-    void dispatchTo(const PacketDispatcher_Nested *) override;
+    void dispatchWith(PacketDispatcher *) override;
 
     std::string toString() const override;
 
@@ -59,7 +59,7 @@ struct ControlPacket : DataPacket, IDeserializable {
     uint8_t partCode_;
     uint16_t statusValue_;
 
-    void dispatchTo(const PacketDispatcher_Nested *) override;
+    void dispatchWith(PacketDispatcher *) override;
 
     bool isValid() const override;
 };
@@ -78,7 +78,7 @@ struct GPSPacket : DataPacket, ILoggable, IDeserializable {
 
     std::string toString() const override;
 
-    void dispatchTo(const PacketDispatcher_Nested *) override;
+    void dispatchWith(PacketDispatcher *) override;
 
     bool isValid() const override;
 };
@@ -120,7 +120,7 @@ struct SensorsPacket : DataPacket, ILoggable, IDeserializable {
     double temperature_;
     double air_speed_;
 
-    void dispatchTo(const PacketDispatcher_Nested *) override;
+    void dispatchWith(PacketDispatcher *) override;
 
     std::string toString() const override;
 

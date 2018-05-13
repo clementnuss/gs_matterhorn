@@ -1,6 +1,8 @@
 #ifndef GS_MATTERHORN_GRAPHUTILS_H
 #define GS_MATTERHORN_GRAPHUTILS_H
 
+#include <qcustomplot.h>
+#include <DataStructures/Datastructs.h>
 
 QCPGraphData
 accelerationFromReading(SensorsPacket reading) {

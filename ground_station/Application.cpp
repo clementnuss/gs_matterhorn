@@ -27,10 +27,10 @@ Application::exec() {
 
 void
 Application::connectSlotsAndSignals() {
-    qRegisterMetaType<SensorsPacket *>("SensorsPacket*");
-    qRegisterMetaType<GPSPacket *>("GPSPacket*");
-    qRegisterMetaType<EventPacket *>("EventPacket*");
-    qRegisterMetaType<ControlPacket *>("ControlPacket*");
+    qRegisterMetaType<SensorsPacket>("SensorsPacket");
+    qRegisterMetaType<GPSPacket>("GPSPacket");
+    qRegisterMetaType<EventPacket>("EventPacket");
+    qRegisterMetaType<ControlPacket>("ControlPacket");
     qRegisterMetaType<QVector<QCPGraphData>>("QVector<QCPGraphData>&");
     qRegisterMetaType<vector<EventPacket>>("vector<RocketEvent>&");
     qRegisterMetaType<GraphFeature>("GraphFeature");
@@ -88,7 +88,6 @@ Application::connectSlotsAndSignals() {
                      &Worker::graphDataReady,
                      &gsMainWindow_,
                      &GSMainwindow::receiveGraphData);
-
 
 
     QObject::connect(&gsMainWindow_,

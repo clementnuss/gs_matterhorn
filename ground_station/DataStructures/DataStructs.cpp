@@ -1,5 +1,5 @@
 #include "DataStructures/Datastructs.h"
-#include "MainWorker.h"
+#include "PacketDispatcher.h"
 
 /**
  * DataPacket
@@ -11,7 +11,7 @@ DataPacket::DataPacket(uint32_t timestamp, uint32_t sequenceNumber, FlyableType 
         flyableType_{flyableType} {}
 
 void
-DataPacket::dispatchTo(const PacketDispatcher_Nested *d) {
+DataPacket::dispatchWith(PacketDispatcher *d) {
 
 }
 
@@ -25,7 +25,7 @@ EventPacket::EventPacket(uint32_t timestamp, uint32_t sequenceNumber, FlyableTyp
 
 
 void
-EventPacket::dispatchTo(const PacketDispatcher_Nested *d) {
+EventPacket::dispatchWith(PacketDispatcher *d) {
 
 }
 
@@ -57,7 +57,7 @@ ControlPacket::ControlPacket(uint32_t timestamp, uint32_t sequenceNumber, Flyabl
 
 
 void
-ControlPacket::dispatchTo(const PacketDispatcher_Nested *d) {
+ControlPacket::dispatchWith(PacketDispatcher *d) {
 
 }
 
@@ -96,7 +96,7 @@ GPSPacket::toString() const {
 }
 
 void
-GPSPacket::dispatchTo(const PacketDispatcher_Nested *d) {
+GPSPacket::dispatchWith(PacketDispatcher *d) {
     d->dispatch(this);
 }
 
@@ -184,7 +184,7 @@ SensorsPacket::SensorsPacket(uint32_t timestamp, uint32_t sequenceNumber, Flyabl
 
 
 void
-SensorsPacket::dispatchTo(const PacketDispatcher_Nested *d) {
+SensorsPacket::dispatchWith(PacketDispatcher *d) {
     d->dispatch(this);
 }
 
