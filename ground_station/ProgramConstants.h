@@ -39,15 +39,11 @@ namespace PrintConstants {
 }
 
 namespace LogConstants {
-    static const std::string WORKER_TELEMETRY_ROCKET_LOG_PATH{"FlightData/rocket_sensors_data"};
-    static const std::string WORKER_EVENTS_ROCKET_LOG_PATH{"FlightData/rocket_events_data"};
-    static const std::string WORKER_GPS_ROCKET_LOG_PATH{"FlightData/rocket_gps_data"};
-    static const std::string WORKER_TELEMETRY_PAYLOAD_LOG_PATH{"FlightData/payload_sensors_data"};
-    static const std::string WORKER_EVENTS_PAYLOAD_LOG_PATH{"FlightData/payload_events_data"};
-    static const std::string WORKER_GPS_PAYLOAD_LOG_PATH{"FlightData/payload_gps_data"};
     static const std::string BYTES_LOG_PATH{"RawData/bytes_received"};
     static const std::string DECODER_LOG_PATH{"ErrorData/radio_receiver_events"};
-
+    static const std::string WORKER_TELEMETRY_LOG_PATH("FlightData/sensors_data");
+    static const std::string WORKER_GPS_LOG_PATH("FlightData/gps_data");
+    static const std::string WORKER_EVENT_LOG_PATH("FlightData/event_data");
 }
 
 namespace TimeConstants {

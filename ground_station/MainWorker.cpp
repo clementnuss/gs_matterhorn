@@ -14,23 +14,12 @@
 Worker::Worker(GSMainwindow *gsMainwindow) :
         packetDispatcher_{new PacketDispatcher(this)},
         loggingEnabled_{false},
-        sensorsLogger900_{LogConstants::WORKER_TELEMETRY_ROCKET_LOG_PATH},
-        eventsLogger900_{LogConstants::WORKER_EVENTS_ROCKET_LOG_PATH},
-        gpsLogger900_{LogConstants::WORKER_GPS_ROCKET_LOG_PATH},
-        sensorsLogger433_{LogConstants::WORKER_TELEMETRY_PAYLOAD_LOG_PATH},
-        eventsLogger433_{LogConstants::WORKER_EVENTS_PAYLOAD_LOG_PATH},
-        gpsLogger433_{LogConstants::WORKER_GPS_PAYLOAD_LOG_PATH},
-        lastNumericalValuesUpdateRocket_{chrono::system_clock::now()},
-        lastNumericalValuesUpdatePayload_{chrono::system_clock::now()},
         lastIteration_{chrono::system_clock::now()},
-        lastGPSTimestamp_{0},
-        lastPayloadGPSTimestamp_{0},
         timeOfLastLinkCheck_{chrono::system_clock::now()},
         timeOfLastReceivedTelemetry_{chrono::system_clock::now()},
         millisBetweenLastTwoPackets_{0},
         replayMode_{false},
         updateHandler_{false},
-        lastComputedPosition_{},
         telemetryHandler900MHz_{},
         telemetryHandler433MHz_{} {
 
@@ -107,7 +96,6 @@ Worker::run() {
             loggingEnabled_ = false;
             replayMode_ = false;
             millisBetweenLastTwoPackets_ = 0;
-            lastNumericalValuesUpdateRocket_ = chrono::system_clock::now();
             lastIteration_ = chrono::system_clock::now();
             timeOfLastLinkCheck_ = chrono::system_clock::now();
             timeOfLastReceivedTelemetry_ = chrono::system_clock::now();
@@ -161,20 +149,7 @@ Worker::mainRoutine() {
  */
 void
 Worker::updateLoggingStatus() {
-
-    if (loggingEnabled_) {
-        gpsLogger900_.close();
-        sensorsLogger900_.close();
-        eventsLogger900_.close();
-
-        gpsLogger433_.close();
-        sensorsLogger433_.close();
-        eventsLogger433_.close();
-    }
-
-    loggingEnabled_ = !loggingEnabled_;
-    emit loggingStatusReady(loggingEnabled_);
-    cout << "Logging is now " << (loggingEnabled_ ? "enabled" : "disabled") << endl;
+    emit loggingStatusReady(packetDispatcher_->toggleLogging());
 }
 
 

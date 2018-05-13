@@ -9,7 +9,11 @@ PacketDispatcher::PacketDispatcher(Worker *const containerWorker) :
         sensorsPacketQueues_{},
         gpsPacketQueues_{},
         eventPacketQueues_{},
-        lastUpdates_{} {
+        lastUpdates_{},
+        sensorsLogger_{LogConstants::WORKER_TELEMETRY_LOG_PATH},
+        gpsLogger_{LogConstants::WORKER_GPS_LOG_PATH},
+        eventLogger_{LogConstants::WORKER_EVENT_LOG_PATH},
+        logEnabled_{false} {
 
     // Build queues for each flyable type
     for (size_t i = 0; i < FlyableType::Count; i++) {
@@ -28,23 +32,54 @@ PacketDispatcher::PacketDispatcher(Worker *const containerWorker) :
 void
 PacketDispatcher::dispatch(SensorsPacket *p) {
     sensorsPacketQueues_[p->flyableType_].emplace_back(p);
+
+    if (logEnabled_)
+        sensorsLogger_.registerString(p->toString());
 }
 
 void
 PacketDispatcher::dispatch(GPSPacket *p) {
     gpsPacketQueues_[p->flyableType_].emplace_back(p);
+
+    if (logEnabled_)
+        gpsLogger_.registerString(p->toString());
 }
 
 void
 PacketDispatcher::dispatch(EventPacket *p) {
     eventPacketQueues_[p->flyableType_].emplace_back(p);
+
+    if (logEnabled_)
+        eventLogger_.registerString(p->toString());
+}
+
+
+/**
+ *
+ *
+ * @param data A reference to a vector of telemetry structs.
+ * @param extractionFct A helper function to convert the strucs to plottable objects (QCPGraphData).
+ * @return A QVector of QCPGraphData.
+ */
+QVector<QCPGraphData>
+extractGraphData(std::vector<SensorsPacket *> &data, QCPGraphData (*extractionFct)(SensorsPacket)) {
+    QVector<QCPGraphData> v;
+    long long int lastTimestampSeen = 0;
+
+    for (SensorsPacket *reading : data) {
+        if (abs(lastTimestampSeen - reading->timestamp_) > UIConstants::GRAPH_DATA_INTERVAL_USECS) {
+            v.append(extractionFct(*reading));
+            lastTimestampSeen = reading->timestamp_;
+        }
+    }
+
+    return v;
 }
 
 void
 PacketDispatcher::processDataFlows() {
     //Sensor data needs to be polled first!
 
-    //TODO: log
     //TODO: Build and transmit graph data
 
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
@@ -59,29 +94,6 @@ PacketDispatcher::processDataFlows() {
 
     displayFreshValues();
     releaseMemory();
-}
-
-
-/**
- *
- *
- * @param data A reference to a vector of telemetry structs.
- * @param extractionFct A helper function to convert the strucs to plottable objects (QCPGraphData).
- * @return A QVector of QCPGraphData.
- */
-QVector<QCPGraphData>
-PacketDispatcher::extractGraphData(std::vector<SensorsPacket *> &data, QCPGraphData (*extractionFct)(SensorsPacket)) {
-    QVector<QCPGraphData> v;
-    long long int lastTimestampSeen = 0;
-
-    for (SensorsPacket *reading : data) {
-        if (abs(lastTimestampSeen - reading->timestamp_) > UIConstants::GRAPH_DATA_INTERVAL_USECS) {
-            v.append(extractionFct(*reading));
-            lastTimestampSeen = reading->timestamp_;
-        }
-    }
-
-    return v;
 }
 
 
@@ -139,4 +151,10 @@ PacketDispatcher::emitIfNonEmpty(const std::vector<T *> &v) {
         T t = (*v.back());
         emit worker_->dataPacketReady(t);
     }
+}
+
+bool
+PacketDispatcher::toggleLogging() {
+    logEnabled_ = !logEnabled_;
+    return logEnabled_;
 }

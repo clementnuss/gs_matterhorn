@@ -27,15 +27,7 @@ void
 FileLogger::registerData(const vector<reference_wrapper<ILoggable>> &data) {
 
     for (const auto loggable : data) {
-
-        if (bufferIndex_ >= bufferSize) {
-            //cout << "\n Writing log file.." << endl;
-            writeFile();
-            bufferIndex_ = 0;
-        }
-
-        buffer[bufferIndex_] = loggable.get().toString();
-        bufferIndex_++;
+        registerString(loggable.get().toString());
     }
 }
 
