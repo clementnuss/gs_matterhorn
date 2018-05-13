@@ -54,12 +54,6 @@ signals:
 
     void loggingStatusReady(bool);
 
-    void sensorsDataReady(SensorsPacket) const;
-
-    void eventDataReady(EventPacket) const;
-
-    void gpsDataReady(GPSPacket) const;
-
     void dataPacketReady(SensorsPacket) const;
 
     void dataPacketReady(EventPacket) const;
@@ -82,12 +76,6 @@ signals:
 private:
 
     void checkLinkStatuses();
-
-    void displaySensorData(SensorsPacket *);
-
-    void displayEventData(EventPacket *);
-
-    void displayGPSData(GPSPacket *);
 
     PacketDispatcher *packetDispatcher_;
 

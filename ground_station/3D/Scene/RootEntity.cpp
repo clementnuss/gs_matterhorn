@@ -24,8 +24,6 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         Qt3DCore::QEntity(parent),
         cameraController_{new CameraController(this)},
         camera_{view->camera()},
-        rocketTracker_{nullptr},
-        payloadTracker_{nullptr},
         rocketTrace_{nullptr},
         payloadTrace_{nullptr},
         simTrace_{nullptr},
@@ -42,14 +40,29 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         lastComputedPosition_{0, 0, 0},
         previousComputedPosition_{0, 0, 0},
         registeredEvents_{},
-        worldRef_{std::make_shared<const WorldReference>(LatLon {
+        worldRef_{std::make_shared<const WorldReference>(LatLon{
                 ConfSingleton::instance().get("origin.lat", 0.0),
                 ConfSingleton::instance().get("origin.lon", 0.0)
         })},
-        elevationModel_{nullptr} {
+        elevationModel_{nullptr},
+        trackedFlyables_{} {
 
     initRenderSettings(view);
     initCamera(view);
+
+    trackedFlyables_.insert(std::make_pair<FlyableType, Tracker *>(
+            FlyableType::ROCKET,
+            new Tracker(launchSitePos_, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
+                        TextType::BOLD, this, OpenGLConstants::ABOVE_MARKER_OFFSET,
+                        OpenGLConstants::ABOVE_CENTER_LABEL)
+    ));
+
+    trackedFlyables_.insert(std::make_pair<FlyableType, Tracker *>(
+            FlyableType::PAYLOAD,
+            new Tracker(launchSitePos_, camera_, TextureConstants::CARET_DOWN, QStringLiteral("PAYLOAD"),
+                        TextType::LEGEND, this, OpenGLConstants::ABOVE_MARKER_OFFSET,
+                        OpenGLConstants::ABOVE_RIGHT_LABEL)
+    ));
 }
 
 void
@@ -82,16 +95,9 @@ RootEntity::init() {
             2,
             QString::fromStdString(ConfSingleton::instance().get("commonTexturePath", std::string{""})));
 
-    // Initialize tracker objects, they are used to visualize moving objects in the 3D representation
-    rocketTracker_ = new Tracker(launchSitePos_, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
-                                 TextType::BOLD, this, OpenGLConstants::ABOVE_MARKER_OFFSET,
-                                 OpenGLConstants::ABOVE_CENTER_LABEL);
     rocketTrace_ = new Line(this, QColor::fromRgb(255, 255, 255), false);
     rocketTrace_->setData({launchSitePos_, launchSitePos_});
 
-    payloadTracker_ = new Tracker(launchSitePos_, camera_, TextureConstants::CARET_DOWN, QStringLiteral("PAYLOAD"),
-                                  TextType::LEGEND, this, OpenGLConstants::ABOVE_MARKER_OFFSET,
-                                  OpenGLConstants::ABOVE_RIGHT_LABEL);
     payloadTrace_ = new Line(this, QColor::fromRgb(255, 159, 0), false);
     payloadTrace_->setData({launchSitePos_, launchSitePos_});
 
@@ -114,8 +120,8 @@ RootEntity::init() {
 
     // Setup dynamic camera parameters
     cameraController_->setCameraViewCenter(launchSitePos_);
-    cameraController_->registerObservable(rocketTracker_);
-    cameraController_->registerObservable(payloadTracker_);
+    cameraController_->registerObservable(trackedFlyables_[FlyableType::ROCKET]);
+    cameraController_->registerObservable(trackedFlyables_[FlyableType::PAYLOAD]);
     cameraController_->registerObservable(gs);
 
     reportWindData();
@@ -130,8 +136,8 @@ RootEntity::reportWindData() {
         std::stringstream ss;
         std::pair<float, float> speedAndAngle = windData_->speedAndAngleForAltitude(i);
         ss << std::setw(7) << std::setfill(' ') << i << "m"
-                << std::setw(7) << std::setfill(' ') << std::setprecision(2) << std::fixed << speedAndAngle.first << "m/s"
-                << std::setw(8) << std::setfill(' ') << std::setprecision(2) << std::fixed << speedAndAngle.second << "°\n";
+           << std::setw(7) << std::setfill(' ') << std::setprecision(2) << std::fixed << speedAndAngle.first << "m/s"
+           << std::setw(8) << std::setfill(' ') << std::setprecision(2) << std::fixed << speedAndAngle.second << "°\n";
         emit addInfoString(QString::fromStdString(ss.str()));
     }
 
@@ -149,7 +155,7 @@ RootEntity::updateFlightPosition(const Position pos) {
     if (elapsedTime > 0 && previousComputedPosition_.length() > 0) {
         lastComputedSpeed_ = (lastComputedPosition_ - previousComputedPosition_) / elapsedTime;
 
-        rocketTracker_->updatePosition(lastComputedPosition_);
+        trackedFlyables_[FlyableType::ROCKET]->updatePosition(lastComputedPosition_);
         rocketRuler_->updatePosition(lastComputedPosition_);
         rocketTrace_->appendData(lastComputedPosition_);
 
@@ -175,8 +181,28 @@ RootEntity::updatePayloadPosition(const Position pos) {
     QVector2D horizontalWorldPos = worldRef_->translationFromOrigin(pos.latLon);
     QVector3D pos3D = {horizontalWorldPos.x(), static_cast<float>(pos.altitude), horizontalWorldPos.y()};
 
-    payloadTracker_->updatePosition(pos3D);
+    trackedFlyables_[FlyableType::PAYLOAD]->updatePosition(pos3D);
     payloadTrace_->appendData(pos3D);
+}
+
+
+void
+RootEntity::updateTrackerLatLon(FlyableType flyableType, const LatLon &latLon) {
+
+    Tracker *t{trackedFlyables_[flyableType]};
+    QVector2D horPos{worldRef_->translationFromOrigin(latLon)};
+    QVector3D tPos{t->getPosition()};
+
+    t->updatePosition(QVector3D{horPos.x(), tPos.y(), horPos.y()});
+}
+
+void
+RootEntity::updateTrackerAltitude(FlyableType flyableType, const float &alt) {
+
+    Tracker *t{trackedFlyables_[flyableType]};
+    QVector3D tPos{t->getPosition()};
+
+    t->updatePosition(QVector3D{tPos.x(), alt, tPos.z()});
 }
 
 void
@@ -197,7 +223,7 @@ RootEntity::updateRocketTracker(QVector<QVector3D> &positions, const QVector3D &
     addToEach(positions, launchSitePos_ + accumulatedBias);
     QVector3D lastPos = positions.last();
 
-    rocketTracker_->updatePosition(lastPos);
+    trackedFlyables_[FlyableType::ROCKET]->updatePosition(lastPos);
     rocketRuler_->updatePosition(lastPos);
     rocketTrace_->appendData(positions);
 
@@ -226,7 +252,7 @@ RootEntity::registerEvent(const EventPacket &event) {
         return;
     }
 
-    registeredEvents_.emplace_back(std::make_pair(event.timestamp_, new Tracker(rocketTracker_->getPosition(), camera_,
+    registeredEvents_.emplace_back(std::make_pair(event.timestamp_, new Tracker(trackedFlyables_[FlyableType::ROCKET]->getPosition(), camera_,
                                                                                 TextureConstants::DOWNWARD_DIAGONAL,
                                                                                 QString::fromStdString(
                                                                                         RocketEventConstants::EVENT_CODES.at(

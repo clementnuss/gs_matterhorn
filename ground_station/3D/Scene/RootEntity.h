@@ -25,11 +25,13 @@ public:
 
     void registerEvent(const EventPacket &eventPacket);
 
-public slots:
-
     void updateFlightPosition(const Position pos);
 
     void updatePayloadPosition(const Position pos);
+
+    void updateTrackerLatLon(FlyableType, const LatLon &);
+
+    void updateTrackerAltitude(FlyableType, const float &);
 
     void resetTrace();
 
@@ -65,14 +67,13 @@ private:
     CameraController *cameraController_;
     Qt3DRender::QCamera *camera_;
     QVector3D launchSitePos_;
-    Tracker *rocketTracker_;
-    Tracker *payloadTracker_;
     Line *rocketTrace_;
     Line *payloadTrace_;
     Line *simTrace_;
     Ruler *rocketRuler_;
 
     std::vector<std::pair<uint32_t, Tracker *>> registeredEvents_;
+    std::map<FlyableType, Tracker *> trackedFlyables_;
 };
 
 #endif //GS_MATTERHORN_ROOTENTITY_H

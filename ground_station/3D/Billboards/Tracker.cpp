@@ -14,19 +14,17 @@ Tracker::Tracker(const QVector3D &position, const Qt3DRender::QCamera *const cam
           text_{nullptr} {
 
     this->addComponent(transform_);
+    transform_->setScale(UI3DConstants::TRACKER_SIZE);
 
     marker_ = new Marker(iconTextureName, 2, 2, markerOffset_, camera, this);
-    text_ = new Text3D(std::move(text), textType, camera, textOffset_, this);
+    text_ = new Text3D(text, textType, camera, textOffset_, this);
 
     updatePosition(position);
 }
 
 void
-Tracker::updatePosition(QVector3D newPosition) {
-    QMatrix4x4 m{};
-    m.translate(newPosition);
-    m.scale(UI3DConstants::TRACKER_SIZE, UI3DConstants::TRACKER_SIZE, UI3DConstants::TRACKER_SIZE);
-    transform_->setMatrix(m);
+Tracker::updatePosition(const QVector3D &newPosition) {
+    transform_->setTranslation(newPosition);
 }
 
 QVector3D

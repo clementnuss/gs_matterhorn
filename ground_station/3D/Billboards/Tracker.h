@@ -18,7 +18,7 @@ public:
 
 public slots:
 
-    void updatePosition(QVector3D pos);
+    void updatePosition(const QVector3D &pos);
 
     QVector3D getPosition();
 

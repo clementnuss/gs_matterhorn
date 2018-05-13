@@ -81,6 +81,8 @@ struct GPSPacket : DataPacket, ILoggable, IDeserializable {
     void dispatchWith(PacketDispatcher *) override;
 
     bool isValid() const override;
+
+    LatLon latLon() const;
 };
 
 struct Data3D : ILoggable {
