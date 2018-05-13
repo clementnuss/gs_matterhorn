@@ -263,8 +263,6 @@ Worker::transmitCommand(int command) {
     }
 }
 
-//TODO: determine whether a non working handler should be used or not
-
 
 void
 Worker::defineReplayMode(const QString &parameters) {
@@ -336,87 +334,4 @@ Worker::moveTrackingSystem(double currentAltitude) {
 #endif
 }
 
-/**
- * Emits to the UI the latest sensors data. If the interval between two calls to this function is lower
- * than the program constant regulating the UI sensors refresh rate then the function has no effect.
- *
- * @param sp The SensorPacket to be displayed.
- */
-void
-Worker::displaySensorData(SensorsPacket *sp) {
-
-    /*chrono::system_clock::time_point now = chrono::system_clock::now();
-
-    switch (sp->flyableType_) {
-        case FlyableType::ROCKET:
-            if (msecsBetween(lastNumericalValuesUpdateRocket_, now) > UIConstants::NUMERICAL_SENSORS_VALUES_REFRESH_RATE)
-                lastNumericalValuesUpdateRocket_ = now;
-            emit sensorsDataReady(sp);
-            return;
-
-        case FlyableType::PAYLOAD:
-            if (msecsBetween(lastNumericalValuesUpdatePayload_, now) > UIConstants::NUMERICAL_SENSORS_VALUES_REFRESH_RATE)
-                lastNumericalValuesUpdatePayload_ = now;
-            emit sensorsDataReady(sp);
-            return;
-    }*/
-}
-
-/**
- * Emits to the UI the latest event data. If the event has already been registered then the function has no effect.
- *
- * @param ep The EventPacket to be displayed.
- */
-void
-Worker::displayEventData(EventPacket *ep) {
-
-    /* if (ep->timestamp_ != lastEventTimestamp_) {
-         lastEventTimestamp_ = ep->timestamp_;
-         emit eventDataReady(ep);
-     }*/
-}
-
-/**
- * Emits to the UI the latest sensors data. If the gps data has already been registered then the function has no effect.
- *
- * @param gp The GPSPacket to be displayed.
- */
-void
-Worker::displayGPSData(GPSPacket *gp) {
-
-
-    /* switch (gp->flyableType_) {
-         case FlyableType::ROCKET:
-
-             if (gp->timestamp_ != lastGPSTimestamp_) {
-                 lastGPSTimestamp_ = gp->timestamp_;
-                 if (gp->isValid()) {
-                     lastComputedPosition_.latLon = {gp->latitude_, gp->longitude_};
- #if USE_3D_MODULE
-                     emit flightPositionReady(lastComputedPosition_);
- #endif
-                 }
-
-             }
-
-             break;
-
-         case FlyableType::PAYLOAD:
-
-             if (gp->timestamp_ != lastPayloadGPSTimestamp_) {
-                 lastPayloadGPSTimestamp_ = gp->timestamp_;
-                 if (gp->isValid()) {
-                     lastComputedPayloadPosition_.latLon = {gp->latitude_, gp->longitude_};
- #if USE_3D_MODULE
-                     emit payloadPositionReady(lastComputedPayloadPosition_);
- #endif
-                 }
-             }
-
-             break;
-     }
-
-     emit gpsDataReady(gp);
-     */
-}
 

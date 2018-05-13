@@ -5,6 +5,7 @@
 #include "Utilities/ReaderUtils.h"
 #include "ConfigParser/ConfigParser.h"
 
+
 /**
  * GSMainwindow is the main user interface class. It communicate through Qt SLOTS system with the
  * main worker thread of the application in order to constantly display fresh data.
@@ -28,7 +29,9 @@ GSMainwindow::GSMainwindow() :
         groundAltitude_{ConfSingleton::instance().get("launchsite.altitude", 0.0)},
         prevInfoHighlight_{0},
         playbackReversed_{false},
-        traceData_{} {
+        traceData_{},
+        telemetryLabelsMap_{},
+        gpsLabelsMap_{} {
 
     ui->setupUi(this);
 
@@ -39,6 +42,54 @@ GSMainwindow::GSMainwindow() :
     ui->graph_clear_items_button->setIcon(QIcon(":/UI/icons/remove.png"));
     ui->graph_sync_button->setIcon(QIcon(":/UI/icons/sync.png"));
     ui->graph_autoplay_button->setIcon(QIcon(":/UI/icons/play.png"));
+
+    telemetryLabelsMap_.insert(std::make_pair<FlyableType, SensorLabelsStruct>(
+            FlyableType::ROCKET,
+            SensorLabelsStruct{
+                    ui->telemetry_altitude_value,
+                    ui->telemetry_speed_value,
+                    ui->telemetry_acceleration_value,
+                    ui->telemetry_pressure_value,
+                    ui->telemetry_temperature_value,
+                    ui->telemetry_yaw_value,
+                    ui->telemetry_pitch_value,
+                    ui->telemetry_roll_value,
+            })
+    );
+
+    telemetryLabelsMap_.insert(std::make_pair<FlyableType, SensorLabelsStruct>(
+            FlyableType::PAYLOAD,
+            SensorLabelsStruct{
+                    ui->telemetry_altitude_value_payload,
+                    ui->telemetry_speed_value_payload,
+                    ui->telemetry_acceleration_value_payload,
+                    ui->telemetry_pressure_value_payload,
+                    ui->telemetry_temperature_value_payload,
+                    ui->telemetry_yaw_value_payload,
+                    ui->telemetry_pitch_value_payload,
+                    ui->telemetry_roll_value_payload,
+            })
+    );
+
+    gpsLabelsMap_.insert(std::make_pair<FlyableType, GpsLabelsStruct>(
+            FlyableType::ROCKET,
+            GpsLabelsStruct{
+                    ui->gps_sats_value,
+                    ui->gps_hdop_value,
+                    ui->gps_latitude_value,
+                    ui->gps_longitude_value
+            }
+    ));
+
+    gpsLabelsMap_.insert(std::make_pair<FlyableType, GpsLabelsStruct>(
+            FlyableType::PAYLOAD,
+            GpsLabelsStruct{
+                    ui->gps_sats_value,
+                    ui->gps_hdop_value,
+                    ui->gps_latitude_value,
+                    ui->gps_longitude_value
+            }
+    ));
 
 #if USE_3D_MODULE
     setup3DModule();
@@ -93,38 +144,20 @@ GSMainwindow::updateTime() {
  * @param sp The Telemetry object from which to extract data to update the display.
  */
 void
-GSMainwindow::receiveSensorData(const SensorsPacket sp) {
+GSMainwindow::receiveDataPacket(SensorsPacket sp) {
 
-    switch (sp.flyableType_) {
-        case FlyableType::ROCKET:
+    SensorLabelsStruct s = telemetryLabelsMap_[sp.flyableType_];
 
-            // Want to display altitude relative to ground
-            ui->telemetry_altitude_value->setText(QString::number(std::max(0.0, sp.altitude_ - groundAltitude_), 'f', UIConstants::PRECISION));
+    // Want to display altitude relative to ground
+    s.altitude->setText(QString::number(std::max(0.0, sp.altitude_ - groundAltitude_), 'f', UIConstants::PRECISION));
+    s.speed->setText(QString::number(sp.air_speed_, 'f', UIConstants::PRECISION));
+    s.acceleration->setText(QString::number(sp.acceleration_.norm(), 'f', UIConstants::PRECISION));
+    s.pressure->setText(QString::number(sp.pressure_, 'f', UIConstants::PRECISION));
+    s.temperature->setText(QString::number(sp.temperature_, 'f', UIConstants::PRECISION));
+    s.yaw->setText(QString::number(sp.eulerAngles_.x_, 'f', UIConstants::PRECISION));
+    s.pitch->setText(QString::number(sp.eulerAngles_.y_, 'f', UIConstants::PRECISION));
+    s.roll->setText(QString::number(sp.eulerAngles_.z_, 'f', UIConstants::PRECISION));
 
-            ui->telemetry_speed_value->setText(QString::number(sp.air_speed_, 'f', UIConstants::PRECISION));
-            ui->telemetry_acceleration_value->setText(QString::number(sp.acceleration_.norm(), 'f', UIConstants::PRECISION));
-            ui->telemetry_pressure_value->setText(QString::number(sp.pressure_, 'f', UIConstants::PRECISION));
-            ui->telemetry_temperature_value->setText(QString::number(sp.temperature_, 'f', UIConstants::PRECISION));
-            ui->telemetry_yaw_value->setText(QString::number(sp.eulerAngles_.x_, 'f', UIConstants::PRECISION));
-            ui->telemetry_pitch_value->setText(QString::number(sp.eulerAngles_.y_, 'f', UIConstants::PRECISION));
-            ui->telemetry_roll_value->setText(QString::number(sp.eulerAngles_.z_, 'f', UIConstants::PRECISION));
-            break;
-
-        case FlyableType::PAYLOAD:
-
-            // Want to display altitude relative to ground
-            ui->telemetry_altitude_value_payload->setText(QString::number(std::max(0.0, sp.altitude_ - groundAltitude_), 'f', UIConstants::PRECISION));
-
-            ui->telemetry_speed_value_payload->setText(QString::number(sp.air_speed_, 'f', UIConstants::PRECISION));
-            ui->telemetry_acceleration_value_payload->setText(QString::number(sp.acceleration_.norm(), 'f', UIConstants::PRECISION));
-            ui->telemetry_pressure_value_payload->setText(QString::number(sp.pressure_, 'f', UIConstants::PRECISION));
-            ui->telemetry_temperature_value_payload->setText(QString::number(sp.temperature_, 'f', UIConstants::PRECISION));
-            ui->telemetry_yaw_value_payload->setText(QString::number(sp.eulerAngles_.x_, 'f', UIConstants::PRECISION));
-            ui->telemetry_pitch_value_payload->setText(QString::number(sp.eulerAngles_.y_, 'f', UIConstants::PRECISION));
-            ui->telemetry_roll_value_payload->setText(QString::number(sp.eulerAngles_.z_, 'f', UIConstants::PRECISION));
-            break;
-
-    }
 }
 
 
@@ -134,7 +167,7 @@ GSMainwindow::receiveSensorData(const SensorsPacket sp) {
  * @param event
  */
 void
-GSMainwindow::receiveEventData(const EventPacket event) {
+GSMainwindow::receiveDataPacket(const EventPacket event) {
 
     int seconds = event.timestamp_ / TimeConstants::MSECS_IN_SEC;
     int minutes = seconds / TimeConstants::SECS_IN_MINUTE;
@@ -158,31 +191,15 @@ GSMainwindow::receiveEventData(const EventPacket event) {
  * @param gpsData
  */
 void
-GSMainwindow::receiveGPSData(const GPSPacket gpsData) {
+GSMainwindow::receiveDataPacket(const GPSPacket gpsData) {
 
-    switch (gpsData.flyableType_) {
-        case FlyableType::ROCKET:
+    GpsLabelsStruct s = gpsLabelsMap_[gpsData.flyableType_];
 
-            ui->gps_sats_value->setText(QString::number(gpsData.satsCount_));
+    s.sats->setText(QString::number(gpsData.satsCount_));
+    s.hdop->setText(QString::number(gpsData.hdop_, 'f', UIConstants::PRECISION));
+    s.latitude->setText(QString::number(gpsData.latitude_, 'f', UIConstants::PRECISION_GPS));
+    s.longitude->setText(QString::number(gpsData.longitude_, 'f', UIConstants::PRECISION_GPS));
 
-            if (gpsData.isValid()) {
-                ui->gps_hdop_value->setText(QString::number(gpsData.hdop_, 'f', UIConstants::PRECISION));
-                ui->gps_latitude_value->setText(QString::number(gpsData.latitude_, 'f', UIConstants::PRECISION_GPS));
-                ui->gps_longitude_value->setText(QString::number(gpsData.longitude_, 'f', UIConstants::PRECISION_GPS));
-            }
-            break;
-
-        case FlyableType::PAYLOAD:
-
-            ui->gps_sats_value->setText(QString::number(gpsData.satsCount_));
-
-            if (gpsData.isValid()) {
-                ui->gps_hdop_value_payload->setText(QString::number(gpsData.hdop_, 'f', UIConstants::PRECISION));
-                ui->gps_latitude_value_payload->setText(QString::number(gpsData.latitude_, 'f', UIConstants::PRECISION_GPS));
-                ui->gps_longitude_value_payload->setText(QString::number(gpsData.longitude_, 'f', UIConstants::PRECISION_GPS));
-            }
-            break;
-    }
 }
 
 

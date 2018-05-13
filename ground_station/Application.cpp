@@ -60,19 +60,19 @@ Application::connectSlotsAndSignals() {
                      &Worker::run);
 
     QObject::connect(worker_,
-                     &Worker::sensorsDataReady,
+                     QOverload<SensorsPacket>::of(&Worker::dataPacketReady),
                      &gsMainWindow_,
-                     &GSMainwindow::receiveSensorData);
+                     QOverload<SensorsPacket>::of(&GSMainwindow::receiveDataPacket));
 
     QObject::connect(worker_,
-                     &Worker::eventDataReady,
+                     QOverload<EventPacket>::of(&Worker::dataPacketReady),
                      &gsMainWindow_,
-                     &GSMainwindow::receiveEventData);
+                     QOverload<EventPacket>::of(&GSMainwindow::receiveDataPacket));
 
     QObject::connect(worker_,
-                     &Worker::gpsDataReady,
+                     QOverload<GPSPacket>::of(&Worker::dataPacketReady),
                      &gsMainWindow_,
-                     &GSMainwindow::receiveGPSData);
+                     QOverload<GPSPacket>::of(&GSMainwindow::receiveDataPacket));
 
     QObject::connect(worker_,
                      &Worker::loggingStatusReady,

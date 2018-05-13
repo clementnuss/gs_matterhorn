@@ -20,6 +20,15 @@ namespace Ui {
     class GSMainwindow;
 }
 
+
+struct SensorLabelsStruct {
+    QLabel *altitude, *speed, *acceleration, *pressure, *temperature, *yaw, *pitch, *roll;
+};
+
+struct GpsLabelsStruct {
+    QLabel *sats, *hdop, *latitude, *longitude;
+};
+
 class GSMainwindow : public QMainWindow {
 Q_OBJECT
 
@@ -42,11 +51,12 @@ public:
 public slots:
 
     /* TELEMETRY-RELATED SLOTS */
-    void receiveSensorData(const SensorsPacket);
 
-    void receiveEventData(const EventPacket);
+    void receiveDataPacket(SensorsPacket);
 
-    void receiveGPSData(const GPSPacket);
+    void receiveDataPacket(EventPacket);
+
+    void receiveDataPacket(GPSPacket);
 
     void receiveGraphData(QVector<QCPGraphData> &, GraphFeature);
 
@@ -163,6 +173,10 @@ private:
     RootEntity *rootEntity3D_;
     QTime animationTriggerTime_;
     QVector<QVector3D> traceData_;
+
+    // Flyable to label maps
+    std::map<FlyableType, SensorLabelsStruct> telemetryLabelsMap_;
+    std::map<FlyableType, GpsLabelsStruct> gpsLabelsMap_;
 };
 
 #endif // GSWIDGET_H
