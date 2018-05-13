@@ -156,7 +156,6 @@ RadioReceiver::handleReceive(std::size_t bytesTransferred) {
     vector<reference_wrapper<ILoggable>> bytesReadingVector{};
     bytesReadingVector.emplace_back(bytesReading);
     bytesLogger_.registerData(bytesReadingVector);
-
 }
 
 void

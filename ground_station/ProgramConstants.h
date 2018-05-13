@@ -127,6 +127,9 @@ namespace CommunicationsConstants {
      */
     static constexpr CRC::Parameters<crcpp_uint16, 16> CRC_16_GENERATOR_POLY = {0xA2EB, 0xFFFF, 0xFFFF, false, false};
 
+    static constexpr uint8_t FLYABLE_TYPE_MASK = 0xF0;
+    static constexpr uint8_t PAYLOAD_TYPE_MASK = 0x0F;
+
     static constexpr int MSECS_BETWEEN_LINK_CHECKS = 0;
     static constexpr uint32_t TELEMETRY_BAUD_RATE = 115200;
     static constexpr int MSECS_NOMINAL_RATE = 200;

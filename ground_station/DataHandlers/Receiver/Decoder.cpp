@@ -36,14 +36,15 @@ Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
     }
 
     //TODO: change name to payloadInfo -> split into vehicleID and payloadtype
-    uint8_t payloadType = headerBuffer[SEQUENCE_NUMBER_SIZE];
+    uint8_t payloadInfo = headerBuffer[SEQUENCE_NUMBER_SIZE];
 
-    //uint8_t payloadInfo =
-    //uint8_t payloadType =
+    uint8_t flyableType = payloadInfo & CommunicationsConstants::FLYABLE_TYPE_MASK;
+    uint8_t payloadType = payloadInfo & CommunicationsConstants::PAYLOAD_TYPE_MASK;
 
     if (PayloadType::TYPES_TABLE.count(payloadType) > 0) {
 
         currentDatagram_.sequenceNumber_ = seqNum;
+        currentDatagram_.flyableType_ = static_cast<FlyableType>(flyableType);
         currentDatagram_.payloadType_ = PayloadType::typeFromCode(payloadType);
         return true;
 
