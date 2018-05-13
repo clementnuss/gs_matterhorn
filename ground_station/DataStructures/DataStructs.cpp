@@ -16,6 +16,17 @@ DataPacket::dispatchWith(PacketDispatcher *d) {
 }
 
 
+std::string
+DataPacket::toString() const {
+    std::stringstream ss;
+
+    ss << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << static_cast<int>(flyableType_)
+       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << sequenceNumber_
+       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << timestamp_;
+
+    return ss.str();
+}
+
 /**
  * EventPacket
  */
@@ -33,7 +44,7 @@ std::string
 EventPacket::toString() const {
     std::stringstream ss;
 
-    ss << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << timestamp_
+    ss << DataPacket::toString()
        << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << code_
        << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << " "
        << description_;
@@ -85,7 +96,7 @@ std::string
 GPSPacket::toString() const {
     std::stringstream ss;
 
-    ss << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << timestamp_
+    ss << DataPacket::toString()
        << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << (int) satsCount_
        << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << std::setprecision(PRECISION) << fixed << hdop_
        << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << std::setprecision(PRECISION_GPS) << fixed << latitude_
@@ -195,12 +206,9 @@ SensorsPacket::dispatchWith(PacketDispatcher *d) {
 
 std::string
 SensorsPacket::toString() const {
-    std::stringstream format;
-    format << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << std::setprecision(PRECISION) << fixed;
 
     std::stringstream ss;
-    ss << sequenceNumber_
-       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << this->timestamp_
+    ss << DataPacket::toString()
        << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << std::setprecision(PRECISION) << fixed << altitude_
        << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << std::setprecision(PRECISION) << fixed << air_speed_
        << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << std::setprecision(PRECISION) << fixed << pressure_

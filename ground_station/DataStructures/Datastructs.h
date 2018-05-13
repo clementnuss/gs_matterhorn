@@ -7,12 +7,10 @@
 #include <cmath>
 #include <utility>
 #include <Flyable.h>
-#include "ILoggable.h"
 #include "ProgramConstants.h"
 
 using namespace PrintConstants;
 
-// Needed because of the C++ limitation in forward-declaring nested classes
 class PacketDispatcher;
 
 struct IDeserializable {
@@ -21,19 +19,25 @@ struct IDeserializable {
     virtual bool isValid() const = 0;
 };
 
-struct DataPacket {
+struct ILoggable {
+    virtual std::string toString() const = 0;
+};
+
+struct DataPacket : public ILoggable {
     DataPacket() = default;
 
     explicit DataPacket(uint32_t timestamp, uint32_t sequenceNumber, FlyableType flyableType);
 
     virtual void dispatchWith(PacketDispatcher *);
 
+    std::string toString() const override;
+
     uint32_t timestamp_;
     uint32_t sequenceNumber_;
     FlyableType flyableType_;
 };
 
-struct EventPacket : DataPacket, ILoggable, IDeserializable {
+struct EventPacket : public DataPacket, IDeserializable {
     EventPacket() = default;
     EventPacket(const EventPacket &that) = default;
     EventPacket(uint32_t timestamp, uint32_t sequenceNumber, FlyableType flyableType,
@@ -50,7 +54,7 @@ struct EventPacket : DataPacket, ILoggable, IDeserializable {
     bool isValid() const override;
 };
 
-struct ControlPacket : DataPacket, IDeserializable {
+struct ControlPacket : public DataPacket, IDeserializable {
     ControlPacket() = default;
     ControlPacket(const ControlPacket &that) = default;
     ControlPacket(uint32_t timestamp, uint32_t sequenceNumber, FlyableType flyableType,
@@ -64,7 +68,7 @@ struct ControlPacket : DataPacket, IDeserializable {
     bool isValid() const override;
 };
 
-struct GPSPacket : DataPacket, ILoggable, IDeserializable {
+struct GPSPacket : public DataPacket, IDeserializable {
     GPSPacket() = default;
     GPSPacket(const GPSPacket &that) = default;
     GPSPacket(uint32_t timestamp, uint32_t sequenceNumber, FlyableType flyableType,
@@ -85,7 +89,7 @@ struct GPSPacket : DataPacket, ILoggable, IDeserializable {
     LatLon latLon() const;
 };
 
-struct Data3D : ILoggable {
+struct Data3D : public ILoggable {
     Data3D();
 
     Data3D(double x, double y, double z);
@@ -105,7 +109,7 @@ struct Data3D : ILoggable {
     Data3D operator+=(const Data3D &rhs);
 };
 
-struct SensorsPacket : DataPacket, ILoggable, IDeserializable {
+struct SensorsPacket : public DataPacket, IDeserializable {
     SensorsPacket();
     SensorsPacket(uint32_t timestamp, uint32_t sequenceNumber, FlyableType flyableType,
                   double altitude, Data3D acceleration,
