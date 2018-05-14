@@ -7,6 +7,7 @@
 #include <3D/Billboards/Text3D.h>
 #include <Qt3DRender/QCamera>
 #include <3D/Interfaces/IObservable.h>
+#include <3D/Line/Line.h>
 
 
 class Tracker : public Qt3DCore::QEntity, public IObservable {
@@ -15,6 +16,10 @@ public:
     explicit Tracker(const QVector3D &position, const Qt3DRender::QCamera *const camera, const QString &iconTextureName, const QString &text,
                      TextType textType, Qt3DCore::QNode *const parent, const QVector3D &markerOffset,
                      const QVector3D &textOffset);
+
+    void resetTrace() {
+        trace_->clearData();
+    }
 
 public slots:
 
@@ -31,6 +36,8 @@ private:
     Qt3DCore::QTransform *transform_;
     QVector3D textOffset_;
     QVector3D markerOffset_;
+
+    Line *trace_;
 };
 
 

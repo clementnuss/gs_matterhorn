@@ -11,7 +11,7 @@ namespace OpenGLConstants {
     static constexpr int VERSION_MINOR = 3;
     static constexpr int ANISOTROPY_MAX = 8;
     static constexpr int MAX_LINE_RESOLUTION = 500;
-    static constexpr int MAX_LINE_DATAPOINTS = 100000;
+    static constexpr int MAX_LINE_DATAPOINTS = 100;
     static constexpr int RULER_SPACING = 250;
     static constexpr int RULER_MAX_HEIGHT = 5000;
     static const QVector3D ABOVE_MARKER_OFFSET = QVector3D(0, 0.5, 0);

@@ -24,8 +24,6 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         Qt3DCore::QEntity(parent),
         cameraController_{new CameraController(this)},
         camera_{view->camera()},
-        rocketTrace_{nullptr},
-        payloadTrace_{nullptr},
         simTrace_{nullptr},
         rocketRuler_{nullptr},
         splashDownPredictor_{nullptr},
@@ -95,11 +93,6 @@ RootEntity::init() {
             2,
             QString::fromStdString(ConfSingleton::instance().get("commonTexturePath", std::string{""})));
 
-    rocketTrace_ = new Line(this, QColor::fromRgb(255, 255, 255), false);
-    rocketTrace_->setData({launchSitePos_, launchSitePos_});
-
-    payloadTrace_ = new Line(this, QColor::fromRgb(255, 159, 0), false);
-    payloadTrace_->setData({launchSitePos_, launchSitePos_});
 
     auto *gs = new GroundStation(worldRef_->worldPosAt(gsLatLon, elevationModel_), TextureConstants::DOUBLE_DOWN_ARROW,
                                  camera_, this);
@@ -157,7 +150,6 @@ RootEntity::updateFlightPosition(const Position pos) {
 
         trackedFlyables_[FlyableType::ROCKET]->updatePosition(lastComputedPosition_);
         rocketRuler_->updatePosition(lastComputedPosition_);
-        rocketTrace_->appendData(lastComputedPosition_);
 
         splashDownPredictor_->updatePos(lastComputedPosition_);
         splashDownPredictor_->updateSpeed(lastComputedSpeed_);
@@ -182,7 +174,6 @@ RootEntity::updatePayloadPosition(const Position pos) {
     QVector3D pos3D = {horizontalWorldPos.x(), static_cast<float>(pos.altitude), horizontalWorldPos.y()};
 
     trackedFlyables_[FlyableType::PAYLOAD]->updatePosition(pos3D);
-    payloadTrace_->appendData(pos3D);
 }
 
 
@@ -207,7 +198,10 @@ RootEntity::updateTrackerAltitude(FlyableType flyableType, const float &alt) {
 
 void
 RootEntity::resetTrace() {
-    rocketTrace_->clearData();
+
+    for (size_t i = 0; i < FlyableType::Count; i++)
+        trackedFlyables_[static_cast<FlyableType>(i)]->resetTrace();
+
 }
 
 
@@ -225,7 +219,6 @@ RootEntity::updateRocketTracker(QVector<QVector3D> &positions, const QVector3D &
 
     trackedFlyables_[FlyableType::ROCKET]->updatePosition(lastPos);
     rocketRuler_->updatePosition(lastPos);
-    rocketTrace_->appendData(positions);
 
     splashDownPredictor_->updatePos(lastPos);
     splashDownPredictor_->updateSpeed(speed);

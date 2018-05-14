@@ -18,6 +18,8 @@ Tracker::Tracker(const QVector3D &position, const Qt3DRender::QCamera *const cam
 
     marker_ = new Marker(iconTextureName, 2, 2, markerOffset_, camera, this);
     text_ = new Text3D(text, textType, camera, textOffset_, this);
+    trace_ = new Line(parent, QColor(255, 255, 255), false);
+    trace_->setData({position, position});
 
     updatePosition(position);
 }
@@ -25,6 +27,7 @@ Tracker::Tracker(const QVector3D &position, const Qt3DRender::QCamera *const cam
 void
 Tracker::updatePosition(const QVector3D &newPosition) {
     transform_->setTranslation(newPosition);
+    trace_->appendData(newPosition);
 }
 
 QVector3D
