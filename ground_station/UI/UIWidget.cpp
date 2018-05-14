@@ -158,7 +158,7 @@ GSMainwindow::receiveDataPacket(SensorsPacket sp) {
     s.pitch->setText(QString::number(sp.eulerAngles_.y_, 'f', UIConstants::PRECISION));
     s.roll->setText(QString::number(sp.eulerAngles_.z_, 'f', UIConstants::PRECISION));
 
-    //rootEntity3D_->updateTrackerAltitude(sp.flyableType_, sp.altitude_);
+    rootEntity3D_->updateTrackerAltitude(sp.flyableType_, sp.altitude_);
 }
 
 
@@ -194,14 +194,19 @@ GSMainwindow::receiveDataPacket(const EventPacket event) {
 void
 GSMainwindow::receiveDataPacket(const GPSPacket gpsData) {
 
+
     GpsLabelsStruct s = gpsLabelsMap_[gpsData.flyableType_];
 
     s.sats->setText(QString::number(gpsData.satsCount_));
     s.hdop->setText(QString::number(gpsData.hdop_, 'f', UIConstants::PRECISION));
-    s.latitude->setText(QString::number(gpsData.latitude_, 'f', UIConstants::PRECISION_GPS));
-    s.longitude->setText(QString::number(gpsData.longitude_, 'f', UIConstants::PRECISION_GPS));
 
-    //rootEntity3D_->updateTrackerLatLon(gpsData.flyableType_, gpsData.latLon());
+    if (gpsData.isValid()) {
+        s.latitude->setText(QString::number(gpsData.latitude_, 'f', UIConstants::PRECISION_GPS));
+        s.longitude->setText(QString::number(gpsData.longitude_, 'f', UIConstants::PRECISION_GPS));
+
+
+        rootEntity3D_->updateTrackerLatLon(gpsData.flyableType_, gpsData.latLon());
+    }
 }
 
 

@@ -3,6 +3,7 @@
 #include <DataHandlers/Receiver/RadioReceiver.h>
 #include <DataHandlers/Replay/TelemetryReplay.h>
 #include <ConfigParser/ConfigParser.h>
+#include <DataHandlers/Receiver/CompositeReceiver.h>
 #include "MainWorker.h"
 #include "PacketDispatcher.h"
 
@@ -21,7 +22,8 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
         replayMode_{false},
         updateHandler_{false},
         telemetryHandler900MHz_{},
-        telemetryHandler433MHz_{} {
+        telemetryHandler433MHz_{},
+        compositeReceiver_{} {
 
     gsMainwindow->setRealTimeMode();
     try {
@@ -40,6 +42,8 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
     } catch (const std::runtime_error &e) {
         std::cerr << "Unable to start radio receiver handler:\n" << e.what();
     }
+
+    compositeReceiver_ = std::make_unique<CompositeReceiver>(std::move(telemetryHandler900MHz_), std::move(telemetryHandler433MHz_), 10);
 
 #if USE_TRACKING
     vector<serial::PortInfo> devices_found = serial::list_ports();
@@ -92,27 +96,7 @@ void
 Worker::run() {
 
     while (!(QThread::currentThread()->isInterruptionRequested())) {
-        if (updateHandler_.load()) {
-            loggingEnabled_ = false;
-            replayMode_ = false;
-            millisBetweenLastTwoPackets_ = 0;
-            lastIteration_ = chrono::system_clock::now();
-            timeOfLastLinkCheck_ = chrono::system_clock::now();
-            timeOfLastReceivedTelemetry_ = chrono::system_clock::now();
-
-
-            telemetryHandler900MHz_.swap(newHandler_);
-            newHandler_ = nullptr;
-            if (telemetryHandler900MHz_->isReplayReceiver()) {
-                replayMode_ = true;
-            }
-            emit resetUIState();
-
-            updateHandler_.store(false);
-        } else {
-            mainRoutine();
-        }
-
+        mainRoutine();
     }
 
     std::cout << "The worker thread was interrupted" << std::endl;
@@ -131,7 +115,7 @@ Worker::mainRoutine() {
     lastIteration_ = chrono::system_clock::now();
     checkLinkStatuses();
 
-    std::list<std::unique_ptr<DataPacket>> dataPackets = telemetryHandler900MHz_->pollData();
+    std::list<std::unique_ptr<DataPacket>> dataPackets = compositeReceiver_->pollData();
     for (std::unique_ptr<DataPacket> &dp : dataPackets) {
         dp.release()->dispatchWith(packetDispatcher_);
     }
@@ -141,7 +125,6 @@ Worker::mainRoutine() {
     QCoreApplication::sendPostedEvents(this);
     QCoreApplication::processEvents();
 }
-
 
 
 /**
@@ -199,7 +182,6 @@ Worker::checkLinkStatuses() {
         emit linkStatusReady(status);
     }
 }
-
 
 
 void

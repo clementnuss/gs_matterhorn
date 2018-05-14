@@ -92,6 +92,7 @@ private:
 
     std::unique_ptr<IReceiver> telemetryHandler900MHz_;
     std::unique_ptr<IReceiver> telemetryHandler433MHz_;
+    std::unique_ptr<IReceiver> compositeReceiver_;
     std::unique_ptr<IReceiver> newHandler_;
     std::chrono::system_clock::time_point lastIteration_;
     std::chrono::system_clock::time_point timeOfLastLinkCheck_;
