@@ -16,7 +16,7 @@ void main()
     // Flipped texture coordinates
     texCoord = vertexTexCoord;
 
-    float theta = dot(normalize(lightSource), vertexNormal);
+    float theta = 1.5 * dot(normalize(lightSource), vertexNormal);
 
     color = vec3(0.5 * (cos(theta)+1),
                          0.5 * (cos(theta)+1),
