@@ -35,7 +35,6 @@ Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
 
     }
 
-    //TODO: change name to payloadInfo -> split into vehicleID and payloadtype
     uint8_t payloadInfo = headerBuffer[SEQUENCE_NUMBER_SIZE];
 
     uint8_t flyableType = payloadInfo & CommunicationsConstants::FLYABLE_TYPE_MASK;

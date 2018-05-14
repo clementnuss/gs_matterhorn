@@ -3,7 +3,6 @@
 #include <DataHandlers/Receiver/Decoder.h>
 #include <Utilities/RandUtils.h>
 #include <Utilities/SensorUtils.h>
-#include "Datastructs.h"
 
 static constexpr double epsilon = 1e-3;
 
@@ -248,21 +247,23 @@ static void parseAndTestTelemetryPacket(Decoder &decoder, vector<uint8_t> &datag
     Datagram d;
     parsePacket(decoder, datagram, PayloadType::TELEMETRY, &d);
 
-    SensorsPacket data = PayloadDataConverter::toSensorsPacket(d.payloadData_);
-    EXPECT_EQ(timestamp, data.timestamp_);
-    EXPECT_NEAR(accelReading.x_ * SensorConstants::MPU_ACCEL_MULTIPLIER, data.acceleration_.x_, epsilon);
-    EXPECT_NEAR(accelReading.y_ * SensorConstants::MPU_ACCEL_MULTIPLIER, data.acceleration_.y_, epsilon);
-    EXPECT_NEAR(accelReading.z_ * SensorConstants::MPU_ACCEL_MULTIPLIER, data.acceleration_.z_, epsilon);
-    EXPECT_NEAR(gyroReading.x_, data.gyroscope_.x_, epsilon);
-    EXPECT_NEAR(gyroReading.y_, data.gyroscope_.y_, epsilon);
-    EXPECT_NEAR(gyroReading.z_, data.gyroscope_.z_, epsilon);
-    EXPECT_NEAR(magReading.x_, data.eulerAngles_.x_, epsilon);
-    EXPECT_NEAR(magReading.y_, data.eulerAngles_.y_, epsilon);
-    EXPECT_NEAR(magReading.z_, data.eulerAngles_.z_, epsilon);
-    EXPECT_NEAR(temp, data.temperature_, epsilon);
-    EXPECT_NEAR(pres / 100.0f, data.pressure_, epsilon);
-    EXPECT_NEAR(altitudeFromPressure(pres / 100.0f), data.altitude_, epsilon);
-    EXPECT_NEAR(airSpeedFromPitotPressure(pitot), data.air_speed_, epsilon);
+    SensorsPacket *data = PayloadDataConverter::toSensorsPacket(d.flyableType_, d.sequenceNumber_, d.payloadData_);
+    EXPECT_EQ(timestamp, data->timestamp_);
+    EXPECT_NEAR(accelReading.x_ * SensorConstants::MPU_ACCEL_MULTIPLIER, data->acceleration_.x_, epsilon);
+    EXPECT_NEAR(accelReading.y_ * SensorConstants::MPU_ACCEL_MULTIPLIER, data->acceleration_.y_, epsilon);
+    EXPECT_NEAR(accelReading.z_ * SensorConstants::MPU_ACCEL_MULTIPLIER, data->acceleration_.z_, epsilon);
+    EXPECT_NEAR(gyroReading.x_, data->gyroscope_.x_, epsilon);
+    EXPECT_NEAR(gyroReading.y_, data->gyroscope_.y_, epsilon);
+    EXPECT_NEAR(gyroReading.z_, data->gyroscope_.z_, epsilon);
+    EXPECT_NEAR(magReading.x_, data->eulerAngles_.x_, epsilon);
+    EXPECT_NEAR(magReading.y_, data->eulerAngles_.y_, epsilon);
+    EXPECT_NEAR(magReading.z_, data->eulerAngles_.z_, epsilon);
+    EXPECT_NEAR(temp, data->temperature_, epsilon);
+    EXPECT_NEAR(pres / 100.0f, data->pressure_, epsilon);
+    EXPECT_NEAR(altitudeFromPressure(pres / 100.0f), data->altitude_, epsilon);
+    EXPECT_NEAR(airSpeedFromPitotPressure(pitot), data->air_speed_, epsilon);
+
+    delete data;
 }
 
 
@@ -271,8 +272,7 @@ static void parseAndTestTelemetryPacket(Decoder &decoder, vector<uint8_t> &datag
 // ------------------------------------------------ Unit tests ------------------------------------------------------ //
 TEST(DecoderTests, singleTelemetryPacket) {
 
-    Decoder decoder{}
-    (<#initializer#>);
+    Decoder decoder{"test_decoder"};
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
@@ -303,8 +303,7 @@ TEST(DecoderTests, singleTelemetryPacket) {
 }
 
 TEST(DecoderTests, multipleTelemetryPackets) {
-    Decoder decoder{}
-    (<#initializer#>);
+    Decoder decoder{"test_decoder"};
     srand(0);
     constexpr size_t measureCount = 10000;
 
@@ -354,8 +353,7 @@ TEST(DecoderTests, multipleTelemetryPackets) {
 }
 
 TEST(DecoderTests, singleEventPacket) {
-    Decoder decoder{}
-    (<#initializer#>);
+    Decoder decoder{"test_decoder"};
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
@@ -368,18 +366,19 @@ TEST(DecoderTests, singleEventPacket) {
 
     parsePacket(decoder, datagram, PayloadType::EVENT, &d);
 
-    EventPacket data = PayloadDataConverter::toEventPacket(d.payloadData_);
+    EventPacket *data = PayloadDataConverter::toEventPacket(d.flyableType_, d.sequenceNumber_, d.payloadData_);
     EXPECT_EQ(seqnum, d.sequenceNumber_);
-    EXPECT_EQ(timestamp, data.timestamp_);
-    EXPECT_EQ(code, data.code_);
+    EXPECT_EQ(timestamp, data->timestamp_);
+    EXPECT_EQ(code, data->code_);
+
+    delete data;
 }
 
 TEST(DecoderTests, multipleEventPackets) {
 
     size_t measureCount = 256 * 5;
 
-    Decoder decoder{}
-    (<#initializer#>);
+    Decoder decoder{"test_decoder"};
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
@@ -396,14 +395,14 @@ TEST(DecoderTests, multipleEventPackets) {
 
         parsePacket(decoder, datagram, PayloadType::EVENT, &d);
 
-        EventPacket data = PayloadDataConverter::toEventPacket(d.payloadData_);
+        EventPacket *data = PayloadDataConverter::toEventPacket(d.flyableType_, d.sequenceNumber_, d.payloadData_);
         EXPECT_EQ(seqnum, d.sequenceNumber_);
-        EXPECT_EQ(timestamp, data.timestamp_);
+        EXPECT_EQ(timestamp, data->timestamp_);
         if (RocketEventConstants::EVENT_CODES.find(code)
             != RocketEventConstants::EVENT_CODES.end()) {
-            EXPECT_EQ(code, data.code_);
+            EXPECT_EQ(code, data->code_);
         } else {
-            EXPECT_EQ(RocketEventConstants::INVALID_EVENT_CODE, data.code_);
+            EXPECT_EQ(RocketEventConstants::INVALID_EVENT_CODE, data->code_);
         }
     }
 
@@ -411,8 +410,7 @@ TEST(DecoderTests, multipleEventPackets) {
 
 TEST(DecoderTests, singleControlPacket) {
 
-    Decoder decoder{}
-    (<#initializer#>);
+    Decoder decoder{"test_decoder"};
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
@@ -426,11 +424,11 @@ TEST(DecoderTests, singleControlPacket) {
 
     parsePacket(decoder, datagram, PayloadType::CONTROL, &d);
 
-    ControlPacket data = PayloadDataConverter::toControlPacket(d.payloadData_);
+    ControlPacket *data = PayloadDataConverter::toControlPacket(d.flyableType_, d.sequenceNumber_, d.payloadData_);
     EXPECT_EQ(seqnum, d.sequenceNumber_);
-    EXPECT_EQ(timestamp, data.timestamp_);
-    EXPECT_EQ(partCode, data.partCode_);
-    EXPECT_EQ(statusValue, data.statusValue_);
+    EXPECT_EQ(timestamp, data->timestamp_);
+    EXPECT_EQ(partCode, data->partCode_);
+    EXPECT_EQ(statusValue, data->statusValue_);
 
 }
 
@@ -438,8 +436,7 @@ TEST(DecoderTests, singleControlPacket) {
 TEST(DecoderTests, multipleControlPackets) {
     size_t measureCount = 256 * 5;
 
-    Decoder decoder{}
-    (<#initializer#>);
+    Decoder decoder{"test_decoder"};
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
@@ -459,17 +456,17 @@ TEST(DecoderTests, multipleControlPackets) {
 
         parsePacket(decoder, datagram, PayloadType::CONTROL, &d);
 
-        ControlPacket data = PayloadDataConverter::toControlPacket(d.payloadData_);
+        ControlPacket *data = PayloadDataConverter::toControlPacket(d.flyableType_, d.sequenceNumber_, d.payloadData_);
         EXPECT_EQ(seqnum, d.sequenceNumber_);
-        EXPECT_EQ(timestamp, data.timestamp_);
+        EXPECT_EQ(timestamp, data->timestamp_);
 
         if (ControlConstants::CONTROL_PARTS_CODES.find(partCode)
             != ControlConstants::CONTROL_PARTS_CODES.end()) {
-            EXPECT_EQ(partCode, data.partCode_);
-            EXPECT_EQ(statusValue, data.statusValue_);
+            EXPECT_EQ(partCode, data->partCode_);
+            EXPECT_EQ(statusValue, data->statusValue_);
         } else {
-            EXPECT_EQ(ControlConstants::INVALID_PART_CODE, data.partCode_);
-            EXPECT_EQ(ControlConstants::INVALID_STATUS_VALUE, data.statusValue_);
+            EXPECT_EQ(ControlConstants::INVALID_PART_CODE, data->partCode_);
+            EXPECT_EQ(ControlConstants::INVALID_STATUS_VALUE, data->statusValue_);
         }
     }
 
@@ -477,8 +474,7 @@ TEST(DecoderTests, multipleControlPackets) {
 
 TEST(DecoderTests, singleGPSPacket) {
 
-    Decoder decoder{}
-    (<#initializer#>);
+    Decoder decoder{"test_decoder"};
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
@@ -496,22 +492,21 @@ TEST(DecoderTests, singleGPSPacket) {
 
     parsePacket(decoder, datagram, PayloadType::GPS, &d);
 
-    GPSPacket data = PayloadDataConverter::toGPSPacket(d.payloadData_);
+    GPSPacket *data = PayloadDataConverter::toGPSPacket(d.flyableType_, d.sequenceNumber_, d.payloadData_);
     EXPECT_EQ(seqnum, d.sequenceNumber_);
-    EXPECT_EQ(timestamp, data.timestamp_);
-    EXPECT_EQ(satsCount, data.satsCount_);
-    EXPECT_NEAR(rssi, data.hdop_, epsilon);
-    EXPECT_NEAR(latitude, data.latitude_, epsilon);
-    EXPECT_NEAR(longitude, data.longitude_, epsilon);
-    EXPECT_NEAR(altitude / 100.0f, data.altitude_, epsilon);
+    EXPECT_EQ(timestamp, data->timestamp_);
+    EXPECT_EQ(satsCount, data->satsCount_);
+    EXPECT_NEAR(rssi, data->hdop_, epsilon);
+    EXPECT_NEAR(latitude, data->latitude_, epsilon);
+    EXPECT_NEAR(longitude, data->longitude_, epsilon);
+    EXPECT_NEAR(altitude / 100.0f, data->altitude_, epsilon);
 }
 
 
 TEST(DecoderTests, multipleGPSPackets) {
     size_t measureCount = 256 * 5;
 
-    Decoder decoder{}
-    (<#initializer#>);
+    Decoder decoder{"test_decoder"};
 
     ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
 
@@ -535,22 +530,21 @@ TEST(DecoderTests, multipleGPSPackets) {
 
         parsePacket(decoder, datagram, PayloadType::GPS, &d);
 
-        GPSPacket data = PayloadDataConverter::toGPSPacket(d.payloadData_);
+        GPSPacket *data = PayloadDataConverter::toGPSPacket(d.flyableType_, d.sequenceNumber_, d.payloadData_);
         EXPECT_EQ(seqnum, d.sequenceNumber_);
-        EXPECT_EQ(timestamp, data.timestamp_);
-        EXPECT_EQ(satsCount, data.satsCount_);
-        EXPECT_NEAR(rssi, data.hdop_, epsilon);
-        EXPECT_NEAR(latitude, data.latitude_, epsilon);
-        EXPECT_NEAR(longitude, data.longitude_, epsilon);
-        EXPECT_NEAR(altitude / 100.0f, data.altitude_, epsilon);
+        EXPECT_EQ(timestamp, data->timestamp_);
+        EXPECT_EQ(satsCount, data->satsCount_);
+        EXPECT_NEAR(rssi, data->hdop_, epsilon);
+        EXPECT_NEAR(latitude, data->latitude_, epsilon);
+        EXPECT_NEAR(longitude, data->longitude_, epsilon);
+        EXPECT_NEAR(altitude / 100.0f, data->altitude_, epsilon);
     }
 }
 
 TEST(DecoderTests, resistsToRandomByteSequence) {
     srand(0);
     const size_t randomTestSequenceLength = 10000;
-    Decoder decoder{}
-    (<#initializer#>);
+    Decoder decoder{"test_decoder"};
 
     for (int i = 0; i < randomTestSequenceLength; i++) {
         if (decoder.processByte(static_cast<uint8_t>(rand() % 256))) {
@@ -565,8 +559,7 @@ TEST(DecoderTests, resistsToRandomHeader) {
     vector<uint8_t> byteSeq{};
     const size_t datagramLength = 1000;
     const size_t datagramCounts = 1000;
-    Decoder decoder{}
-    (<#initializer#>);
+    Decoder decoder{"test_decoder"};
 
     for (int i = 0; i < datagramCounts; i++) {
         feedWithValidPreamble(decoder);
@@ -584,8 +577,7 @@ TEST(DecoderTests, resistsToRandomPayloads) {
     vector<uint8_t> byteSeq{};
     const size_t datagramLength = 1000;
     const size_t datagramCounts = 10000;
-    Decoder decoder{}
-    (<#initializer#>);
+    Decoder decoder{"test_decoder"};
 
     for (int i = 0; i < datagramCounts; i++) {
 
@@ -612,12 +604,15 @@ TEST(DecoderTests, resistsToRandomPayloads) {
 
 TEST(DecoderTests, missingControlFlagResetsMachine) {
     srand(0);
-    Decoder decoder{}
-    (<#initializer#>);
+    Decoder decoder{"test_decoder"};
 
     for (int b = 0; b <= UINT8_MAX; b++) {
         if (b == CONTROL_FLAG) {
             continue;
+        }
+
+        if (b == 45) {
+            std::cout << "test";
         }
 
         EXPECT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
@@ -636,8 +631,7 @@ TEST(DecoderTests, missingControlFlagResetsMachine) {
 }
 
 TEST(DecoderTests, wrongChecksumDropsPacket) {
-    Decoder decoder{}
-    (<#initializer#>);
+    Decoder decoder{"test_decoder"};
 
     vector<uint8_t> datagram = createDatagram(1410, 999, -1, 2, -3, 4, -5, 6, -7, 8, -9, 12.34, 56.78, 0);
     vector<uint8_t> validDatagram = datagram;

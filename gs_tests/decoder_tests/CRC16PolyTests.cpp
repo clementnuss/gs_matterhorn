@@ -12,14 +12,14 @@ TEST(CRCTest, CRC16Table) {
     auto table = CommunicationsConstants::CRC_16_GENERATOR_POLY.MakeTable();
 
     uint8_t byte = 0;
-    cout << "\n{ ";
+    std::cout << "\n{ ";
     do {
         if (byte % 10 == 0)
-            cout << std::endl;
+            std::cout << std::endl;
 
-        cout << "0x" << setw(4) << setfill('0') << std::hex << table[byte] << ", ";
+        std::cout << "0x" << std::setw(4) << std::setfill('0') << std::hex << table[byte] << ", ";
     } while (++byte < 0xff);
-    cout << "0x" << setw(4) << setfill('0') << std::hex << table[byte] << "}" << std::endl;
+    std::cout << "0x" << std::setw(4) << std::setfill('0') << std::hex << table[byte] << "}" << std::endl;
 
     ASSERT_EQ(0x0, table[0]);
 }
@@ -74,6 +74,6 @@ TEST(CRCTest, lightCRCImplementation) {
     }
 
     uint16_t finalizedCRC = crc ^CommunicationsConstants::CRC_16_GENERATOR_POLY.finalXOR;
-    cout << endl;
+    std::cout << endl;
     ASSERT_EQ(refCrc, finalizedCRC);
 }
