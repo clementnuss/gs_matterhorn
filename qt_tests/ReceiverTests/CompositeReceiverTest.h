@@ -274,6 +274,62 @@ private slots:
                                      {5, FlyableType::PAYLOAD}});
 
     }
+
+    void monoVehicleReceiverIsResilientToResets() {
+
+        for (auto flyableType : typeList) {
+            // Test when only one receiver has data
+            primaryReceiver->registerPackets(makePacketVector(1, 100, flyableType));
+
+            // Simulate reset
+            primaryReceiver->registerPackets(makePacketVector(1, 10, flyableType));
+
+            std::vector<uint32_t> v;
+
+            for (int i = 0; i < 101; i++)
+                v.emplace_back(i);
+
+            for (int i = 0; i < 11; i++)
+                v.emplace_back(i);
+
+
+            assertSequenceEquality(compositeReceiver->pollData(), v);
+        }
+    }
+
+    void monoVehicleMultiChannelReceiverIsResilientToReset() {
+
+        for (auto flyableType : typeList) {
+            // Test when only one receiver has data
+            primaryReceiver->registerPackets(makePacketVector(1, 25, flyableType));
+            backupReceiver->registerPackets(makePacketVector(26, 50, flyableType));
+            primaryReceiver->registerPackets(makePacketVector(51, 75, flyableType));
+            backupReceiver->registerPackets(makePacketVector(75, 100, flyableType));
+            primaryReceiver->registerPackets(makePacketVector(1, 25, flyableType));
+            backupReceiver->registerPackets(makePacketVector(25, 50, flyableType));
+
+            // Simulate reset
+            primaryReceiver->registerPackets(makePacketVector(1, 10, flyableType));
+
+            std::vector<uint32_t> v;
+
+            for (int i = 0; i < 101; i++)
+                v.emplace_back(i);
+
+            for (int i = 0; i < 51; i++)
+                v.emplace_back(i);
+
+            assertSequenceEquality(compositeReceiver->pollData(), v);
+        }
+
+    }
+
+
+    void multiVehicleReceiverIsResilientToResets() {
+
+        Q_ASSERT(false);
+    }
+
 };
 
 #endif //GS_MATTERHORN_COMPOSITERECEIVERTEST_H
