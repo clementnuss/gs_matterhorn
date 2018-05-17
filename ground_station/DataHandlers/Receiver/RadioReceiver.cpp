@@ -17,7 +17,8 @@ RadioReceiver::RadioReceiver(const string &hardwareID, const string &logTitle)
           recvBuffer_{},
           threadEnabled_{true},
           dataQueue_{100},
-          bytesLogger_{LogConstants::BYTES_LOG_PATH + logTitle} {
+          bytesLogger_{LogConstants::BYTES_LOG_PATH + logTitle},
+          packetLogger_{LogConstants::RECEIVER_LOG_PATH + logTitle} {
 
     if (hardwareID.empty()) {
         std::cerr << "Empty serial port specified, telemetry acquisition will not work." << std::endl;
@@ -162,7 +163,7 @@ void
 RadioReceiver::unpackPayload() {
     Datagram d = byteDecoder_.retrieveDatagram();
 
-    std::unique_ptr<DataPacket> p;
+
     std::function<DataPacket *(const FlyableType &, const uint32_t &, const std::vector<uint8_t> &)> conversionFunc;
 
     switch (d.payloadType_->code()) {
@@ -184,7 +185,9 @@ RadioReceiver::unpackPayload() {
             break;
     }
 
-    dataQueue_.push(conversionFunc(d.flyableType_, d.sequenceNumber_, d.payloadData_));
+    DataPacket *p{conversionFunc(d.flyableType_, d.sequenceNumber_, d.payloadData_)};
+    packetLogger_.registerString(p->toString());
+    dataQueue_.push(p);
 }
 
 

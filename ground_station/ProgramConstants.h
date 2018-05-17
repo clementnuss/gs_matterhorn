@@ -44,6 +44,7 @@ namespace LogConstants {
     static const std::string WORKER_TELEMETRY_LOG_PATH("FlightData/sensors_data");
     static const std::string WORKER_GPS_LOG_PATH("FlightData/gps_data");
     static const std::string WORKER_EVENT_LOG_PATH("FlightData/event_data");
+    static const std::string RECEIVER_LOG_PATH("ReceiversLogs/packets_received");
 }
 
 namespace TimeConstants {
