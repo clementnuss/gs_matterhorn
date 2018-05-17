@@ -27,6 +27,8 @@ private:
     void mergePacketQueuesStep();
     void addToMergeQueueAndPop(std::unique_ptr<DataPacket> *, std::list<std::unique_ptr<DataPacket>> *);
 
+    void addPacketsPriorToReset(std::list<std::unique_ptr<DataPacket>> *, FlyableType);
+
 private:
     std::unique_ptr<IReceiver> primaryReceiver_;
     std::unique_ptr<IReceiver> backupReceiver_;

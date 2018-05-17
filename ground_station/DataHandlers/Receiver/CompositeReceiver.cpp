@@ -3,6 +3,8 @@
 #include <iostream>
 #include "CompositeReceiver.h"
 
+static constexpr uint32_t INITIAL_SEQUENCE_NUMBER{1};
+
 CompositeReceiver::CompositeReceiver(std::unique_ptr<IReceiver> primaryReceiver, std::unique_ptr<IReceiver> backupReceiver, const unsigned int limitLag) :
         primaryReceiver_{std::move(primaryReceiver)},
         backupReceiver_{std::move(backupReceiver)},
@@ -15,7 +17,7 @@ CompositeReceiver::CompositeReceiver(std::unique_ptr<IReceiver> primaryReceiver,
     for (size_t i = 0; i < FlyableType::Count; i++) {
 
         seqMap_.emplace(
-                std::make_pair(static_cast<FlyableType>(i), 1)
+                std::make_pair(static_cast<FlyableType>(i), INITIAL_SEQUENCE_NUMBER)
         );
 
     }
@@ -47,7 +49,7 @@ CompositeReceiver::pollData() {
 
 inline bool
 isNotFresh(std::list<std::unique_ptr<DataPacket>> *q, const uint32_t &index, const FlyableType &fType) {
-    return !q->empty() && q->front()->sequenceNumber_ < index && q->front()->flyableType_ == fType;
+    return !q->empty() && q->front()->sequenceNumber_ + 1 == index && q->front()->flyableType_ == fType;
 }
 
 void
@@ -57,6 +59,7 @@ CompositeReceiver::mergePacketQueuesStep() {
     std::unique_ptr<DataPacket> *e2;
     std::unique_ptr<DataPacket> *elementSelector;
     std::list<std::unique_ptr<DataPacket>> *queueSelector;
+
 
     // If both queue contain elements retrieve as much as possible
     while (!primaryQueue_.empty() && !backupQueue_.empty()) {
@@ -81,21 +84,20 @@ CompositeReceiver::mergePacketQueuesStep() {
         // Only considers packets more recent that the last considered
         if (seqNum >= seqMap_[fType]) {
             seqMap_[fType] = seqNum + 1;
-
-            // Add element to merge queue
             mergeQueue_.push_back(std::move(*elementSelector));
+        } else if (seqNum + limitLag_ < seqMap_[fType]) {
+            // We are seeing a significantly lower sequence number -> might have experienced a reset on sender side
+            std::cout << "Suspecting a reset on the sender side ! \n";
+            addPacketsPriorToReset(&primaryQueue_, fType);
+            addPacketsPriorToReset(&backupQueue_, fType);
+            seqMap_[fType] = INITIAL_SEQUENCE_NUMBER;
+            mergeQueue_.push_back(std::move(*elementSelector));
+        } else {
+            // Ignore the packet
         }
 
         // Remove from selected queue
         queueSelector->pop_front();
-
-        // Trim both queues to remove potential duplicate packets
-        if (isNotFresh(&primaryQueue_, seqMap_[fType], fType))
-            primaryQueue_.pop_front();
-
-        if (isNotFresh(&backupQueue_, seqMap_[fType], fType))
-            backupQueue_.pop_front();
-
     }
 
 
@@ -118,8 +120,15 @@ CompositeReceiver::mergePacketQueuesStep() {
         // Is the element the next element we are seeking ?
         if (elementSeqNum < seqMap_[fType]) {
 
-            //std::cerr << "The element sequence number was less than the index, this means a packet arrived out of order ! " << std::endl;
-            queueSelector->pop_front();
+            if (elementSeqNum + limitLag_ < seqMap_[fType]) {
+                // We are seeing a packet with a significant lag. We assume that a reset occured on the sending side
+                std::cout << "Suspecting a reset on the sender side ! \n";
+                seqMap_[fType] = elementSeqNum + 1;
+                addToMergeQueueAndPop(elementSelector, queueSelector);
+            } else {
+                // std::cerr << "The element sequence number was less than the index, this means a packet arrived out of order ! " << std::endl;
+                queueSelector->pop_front();
+            }
 
         } else if (elementSeqNum == seqMap_[fType]) {
 
@@ -160,6 +169,25 @@ void
 CompositeReceiver::addToMergeQueueAndPop(std::unique_ptr<DataPacket> *packet, std::list<std::unique_ptr<DataPacket>> *queue) {
     mergeQueue_.push_back(std::move(*packet));
     queue->pop_front();
+}
+
+void
+CompositeReceiver::addPacketsPriorToReset(std::list<std::unique_ptr<DataPacket>> *queue, FlyableType type) {
+    auto it = queue->begin();
+
+    while (it != queue->end()) {
+
+        if ((*it)->flyableType_ == type) {
+            if ((*it)->sequenceNumber_ >= seqMap_[type]) {
+                mergeQueue_.push_back(std::move((*it)));
+                it = queue->erase(it);
+            } else {
+                break;
+            }
+        } else {
+            it++;
+        }
+    }
 }
 
 CompositeReceiver::~CompositeReceiver() = default;

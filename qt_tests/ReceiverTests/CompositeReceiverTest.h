@@ -286,10 +286,10 @@ private slots:
 
             std::vector<uint32_t> v;
 
-            for (int i = 0; i < 101; i++)
+            for (int i = 1; i < 101; i++)
                 v.emplace_back(i);
 
-            for (int i = 0; i < 11; i++)
+            for (int i = 1; i < 11; i++)
                 v.emplace_back(i);
 
 
@@ -304,19 +304,21 @@ private slots:
             primaryReceiver->registerPackets(makePacketVector(1, 25, flyableType));
             backupReceiver->registerPackets(makePacketVector(26, 50, flyableType));
             primaryReceiver->registerPackets(makePacketVector(51, 75, flyableType));
-            backupReceiver->registerPackets(makePacketVector(75, 100, flyableType));
-            primaryReceiver->registerPackets(makePacketVector(1, 25, flyableType));
-            backupReceiver->registerPackets(makePacketVector(25, 50, flyableType));
+            backupReceiver->registerPackets(makePacketVector(76, 100, flyableType));
 
             // Simulate reset
-            primaryReceiver->registerPackets(makePacketVector(1, 10, flyableType));
+            primaryReceiver->registerPackets(makePacketVector(1, 25, flyableType));
+            backupReceiver->registerPackets(makePacketVector(26, 50, flyableType));
+
+            // 1 -25 51-75  1 -25
+            // 26-50 76-100 26-50
 
             std::vector<uint32_t> v;
 
-            for (int i = 0; i < 101; i++)
+            for (int i = 1; i < 101; i++)
                 v.emplace_back(i);
 
-            for (int i = 0; i < 51; i++)
+            for (int i = 1; i < 51; i++)
                 v.emplace_back(i);
 
             assertSequenceEquality(compositeReceiver->pollData(), v);
@@ -325,9 +327,59 @@ private slots:
     }
 
 
-    void multiVehicleReceiverIsResilientToResets() {
+    void multiVehicleMultiChannelReceiverIsResilientToResets() {
 
-        Q_ASSERT(false);
+        primaryReceiver->registerPackets(makePacketVector(1, 25, FlyableType::ROCKET));
+        primaryReceiver->registerPackets(makePacketVector(1, 25, FlyableType::PAYLOAD));
+        primaryReceiver->registerPackets(makePacketVector(51, 75, FlyableType::ROCKET));
+        primaryReceiver->registerPackets(makePacketVector(51, 75, FlyableType::PAYLOAD));
+        backupReceiver->registerPackets(makePacketVector(26, 50, FlyableType::ROCKET));
+        backupReceiver->registerPackets(makePacketVector(26, 50, FlyableType::PAYLOAD));
+        backupReceiver->registerPackets(makePacketVector(76, 100, FlyableType::ROCKET));
+        backupReceiver->registerPackets(makePacketVector(76, 100, FlyableType::PAYLOAD));
+
+        std::vector<std::pair<uint32_t, FlyableType>> v;
+
+        for (int i = 1; i <= 25; i++)
+            v.emplace_back(std::make_pair<uint32_t, FlyableType>(i, FlyableType::ROCKET));
+        for (int i = 1; i <= 25; i++)
+            v.emplace_back(std::make_pair<uint32_t, FlyableType>(i, FlyableType::PAYLOAD));
+        for (int i = 26; i <= 50; i++)
+            v.emplace_back(std::make_pair<uint32_t, FlyableType>(i, FlyableType::ROCKET));
+        for (int i = 26; i <= 50; i++)
+            v.emplace_back(std::make_pair<uint32_t, FlyableType>(i, FlyableType::PAYLOAD));
+        for (int i = 51; i <= 75; i++)
+            v.emplace_back(std::make_pair<uint32_t, FlyableType>(i, FlyableType::ROCKET));
+        for (int i = 51; i <= 75; i++)
+            v.emplace_back(std::make_pair<uint32_t, FlyableType>(i, FlyableType::PAYLOAD));
+        for (int i = 76; i <= 100; i++)
+            v.emplace_back(std::make_pair<uint32_t, FlyableType>(i, FlyableType::ROCKET));
+        for (int i = 76; i <= 100; i++)
+            v.emplace_back(std::make_pair<uint32_t, FlyableType>(i, FlyableType::PAYLOAD));
+
+        assertMultiSequenceEquality(compositeReceiver->pollData(), v);
+        v.clear();
+
+        // Simulate rocket resetting
+        primaryReceiver->registerPackets(makePacketVector(1, 25, FlyableType::ROCKET));
+        backupReceiver->registerPackets(makePacketVector(26, 50, FlyableType::ROCKET));
+
+
+        // Simulate payload resetting
+        primaryReceiver->registerPackets(makePacketVector(1, 25, FlyableType::PAYLOAD));
+        backupReceiver->registerPackets(makePacketVector(26, 50, FlyableType::PAYLOAD));
+
+        // Packets after reset
+        for (int i = 1; i <= 25; i++)
+            v.emplace_back(std::make_pair<uint32_t, FlyableType>(i, FlyableType::ROCKET));
+        for (int i = 1; i <= 25; i++)
+            v.emplace_back(std::make_pair<uint32_t, FlyableType>(i, FlyableType::PAYLOAD));
+        for (int i = 26; i <= 50; i++)
+            v.emplace_back(std::make_pair<uint32_t, FlyableType>(i, FlyableType::ROCKET));
+        for (int i = 26; i <= 50; i++)
+            v.emplace_back(std::make_pair<uint32_t, FlyableType>(i, FlyableType::PAYLOAD));
+
+        assertMultiSequenceEquality(compositeReceiver->pollData(), v);
     }
 
 };
