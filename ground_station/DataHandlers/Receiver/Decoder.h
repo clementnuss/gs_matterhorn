@@ -8,6 +8,18 @@
 #include <chrono>
 #include <Loggers/FileLogger.h>
 
+
+enum class DecodingState {
+    SEEKING_FRAMESTART,
+    PARSING_HEADER,
+    SEEKING_CONTROL_FLAG,
+    PARSING_PAYLOAD,
+    PARSING_CHECKSUM,
+    PARSING_AT_COMMAND_HEADER,
+    PARSING_AT_COMMAND,
+    PARSING_AT_COMMAND_CHECKSUM
+};
+
 /**
  * The Decoder class is in charge of interpreting bytes received trough the radio module.
  * It gathers bytes and treats them as specified by the datagram

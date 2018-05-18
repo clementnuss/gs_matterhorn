@@ -12,16 +12,6 @@
 
 typedef uint16_t checksum_t;
 
-enum class DecodingState {
-    SEEKING_FRAMESTART,
-    PARSING_HEADER,
-    SEEKING_CONTROL_FLAG,
-    PARSING_PAYLOAD,
-    PARSING_CHECKSUM,
-    VALIDATING_PAYLOAD,
-    DATAGRAM_READY
-};
-
 struct Datagram {
     Datagram() : sequenceNumber_{0}, payloadType_{nullptr}, flyableType_{FlyableType::ROCKET}, payloadData_{}, complete{false} {}
 
