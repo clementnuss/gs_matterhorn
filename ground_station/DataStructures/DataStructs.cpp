@@ -20,7 +20,7 @@ std::string
 DataPacket::toString() const {
     std::stringstream ss;
 
-    ss << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << static_cast<int>(flyableType_)
+    ss << static_cast<int>(flyableType_)
        << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << sequenceNumber_
        << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << timestamp_;
 
