@@ -43,6 +43,11 @@ struct DataPacket : public ILoggable, IDispatchable {
 
 struct ATCommandResponse : public ILoggable, IDispatchable {
 
+    static constexpr uint8_t FRAME_DELIMITER = 0x7E;
+    static constexpr size_t HEADER_SIZE = 2;
+    static constexpr size_t PAYLOAD_SIZE = 6;
+    static constexpr size_t CHECKSUM_SIZE = 1;
+
     ATCommandResponse() = default;
 
     explicit ATCommandResponse(uint8_t, uint8_t, uint16_t, uint8_t, uint8_t);

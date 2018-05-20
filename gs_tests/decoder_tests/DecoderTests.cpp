@@ -144,18 +144,11 @@ createGPSDatagram(uint32_t seqnum, uint32_t timestamp, uint8_t satCount, float r
 
 // -------------------------- Helper functions for reaching specific Decoder states  ------------------------------- //
 static void feedWithValidPreamble(Decoder &decoder) {
-    if (!dynamic_cast<SeekingFrameStart *>(decoder.currentState())) {
-        cerr << " problem " << endl;
-    }
 
     decoder.processByte(HEADER_PREAMBLE_FLAG);
     decoder.processByte(HEADER_PREAMBLE_FLAG);
     decoder.processByte(HEADER_PREAMBLE_FLAG);
     decoder.processByte(HEADER_PREAMBLE_FLAG);
-
-    if (!dynamic_cast<ParsingHeader *>(decoder.currentState())) {
-        cerr << " problem " << endl;
-    }
 }
 
 static void feedWithValidSequenceNumber(Decoder &decoder) {
@@ -587,8 +580,8 @@ TEST(DecoderTests, resistsToRandomPayloads) {
             uint8_t randomByte = static_cast<uint8_t>(rand() % 256);
 
             // Avoids frame starts
-            if (randomByte == HEADER_PREAMBLE_FLAG) {
-                randomByte -= 1;
+            if (randomByte == HEADER_PREAMBLE_FLAG || randomByte == ATCommandResponse::FRAME_DELIMITER) {
+                continue;
             }
 
             if (decoder.processByte(randomByte)) {

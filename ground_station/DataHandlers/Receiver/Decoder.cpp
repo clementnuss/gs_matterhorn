@@ -120,6 +120,39 @@ Decoder::validatePayload() {
     }
 }
 
+bool
+Decoder::validateATPayload() {
+
+    assert(byteBuffer_.size() == ATCommandResponse::CHECKSUM_SIZE);
+
+    uint8_t checksum{0xFF};
+
+    for (const auto &byte : checksumAccumulator_) {
+        checksum -= byte;
+    }
+
+    if (checksum == byteBuffer_.front()) {
+
+        currentDatagram_.complete = true;
+        return true;
+
+    } else {
+
+        // Log error
+        stringstream ss;
+        ss << setw(PrintConstants::FIELD_WIDTH) << msecsBetween(startupTime_, std::chrono::system_clock::now());
+        ss << PrintConstants::DELIMITER;
+        ss << "Invalid AT checksum, expected: ";
+        ss << setw(PrintConstants::FIELD_WIDTH) << std::hex << byteBuffer_[0];
+        ss << " got: ";
+        ss << std::hex << checksum;
+        logger_.registerString(ss.str());
+
+        return false;
+
+    }
+}
+
 void
 Decoder::assertBufferSmallerThan(size_t bound) {
     assert(0 <= byteBuffer_.size() && byteBuffer_.size() < bound);
@@ -132,17 +165,22 @@ Decoder::currentState() const {
 
 void
 SeekingFrameStart::operator()(Decoder *context, const uint8_t &byte) const {
-    context->assertBufferSmallerThan(PREAMBLE_SIZE);
 
-    if (byte == HEADER_PREAMBLE_FLAG) {
-        context->byteBuffer_.push_back(byte);
+    if (byte == ATCommandResponse::FRAME_DELIMITER) {
+        context->byteBuffer_.clear();
+        context->currentState_ = std::make_unique<ParsingATCommandHeader>();
     } else {
-        context->byteBuffer_.clear();
-    }
+        context->assertBufferSmallerThan(PREAMBLE_SIZE);
+        if (byte == HEADER_PREAMBLE_FLAG) {
+            context->byteBuffer_.push_back(byte);
+        } else {
+            context->byteBuffer_.clear();
+        }
 
-    if (context->byteBuffer_.size() == PREAMBLE_SIZE) {
-        context->byteBuffer_.clear();
-        context->currentState_ = std::make_unique<ParsingHeader>();
+        if (context->byteBuffer_.size() == PREAMBLE_SIZE) {
+            context->byteBuffer_.clear();
+            context->currentState_ = std::make_unique<ParsingHeader>();
+        }
     }
 }
 
@@ -200,6 +238,8 @@ ParsingChecksum::operator()(Decoder *context, const uint8_t &byte) const {
 
     if (context->byteBuffer_.size() == CHECKSUM_SIZE) {
         if (context->validatePayload()) {
+            context->byteBuffer_.clear();
+            context->checksumAccumulator_.clear();
             context->currentState_ = std::make_unique<SeekingFrameStart>();
         } else {
             context->resetMachine();
@@ -209,15 +249,47 @@ ParsingChecksum::operator()(Decoder *context, const uint8_t &byte) const {
 
 void
 ParsingATCommandHeader::operator()(Decoder *context, const uint8_t &byte) const {
+    context->assertBufferSmallerThan(ATCommandResponse::HEADER_SIZE);
 
+    context->byteBuffer_.push_back(byte);
+
+    if (context->byteBuffer_.size() == ATCommandResponse::HEADER_SIZE) {
+
+        context->byteBuffer_.clear();
+        context->currentState_ = std::make_unique<ParsingATCommandPayload>();
+    }
 }
 
 void
 ParsingATCommandPayload::operator()(Decoder *context, const uint8_t &byte) const {
+    context->assertBufferSmallerThan(ATCommandResponse::PAYLOAD_SIZE);
 
+    context->byteBuffer_.push_back(byte);
+    context->checksumAccumulator_.push_back(byte);
+
+    if (context->byteBuffer_.size() == ATCommandResponse::PAYLOAD_SIZE) {
+
+        context->currentDatagram_.payloadData_ = context->byteBuffer_;
+        context->byteBuffer_.clear();
+        context->currentState_ = std::make_unique<ParsingATCommandChecksum>();
+
+    }
 }
 
 void
 ParsingATCommandChecksum::operator()(Decoder *context, const uint8_t &byte) const {
 
+    context->assertBufferSmallerThan(ATCommandResponse::CHECKSUM_SIZE);
+
+    context->byteBuffer_.push_back(byte);
+
+    if (context->byteBuffer_.size() == ATCommandResponse::CHECKSUM_SIZE) {
+        if (context->validateATPayload()) {
+            context->byteBuffer_.clear();
+            context->checksumAccumulator_.clear();
+            context->currentState_ = std::make_unique<SeekingFrameStart>();
+        } else {
+            context->resetMachine();
+        }
+    }
 }

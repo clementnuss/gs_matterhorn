@@ -84,9 +84,9 @@ class Decoder {
 
     friend class ParsingChecksum;
 
-    friend class parsingATCommandHeader;
+    friend class ParsingATCommandHeader;
 
-    friend class parsingATCommandPayload;
+    friend class ParsingATCommandPayload;
 
     friend class ParsingATCommandChecksum;
 
@@ -143,6 +143,8 @@ private:
      * @return True if the checksums match, false and log otherwise
      */
     bool validatePayload();
+
+    bool validateATPayload();
 
     void assertBufferSmallerThan(size_t);
 

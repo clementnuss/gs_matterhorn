@@ -23,19 +23,19 @@ private slots:
         //  7E  00  06  88  01  44  42  00  50  A0
         std::vector<uint8_t> rssiResponse{0x7E, 0x00, 0x06, 0x88, 0x01, 0x44, 0x42, 0x00, 0x50, 0xA0};
 
-        QCOMPARE(DecodingState::SEEKING_FRAMESTART, decoder.currentState());
+        QVERIFY(dynamic_cast<SeekingFrameStart *>(decoder.currentState()));
 
         for (size_t i = 0; i < rssiResponse.size(); i++) {
             decoder.processByte(rssiResponse[i]);
 
             if (i == 0)
-                QCOMPARE(DecodingState::PARSING_AT_COMMAND_HEADER, decoder.currentState());
+                QVERIFY(dynamic_cast<ParsingATCommandHeader *>(decoder.currentState()));
 
             if (i == 2)
-                QCOMPARE(DecodingState::PARSING_AT_COMMAND, decoder.currentState());
+                QVERIFY(dynamic_cast<ParsingATCommandPayload *>(decoder.currentState()));
 
             if (i == 8)
-                QCOMPARE(DecodingState::PARSING_AT_COMMAND_CHECKSUM, decoder.currentState());
+                QVERIFY(dynamic_cast<ParsingATCommandChecksum *>(decoder.currentState()));
         }
 
         QVERIFY(decoder.datagramReady());
