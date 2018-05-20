@@ -21,6 +21,8 @@ public:
 
     virtual void dispatch(EventPacket *);
 
+    virtual void dispatch(ATCommandResponse *);
+
     template<class T>
     void emitIfNonEmpty(const std::vector<T *> &v);
 
@@ -33,12 +35,13 @@ public:
 private:
 
     Worker *const worker_;
+    std::vector<ATCommandResponse *> atCommandsQueue_;
     std::map<FlyableType, std::vector<SensorsPacket *>> sensorsPacketQueues_;
     std::map<FlyableType, std::vector<GPSPacket *>> gpsPacketQueues_;
     std::map<FlyableType, std::vector<EventPacket *>> eventPacketQueues_;
     std::map<FlyableType, std::chrono::system_clock::time_point> lastUpdates_;
 
-    FileLogger sensorsLogger_, gpsLogger_, eventLogger_;
+    FileLogger atLogger_, sensorsLogger_, gpsLogger_, eventLogger_;
 
     bool logEnabled_;
 };

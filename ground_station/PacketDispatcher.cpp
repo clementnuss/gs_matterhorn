@@ -6,10 +6,12 @@
 
 PacketDispatcher::PacketDispatcher(Worker *const containerWorker) :
         worker_{containerWorker},
+        atCommandsQueue_{},
         sensorsPacketQueues_{},
         gpsPacketQueues_{},
         eventPacketQueues_{},
         lastUpdates_{},
+        atLogger_{LogConstants::WORKER_ATCOMMAND_LOG_PATH},
         sensorsLogger_{LogConstants::WORKER_TELEMETRY_LOG_PATH},
         gpsLogger_{LogConstants::WORKER_GPS_LOG_PATH},
         eventLogger_{LogConstants::WORKER_EVENT_LOG_PATH},
@@ -51,6 +53,14 @@ PacketDispatcher::dispatch(EventPacket *p) {
 
     if (logEnabled_)
         eventLogger_.registerString(p->toString());
+}
+
+void
+PacketDispatcher::dispatch(ATCommandResponse *r) {
+    atCommandsQueue_.emplace_back(r);
+
+    if (logEnabled_)
+        atLogger_.registerString(r->toString());
 }
 
 

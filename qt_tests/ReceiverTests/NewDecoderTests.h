@@ -39,6 +39,17 @@ private slots:
         }
 
         QVERIFY(decoder.datagramReady());
+
+        Datagram d = decoder.retrieveDatagram();
+        ATCommandResponse *r = PayloadDataConverter::toATCommandResponse(d.payloadData_);
+        ATCommandResponse response = *r;
+        delete r;
+
+        QCOMPARE(response.frameType_, 0x88);
+        QCOMPARE(response.frameID_, 0x01);
+        QCOMPARE(response.command_, 0x4442);
+        QCOMPARE(response.status_, 0x00);
+        QCOMPARE(response.response_, 0x50);
     }
 };
 

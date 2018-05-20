@@ -27,6 +27,11 @@ public:
     static ControlPacket *toControlPacket(const FlyableType &, const uint32_t &, const std::vector<uint8_t> &);
 
     static GPSPacket *toGPSPacket(const FlyableType &, const uint32_t &, const std::vector<uint8_t> &);
+
+    static ATCommandResponse *toATCommandResponse(const std::vector<uint8_t> &);
+
+private:
+    static constexpr size_t AT_RESPONSE_LENGTH = 6;
 };
 
 

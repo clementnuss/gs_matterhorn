@@ -1,6 +1,11 @@
 #include "DataStructures/Datastructs.h"
 #include "PacketDispatcher.h"
 
+void
+IDispatchable::dispatchWith(PacketDispatcher *) {
+
+}
+
 /**
  * DataPacket
  */
@@ -15,7 +20,6 @@ DataPacket::dispatchWith(PacketDispatcher *d) {
 
 }
 
-
 std::string
 DataPacket::toString() const {
     std::stringstream ss;
@@ -26,6 +30,33 @@ DataPacket::toString() const {
 
     return ss.str();
 }
+
+/**
+ *  AT command response
+ */
+void
+ATCommandResponse::dispatchWith(PacketDispatcher *d) {
+    d->dispatch(this);
+}
+
+std::string
+ATCommandResponse::toString() const {
+    std::stringstream ss;
+
+    ss << command_
+       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << frameType_
+       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << frameID_
+       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << status_
+       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << response_;
+
+    return ss.str();
+}
+
+ATCommandResponse::ATCommandResponse(uint8_t frameType, uint8_t frameID, uint16_t command, uint8_t status, uint8_t response) :
+        frameType_{frameType}, frameID_{frameID}, command_{command}, status_{status}, response_{response} {
+
+}
+
 
 /**
  * EventPacket
@@ -247,3 +278,5 @@ bool
 SensorsPacket::isValid() const {
     return false;
 }
+
+

@@ -23,18 +23,39 @@ struct ILoggable {
     virtual std::string toString() const = 0;
 };
 
-struct DataPacket : public ILoggable {
+struct IDispatchable {
+    virtual void dispatchWith(PacketDispatcher *);
+};
+
+struct DataPacket : public ILoggable, IDispatchable {
     DataPacket() = default;
 
     explicit DataPacket(uint32_t timestamp, uint32_t sequenceNumber, FlyableType flyableType);
 
-    virtual void dispatchWith(PacketDispatcher *);
+    void dispatchWith(PacketDispatcher *) override;
 
     std::string toString() const override;
 
     uint32_t timestamp_;
     uint32_t sequenceNumber_;
     FlyableType flyableType_;
+};
+
+struct ATCommandResponse : public ILoggable, IDispatchable {
+
+    ATCommandResponse() = default;
+
+    explicit ATCommandResponse(uint8_t, uint8_t, uint16_t, uint8_t, uint8_t);
+
+    uint8_t frameType_;
+    uint8_t frameID_;
+    uint16_t command_;
+    uint8_t status_;
+    uint8_t response_;
+
+    void dispatchWith(PacketDispatcher *) override;
+
+    std::string toString() const override;
 };
 
 struct EventPacket : public DataPacket, IDeserializable {

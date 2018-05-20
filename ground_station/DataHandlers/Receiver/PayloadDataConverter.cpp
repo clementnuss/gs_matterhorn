@@ -203,3 +203,30 @@ PayloadDataConverter::toGPSPacket(const FlyableType &flyableType, const uint32_t
                          lon.fl,
                          alt / 100.0f);
 }
+
+
+/**
+ * Builds an ATCommandResponse struct given a sequence of bytes
+ *
+ * @return An ATCommandResponse struct
+ */
+ATCommandResponse *
+PayloadDataConverter::toATCommandResponse(const std::vector<uint8_t> &payloadBuffer) {
+    assert(payloadBuffer.size() == AT_RESPONSE_LENGTH);
+
+    auto it = payloadBuffer.begin();
+
+    auto frameType = parse8<uint8_t>(it);
+    auto frameID = parse8<uint8_t>(it);
+    auto command = parse16<uint16_t>(it);
+    auto status = parse8<uint8_t>(it);
+    auto response = parse8<uint8_t>(it);
+
+    return new ATCommandResponse{
+            frameType,
+            frameID,
+            command,
+            status,
+            response
+    };
+}
