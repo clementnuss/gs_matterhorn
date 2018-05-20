@@ -6,18 +6,19 @@
 #include "Decoder.h"
 #include "Utilities/ParsingUtilities.h"
 
-const std::map<DecodingState, std::pair<DecodingState, void (Decoder::*)(
-        uint8_t)>> Decoder::STATES_TABLE = Decoder::createStatesMap();
 
-Decoder::Decoder(const string &logTitle) : byteBuffer_{}, checksumAccumulator_{}, currentState_{INITIAL_STATE}, currentDatagram_{},
-                                           logger_{LogConstants::DECODER_LOG_PATH + logTitle}, startupTime_{std::chrono::system_clock::now()},
-                                           action_{&Decoder::seekHeader} {}
+Decoder::Decoder(const string &logTitle) : byteBuffer_{},
+                                           checksumAccumulator_{},
+                                           currentState_{std::make_unique<SeekingFrameStart>()},
+                                           currentDatagram_{},
+                                           logger_{LogConstants::DECODER_LOG_PATH + logTitle},
+                                           startupTime_{std::chrono::system_clock::now()} {}
 
 bool
 Decoder::processByte(uint8_t byte) {
     assert(!datagramReady());
 
-    (this->*action_)(byte);
+    (*currentState_)(this, byte);
 
     return this->datagramReady();
 }
@@ -76,99 +77,15 @@ Decoder::retrieveDatagram() {
     return r;
 }
 
-void
-Decoder::jumpToNextState() {
-    auto pair = STATES_TABLE.at(currentState_);
-
-    currentState_ = pair.first;
-    action_ = pair.second;
-}
 
 void
 Decoder::resetMachine() {
     byteBuffer_.clear();
     checksumAccumulator_.clear();
     currentDatagram_ = Datagram();
-    currentState_ = INITIAL_STATE;
-    action_ = &Decoder::seekHeader;
+    currentState_ = std::make_unique<SeekingFrameStart>();
 }
 
-void
-Decoder::seekHeader(uint8_t byte) {
-    assertBufferSmallerThan(PREAMBLE_SIZE);
-
-    if (byte == HEADER_PREAMBLE_FLAG) {
-        byteBuffer_.push_back(byte);
-    } else {
-        byteBuffer_.clear();
-    }
-
-    if (byteBuffer_.size() == PREAMBLE_SIZE) {
-        byteBuffer_.clear();
-        jumpToNextState();
-    }
-}
-
-void
-Decoder::accumulateHeader(uint8_t byte) {
-    assertBufferSmallerThan(HEADER_SIZE);
-
-    byteBuffer_.push_back(byte);
-
-    if (byteBuffer_.size() == HEADER_SIZE) {
-        for (auto b : byteBuffer_) {
-            checksumAccumulator_.push_back(b);
-        }
-
-        if (processHeader(byteBuffer_)) {
-            byteBuffer_.clear();
-            jumpToNextState();
-        } else {
-            resetMachine();
-        }
-    }
-}
-
-void
-Decoder::seekControlFlag(uint8_t byte) {
-    assert(byteBuffer_.empty());
-
-    if (byte == CONTROL_FLAG) {
-        jumpToNextState();
-    } else {
-        //TODO: log
-        resetMachine();
-    }
-}
-
-void
-Decoder::accumulatePayload(uint8_t byte) {
-    assertBufferSmallerThan(currentDatagram_.payloadType_->length());
-
-    byteBuffer_.push_back(byte);
-    checksumAccumulator_.push_back(byte);
-
-    if (byteBuffer_.size() == currentDatagram_.payloadType_->length()) {
-        currentDatagram_.payloadData_ = byteBuffer_;
-        byteBuffer_.clear();
-        jumpToNextState();
-    }
-}
-
-void
-Decoder::accumulateChecksum(uint8_t byte) {
-    assertBufferSmallerThan(CHECKSUM_SIZE);
-
-    byteBuffer_.push_back(byte);
-
-    if (byteBuffer_.size() == CHECKSUM_SIZE) {
-        if (validatePayload()) {
-            jumpToNextState();
-        } else {
-            resetMachine();
-        }
-    }
-}
 
 bool
 Decoder::validatePayload() {
@@ -208,7 +125,99 @@ Decoder::assertBufferSmallerThan(size_t bound) {
     assert(0 <= byteBuffer_.size() && byteBuffer_.size() < bound);
 }
 
-DecodingState
+IState *
 Decoder::currentState() const {
-    return currentState_;
+    return currentState_.get();
+}
+
+void
+SeekingFrameStart::operator()(Decoder *context, const uint8_t &byte) const {
+    context->assertBufferSmallerThan(PREAMBLE_SIZE);
+
+    if (byte == HEADER_PREAMBLE_FLAG) {
+        context->byteBuffer_.push_back(byte);
+    } else {
+        context->byteBuffer_.clear();
+    }
+
+    if (context->byteBuffer_.size() == PREAMBLE_SIZE) {
+        context->byteBuffer_.clear();
+        context->currentState_ = std::make_unique<ParsingHeader>();
+    }
+}
+
+void
+ParsingHeader::operator()(Decoder *context, const uint8_t &byte) const {
+    context->assertBufferSmallerThan(HEADER_SIZE);
+
+    context->byteBuffer_.push_back(byte);
+
+    if (context->byteBuffer_.size() == HEADER_SIZE) {
+        for (auto b : context->byteBuffer_) {
+            context->checksumAccumulator_.push_back(b);
+        }
+
+        if (context->processHeader(context->byteBuffer_)) {
+            context->byteBuffer_.clear();
+            context->currentState_ = std::make_unique<SeekingControlFlag>();
+        } else {
+            context->resetMachine();
+        }
+    }
+}
+
+void
+SeekingControlFlag::operator()(Decoder *context, const uint8_t &byte) const {
+    assert(context->byteBuffer_.empty());
+
+    if (byte == CONTROL_FLAG) {
+        context->currentState_ = std::make_unique<ParsingPayload>();
+    } else {
+        //TODO: log
+        context->resetMachine();
+    }
+}
+
+void
+ParsingPayload::operator()(Decoder *context, const uint8_t &byte) const {
+    context->assertBufferSmallerThan(context->currentDatagram_.payloadType_->length());
+
+    context->byteBuffer_.push_back(byte);
+    context->checksumAccumulator_.push_back(byte);
+
+    if (context->byteBuffer_.size() == context->currentDatagram_.payloadType_->length()) {
+        context->currentDatagram_.payloadData_ = context->byteBuffer_;
+        context->byteBuffer_.clear();
+        context->currentState_ = std::make_unique<ParsingChecksum>();
+    }
+}
+
+void
+ParsingChecksum::operator()(Decoder *context, const uint8_t &byte) const {
+    context->assertBufferSmallerThan(CHECKSUM_SIZE);
+
+    context->byteBuffer_.push_back(byte);
+
+    if (context->byteBuffer_.size() == CHECKSUM_SIZE) {
+        if (context->validatePayload()) {
+            context->currentState_ = std::make_unique<SeekingFrameStart>();
+        } else {
+            context->resetMachine();
+        }
+    }
+}
+
+void
+ParsingATCommandHeader::operator()(Decoder *context, const uint8_t &byte) const {
+
+}
+
+void
+ParsingATCommandPayload::operator()(Decoder *context, const uint8_t &byte) const {
+
+}
+
+void
+ParsingATCommandChecksum::operator()(Decoder *context, const uint8_t &byte) const {
+
 }

@@ -144,7 +144,7 @@ createGPSDatagram(uint32_t seqnum, uint32_t timestamp, uint8_t satCount, float r
 
 // -------------------------- Helper functions for reaching specific Decoder states  ------------------------------- //
 static void feedWithValidPreamble(Decoder &decoder) {
-    if (decoder.currentState() != DecodingState::SEEKING_FRAMESTART) {
+    if (!dynamic_cast<SeekingFrameStart *>(decoder.currentState())) {
         cerr << " problem " << endl;
     }
 
@@ -153,20 +153,19 @@ static void feedWithValidPreamble(Decoder &decoder) {
     decoder.processByte(HEADER_PREAMBLE_FLAG);
     decoder.processByte(HEADER_PREAMBLE_FLAG);
 
-    if (decoder.currentState() != DecodingState::PARSING_HEADER) {
+    if (!dynamic_cast<ParsingHeader *>(decoder.currentState())) {
         cerr << " problem " << endl;
     }
 }
 
 static void feedWithValidSequenceNumber(Decoder &decoder) {
-    ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_HEADER);
-
+    ASSERT_TRUE(dynamic_cast<ParsingHeader *>(decoder.currentState()));
     decoder.processByte(0x01);
     decoder.processByte(0x01);
     decoder.processByte(0x01);
     decoder.processByte(0x01);
 
-    ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_HEADER);
+    ASSERT_TRUE(dynamic_cast<ParsingHeader *>(decoder.currentState()));
 }
 
 static void feedWithValidPayloadType(Decoder &decoder) {
@@ -181,11 +180,11 @@ static void feedWithValidHeader(Decoder &decoder) {
     feedWithValidSequenceNumber(decoder);
     feedWithValidPayloadType(decoder);
 
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_CONTROL_FLAG);
+    ASSERT_TRUE(dynamic_cast<SeekingControlFlag *>(decoder.currentState()));
 
     decoder.processByte(CONTROL_FLAG);
 
-    ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_PAYLOAD);
+    ASSERT_TRUE(dynamic_cast<ParsingPayload *>(decoder.currentState()));
 }
 
 
@@ -196,46 +195,46 @@ static void parsePacket(Decoder &decoder, vector<uint8_t> &datagram, PayloadType
 
     // Process preamble
     for (size_t i = 0; i < PREAMBLE_SIZE; i++) {
-        ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+        ASSERT_TRUE(dynamic_cast<SeekingFrameStart *>(decoder.currentState()));
         ASSERT_FALSE(decoder.datagramReady());
         decoder.processByte(datagram[k++]);
     }
 
     // Process header
     for (size_t i = 0; i < HEADER_SIZE; i++) {
-        ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_HEADER);
+        ASSERT_TRUE(dynamic_cast<ParsingHeader *>(decoder.currentState()));
         ASSERT_FALSE(decoder.datagramReady());
         decoder.processByte(datagram[k++]);
     }
 
     // Process control flag
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_CONTROL_FLAG);
+    ASSERT_TRUE(dynamic_cast<SeekingControlFlag *>(decoder.currentState()));
     ASSERT_FALSE(decoder.datagramReady());
     decoder.processByte(datagram[k++]);
 
     // Process payload
     for (size_t i = 0; i < payloadType.length(); i++) {
-        ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_PAYLOAD);
+        ASSERT_TRUE(dynamic_cast<ParsingPayload *>(decoder.currentState()));
         ASSERT_FALSE(decoder.datagramReady());
         decoder.processByte(datagram[k++]);
     }
 
     // Process checksum
     for (size_t i = 0; i < CHECKSUM_SIZE; i++) {
-        ASSERT_EQ(decoder.currentState(), DecodingState::PARSING_CHECKSUM);
+        ASSERT_TRUE(dynamic_cast<ParsingChecksum *>(decoder.currentState()));
         ASSERT_FALSE(decoder.datagramReady());
         decoder.processByte(datagram[k++]);
     }
 
     // Datagram should be ready
     ASSERT_TRUE(decoder.datagramReady());
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+    ASSERT_TRUE(dynamic_cast<SeekingFrameStart *>(decoder.currentState()));
 
     *out = decoder.retrieveDatagram();
 
     // State machine should be reset
     ASSERT_FALSE(decoder.datagramReady());
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+    ASSERT_TRUE(dynamic_cast<SeekingFrameStart *>(decoder.currentState()));
 
 }
 
@@ -274,7 +273,7 @@ TEST(DecoderTests, singleTelemetryPacket) {
 
     Decoder decoder{"test_decoder"};
 
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+    ASSERT_TRUE(dynamic_cast<SeekingFrameStart *>(decoder.currentState()));
 
     // Test values
     uint32_t seqnum = 1410;
@@ -307,7 +306,7 @@ TEST(DecoderTests, multipleTelemetryPackets) {
     srand(0);
     constexpr size_t measureCount = 10000;
 
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+    ASSERT_TRUE(dynamic_cast<SeekingFrameStart *>(decoder.currentState()));
 
     // Test values
     std::array<uint32_t, measureCount> seqnum{}, timestamp{};
@@ -355,7 +354,7 @@ TEST(DecoderTests, multipleTelemetryPackets) {
 TEST(DecoderTests, singleEventPacket) {
     Decoder decoder{"test_decoder"};
 
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+    ASSERT_TRUE(dynamic_cast<SeekingFrameStart *>(decoder.currentState()));
 
     uint32_t seqnum{1234};
     uint32_t timestamp{18};
@@ -380,7 +379,7 @@ TEST(DecoderTests, multipleEventPackets) {
 
     Decoder decoder{"test_decoder"};
 
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+    ASSERT_TRUE(dynamic_cast<SeekingFrameStart *>(decoder.currentState()));
 
     Rand<uint32_t> uint32Rand;
     Rand<uint8_t> uint8Rand;
@@ -412,7 +411,7 @@ TEST(DecoderTests, singleControlPacket) {
 
     Decoder decoder{"test_decoder"};
 
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+    ASSERT_TRUE(dynamic_cast<SeekingFrameStart *>(decoder.currentState()));
 
     uint32_t seqnum{1234};
     uint32_t timestamp{18};
@@ -438,7 +437,7 @@ TEST(DecoderTests, multipleControlPackets) {
 
     Decoder decoder{"test_decoder"};
 
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+    ASSERT_TRUE(dynamic_cast<SeekingFrameStart *>(decoder.currentState()));
 
     Rand<uint32_t> uint32Rand;
     Rand<uint16_t> uint16Rand;
@@ -476,7 +475,7 @@ TEST(DecoderTests, singleGPSPacket) {
 
     Decoder decoder{"test_decoder"};
 
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+    ASSERT_TRUE(dynamic_cast<SeekingFrameStart *>(decoder.currentState()));
 
     uint32_t seqnum{1234};
     uint32_t timestamp{18};
@@ -508,7 +507,7 @@ TEST(DecoderTests, multipleGPSPackets) {
 
     Decoder decoder{"test_decoder"};
 
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+    ASSERT_TRUE(dynamic_cast<SeekingFrameStart *>(decoder.currentState()));
 
     Rand<uint32_t> uint32Rand;
     Rand<int32_t> int32Rand(10000000, 10000000);
@@ -615,17 +614,17 @@ TEST(DecoderTests, missingControlFlagResetsMachine) {
             std::cout << "test";
         }
 
-        EXPECT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+        EXPECT_TRUE(dynamic_cast<SeekingFrameStart *>(decoder.currentState()));
 
         feedWithValidPreamble(decoder);
         feedWithValidSequenceNumber(decoder);
         feedWithValidPayloadType(decoder);
 
-        EXPECT_EQ(decoder.currentState(), DecodingState::SEEKING_CONTROL_FLAG);
+        EXPECT_TRUE(dynamic_cast<SeekingControlFlag *>(decoder.currentState()));
 
         decoder.processByte(b);
 
-        EXPECT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+        EXPECT_TRUE(dynamic_cast<SeekingFrameStart *>(decoder.currentState()));
     }
 
 }
@@ -638,13 +637,13 @@ TEST(DecoderTests, wrongChecksumDropsPacket) {
 
     datagram[datagram.size() - 1] += 1;
 
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+    ASSERT_TRUE(dynamic_cast<SeekingFrameStart *>(decoder.currentState()));
 
     for (uint8_t b : datagram) {
         ASSERT_FALSE(decoder.processByte(b));
     }
 
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+    ASSERT_TRUE(dynamic_cast<SeekingFrameStart *>(decoder.currentState()));
 
     for (size_t i = 0; i < datagram.size(); i++) {
         if (i == datagram.size() - 1) {
@@ -654,7 +653,7 @@ TEST(DecoderTests, wrongChecksumDropsPacket) {
         }
     }
 
-    ASSERT_EQ(decoder.currentState(), DecodingState::SEEKING_FRAMESTART);
+    ASSERT_TRUE(dynamic_cast<SeekingFrameStart *>(decoder.currentState()));
     ASSERT_TRUE(decoder.datagramReady());
 
 }
