@@ -24,6 +24,12 @@ public:
         return l;
     };
 
+    virtual std::list<std::unique_ptr<ATCommandResponse>> pollATResponses() {
+        std::list<std::unique_ptr<ATCommandResponse>> l;
+        return l;
+    };
+
+
     virtual void sendCommand(const uint8_t *, size_t) {};
 
     virtual bool isReplayReceiver() {};

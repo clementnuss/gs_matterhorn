@@ -120,6 +120,11 @@ Worker::mainRoutine() {
         dp.release()->dispatchWith(packetDispatcher_);
     }
 
+    std::list<std::unique_ptr<ATCommandResponse>> atResponses = compositeReceiver_->pollATResponses();
+    for (std::unique_ptr<ATCommandResponse> &cr : atResponses) {
+        cr.release()->dispatchWith(packetDispatcher_);
+    }
+
     packetDispatcher_->processDataFlows();
 
     QCoreApplication::sendPostedEvents(this);

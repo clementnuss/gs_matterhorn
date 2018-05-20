@@ -28,6 +28,8 @@ public:
 
     std::list<std::unique_ptr<DataPacket>> pollData() override;
 
+    std::list<std::unique_ptr<ATCommandResponse>> pollATResponses() override;
+
     void sendCommand(const uint8_t *, size_t) override;
 
     bool isReplayReceiver() override;
@@ -54,7 +56,8 @@ private:
     FileLogger bytesLogger_;
     FileLogger packetLogger_;
     std::atomic_bool threadEnabled_;
-    boost::lockfree::spsc_queue<DataPacket *> dataQueue_;
+    boost::lockfree::spsc_queue<DataPacket *> dataPacketsQueue_;
+    boost::lockfree::spsc_queue<ATCommandResponse *> atResponsesQueue_;
 
 };
 

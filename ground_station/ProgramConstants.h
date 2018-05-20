@@ -142,6 +142,7 @@ namespace CommunicationsConstants {
     static constexpr int CONTROL_TYPE = 2;
     static constexpr int GPS_TYPE = 3;
     static constexpr int TELEMETRY_ERT18_TYPE = 4;
+    static constexpr int AT_COMMAND_TYPE = 5;
 }
 
 //TODO: use uint8 ?

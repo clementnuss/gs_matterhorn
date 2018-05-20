@@ -144,7 +144,7 @@ GSMainwindow::updateTime() {
  * @param sp The Telemetry object from which to extract data to update the display.
  */
 void
-GSMainwindow::receiveDataPacket(SensorsPacket sp) {
+GSMainwindow::receiveData(SensorsPacket sp) {
 
     SensorLabelsStruct s = telemetryLabelsMap_[sp.flyableType_];
 
@@ -168,7 +168,7 @@ GSMainwindow::receiveDataPacket(SensorsPacket sp) {
  * @param event
  */
 void
-GSMainwindow::receiveDataPacket(const EventPacket event) {
+GSMainwindow::receiveData(const EventPacket event) {
 
     int seconds = event.timestamp_ / TimeConstants::MSECS_IN_SEC;
     int minutes = seconds / TimeConstants::SECS_IN_MINUTE;
@@ -192,7 +192,7 @@ GSMainwindow::receiveDataPacket(const EventPacket event) {
  * @param gpsData
  */
 void
-GSMainwindow::receiveDataPacket(const GPSPacket gpsData) {
+GSMainwindow::receiveData(const GPSPacket gpsData) {
 
 
     GpsLabelsStruct s = gpsLabelsMap_[gpsData.flyableType_];
@@ -207,6 +207,17 @@ GSMainwindow::receiveDataPacket(const GPSPacket gpsData) {
 
         rootEntity3D_->updateTrackerLatLon(gpsData.flyableType_, gpsData.latLon());
     }
+}
+
+
+/**
+ * Qt SLOT to receive and display RSSI data from the receivers
+ *
+ * @param gpsData
+ */
+void
+GSMainwindow::receiveData(const RSSIResponse rssiResponse) {
+
 }
 
 
@@ -319,12 +330,6 @@ GSMainwindow::updateLinkStatus(HandlerStatus status) {
     palette.setColor(label->backgroundRole(), statusColor);
     label->setPalette(palette);
 
-}
-
-void
-GSMainwindow::updateGroundStatus(float temperature, float pressure) {
-    ui->ground_temperature_value->setText(QString::number(temperature, 'f', UIConstants::PRECISION));
-    ui->ground_temperature_value->setText(QString::number(pressure, 'f', UIConstants::PRECISION));
 }
 
 void

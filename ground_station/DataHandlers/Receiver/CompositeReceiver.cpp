@@ -47,6 +47,16 @@ CompositeReceiver::pollData() {
     return consumeAndMove(&mergeQueue_);
 }
 
+std::list<std::unique_ptr<ATCommandResponse>>
+CompositeReceiver::pollATResponses() {
+
+    std::list<std::unique_ptr<ATCommandResponse>> primaryATResponses = primaryReceiver_->pollATResponses();
+    std::list<std::unique_ptr<ATCommandResponse>> backupATResponses = backupReceiver_->pollATResponses();
+    primaryATResponses.splice(primaryATResponses.end(), backupATResponses);
+
+    return primaryATResponses;
+}
+
 inline bool
 isNotFresh(std::list<std::unique_ptr<DataPacket>> *q, const uint32_t &index, const FlyableType &fType) {
     return !q->empty() && q->front()->sequenceNumber_ + 1 == index && q->front()->flyableType_ == fType;

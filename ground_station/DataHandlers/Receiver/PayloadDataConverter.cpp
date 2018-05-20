@@ -222,11 +222,15 @@ PayloadDataConverter::toATCommandResponse(const std::vector<uint8_t> &payloadBuf
     auto status = parse8<uint8_t>(it);
     auto response = parse8<uint8_t>(it);
 
-    return new ATCommandResponse{
-            frameType,
-            frameID,
-            command,
-            status,
-            response
-    };
+    if (command == ATCommandResponse::RSSI_COMMAND_CODE) {
+        return new RSSIResponse{
+                frameType,
+                frameID,
+                command,
+                status,
+                response
+        };
+    } else {
+        return new ATCommandResponse{};
+    }
 }

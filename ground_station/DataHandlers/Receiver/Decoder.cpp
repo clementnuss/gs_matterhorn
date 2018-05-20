@@ -168,6 +168,7 @@ SeekingFrameStart::operator()(Decoder *context, const uint8_t &byte) const {
 
     if (byte == ATCommandResponse::FRAME_DELIMITER) {
         context->byteBuffer_.clear();
+        context->currentDatagram_.payloadType_ = &PayloadType::AT_COMMAND;
         context->currentState_ = std::make_unique<ParsingATCommandHeader>();
     } else {
         context->assertBufferSmallerThan(PREAMBLE_SIZE);
@@ -254,7 +255,6 @@ ParsingATCommandHeader::operator()(Decoder *context, const uint8_t &byte) const 
     context->byteBuffer_.push_back(byte);
 
     if (context->byteBuffer_.size() == ATCommandResponse::HEADER_SIZE) {
-
         context->byteBuffer_.clear();
         context->currentState_ = std::make_unique<ParsingATCommandPayload>();
     }

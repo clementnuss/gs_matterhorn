@@ -36,7 +36,7 @@ DataPacket::toString() const {
  */
 void
 ATCommandResponse::dispatchWith(PacketDispatcher *d) {
-    d->dispatch(this);
+
 }
 
 std::string
@@ -46,15 +46,32 @@ ATCommandResponse::toString() const {
     ss << command_
        << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << frameType_
        << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << frameID_
-       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << status_
-       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << response_;
+       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << status_;
 
     return ss.str();
 }
 
-ATCommandResponse::ATCommandResponse(uint8_t frameType, uint8_t frameID, uint16_t command, uint8_t status, uint8_t response) :
-        frameType_{frameType}, frameID_{frameID}, command_{command}, status_{status}, response_{response} {
+ATCommandResponse::ATCommandResponse(uint8_t frameType, uint8_t frameID, uint16_t command, uint8_t status) :
+        frameType_{frameType}, frameID_{frameID}, command_{command}, status_{status} {
 
+}
+
+RSSIResponse::RSSIResponse(uint8_t frameType, uint8_t frameID, uint16_t command, uint8_t status, uint8_t value) :
+        ATCommandResponse{frameType, frameID, command, status}, value_{value} {}
+
+void
+RSSIResponse::dispatchWith(PacketDispatcher *d) {
+    d->dispatch(this);
+}
+
+std::string
+RSSIResponse::toString() const {
+    std::stringstream ss;
+
+    ss << ATCommandResponse::toString()
+       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << value_;
+
+    return ss.str();
 }
 
 

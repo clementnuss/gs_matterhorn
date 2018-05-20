@@ -23,11 +23,11 @@ struct ILoggable {
     virtual std::string toString() const = 0;
 };
 
-struct IDispatchable {
+struct IDispatchable : public ILoggable {
     virtual void dispatchWith(PacketDispatcher *);
 };
 
-struct DataPacket : public ILoggable, IDispatchable {
+struct DataPacket : public IDispatchable {
     DataPacket() = default;
 
     explicit DataPacket(uint32_t timestamp, uint32_t sequenceNumber, FlyableType flyableType);
@@ -41,26 +41,37 @@ struct DataPacket : public ILoggable, IDispatchable {
     FlyableType flyableType_;
 };
 
-struct ATCommandResponse : public ILoggable, IDispatchable {
+struct ATCommandResponse : public IDispatchable {
 
     static constexpr uint8_t FRAME_DELIMITER = 0x7E;
     static constexpr size_t HEADER_SIZE = 2;
     static constexpr size_t PAYLOAD_SIZE = 6;
     static constexpr size_t CHECKSUM_SIZE = 1;
+    static constexpr uint16_t RSSI_COMMAND_CODE = 0x4442;
 
     ATCommandResponse() = default;
 
-    explicit ATCommandResponse(uint8_t, uint8_t, uint16_t, uint8_t, uint8_t);
+    explicit ATCommandResponse(uint8_t, uint8_t, uint16_t, uint8_t);
 
     uint8_t frameType_;
     uint8_t frameID_;
     uint16_t command_;
     uint8_t status_;
-    uint8_t response_;
 
     void dispatchWith(PacketDispatcher *) override;
 
     std::string toString() const override;
+};
+
+struct RSSIResponse : public ATCommandResponse {
+
+    RSSIResponse() = default;
+
+    explicit RSSIResponse(uint8_t, uint8_t, uint16_t, uint8_t, uint8_t);
+    void dispatchWith(PacketDispatcher *) override;
+    std::string toString() const override;
+
+    uint8_t value_;
 };
 
 struct EventPacket : public DataPacket, IDeserializable {

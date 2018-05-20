@@ -21,7 +21,7 @@ public:
 
     virtual void dispatch(EventPacket *);
 
-    virtual void dispatch(ATCommandResponse *);
+    virtual void dispatch(RSSIResponse *);
 
     template<class T>
     void emitIfNonEmpty(const std::vector<T *> &v);
@@ -35,7 +35,7 @@ public:
 private:
 
     Worker *const worker_;
-    std::vector<ATCommandResponse *> atCommandsQueue_;
+    std::vector<RSSIResponse *> rssiResponsesQueue_;
     std::map<FlyableType, std::vector<SensorsPacket *>> sensorsPacketQueues_;
     std::map<FlyableType, std::vector<GPSPacket *>> gpsPacketQueues_;
     std::map<FlyableType, std::vector<EventPacket *>> eventPacketQueues_;

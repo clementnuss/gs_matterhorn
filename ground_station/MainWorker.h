@@ -54,11 +54,13 @@ signals:
 
     void loggingStatusReady(bool);
 
-    void dataPacketReady(SensorsPacket) const;
+    void dataReady(SensorsPacket) const;
 
-    void dataPacketReady(EventPacket) const;
+    void dataReady(EventPacket) const;
 
-    void dataPacketReady(GPSPacket) const;
+    void dataReady(GPSPacket) const;
+
+    void dataReady(RSSIResponse) const;
 
     void flightPositionReady(Position);
 

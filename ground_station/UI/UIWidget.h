@@ -52,11 +52,13 @@ public slots:
 
     /* TELEMETRY-RELATED SLOTS */
 
-    void receiveDataPacket(SensorsPacket);
+    void receiveData(SensorsPacket);
 
-    void receiveDataPacket(EventPacket);
+    void receiveData(EventPacket);
 
-    void receiveDataPacket(GPSPacket);
+    void receiveData(GPSPacket);
+
+    void receiveData(RSSIResponse);
 
     void receiveGraphData(QVector<QCPGraphData> &, GraphFeature);
 
@@ -73,8 +75,6 @@ public slots:
     void updateLoggingStatus(bool);
 
     void updateLinkStatus(HandlerStatus);
-
-    void updateGroundStatus(float, float);
 
 
     /* CONTROL SLOTS */

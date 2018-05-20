@@ -6,7 +6,7 @@
 
 PacketDispatcher::PacketDispatcher(Worker *const containerWorker) :
         worker_{containerWorker},
-        atCommandsQueue_{},
+        rssiResponsesQueue_{},
         sensorsPacketQueues_{},
         gpsPacketQueues_{},
         eventPacketQueues_{},
@@ -56,8 +56,8 @@ PacketDispatcher::dispatch(EventPacket *p) {
 }
 
 void
-PacketDispatcher::dispatch(ATCommandResponse *r) {
-    atCommandsQueue_.emplace_back(r);
+PacketDispatcher::dispatch(RSSIResponse *r) {
+    rssiResponsesQueue_.emplace_back(r);
 
     if (logEnabled_)
         atLogger_.registerString(r->toString());
@@ -88,16 +88,11 @@ extractGraphData(std::vector<SensorsPacket *> &data, QCPGraphData (*extractionFc
 
 void
 PacketDispatcher::processDataFlows() {
-    //Sensor data needs to be polled first!
-
-    //TODO: Build and transmit graph data
 
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 
-
     QVector<QCPGraphData> altitudeDataBuffer = extractGraphData(sensorsPacketQueues_[FlyableType::ROCKET], altitudeFromReading);
     QVector<QCPGraphData> accelDataBuffer = extractGraphData(sensorsPacketQueues_[FlyableType::ROCKET], accelerationFromReading);
-
 
     emit worker_->graphDataReady(altitudeDataBuffer, GraphFeature::FEATURE1);
     emit worker_->graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
@@ -109,6 +104,8 @@ PacketDispatcher::processDataFlows() {
 
 void
 PacketDispatcher::displayFreshValues() {
+
+    emitIfNonEmpty(rssiResponsesQueue_);
 
     std::chrono::system_clock::time_point now{std::chrono::system_clock::now()};
 
@@ -139,6 +136,8 @@ freeQueue(std::vector<T> &v) {
 void
 PacketDispatcher::releaseMemory() {
 
+    freeQueue<RSSIResponse *>(rssiResponsesQueue_);
+
     for (auto &entry : sensorsPacketQueues_) {
         freeQueue<SensorsPacket *>(entry.second);
     }
@@ -159,7 +158,7 @@ PacketDispatcher::emitIfNonEmpty(const std::vector<T *> &v) {
 
         // Copy the content of the object pointed at by the last element in the vector
         T t = (*v.back());
-        emit worker_->dataPacketReady(t);
+        emit worker_->dataReady(t);
     }
 }
 

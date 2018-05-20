@@ -33,4 +33,6 @@ const PayloadType PayloadType::CONTROL{CommunicationsConstants::CONTROL_TYPE, 7}
  */
 const PayloadType PayloadType::GPS{CommunicationsConstants::GPS_TYPE, 21};
 
+const PayloadType PayloadType::AT_COMMAND{CommunicationsConstants::AT_COMMAND_TYPE, 0};
+
 const std::map<int, PayloadType> PayloadType::TYPES_TABLE = PayloadType::createPayloadTypesMap();

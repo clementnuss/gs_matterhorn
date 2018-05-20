@@ -23,6 +23,7 @@ public:
     static const PayloadType CONTROL;
     static const PayloadType GPS;
     static const PayloadType TELEMETRY_ERT18;
+    static const PayloadType AT_COMMAND;
 
     static const std::map<int, PayloadType> TYPES_TABLE;
 
@@ -39,7 +40,8 @@ private:
                 {CommunicationsConstants::EVENT_TYPE,           EVENT},
                 {CommunicationsConstants::CONTROL_TYPE,         CONTROL},
                 {CommunicationsConstants::GPS_TYPE,             GPS},
-                {CommunicationsConstants::TELEMETRY_ERT18_TYPE, TELEMETRY_ERT18}
+                {CommunicationsConstants::TELEMETRY_ERT18_TYPE, TELEMETRY_ERT18},
+                {CommunicationsConstants::AT_COMMAND_TYPE,      AT_COMMAND}
         };
     }
 

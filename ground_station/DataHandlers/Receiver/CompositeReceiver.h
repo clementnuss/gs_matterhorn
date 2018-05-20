@@ -17,6 +17,8 @@ public:
 
     std::list<std::unique_ptr<DataPacket>> pollData() override;
 
+    std::list<std::unique_ptr<ATCommandResponse>> pollATResponses() override;
+
     void startup() override;
 
     bool isReplayReceiver() override;

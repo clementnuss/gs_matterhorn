@@ -143,7 +143,7 @@
                             <enum>QLayout::SetNoConstraint</enum>
                         </property>
                         <item>
-                            <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,20,16">
+                            <layout class="QHBoxLayout" name="horizontalLayout" stretch="20,20,20">
                                 <property name="spacing">
                                     <number>10</number>
                                 </property>
@@ -1763,7 +1763,7 @@
                                         <property name="flat">
                                             <bool>false</bool>
                                         </property>
-                                        <layout class="QGridLayout" name="gridLayout_2" columnstretch="2,0,3">
+                                        <layout class="QVBoxLayout" name="verticalLayout_12">
                                             <property name="leftMargin">
                                                 <number>7</number>
                                             </property>
@@ -1776,95 +1776,7 @@
                                             <property name="bottomMargin">
                                                 <number>7</number>
                                             </property>
-                                            <property name="horizontalSpacing">
-                                                <number>7</number>
-                                            </property>
-                                            <item row="0" column="2">
-                                                <widget class="QLabel" name="ground_time">
-                                                    <property name="font">
-                                                        <font>
-                                                            <family>Segoe UI</family>
-                                                            <pointsize>8</pointsize>
-                                                        </font>
-                                                    </property>
-                                                    <property name="layoutDirection">
-                                                        <enum>Qt::LeftToRight</enum>
-                                                    </property>
-                                                    <property name="text">
-                                                        <string>00:00:00</string>
-                                                    </property>
-                                                    <property name="alignment">
-                                                        <set>Qt::AlignCenter</set>
-                                                    </property>
-                                                </widget>
-                                            </item>
-                                            <item row="1" column="2">
-                                                <layout class="QHBoxLayout" name="horizontalLayout_11">
-                                                    <item>
-                                                        <widget class="QLabel" name="ground_pressure_value">
-                                                            <property name="font">
-                                                                <font>
-                                                                    <family>Segoe UI</family>
-                                                                    <pointsize>8</pointsize>
-                                                                </font>
-                                                            </property>
-                                                            <property name="text">
-                                                                <string>0.0</string>
-                                                            </property>
-                                                            <property name="alignment">
-                                                                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                                                            </property>
-                                                        </widget>
-                                                    </item>
-                                                    <item>
-                                                        <widget class="QLabel" name="ground_pressure_units">
-                                                            <property name="font">
-                                                                <font>
-                                                                    <family>Segoe UI</family>
-                                                                    <pointsize>8</pointsize>
-                                                                </font>
-                                                            </property>
-                                                            <property name="text">
-                                                                <string>hPa</string>
-                                                            </property>
-                                                        </widget>
-                                                    </item>
-                                                </layout>
-                                            </item>
-                                            <item row="2" column="2">
-                                                <layout class="QHBoxLayout" name="horizontalLayout_13">
-                                                    <item>
-                                                        <widget class="QLabel" name="ground_temperature_value">
-                                                            <property name="font">
-                                                                <font>
-                                                                    <family>Segoe UI</family>
-                                                                    <pointsize>8</pointsize>
-                                                                </font>
-                                                            </property>
-                                                            <property name="text">
-                                                                <string>0.0</string>
-                                                            </property>
-                                                            <property name="alignment">
-                                                                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                                                            </property>
-                                                        </widget>
-                                                    </item>
-                                                    <item>
-                                                        <widget class="QLabel" name="ground_temperature_units">
-                                                            <property name="font">
-                                                                <font>
-                                                                    <family>Segoe UI</family>
-                                                                    <pointsize>8</pointsize>
-                                                                </font>
-                                                            </property>
-                                                            <property name="text">
-                                                                <string>°C</string>
-                                                            </property>
-                                                        </widget>
-                                                    </item>
-                                                </layout>
-                                            </item>
-                                            <item row="0" column="0" rowspan="3">
+                                            <item>
                                                 <widget class="QFrame" name="frame_10">
                                                     <property name="sizePolicy">
                                                         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -1878,175 +1790,364 @@
                                                             <pointsize>8</pointsize>
                                                         </font>
                                                     </property>
-                                                    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,0">
-                                                        <property name="spacing">
-                                                            <number>0</number>
-                                                        </property>
+                                                    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,2,2">
                                                         <property name="leftMargin">
-                                                            <number>0</number>
+                                                            <number>11</number>
                                                         </property>
                                                         <property name="topMargin">
                                                             <number>0</number>
                                                         </property>
                                                         <property name="rightMargin">
-                                                            <number>0</number>
+                                                            <number>11</number>
                                                         </property>
                                                         <property name="bottomMargin">
-                                                            <number>7</number>
+                                                            <number>0</number>
                                                         </property>
                                                         <item>
-                                                            <widget class="QLabel" name="status_logging">
-                                                                <property name="minimumSize">
-                                                                    <size>
-                                                                        <width>0</width>
-                                                                        <height>25</height>
-                                                                    </size>
-                                                                </property>
-                                                                <property name="font">
-                                                                    <font>
-                                                                        <family>Segoe UI</family>
-                                                                        <pointsize>8</pointsize>
-                                                                    </font>
-                                                                </property>
-                                                                <property name="autoFillBackground">
-                                                                    <bool>true</bool>
-                                                                </property>
+                                                            <widget class="QFrame" name="frame_23">
                                                                 <property name="frameShape">
-                                                                    <enum>QFrame::StyledPanel</enum>
+                                                                    <enum>QFrame::NoFrame</enum>
                                                                 </property>
-                                                                <property name="text">
-                                                                    <string>Logging</string>
+                                                                <property name="frameShadow">
+                                                                    <enum>QFrame::Raised</enum>
                                                                 </property>
-                                                                <property name="alignment">
-                                                                    <set>Qt::AlignCenter</set>
-                                                                </property>
-                                                                <property name="margin">
-                                                                    <number>0</number>
-                                                                </property>
+                                                                <layout class="QHBoxLayout" name="horizontalLayout_30">
+                                                                    <property name="leftMargin">
+                                                                        <number>0</number>
+                                                                    </property>
+                                                                    <property name="topMargin">
+                                                                        <number>0</number>
+                                                                    </property>
+                                                                    <property name="rightMargin">
+                                                                        <number>0</number>
+                                                                    </property>
+                                                                    <property name="bottomMargin">
+                                                                        <number>0</number>
+                                                                    </property>
+                                                                    <item>
+                                                                        <widget class="QLabel" name="ground_time">
+                                                                            <property name="font">
+                                                                                <font>
+                                                                                    <family>Segoe UI</family>
+                                                                                    <pointsize>8</pointsize>
+                                                                                </font>
+                                                                            </property>
+                                                                            <property name="layoutDirection">
+                                                                                <enum>Qt::LeftToRight</enum>
+                                                                            </property>
+                                                                            <property name="text">
+                                                                                <string>00:00:00</string>
+                                                                            </property>
+                                                                            <property name="alignment">
+                                                                                <set>Qt::AlignCenter</set>
+                                                                            </property>
+                                                                        </widget>
+                                                                    </item>
+                                                                    <item>
+                                                                        <widget class="QLabel" name="status_logging">
+                                                                            <property name="minimumSize">
+                                                                                <size>
+                                                                                    <width>0</width>
+                                                                                    <height>25</height>
+                                                                                </size>
+                                                                            </property>
+                                                                            <property name="font">
+                                                                                <font>
+                                                                                    <family>Segoe UI</family>
+                                                                                    <pointsize>8</pointsize>
+                                                                                </font>
+                                                                            </property>
+                                                                            <property name="autoFillBackground">
+                                                                                <bool>true</bool>
+                                                                            </property>
+                                                                            <property name="frameShape">
+                                                                                <enum>QFrame::StyledPanel</enum>
+                                                                            </property>
+                                                                            <property name="text">
+                                                                                <string>Logging</string>
+                                                                            </property>
+                                                                            <property name="alignment">
+                                                                                <set>Qt::AlignCenter</set>
+                                                                            </property>
+                                                                            <property name="margin">
+                                                                                <number>0</number>
+                                                                            </property>
+                                                                        </widget>
+                                                                    </item>
+                                                                </layout>
                                                             </widget>
                                                         </item>
                                                         <item>
-                                                            <widget class="QLabel" name="status_battery">
-                                                                <property name="minimumSize">
-                                                                    <size>
-                                                                        <width>0</width>
-                                                                        <height>25</height>
-                                                                    </size>
-                                                                </property>
-                                                                <property name="font">
-                                                                    <font>
-                                                                        <family>Segoe UI</family>
-                                                                        <pointsize>8</pointsize>
-                                                                    </font>
-                                                                </property>
-                                                                <property name="autoFillBackground">
-                                                                    <bool>true</bool>
-                                                                </property>
+                                                            <widget class="QFrame" name="frame_21">
                                                                 <property name="frameShape">
                                                                     <enum>QFrame::StyledPanel</enum>
                                                                 </property>
-                                                                <property name="text">
-                                                                    <string>Battery</string>
+                                                                <property name="frameShadow">
+                                                                    <enum>QFrame::Plain</enum>
                                                                 </property>
-                                                                <property name="alignment">
-                                                                    <set>Qt::AlignCenter</set>
-                                                                </property>
-                                                                <property name="margin">
-                                                                    <number>0</number>
-                                                                </property>
+                                                                <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="3,1,1,1,1,1,1,1">
+                                                                    <property name="spacing">
+                                                                        <number>5</number>
+                                                                    </property>
+                                                                    <property name="leftMargin">
+                                                                        <number>0</number>
+                                                                    </property>
+                                                                    <property name="topMargin">
+                                                                        <number>0</number>
+                                                                    </property>
+                                                                    <property name="rightMargin">
+                                                                        <number>0</number>
+                                                                    </property>
+                                                                    <property name="bottomMargin">
+                                                                        <number>0</number>
+                                                                    </property>
+                                                                    <item>
+                                                                        <widget class="QLabel" name="status_radio1">
+                                                                            <property name="minimumSize">
+                                                                                <size>
+                                                                                    <width>0</width>
+                                                                                    <height>25</height>
+                                                                                </size>
+                                                                            </property>
+                                                                            <property name="font">
+                                                                                <font>
+                                                                                    <family>Segoe UI</family>
+                                                                                    <pointsize>8</pointsize>
+                                                                                </font>
+                                                                            </property>
+                                                                            <property name="autoFillBackground">
+                                                                                <bool>true</bool>
+                                                                            </property>
+                                                                            <property name="frameShape">
+                                                                                <enum>QFrame::NoFrame</enum>
+                                                                            </property>
+                                                                            <property name="text">
+                                                                                <string>RF1</string>
+                                                                            </property>
+                                                                            <property name="alignment">
+                                                                                <set>Qt::AlignCenter</set>
+                                                                            </property>
+                                                                            <property name="margin">
+                                                                                <number>0</number>
+                                                                            </property>
+                                                                        </widget>
+                                                                    </item>
+                                                                    <item>
+                                                                        <spacer name="horizontalSpacer_4">
+                                                                            <property name="orientation">
+                                                                                <enum>Qt::Horizontal</enum>
+                                                                            </property>
+                                                                            <property name="sizeHint" stdset="0">
+                                                                                <size>
+                                                                                    <width>40</width>
+                                                                                    <height>20</height>
+                                                                                </size>
+                                                                            </property>
+                                                                        </spacer>
+                                                                    </item>
+                                                                    <item>
+                                                                        <widget class="QLabel" name="rf1_rssi_label">
+                                                                            <property name="text">
+                                                                                <string>RSSI</string>
+                                                                            </property>
+                                                                        </widget>
+                                                                    </item>
+                                                                    <item>
+                                                                        <widget class="QLabel" name="rf1_rssi_value">
+                                                                            <property name="font">
+                                                                                <font>
+                                                                                    <italic>false</italic>
+                                                                                </font>
+                                                                            </property>
+                                                                            <property name="text">
+                                                                                <string>-00</string>
+                                                                            </property>
+                                                                            <property name="alignment">
+                                                                                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                                                                            </property>
+                                                                        </widget>
+                                                                    </item>
+                                                                    <item>
+                                                                        <widget class="QLabel" name="rf1_rssi_db_label">
+                                                                            <property name="text">
+                                                                                <string>dB</string>
+                                                                            </property>
+                                                                        </widget>
+                                                                    </item>
+                                                                    <item>
+                                                                        <spacer name="horizontalSpacer_2">
+                                                                            <property name="orientation">
+                                                                                <enum>Qt::Horizontal</enum>
+                                                                            </property>
+                                                                            <property name="sizeHint" stdset="0">
+                                                                                <size>
+                                                                                    <width>40</width>
+                                                                                    <height>20</height>
+                                                                                </size>
+                                                                            </property>
+                                                                        </spacer>
+                                                                    </item>
+                                                                    <item>
+                                                                        <widget class="QLabel" name="rf1_pps_label">
+                                                                            <property name="text">
+                                                                                <string>PPS:</string>
+                                                                            </property>
+                                                                            <property name="alignment">
+                                                                                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                                                                            </property>
+                                                                        </widget>
+                                                                    </item>
+                                                                    <item>
+                                                                        <widget class="QLabel" name="rf1_pps_value">
+                                                                            <property name="text">
+                                                                                <string>0</string>
+                                                                            </property>
+                                                                            <property name="alignment">
+                                                                                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                                                                            </property>
+                                                                        </widget>
+                                                                    </item>
+                                                                </layout>
                                                             </widget>
                                                         </item>
                                                         <item>
-                                                            <widget class="QLabel" name="status_radio1">
-                                                                <property name="minimumSize">
-                                                                    <size>
-                                                                        <width>0</width>
-                                                                        <height>25</height>
-                                                                    </size>
-                                                                </property>
-                                                                <property name="font">
-                                                                    <font>
-                                                                        <family>Segoe UI</family>
-                                                                        <pointsize>8</pointsize>
-                                                                    </font>
-                                                                </property>
-                                                                <property name="autoFillBackground">
-                                                                    <bool>true</bool>
+                                                            <widget class="QFrame" name="frame_22">
+                                                                <property name="sizePolicy">
+                                                                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                                                        <horstretch>0</horstretch>
+                                                                        <verstretch>0</verstretch>
+                                                                    </sizepolicy>
                                                                 </property>
                                                                 <property name="frameShape">
                                                                     <enum>QFrame::StyledPanel</enum>
                                                                 </property>
-                                                                <property name="text">
-                                                                    <string>Radio I</string>
+                                                                <property name="frameShadow">
+                                                                    <enum>QFrame::Plain</enum>
                                                                 </property>
-                                                                <property name="alignment">
-                                                                    <set>Qt::AlignCenter</set>
-                                                                </property>
-                                                                <property name="margin">
-                                                                    <number>0</number>
-                                                                </property>
-                                                            </widget>
-                                                        </item>
-                                                        <item>
-                                                            <widget class="QLabel" name="status_radio2">
-                                                                <property name="minimumSize">
-                                                                    <size>
-                                                                        <width>0</width>
-                                                                        <height>25</height>
-                                                                    </size>
-                                                                </property>
-                                                                <property name="font">
-                                                                    <font>
-                                                                        <family>Segoe UI</family>
-                                                                        <pointsize>8</pointsize>
-                                                                    </font>
-                                                                </property>
-                                                                <property name="autoFillBackground">
-                                                                    <bool>true</bool>
-                                                                </property>
-                                                                <property name="frameShape">
-                                                                    <enum>QFrame::StyledPanel</enum>
-                                                                </property>
-                                                                <property name="text">
-                                                                    <string>Radio II</string>
-                                                                </property>
-                                                                <property name="alignment">
-                                                                    <set>Qt::AlignCenter</set>
-                                                                </property>
-                                                                <property name="margin">
-                                                                    <number>0</number>
-                                                                </property>
-                                                            </widget>
-                                                        </item>
-                                                        <item>
-                                                            <widget class="QLabel" name="status_video">
-                                                                <property name="minimumSize">
-                                                                    <size>
-                                                                        <width>0</width>
-                                                                        <height>25</height>
-                                                                    </size>
-                                                                </property>
-                                                                <property name="font">
-                                                                    <font>
-                                                                        <family>Segoe UI</family>
-                                                                        <pointsize>8</pointsize>
-                                                                    </font>
-                                                                </property>
-                                                                <property name="autoFillBackground">
-                                                                    <bool>true</bool>
-                                                                </property>
-                                                                <property name="frameShape">
-                                                                    <enum>QFrame::StyledPanel</enum>
-                                                                </property>
-                                                                <property name="text">
-                                                                    <string>Video</string>
-                                                                </property>
-                                                                <property name="alignment">
-                                                                    <set>Qt::AlignCenter</set>
-                                                                </property>
-                                                                <property name="margin">
-                                                                    <number>0</number>
-                                                                </property>
+                                                                <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="3,1,1,1,1,1,1,1">
+                                                                    <property name="spacing">
+                                                                        <number>5</number>
+                                                                    </property>
+                                                                    <property name="leftMargin">
+                                                                        <number>0</number>
+                                                                    </property>
+                                                                    <property name="topMargin">
+                                                                        <number>0</number>
+                                                                    </property>
+                                                                    <property name="rightMargin">
+                                                                        <number>0</number>
+                                                                    </property>
+                                                                    <property name="bottomMargin">
+                                                                        <number>0</number>
+                                                                    </property>
+                                                                    <item>
+                                                                        <widget class="QLabel" name="status_radio2">
+                                                                            <property name="minimumSize">
+                                                                                <size>
+                                                                                    <width>0</width>
+                                                                                    <height>25</height>
+                                                                                </size>
+                                                                            </property>
+                                                                            <property name="font">
+                                                                                <font>
+                                                                                    <family>Segoe UI</family>
+                                                                                    <pointsize>8</pointsize>
+                                                                                </font>
+                                                                            </property>
+                                                                            <property name="autoFillBackground">
+                                                                                <bool>true</bool>
+                                                                            </property>
+                                                                            <property name="frameShape">
+                                                                                <enum>QFrame::NoFrame</enum>
+                                                                            </property>
+                                                                            <property name="text">
+                                                                                <string>RF2</string>
+                                                                            </property>
+                                                                            <property name="alignment">
+                                                                                <set>Qt::AlignCenter</set>
+                                                                            </property>
+                                                                            <property name="margin">
+                                                                                <number>0</number>
+                                                                            </property>
+                                                                        </widget>
+                                                                    </item>
+                                                                    <item>
+                                                                        <spacer name="horizontalSpacer_5">
+                                                                            <property name="orientation">
+                                                                                <enum>Qt::Horizontal</enum>
+                                                                            </property>
+                                                                            <property name="sizeHint" stdset="0">
+                                                                                <size>
+                                                                                    <width>40</width>
+                                                                                    <height>20</height>
+                                                                                </size>
+                                                                            </property>
+                                                                        </spacer>
+                                                                    </item>
+                                                                    <item>
+                                                                        <widget class="QLabel" name="rf2_rssi_label">
+                                                                            <property name="text">
+                                                                                <string>RSSI:</string>
+                                                                            </property>
+                                                                        </widget>
+                                                                    </item>
+                                                                    <item>
+                                                                        <widget class="QLabel" name="rf2_rssi_value">
+                                                                            <property name="text">
+                                                                                <string>-00</string>
+                                                                            </property>
+                                                                            <property name="alignment">
+                                                                                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                                                                            </property>
+                                                                        </widget>
+                                                                    </item>
+                                                                    <item>
+                                                                        <widget class="QLabel" name="rf2_rssi_db_label">
+                                                                            <property name="text">
+                                                                                <string>dB</string>
+                                                                            </property>
+                                                                        </widget>
+                                                                    </item>
+                                                                    <item>
+                                                                        <spacer name="horizontalSpacer_3">
+                                                                            <property name="orientation">
+                                                                                <enum>Qt::Horizontal</enum>
+                                                                            </property>
+                                                                            <property name="sizeHint" stdset="0">
+                                                                                <size>
+                                                                                    <width>40</width>
+                                                                                    <height>20</height>
+                                                                                </size>
+                                                                            </property>
+                                                                        </spacer>
+                                                                    </item>
+                                                                    <item>
+                                                                        <widget class="QLabel" name="rf2_pps_label">
+                                                                            <property name="sizePolicy">
+                                                                                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                                                                                    <horstretch>0</horstretch>
+                                                                                    <verstretch>0</verstretch>
+                                                                                </sizepolicy>
+                                                                            </property>
+                                                                            <property name="text">
+                                                                                <string>PPS:</string>
+                                                                            </property>
+                                                                            <property name="alignment">
+                                                                                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                                                                            </property>
+                                                                        </widget>
+                                                                    </item>
+                                                                    <item>
+                                                                        <widget class="QLabel" name="rf2_pps_value">
+                                                                            <property name="text">
+                                                                                <string>0</string>
+                                                                            </property>
+                                                                            <property name="alignment">
+                                                                                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                                                                            </property>
+                                                                        </widget>
+                                                                    </item>
+                                                                </layout>
                                                             </widget>
                                                         </item>
                                                     </layout>
@@ -2607,8 +2708,8 @@
                                                                                                 <rect>
                                                                                                     <x>0</x>
                                                                                                     <y>0</y>
-                                                                                                    <width>193</width>
-                                                                                                    <height>421</height>
+                                                                                                    <width>113</width>
+                                                                                                    <height>139</height>
                                                                                                 </rect>
                                                                                             </property>
                                                                                             <layout class="QVBoxLayout" name="verticalLayout_6">

@@ -16,7 +16,8 @@ RadioReceiver::RadioReceiver(const string &hardwareID, const string &logTitle)
         : byteDecoder_{logTitle}, devicePort_{}, serialPort_{}, thread_{},
           recvBuffer_{},
           threadEnabled_{true},
-          dataQueue_{100},
+          dataPacketsQueue_{128},
+          atResponsesQueue_{4},
           bytesLogger_{LogConstants::BYTES_LOG_PATH + logTitle},
           packetLogger_{LogConstants::RECEIVER_LOG_PATH + logTitle} {
 
@@ -103,7 +104,12 @@ consumeQueue(boost::lockfree::spsc_queue<S *> *queue) {
 
 std::list<std::unique_ptr<DataPacket>>
 RadioReceiver::pollData() {
-    return consumeQueue(&dataQueue_);
+    return consumeQueue(&dataPacketsQueue_);
+}
+
+std::list<std::unique_ptr<ATCommandResponse>>
+RadioReceiver::pollATResponses() {
+    return consumeQueue(&atResponsesQueue_);
 }
 
 void
@@ -163,31 +169,37 @@ void
 RadioReceiver::unpackPayload() {
     Datagram d = byteDecoder_.retrieveDatagram();
 
+    DataPacket *p;
 
-    std::function<DataPacket *(const FlyableType &, const uint32_t &, const std::vector<uint8_t> &)> conversionFunc;
-
+    //TODO: better solution than switch ?
     switch (d.payloadType_->code()) {
         case CommunicationsConstants::TELEMETRY_TYPE:
-            conversionFunc = PayloadDataConverter::toSensorsPacket;
+            p = PayloadDataConverter::toSensorsPacket(d.flyableType_, d.sequenceNumber_, d.payloadData_);
             break;
         case CommunicationsConstants::EVENT_TYPE:
-            conversionFunc = PayloadDataConverter::toEventPacket;
+            p = PayloadDataConverter::toEventPacket(d.flyableType_, d.sequenceNumber_, d.payloadData_);
             break;
         case CommunicationsConstants::CONTROL_TYPE:
-            conversionFunc = PayloadDataConverter::toControlPacket;
+            p = PayloadDataConverter::toControlPacket(d.flyableType_, d.sequenceNumber_, d.payloadData_);
             break;
         case CommunicationsConstants::GPS_TYPE:
-            conversionFunc = PayloadDataConverter::toGPSPacket;
+            p = PayloadDataConverter::toGPSPacket(d.flyableType_, d.sequenceNumber_, d.payloadData_);
             break;
         case CommunicationsConstants::TELEMETRY_ERT18_TYPE:
-            conversionFunc = PayloadDataConverter::toERT18SensorsPacket;
+            p = PayloadDataConverter::toERT18SensorsPacket(d.flyableType_, d.sequenceNumber_, d.payloadData_);
+            break;
+        case CommunicationsConstants::AT_COMMAND_TYPE: {
+            ATCommandResponse *r{PayloadDataConverter::toATCommandResponse(d.payloadData_)};
+            packetLogger_.registerString(r->toString());
+            atResponsesQueue_.push(r);
+            return;
+        }
         default:
             break;
     }
 
-    DataPacket *p{conversionFunc(d.flyableType_, d.sequenceNumber_, d.payloadData_)};
     packetLogger_.registerString(p->toString());
-    dataQueue_.push(p);
+    dataPacketsQueue_.push(p);
 }
 
 
