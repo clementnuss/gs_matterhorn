@@ -94,8 +94,8 @@ PacketDispatcher::processDataFlows() {
     QVector<QCPGraphData> altitudeDataBuffer = extractGraphData(sensorsPacketQueues_[FlyableType::ROCKET], altitudeFromReading);
     QVector<QCPGraphData> accelDataBuffer = extractGraphData(sensorsPacketQueues_[FlyableType::ROCKET], accelerationFromReading);
 
-    emit worker_->graphDataReady(altitudeDataBuffer, GraphFeature::FEATURE1);
-    emit worker_->graphDataReady(accelDataBuffer, GraphFeature::FEATURE2);
+    emit worker_->graphDataChanged(altitudeDataBuffer, GraphFeature::FEATURE1);
+    emit worker_->graphDataChanged(accelDataBuffer, GraphFeature::FEATURE2);
 
     displayFreshValues();
     releaseMemory();
@@ -158,7 +158,7 @@ PacketDispatcher::emitIfNonEmpty(const std::vector<T *> &v) {
 
         // Copy the content of the object pointed at by the last element in the vector
         T t = (*v.back());
-        emit worker_->dataReady(t);
+        emit worker_->dataChanged(t);
     }
 }
 

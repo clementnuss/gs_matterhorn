@@ -61,6 +61,7 @@ namespace UIConstants {
     static constexpr int TEXT_POINT_SIZE = 8;
 
     static constexpr int PRECISION = 2;
+    static constexpr int PRECISION_PPS = 1;
     static constexpr int PRECISION_GPS = 6;
 
     // Refresh rates are in milliseconds
@@ -132,7 +133,7 @@ namespace CommunicationsConstants {
     static constexpr uint8_t FLYABLE_TYPE_MASK = 0xF0;
     static constexpr uint8_t PAYLOAD_TYPE_MASK = 0x0F;
 
-    static constexpr int MSECS_BETWEEN_LINK_CHECKS = 0;
+    static constexpr int MSECS_BETWEEN_LINK_CHECKS = 1000;
     static constexpr uint32_t TELEMETRY_BAUD_RATE = 115200;
     static constexpr int MSECS_NOMINAL_RATE = 200;
     static constexpr float MSECS_LOSSY_RATE = 500;

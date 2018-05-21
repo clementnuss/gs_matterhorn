@@ -86,7 +86,7 @@ Worker::~Worker() {
  */
 void
 Worker::emitAllStatuses() {
-    emit loggingStatusReady(loggingEnabled_);
+    emit loggingStatusChanged(loggingEnabled_);
 }
 
 /**
@@ -137,7 +137,7 @@ Worker::mainRoutine() {
  */
 void
 Worker::updateLoggingStatus() {
-    emit loggingStatusReady(packetDispatcher_->toggleLogging());
+    emit loggingStatusChanged(packetDispatcher_->toggleLogging());
 }
 
 
@@ -169,22 +169,8 @@ Worker::checkLinkStatuses() {
     if (elapsedMillis > CommunicationsConstants::MSECS_BETWEEN_LINK_CHECKS) {
 
         timeOfLastLinkCheck_ = now;
-
-        elapsedMillis = msecsBetween(timeOfLastReceivedTelemetry_, now);
-
-        HandlerStatus status;
-
-        if (elapsedMillis > CommunicationsConstants::MSECS_LOSSY_RATE
-            || millisBetweenLastTwoPackets_ > CommunicationsConstants::MSECS_LOSSY_RATE) {
-            status = HandlerStatus::DOWN;
-        } else if (CommunicationsConstants::MSECS_NOMINAL_RATE < millisBetweenLastTwoPackets_
-                   && millisBetweenLastTwoPackets_ <= CommunicationsConstants::MSECS_LOSSY_RATE) {
-            status = HandlerStatus::LOSSY;
-        } else {
-            status = HandlerStatus::NOMINAL;
-        }
-
-        emit linkStatusReady(status);
+        emit ppsChanged(compositeReceiver_->getPPS());
+        compositeReceiver_->sendCommand(&ATCommandResponse::RSSI_COMMAND[0], ATCommandResponse::RSSI_COMMAND.size());
     }
 }
 

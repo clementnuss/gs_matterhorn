@@ -48,6 +48,7 @@ struct ATCommandResponse : public IDispatchable {
     static constexpr size_t PAYLOAD_SIZE = 6;
     static constexpr size_t CHECKSUM_SIZE = 1;
     static constexpr uint16_t RSSI_COMMAND_CODE = 0x4442;
+    static const std::vector<uint8_t> RSSI_COMMAND;
 
     ATCommandResponse() = default;
 

@@ -171,8 +171,10 @@ CompositeReceiver::isReplayReceiver() {
 }
 
 void
-CompositeReceiver::sendCommand(const uint8_t *, size_t) {
-
+CompositeReceiver::sendCommand(const uint8_t *command, size_t size) {
+    //TODO: don't send to both receivers ?
+    primaryReceiver_->sendCommand(command, size);
+    backupReceiver_->sendCommand(command, size);
 }
 
 void
@@ -198,6 +200,16 @@ CompositeReceiver::addPacketsPriorToReset(std::list<std::unique_ptr<DataPacket>>
             it++;
         }
     }
+}
+
+float
+CompositeReceiver::getPPS() {
+    return primaryReceiver_->getPPS();
+}
+
+float
+CompositeReceiver::getPPS(bool pollPrimaryReceiver) {
+    return (pollPrimaryReceiver) ? primaryReceiver_->getPPS() : backupReceiver_->getPPS();
 }
 
 CompositeReceiver::~CompositeReceiver() = default;

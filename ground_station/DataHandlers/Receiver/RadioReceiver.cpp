@@ -3,6 +3,7 @@
 #include <boost/asio/placeholders.hpp>
 #include <boost/bind.hpp>
 #include <thread>
+#include <Utilities/TimeUtils.h>
 #include "RadioReceiver.h"
 
 
@@ -15,7 +16,9 @@
 RadioReceiver::RadioReceiver(const string &hardwareID, const string &logTitle)
         : byteDecoder_{logTitle}, devicePort_{}, serialPort_{}, thread_{},
           recvBuffer_{},
+          lastPPSPoll_{std::chrono::system_clock::now()},
           threadEnabled_{true},
+          ppsCount_{0},
           dataPacketsQueue_{128},
           atResponsesQueue_{4},
           bytesLogger_{LogConstants::BYTES_LOG_PATH + logTitle},
@@ -167,6 +170,9 @@ RadioReceiver::handleReceive(std::size_t bytesTransferred) {
 
 void
 RadioReceiver::unpackPayload() {
+
+    ppsCount_++;
+
     Datagram d = byteDecoder_.retrieveDatagram();
 
     DataPacket *p;
@@ -212,10 +218,22 @@ RadioReceiver::~RadioReceiver() {
 
 void
 RadioReceiver::sendCommand(const uint8_t *command, size_t size) {
-    serialPort_.write(command, size);
+    if (serialPort_.isOpen()) {
+        serialPort_.write(command, size);
+    }
 }
 
 bool
 RadioReceiver::isReplayReceiver() {
     return false;
+}
+
+float
+RadioReceiver::getPPS() {
+    std::chrono::system_clock::time_point now{std::chrono::system_clock::now()};
+    float pps{ppsCount_ / (msecsBetween(lastPPSPoll_, now) / 1000.0f)};
+    ppsCount_ = 0;
+    lastPPSPoll_ = now;
+
+    return pps;
 }

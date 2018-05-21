@@ -37,6 +37,7 @@ Application::connectSlotsAndSignals() {
     qRegisterMetaType<HandlerStatus>("HandlerStatus");
     qRegisterMetaType<Position>("Position");
     qRegisterMetaType<FlyableType>("FlyableType");
+    qRegisterMetaType<RSSIResponse>("RSSIResponse");
 
     // Call worker destructor, cleaning up all resources
     QObject::connect(&workerThread_, &QThread::finished, worker_, &Worker::deleteLater);
@@ -44,12 +45,12 @@ Application::connectSlotsAndSignals() {
     //TODO: change those preprocessor commands for global variables
 #if USE_3D_MODULE
     QObject::connect(worker_,
-                     &Worker::flightPositionReady,
+                     &Worker::flightPositionChanged,
                      gsMainWindow_.get3DModule(),
                      &RootEntity::updateFlightPosition);
 
     QObject::connect(worker_,
-                     &Worker::payloadPositionReady,
+                     &Worker::payloadPositionChanged,
                      gsMainWindow_.get3DModule(),
                      &RootEntity::updatePayloadPosition);
 #endif
@@ -60,39 +61,44 @@ Application::connectSlotsAndSignals() {
                      &Worker::run);
 
     QObject::connect(worker_,
-                     QOverload<SensorsPacket>::of(&Worker::dataReady),
+                     QOverload<SensorsPacket>::of(&Worker::dataChanged),
                      &gsMainWindow_,
-                     QOverload<SensorsPacket>::of(&GSMainwindow::receiveData));
+                     QOverload<SensorsPacket>::of(&GSMainwindow::updateData));
 
     QObject::connect(worker_,
-                     QOverload<EventPacket>::of(&Worker::dataReady),
+                     QOverload<EventPacket>::of(&Worker::dataChanged),
                      &gsMainWindow_,
-                     QOverload<EventPacket>::of(&GSMainwindow::receiveData));
+                     QOverload<EventPacket>::of(&GSMainwindow::updateData));
 
     QObject::connect(worker_,
-                     QOverload<GPSPacket>::of(&Worker::dataReady),
+                     QOverload<GPSPacket>::of(&Worker::dataChanged),
                      &gsMainWindow_,
-                     QOverload<GPSPacket>::of(&GSMainwindow::receiveData));
+                     QOverload<GPSPacket>::of(&GSMainwindow::updateData));
 
     QObject::connect(worker_,
-                     QOverload<RSSIResponse>::of(&Worker::dataReady),
+                     QOverload<RSSIResponse>::of(&Worker::dataChanged),
                      &gsMainWindow_,
-                     QOverload<RSSIResponse>::of(&GSMainwindow::receiveData));
+                     QOverload<RSSIResponse>::of(&GSMainwindow::updateData));
 
     QObject::connect(worker_,
-                     &Worker::loggingStatusReady,
+                     &Worker::ppsChanged,
+                     &gsMainWindow_,
+                     &GSMainwindow::updatePPS);
+
+    QObject::connect(worker_,
+                     &Worker::loggingStatusChanged,
                      &gsMainWindow_,
                      &GSMainwindow::updateLoggingStatus);
 
     QObject::connect(worker_,
-                     &Worker::linkStatusReady,
+                     &Worker::linkStatusChanged,
                      &gsMainWindow_,
                      &GSMainwindow::updateLinkStatus);
 
     QObject::connect(worker_,
-                     &Worker::graphDataReady,
+                     &Worker::graphDataChanged,
                      &gsMainWindow_,
-                     &GSMainwindow::receiveGraphData);
+                     &GSMainwindow::updateGraphData);
 
 
     QObject::connect(&gsMainWindow_,
@@ -106,7 +112,7 @@ Application::connectSlotsAndSignals() {
                      &Worker::toggleTracking);
 
     QObject::connect(&gsMainWindow_,
-                     &GSMainwindow::changePlaybackSpeed,
+                     &GSMainwindow::playbackSpeedChanged,
                      worker_,
                      &Worker::updatePlaybackSpeed);
 

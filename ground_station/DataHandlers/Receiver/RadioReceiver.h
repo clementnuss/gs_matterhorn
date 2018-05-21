@@ -34,6 +34,8 @@ public:
 
     bool isReplayReceiver() override;
 
+    float getPPS() override;
+
 private:
 
     /**
@@ -55,7 +57,9 @@ private:
     uint8_t *recvBuffer_;
     FileLogger bytesLogger_;
     FileLogger packetLogger_;
+    std::chrono::system_clock::time_point lastPPSPoll_;
     std::atomic_bool threadEnabled_;
+    std::atomic_int ppsCount_;
     boost::lockfree::spsc_queue<DataPacket *> dataPacketsQueue_;
     boost::lockfree::spsc_queue<ATCommandResponse *> atResponsesQueue_;
 

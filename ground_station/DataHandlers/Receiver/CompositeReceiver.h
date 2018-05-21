@@ -25,6 +25,10 @@ public:
 
     void sendCommand(const uint8_t *, size_t) override;
 
+    float getPPS() override;
+
+    float getPPS(bool);
+
 private:
     void mergePacketQueuesStep();
     void addToMergeQueueAndPop(std::unique_ptr<DataPacket> *, std::list<std::unique_ptr<DataPacket>> *);

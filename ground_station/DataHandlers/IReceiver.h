@@ -14,8 +14,9 @@ public:
     virtual ~IReceiver() {};
     virtual void startup() = 0;
     virtual std::list<std::unique_ptr<DataPacket>> pollData() = 0;
-
     virtual std::list<std::unique_ptr<ATCommandResponse>> pollATResponses() = 0;
+
+    virtual float getPPS() = 0;
     virtual void sendCommand(const uint8_t *, size_t) = 0;
     virtual bool isReplayReceiver()= 0;
 

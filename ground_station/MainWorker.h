@@ -52,25 +52,27 @@ public slots:
 
 signals:
 
-    void loggingStatusReady(bool);
+    void loggingStatusChanged(bool);
 
-    void dataReady(SensorsPacket) const;
+    void dataChanged(SensorsPacket) const;
 
-    void dataReady(EventPacket) const;
+    void dataChanged(EventPacket) const;
 
-    void dataReady(GPSPacket) const;
+    void dataChanged(GPSPacket) const;
 
-    void dataReady(RSSIResponse) const;
+    void dataChanged(RSSIResponse) const;
 
-    void flightPositionReady(Position);
+    void flightPositionChanged(Position);
 
-    void payloadPositionReady(Position);
+    void payloadPositionChanged(Position);
 
-    void graphDataReady(QVector<QCPGraphData> &, GraphFeature);
+    void ppsChanged(float);
 
-    void linkStatusReady(HandlerStatus);
+    void graphDataChanged(QVector<QCPGraphData> &, GraphFeature);
 
-    void groundStatusReady(float, float);
+    void linkStatusChanged(HandlerStatus);
+
+    void groundStatusChanged(float, float);
 
     void resetUIState();
 

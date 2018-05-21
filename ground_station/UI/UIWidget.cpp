@@ -144,7 +144,7 @@ GSMainwindow::updateTime() {
  * @param sp The Telemetry object from which to extract data to update the display.
  */
 void
-GSMainwindow::receiveData(SensorsPacket sp) {
+GSMainwindow::updateData(SensorsPacket sp) {
 
     SensorLabelsStruct s = telemetryLabelsMap_[sp.flyableType_];
 
@@ -168,7 +168,7 @@ GSMainwindow::receiveData(SensorsPacket sp) {
  * @param event
  */
 void
-GSMainwindow::receiveData(const EventPacket event) {
+GSMainwindow::updateData(const EventPacket event) {
 
     int seconds = event.timestamp_ / TimeConstants::MSECS_IN_SEC;
     int minutes = seconds / TimeConstants::SECS_IN_MINUTE;
@@ -192,7 +192,7 @@ GSMainwindow::receiveData(const EventPacket event) {
  * @param gpsData
  */
 void
-GSMainwindow::receiveData(const GPSPacket gpsData) {
+GSMainwindow::updateData(const GPSPacket gpsData) {
 
 
     GpsLabelsStruct s = gpsLabelsMap_[gpsData.flyableType_];
@@ -216,10 +216,15 @@ GSMainwindow::receiveData(const GPSPacket gpsData) {
  * @param gpsData
  */
 void
-GSMainwindow::receiveData(const RSSIResponse rssiResponse) {
-
+GSMainwindow::updateData(const RSSIResponse rssiResponse) {
+    ui->rf1_rssi_value->setText(QString::number(-static_cast<int>(rssiResponse.value_)));
 }
 
+
+void
+GSMainwindow::updatePPS(const float pps) {
+    ui->rf1_pps_value->setText(QString::number(pps, 'f', UIConstants::PRECISION_PPS));
+}
 
 /**
  * Qt SLOT for adding QCPGraphData objects to a given plot
@@ -229,7 +234,7 @@ GSMainwindow::receiveData(const RSSIResponse rssiResponse) {
  */
 //TODO: only use qvectors or only use vectors
 void
-GSMainwindow::receiveGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
+GSMainwindow::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
 
     if (d.isEmpty()) {
 
@@ -641,7 +646,7 @@ GSMainwindow::applyToAllPlots(const std::function<void(QCustomPlot *)> &f) {
 void
 GSMainwindow::increaseSpeed() {
     replayPlaybackSpeed_ *= DataConstants::INCREASE_FACTOR;
-    emit changePlaybackSpeed(replayPlaybackSpeed_);
+    emit playbackSpeedChanged(replayPlaybackSpeed_);
     ui->time_unfolding_current_speed->setText(
             QString::number(replayPlaybackSpeed_, 'f', 2));
 }
@@ -650,7 +655,7 @@ void
 GSMainwindow::decreaseSpeed() {
     assert(replayMode_);
     replayPlaybackSpeed_ *= DataConstants::DECREASE_FACTOR;
-    emit changePlaybackSpeed(replayPlaybackSpeed_);
+    emit playbackSpeedChanged(replayPlaybackSpeed_);
     ui->time_unfolding_current_speed->setText(
             QString::number(replayPlaybackSpeed_, 'f', 2));
 }

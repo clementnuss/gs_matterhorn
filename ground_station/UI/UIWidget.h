@@ -52,15 +52,17 @@ public slots:
 
     /* TELEMETRY-RELATED SLOTS */
 
-    void receiveData(SensorsPacket);
+    void updateData(SensorsPacket);
 
-    void receiveData(EventPacket);
+    void updateData(EventPacket);
 
-    void receiveData(GPSPacket);
+    void updateData(GPSPacket);
 
-    void receiveData(RSSIResponse);
+    void updateData(RSSIResponse);
 
-    void receiveGraphData(QVector<QCPGraphData> &, GraphFeature);
+    void updatePPS(float);
+
+    void updateGraphData(QVector<QCPGraphData> &, GraphFeature);
 
 
     /* USER INTERACTION SLOTS */
@@ -119,7 +121,7 @@ signals:
 
     void toggleTracking();
 
-    void changePlaybackSpeed(double);
+    void playbackSpeedChanged(double);
 
     void resetTelemetryReplayPlayback();
 
