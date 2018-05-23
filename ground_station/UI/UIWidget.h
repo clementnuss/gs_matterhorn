@@ -60,7 +60,9 @@ public slots:
 
     void updateData(RSSIResponse);
 
-    void updatePPS(float);
+    void updatePrimaryRFPPS(float);
+
+    void updateSecondaryRFPPS(float);
 
     void updateGraphData(QVector<QCPGraphData> &, GraphFeature);
 

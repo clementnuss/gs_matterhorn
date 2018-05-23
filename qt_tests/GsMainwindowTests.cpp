@@ -13,8 +13,6 @@ void GsMainwindowTests::telemetryReadingCorrectlyDisplayed() {
     qRegisterMetaType<GraphFeature>("GraphFeature");
     qRegisterMetaType<HandlerStatus>("HandlerStatus");
 
-    QCOMPARE(gsMainWindow_.ui->ground_pressure_value->text().toStdString(), "0.0");
-    QCOMPARE(gsMainWindow_.ui->ground_temperature_value->text().toStdString(), "0.0");
     QCOMPARE(gsMainWindow_.ui->telemetry_yaw_value->text().toStdString(), "0.0");
     QCOMPARE(gsMainWindow_.ui->telemetry_pitch_value->text().toStdString(), "0.0");
     QCOMPARE(gsMainWindow_.ui->telemetry_roll_value->text().toStdString(), "0.0");
@@ -48,7 +46,7 @@ void GsMainwindowTests::correctSignalsActivation() {
     gsMainWindow_.resetPlayback();
     QVERIFY(resetPlaybackSpy.count() == 1);
 
-    QSignalSpy playbackSpeedChangeSpy(&gsMainWindow_, &GSMainwindow::changePlaybackSpeed);
+    QSignalSpy playbackSpeedChangeSpy(&gsMainWindow_, &GSMainwindow::playbackSpeedChanged);
     gsMainWindow_.ui->time_unfolding_increase->click();
     auto args = playbackSpeedChangeSpy.takeFirst();
     QCOMPARE(args.at(0).toDouble(), 1.5);

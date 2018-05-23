@@ -216,7 +216,7 @@ PayloadDataConverter::toATCommandResponse(const std::vector<uint8_t> &payloadBuf
 
     auto it = payloadBuffer.begin();
 
-    auto frameType = parse8<uint8_t>(it);
+    auto frameType = parse8<uint8_t>(it); // Unused
     auto frameID = parse8<uint8_t>(it);
     auto command = parse16<uint16_t>(it);
     auto status = parse8<uint8_t>(it);
@@ -224,7 +224,6 @@ PayloadDataConverter::toATCommandResponse(const std::vector<uint8_t> &payloadBuf
 
     if (command == ATCommandResponse::RSSI_COMMAND_CODE) {
         return new RSSIResponse{
-                frameType,
                 frameID,
                 command,
                 status,

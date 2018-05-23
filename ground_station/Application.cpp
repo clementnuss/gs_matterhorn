@@ -81,9 +81,14 @@ Application::connectSlotsAndSignals() {
                      QOverload<RSSIResponse>::of(&GSMainwindow::updateData));
 
     QObject::connect(worker_,
-                     &Worker::ppsChanged,
+                     &Worker::ppsOnPrimaryRFChanged,
                      &gsMainWindow_,
-                     &GSMainwindow::updatePPS);
+                     &GSMainwindow::updatePrimaryRFPPS);
+
+    QObject::connect(worker_,
+                     &Worker::ppsOnSecondaryRFChanged,
+                     &gsMainWindow_,
+                     &GSMainwindow::updateSecondaryRFPPS);
 
     QObject::connect(worker_,
                      &Worker::loggingStatusChanged,

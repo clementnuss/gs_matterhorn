@@ -267,6 +267,11 @@ ParsingATCommandPayload::operator()(Decoder *context, const uint8_t &byte) const
     context->byteBuffer_.push_back(byte);
     context->checksumAccumulator_.push_back(byte);
 
+    if (context->byteBuffer_[0] != ATCommandResponse::FRAME_TYPE) {
+        // This is not an AT response, bail out
+        context->resetMachine();
+    }
+
     if (context->byteBuffer_.size() == ATCommandResponse::PAYLOAD_SIZE) {
 
         context->currentDatagram_.payloadData_ = context->byteBuffer_;

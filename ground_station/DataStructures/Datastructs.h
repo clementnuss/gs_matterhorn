@@ -44,6 +44,7 @@ struct DataPacket : public IDispatchable {
 struct ATCommandResponse : public IDispatchable {
 
     static constexpr uint8_t FRAME_DELIMITER = 0x7E;
+    static constexpr uint8_t FRAME_TYPE = 0x88;
     static constexpr size_t HEADER_SIZE = 2;
     static constexpr size_t PAYLOAD_SIZE = 6;
     static constexpr size_t CHECKSUM_SIZE = 1;
@@ -52,9 +53,8 @@ struct ATCommandResponse : public IDispatchable {
 
     ATCommandResponse() = default;
 
-    explicit ATCommandResponse(uint8_t, uint8_t, uint16_t, uint8_t);
+    explicit ATCommandResponse(uint8_t, uint16_t, uint8_t);
 
-    uint8_t frameType_;
     uint8_t frameID_;
     uint16_t command_;
     uint8_t status_;
@@ -68,7 +68,7 @@ struct RSSIResponse : public ATCommandResponse {
 
     RSSIResponse() = default;
 
-    explicit RSSIResponse(uint8_t, uint8_t, uint16_t, uint8_t, uint8_t);
+    explicit RSSIResponse(uint8_t, uint16_t, uint8_t, uint8_t);
     void dispatchWith(PacketDispatcher *) override;
     std::string toString() const override;
 

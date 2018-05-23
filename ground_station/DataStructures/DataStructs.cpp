@@ -46,20 +46,19 @@ ATCommandResponse::toString() const {
     std::stringstream ss;
 
     ss << command_
-       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << frameType_
        << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << frameID_
        << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << status_;
 
     return ss.str();
 }
 
-ATCommandResponse::ATCommandResponse(uint8_t frameType, uint8_t frameID, uint16_t command, uint8_t status) :
-        frameType_{frameType}, frameID_{frameID}, command_{command}, status_{status} {
+ATCommandResponse::ATCommandResponse(uint8_t frameID, uint16_t command, uint8_t status) :
+        frameID_{frameID}, command_{command}, status_{status} {
 
 }
 
-RSSIResponse::RSSIResponse(uint8_t frameType, uint8_t frameID, uint16_t command, uint8_t status, uint8_t value) :
-        ATCommandResponse{frameType, frameID, command, status}, value_{value} {}
+RSSIResponse::RSSIResponse(uint8_t frameID, uint16_t command, uint8_t status, uint8_t value) :
+        ATCommandResponse{frameID, command, status}, value_{value} {}
 
 void
 RSSIResponse::dispatchWith(PacketDispatcher *d) {

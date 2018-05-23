@@ -222,9 +222,16 @@ GSMainwindow::updateData(const RSSIResponse rssiResponse) {
 
 
 void
-GSMainwindow::updatePPS(const float pps) {
+GSMainwindow::updatePrimaryRFPPS(const float pps) {
     ui->rf1_pps_value->setText(QString::number(pps, 'f', UIConstants::PRECISION_PPS));
 }
+
+
+void
+GSMainwindow::updateSecondaryRFPPS(const float pps) {
+    ui->rf2_pps_value->setText(QString::number(pps, 'f', UIConstants::PRECISION_PPS));
+}
+
 
 /**
  * Qt SLOT for adding QCPGraphData objects to a given plot

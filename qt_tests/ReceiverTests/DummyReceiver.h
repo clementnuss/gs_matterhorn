@@ -40,6 +40,8 @@ public:
         }
     }
 
+    virtual float getPPS() { return 0.0f; }
+
 private:
     std::list<std::unique_ptr<DataPacket>> internalQueue_;
 };
