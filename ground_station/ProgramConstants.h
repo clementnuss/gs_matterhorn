@@ -75,6 +75,16 @@ namespace UIConstants {
     static constexpr int GRAPH_XRANGE_SECS = 20;
     static constexpr int GRAPH_MEMORY_SECS = 600;
     static constexpr int GRAPH_MEMORY_USECS = GRAPH_MEMORY_SECS * TimeConstants::USECS_IN_SEC;
+
+    namespace RSSIThresholds {
+        static constexpr float GOOD = 40;
+        static constexpr float POOR = 90;
+    }
+
+    namespace PPSThresholds {
+        static constexpr float GOOD = 50;
+        static constexpr float POOR = 20;
+    }
 }
 
 namespace SimulatorConstants {

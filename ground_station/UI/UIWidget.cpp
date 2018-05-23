@@ -1,4 +1,5 @@
 #include <Qt3DInput/QInputAspect>
+#include <Utilities/MathUtils.h>
 #include "UIWidget.h"
 #include "UI/Colors.h"
 #include "Readers/FileReader.h"
@@ -209,6 +210,14 @@ GSMainwindow::updateData(const GPSPacket gpsData) {
     }
 }
 
+QColor
+colorForQualityValue(const float &v, const float &lo, const float &hi) {
+    float vnorm{normalize(static_cast<float>(v), lo, hi)};
+    return QColor{lerp(UIColors::GREEN_R, UIColors::RED_R, vnorm),
+                  lerp(UIColors::GREEN_G, UIColors::RED_G, vnorm),
+                  lerp(UIColors::GREEN_B, UIColors::RED_B, vnorm)
+    };
+}
 
 /**
  * Qt SLOT to receive and display RSSI data from the receivers
@@ -217,20 +226,43 @@ GSMainwindow::updateData(const GPSPacket gpsData) {
  */
 void
 GSMainwindow::updateData(const RSSIResponse rssiResponse) {
-    QLabel *l = (rssiResponse.frameID_ == ATCommandResponse::FRAME_ID_RF1) ? ui->rf1_rssi_value : ui->rf2_rssi_value;
-    l->setText(QString::number(-static_cast<int>(rssiResponse.value_)));
+
+    QLabel *label;
+    if (rssiResponse.frameID_ == ATCommandResponse::FRAME_ID_RF1) {
+        label = ui->rf1_rssi_value;
+    } else {
+        label = ui->rf2_rssi_value;
+    }
+
+    QPalette palette = label->palette();
+    palette.setColor(label->backgroundRole(), colorForQualityValue(
+            static_cast<float>(rssiResponse.value_),
+            UIConstants::RSSIThresholds::POOR,
+            UIConstants::RSSIThresholds::GOOD)
+    );
+    label->setPalette(palette);
+    label->setText(QString::number(-static_cast<int>(rssiResponse.value_)));
 }
 
+void
+updatePPS(QLabel *label, const float &pps) {
+    QPalette palette = label->palette();
+    palette.setColor(label->backgroundRole(), colorForQualityValue(pps, UIConstants::PPSThresholds::POOR,
+                                                                   UIConstants::PPSThresholds::GOOD)
+    );
+    label->setPalette(palette);
+    label->setText(QString::number(pps, 'f', UIConstants::PRECISION_PPS));
+}
 
 void
 GSMainwindow::updatePrimaryRFPPS(const float pps) {
-    ui->rf1_pps_value->setText(QString::number(pps, 'f', UIConstants::PRECISION_PPS));
+    updatePPS(ui->rf1_pps_value, pps);
 }
 
 
 void
 GSMainwindow::updateSecondaryRFPPS(const float pps) {
-    ui->rf2_pps_value->setText(QString::number(pps, 'f', UIConstants::PRECISION_PPS));
+    updatePPS(ui->rf2_pps_value, pps);
 }
 
 
@@ -324,24 +356,6 @@ GSMainwindow::updateLoggingStatus(bool enabled) {
 
 void
 GSMainwindow::updateLinkStatus(HandlerStatus status) {
-    QColor statusColor;
-
-    switch (status) {
-        case HandlerStatus::NOMINAL:
-            statusColor = UIColors::GREEN;
-            break;
-        case HandlerStatus::LOSSY:
-            statusColor = UIColors::YELLOW;
-            break;
-        case HandlerStatus::DOWN:
-            statusColor = UIColors::RED;
-            break;
-    }
-
-    QLabel *label = ui->status_radio1;
-    QPalette palette = label->palette();
-    palette.setColor(label->backgroundRole(), statusColor);
-    label->setPalette(palette);
 
 }
 
