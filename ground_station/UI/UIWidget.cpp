@@ -217,7 +217,8 @@ GSMainwindow::updateData(const GPSPacket gpsData) {
  */
 void
 GSMainwindow::updateData(const RSSIResponse rssiResponse) {
-    ui->rf1_rssi_value->setText(QString::number(-static_cast<int>(rssiResponse.value_)));
+    QLabel *l = (rssiResponse.frameID_ == ATCommandResponse::FRAME_ID_RF1) ? ui->rf1_rssi_value : ui->rf2_rssi_value;
+    l->setText(QString::number(-static_cast<int>(rssiResponse.value_)));
 }
 
 

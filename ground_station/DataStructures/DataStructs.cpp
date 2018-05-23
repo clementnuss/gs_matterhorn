@@ -34,7 +34,8 @@ DataPacket::toString() const {
 /**
  *  AT command response
  */
-const std::vector<uint8_t> ATCommandResponse::RSSI_COMMAND = {0x7E, 0x00, 0x04, 0x08, 0x01, 0x44, 0x42, 0x70};
+const std::vector<uint8_t> ATCommandResponse::RSSI_COMMAND_RF1 = {0x7E, 0x00, 0x04, 0x08, ATCommandResponse::FRAME_ID_RF1, 0x44, 0x42, 0x70};
+const std::vector<uint8_t> ATCommandResponse::RSSI_COMMAND_RF2 = {0x7E, 0x00, 0x04, 0x08, ATCommandResponse::FRAME_ID_RF2, 0x44, 0x42, 0x70};
 
 void
 ATCommandResponse::dispatchWith(PacketDispatcher *d) {

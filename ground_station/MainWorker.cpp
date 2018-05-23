@@ -171,7 +171,8 @@ Worker::checkLinkStatuses() {
         timeOfLastLinkCheck_ = now;
         emit ppsOnPrimaryRFChanged(compositeReceiver_->getPPS(true));
         emit ppsOnSecondaryRFChanged(compositeReceiver_->getPPS(false));
-        compositeReceiver_->sendCommand(&ATCommandResponse::RSSI_COMMAND[0], ATCommandResponse::RSSI_COMMAND.size());
+        compositeReceiver_->sendCommand(&ATCommandResponse::RSSI_COMMAND_RF1[0], ATCommandResponse::RSSI_COMMAND_RF1.size(), true);
+        compositeReceiver_->sendCommand(&ATCommandResponse::RSSI_COMMAND_RF2[0], ATCommandResponse::RSSI_COMMAND_RF2.size(), false);
     }
 }
 

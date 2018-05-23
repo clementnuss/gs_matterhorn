@@ -45,11 +45,14 @@ struct ATCommandResponse : public IDispatchable {
 
     static constexpr uint8_t FRAME_DELIMITER = 0x7E;
     static constexpr uint8_t FRAME_TYPE = 0x88;
+    static constexpr uint8_t FRAME_ID_RF1 = 0x01;
+    static constexpr uint8_t FRAME_ID_RF2 = 0x02;
     static constexpr size_t HEADER_SIZE = 2;
     static constexpr size_t PAYLOAD_SIZE = 6;
     static constexpr size_t CHECKSUM_SIZE = 1;
     static constexpr uint16_t RSSI_COMMAND_CODE = 0x4442;
-    static const std::vector<uint8_t> RSSI_COMMAND;
+    static const std::vector<uint8_t> RSSI_COMMAND_RF1;
+    static const std::vector<uint8_t> RSSI_COMMAND_RF2;
 
     ATCommandResponse() = default;
 

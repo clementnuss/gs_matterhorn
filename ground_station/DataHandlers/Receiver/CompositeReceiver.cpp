@@ -172,9 +172,13 @@ CompositeReceiver::isReplayReceiver() {
 
 void
 CompositeReceiver::sendCommand(const uint8_t *command, size_t size) {
-    //TODO: don't send to both receivers ?
     primaryReceiver_->sendCommand(command, size);
     backupReceiver_->sendCommand(command, size);
+}
+
+void
+CompositeReceiver::sendCommand(const uint8_t *command, size_t size, bool toPrimaryReceiver) {
+    (toPrimaryReceiver) ? primaryReceiver_->sendCommand(command, size) : backupReceiver_->sendCommand(command, size);
 }
 
 void
