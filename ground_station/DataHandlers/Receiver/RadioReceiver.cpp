@@ -219,7 +219,12 @@ RadioReceiver::~RadioReceiver() {
 void
 RadioReceiver::sendCommand(const uint8_t *command, size_t size) {
     if (serialPort_.isOpen()) {
-        serialPort_.write(command, size);
+        try {
+            serialPort_.write(command, size);
+        } catch (serial::IOException &e) {
+            std::cerr << "IOException while sending command to serial port " << devicePort_ << std::endl;
+            serialPort_.close();
+        }
     }
 }
 
