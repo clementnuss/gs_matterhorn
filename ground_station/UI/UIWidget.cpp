@@ -212,10 +212,11 @@ GSMainwindow::updateData(const GPSPacket gpsData) {
 
 QColor
 colorForQualityValue(const float &v, const float &lo, const float &hi) {
-    float vnorm{normalize(static_cast<float>(v), lo, hi)};
-    return QColor{lerp(UIColors::GREEN_R, UIColors::RED_R, vnorm),
-                  lerp(UIColors::GREEN_G, UIColors::RED_G, vnorm),
-                  lerp(UIColors::GREEN_B, UIColors::RED_B, vnorm)
+    float vnorm{normalize(v, lo, hi)};
+    return QColor{static_cast<int>(lerp(UIColors::RED_R, UIColors::GREEN_R, vnorm)),
+                  static_cast<int>(lerp(UIColors::RED_G, UIColors::GREEN_G, vnorm)),
+                  static_cast<int>(lerp(UIColors::RED_B, UIColors::GREEN_B, vnorm)),
+                  0xFF
     };
 }
 
@@ -228,41 +229,47 @@ void
 GSMainwindow::updateData(const RSSIResponse rssiResponse) {
 
     QLabel *label;
+    QFrame *groupFrame;
+
     if (rssiResponse.frameID_ == ATCommandResponse::FRAME_ID_RF1) {
         label = ui->rf1_rssi_value;
+        groupFrame = ui->rf1_rssi_group;
     } else {
         label = ui->rf2_rssi_value;
+        groupFrame = ui->rf2_rssi_group;
     }
 
-    QPalette palette = label->palette();
-    palette.setColor(label->backgroundRole(), colorForQualityValue(
-            static_cast<float>(rssiResponse.value_),
-            UIConstants::RSSIThresholds::POOR,
-            UIConstants::RSSIThresholds::GOOD)
-    );
-    label->setPalette(palette);
     label->setText(QString::number(-static_cast<int>(rssiResponse.value_)));
+
+    QPalette palette = groupFrame->palette();
+    palette.setColor(groupFrame->backgroundRole(), colorForQualityValue(
+            -static_cast<float>(rssiResponse.value_),
+            UIConstants::RSSIThresholds::GOOD,
+            UIConstants::RSSIThresholds::POOR)
+    );
+
+    groupFrame->setPalette(palette);
 }
 
 void
-updatePPS(QLabel *label, const float &pps) {
-    QPalette palette = label->palette();
-    palette.setColor(label->backgroundRole(), colorForQualityValue(pps, UIConstants::PPSThresholds::POOR,
+updatePPS(QLabel *label, QFrame *groupFrame, const float &pps) {
+    QPalette palette = groupFrame->palette();
+    palette.setColor(groupFrame->backgroundRole(), colorForQualityValue(pps, UIConstants::PPSThresholds::POOR,
                                                                    UIConstants::PPSThresholds::GOOD)
     );
-    label->setPalette(palette);
+    groupFrame->setPalette(palette);
     label->setText(QString::number(pps, 'f', UIConstants::PRECISION_PPS));
 }
 
 void
 GSMainwindow::updatePrimaryRFPPS(const float pps) {
-    updatePPS(ui->rf1_pps_value, pps);
+    updatePPS(ui->rf1_pps_value, ui->rf1_pps_group, pps);
 }
 
 
 void
 GSMainwindow::updateSecondaryRFPPS(const float pps) {
-    updatePPS(ui->rf2_pps_value, pps);
+    updatePPS(ui->rf2_pps_value, ui->rf2_pps_group, pps);
 }
 
 

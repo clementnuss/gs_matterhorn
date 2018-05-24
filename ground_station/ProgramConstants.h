@@ -77,8 +77,8 @@ namespace UIConstants {
     static constexpr int GRAPH_MEMORY_USECS = GRAPH_MEMORY_SECS * TimeConstants::USECS_IN_SEC;
 
     namespace RSSIThresholds {
-        static constexpr float GOOD = 40;
-        static constexpr float POOR = 90;
+        static constexpr float GOOD = -40;
+        static constexpr float POOR = -90;
     }
 
     namespace PPSThresholds {
