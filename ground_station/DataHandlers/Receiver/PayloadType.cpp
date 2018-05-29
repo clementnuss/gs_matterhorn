@@ -13,7 +13,7 @@ const PayloadType PayloadType::TELEMETRY{CommunicationsConstants::TELEMETRY_TYPE
  *  [TIMESTAMP | ACC | EULER | TEMP | PRES | PITOT]    Field name
  *       4       12    12      4      4       0        Size in bytes 36
  */
-const PayloadType PayloadType::TELEMETRY_ERT18{CommunicationsConstants::TELEMETRY_ERT18_TYPE, 36};
+const PayloadType PayloadType::TELEMETRY_ERT18{CommunicationsConstants::TELEMETRY_ERT18_TYPE, 40};
 
 /*
  *  [TIMESTAMP | EVENT CODE]                                Field name

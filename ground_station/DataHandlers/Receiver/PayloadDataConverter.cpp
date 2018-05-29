@@ -30,6 +30,8 @@ PayloadDataConverter::toERT18SensorsPacket(const FlyableType &flyableType, const
     float_cast pressure = {.uint32 = parse32<uint32_t>(it)};
     float pressure_hPa = pressure.fl;
 
+    float_cast air_speed = {.uint32 = parse32<uint32_t>(it)};
+
     // more info here: https://barani.biz/apps/sea-level-pressure/
     /*
     double adjustedSeaLevelPressure = SensorConstants::currentLocationReferenceHPa * pow(
@@ -41,8 +43,6 @@ PayloadDataConverter::toERT18SensorsPacket(const FlyableType &flyableType, const
     //TODO: factorize functions and test independently
     double altitude = altitudeFromPressure(pressure_hPa);
 
-//    double air_speed = airSpeedFromPitotPressure(pitotPressure);
-
     return new SensorsPacket(measurement_time,
                              sequenceNumber,
                              flyableType,
@@ -52,7 +52,7 @@ PayloadDataConverter::toERT18SensorsPacket(const FlyableType &flyableType, const
                              Data3D {0, 0, 0},
                              pressure_hPa,
                              temperature.fl,
-                             0.0);
+                             air_speed.fl);
 }
 
 /**

@@ -1,3 +1,4 @@
+/*
 #include <DataHandlers/IReceiver.h>
 #include <DataHandlers/Simulator/TelemetrySimulator.h>
 #include "gtest/gtest.h"
@@ -20,3 +21,4 @@ TEST(SimulatorsTests, simulatedTelemetryIsCorrect) {
         //TODO: perform more elaborate tests
     }
 }
+*/
