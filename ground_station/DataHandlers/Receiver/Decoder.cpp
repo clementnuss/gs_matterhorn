@@ -38,7 +38,7 @@ Decoder::processHeader(std::vector<uint8_t> headerBuffer) {
 
     uint8_t payloadInfo = headerBuffer[SEQUENCE_NUMBER_SIZE];
 
-    uint8_t flyableType = payloadInfo & CommunicationsConstants::FLYABLE_TYPE_MASK;
+    uint8_t flyableType = (payloadInfo & CommunicationsConstants::FLYABLE_TYPE_MASK) >> 4;
     uint8_t payloadType = payloadInfo & CommunicationsConstants::PAYLOAD_TYPE_MASK;
 
     if (PayloadType::TYPES_TABLE.count(payloadType) > 0) {

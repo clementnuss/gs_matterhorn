@@ -244,8 +244,8 @@ GSMainwindow::updateData(const RSSIResponse rssiResponse) {
     QPalette palette = groupFrame->palette();
     palette.setColor(groupFrame->backgroundRole(), colorForQualityValue(
             -static_cast<float>(rssiResponse.value_),
-            UIConstants::RSSIThresholds::GOOD,
-            UIConstants::RSSIThresholds::POOR)
+            UIConstants::RSSIThresholds::POOR,
+            UIConstants::RSSIThresholds::GOOD)
     );
 
     groupFrame->setPalette(palette);
