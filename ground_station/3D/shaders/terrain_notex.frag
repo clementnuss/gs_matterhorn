@@ -2,8 +2,6 @@
 
 varying vec3 color;
 
-uniform sampler2D diffuseTexture;
-
 void main()
 {
     vec3 clay = vec3(0.81, 0.77, 0.69);

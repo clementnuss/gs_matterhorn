@@ -45,9 +45,9 @@ ContinuousElevationModel::slopeAt(const LatLon &latLon) const {
     QVector3D slopeSE = slopeSample(latSWi, lonSWi + 1);
     QVector3D slopeNE = slopeSample(latSWi + 1, lonSWi + 1);
 
-    QVector3D elevation = bilerpVect(slopeSW, slopeSE, slopeNW, slopeNE, lonSW - lonSWi, latSW - latSWi);
+    QVector3D slope = bilerpVect(slopeSW, slopeSE, slopeNW, slopeNE, lonSW - lonSWi, latSW - latSWi);
 
-    return slopeSample(latSWi, lonSWi);
+    return slope;
 }
 
 float
