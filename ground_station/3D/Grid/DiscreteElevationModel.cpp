@@ -69,5 +69,5 @@ DiscreteElevationModel::extent() const {
 double
 DiscreteElevationModel::geoAngleToIndex(const GeoAngle &geoAngle) {
     return geoAngle.degrees * GridConstants::SAMPLES_PER_DEGREE + geoAngle.minutes * GridConstants::SAMPLES_PER_MINUTE +
-           geoAngle.seconds;
+           geoAngle.seconds / GridConstants::DEM_RESOLUTION;
 }

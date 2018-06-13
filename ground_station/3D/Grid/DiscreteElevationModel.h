@@ -7,6 +7,7 @@
 
 #include <3D/CoordinateUtils.h>
 #include <DataStructures/Interval2D.h>
+#include <3D/3DVisualisationConstants.h>
 #include "IDiscreteElevationModel.h"
 
 class DiscreteElevationModel : public IDiscreteElevationModel {
@@ -22,7 +23,7 @@ public:
 
 private:
 
-    static constexpr int MODEL_RESOLUTION = 3600;
+    static constexpr int MODEL_RESOLUTION = GridConstants::SAMPLES_PER_DEGREE;
     static constexpr int BYTES_PER_MEASURE = 2;
     const uint16_t *hgtData_;
     boost::iostreams::mapped_file_source hgtFile_;

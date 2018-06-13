@@ -69,10 +69,11 @@ namespace GridConstants {
     static constexpr int EARTH_RADIUS = 6371000;
     static constexpr int MINUTES_PER_DEGREE = 60;
     static constexpr int SECONDS_PER_DEGREE = 3600;
-    static constexpr int SAMPLES_PER_DEGREE = 3600;
-    static constexpr int SAMPLES_PER_MINUTE = 60;
+    static constexpr int DEM_RESOLUTION = 3;
+    static constexpr int SAMPLES_PER_DEGREE = SECONDS_PER_DEGREE / DEM_RESOLUTION; // Resolution of Digital Elevation Model
+    static constexpr int SAMPLES_PER_MINUTE = SAMPLES_PER_DEGREE / MINUTES_PER_DEGREE;
     static constexpr int GRID_RESOLUTION = 101;
-    static constexpr int GRID_LENGTH_IN_METERS = 1250;
+    static constexpr int GRID_LENGTH_IN_METERS = 2500;
     static constexpr int HIGHLIGHT_AREA_IN_METERS = 200;
     static constexpr int HIGHLIGHT_AREA_RESOLUTION = 2;
 }
