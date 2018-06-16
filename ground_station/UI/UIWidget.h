@@ -76,6 +76,8 @@ public slots:
 
 
     /* STATUS UPDATE SLOTS */
+    void toggleLog();
+
     void updateLoggingStatus(bool);
 
     void updateLinkStatus(HandlerStatus);

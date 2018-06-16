@@ -108,6 +108,7 @@ GSMainwindow::~GSMainwindow() {
 void
 GSMainwindow::connectComponents() {
     connect(&clockTimer, SIGNAL(timeout()), this, SLOT(updateTime()));
+    connect(ui->logging_button, &QPushButton::clicked, this, &GSMainwindow::toggleLog);
     connect(ui->graph_clear_items_button, &QPushButton::clicked, this, &GSMainwindow::clearAllGraphItems);
     connect(ui->graph_autoplay_button, &QPushButton::clicked, this, &GSMainwindow::updateAutoPlay);
     connect(ui->graph_sync_button, &QPushButton::clicked, this, &GSMainwindow::updatePlotSync);
@@ -355,10 +356,16 @@ GSMainwindow::updateGraphData(QVector<QCPGraphData> &d, GraphFeature feature) {
  */
 void
 GSMainwindow::updateLoggingStatus(bool enabled) {
-    QLabel *label = ui->status_logging;
-    QPalette palette = label->palette();
-    palette.setColor(label->backgroundRole(), enabled ? UIColors::GREEN : UIColors::RED);
-    label->setPalette(palette);
+    QPushButton *button = ui->logging_button;
+    QPalette palette = button->palette();
+    palette.setColor(button->backgroundRole(), enabled ? UIColors::GREEN : UIColors::RED);
+    button->setPalette(palette);
+    button->setText(enabled ? "Logging enabled" : "Logging disabled");
+}
+
+void
+GSMainwindow::toggleLog() {
+    emit toggleLogging();
 }
 
 void
@@ -742,10 +749,7 @@ GSMainwindow::event(QEvent *event) {
         std::cout << "Event" << std::endl;
         auto *ke = dynamic_cast<QKeyEvent *>(event);
 
-        if (ke->key() == Qt::Key_Space) {
-            emit toggleLogging();
-            return true;
-        } else if (ke->key() == Qt::Key_Control) {
+        if (ke->key() == Qt::Key_Control) {
             ui->stackedWidget->setCurrentIndex((ui->stackedWidget->currentIndex() + 1) % ui->stackedWidget->count());
             return true;
         } else if (ke->key() == Qt::Key_F11) {
