@@ -29,9 +29,9 @@
         <file>3D/textures/crosshair.png</file>
         <file>3D/models/compass.obj</file>
         <file>3D/textures/compass_colors.png</file>
-        <file>3D/textures/terrain/payerne-0-0.jpg</file>
-        <file>3D/textures/terrain/payerne-0-1.jpg</file>
-        <file>3D/textures/terrain/payerne-1-0.jpg</file>
-        <file>3D/textures/terrain/payerne-1-1.jpg</file>
+        <file>3D/textures/terrain/irec-0-0.jpg</file>
+        <file>3D/textures/terrain/irec-0-1.jpg</file>
+        <file>3D/textures/terrain/irec-1-0.jpg</file>
+        <file>3D/textures/terrain/irec-1-1.jpg</file>
     </qresource>
 </RCC>

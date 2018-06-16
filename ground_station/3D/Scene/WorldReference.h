@@ -14,7 +14,7 @@ public:
     explicit WorldReference(const LatLon &origin) :
             origin_{origin},
             arcNorthSouthDistance_{
-                    (2.0 * M_PI * GridConstants::EARTH_RADIUS) / (360 * GridConstants::SAMPLES_PER_DEGREE)},
+                    (2.0 * M_PI * GridConstants::EARTH_RADIUS) / (360 * GridConstants::SECONDS_PER_DEGREE)},
             arcWestEastDistance_{arcNorthSouthDistance_ * std::cos(toRadians(origin.latitude))} {
     }
 
@@ -31,11 +31,11 @@ public:
     }
 
     double latitudeFromDistance(float meters, double reference) const {
-        return reference + (meters / (arcNorthSouthDistance_ * GridConstants::SAMPLES_PER_DEGREE));
+        return reference + (meters / (arcNorthSouthDistance_ * GridConstants::SECONDS_PER_DEGREE));
     }
 
     double longitudeFromDistance(float meters, double reference) const {
-        return reference + (meters / (arcWestEastDistance_ * GridConstants::SAMPLES_PER_DEGREE));
+        return reference + (meters / (arcWestEastDistance_ * GridConstants::SECONDS_PER_DEGREE));
     }
 
     QVector3D worldPosAt(const LatLon &point, std::shared_ptr<const ContinuousElevationModel> &model) const {
