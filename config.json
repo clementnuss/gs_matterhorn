@@ -1,27 +1,26 @@
 {
-  "origin": {
-    "lat": 46.83850,
-    "lon": 6.89931
+  "origin": { 
+    "lat": 32.942380,
+    "lon": -106.914828
   },
   "gs": {
-    "lat": 46.837704,
-    "lon": 6.898836
+    "lat": 32.940272,
+    "lon": -106.919195
   },
   "launchsite": {
-    "lat": 46.838176,
-    "lon": 6.899335,
+    "lat": 32.942380,
+    "lon": -106.914828,
     "distance": 50.0,
-    "altitude": 430.0,
+    "altitude": 1382.74,
     "adjustedSeaLevelPressure": 1015.6
   },
   "dems": [
-    "./DEM/N46E006.hgt",
-    "./DEM/N46E007.hgt"
+    "./DEM/N32W107.hgt" 
   ],
-  "commonTexturePath": "qrc:/3D/textures/terrain/payerne",
+  "commonTexturePath": "qrc:/3D/textures/terrain/irec",
   "meteoFile": "./MeteoData/meteo_payerne_test.txt",
-  "receiverID": {
-    "900MHz": "FTDIBUS\\COMPORT&VID_0403&PID_6015",
-    "433MHz": "USB\\VID_1A86&PID_7523&REV_0263"
+  "receiverID":{
+	"900MHz": "FTDIBUS\\COMPORT&VID_0403&PID_6015",
+	"433MHz": ""
   }
 }

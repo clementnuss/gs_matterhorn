@@ -85,10 +85,10 @@ GSMainwindow::GSMainwindow() :
     gpsLabelsMap_.insert(std::make_pair<FlyableType, GpsLabelsStruct>(
             FlyableType::PAYLOAD,
             GpsLabelsStruct{
-                    ui->gps_sats_value,
-                    ui->gps_hdop_value,
-                    ui->gps_latitude_value,
-                    ui->gps_longitude_value
+                    ui->gps_sats_value_payload,
+                    ui->gps_hdop_value_payload,
+                    ui->gps_latitude_value_payload,
+                    ui->gps_longitude_value_payload
             }
     ));
 
