@@ -37,6 +37,7 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
         lastComputedSpeed_{0, 0, 0},
         lastComputedPosition_{0, 0, 0},
         previousComputedPosition_{0, 0, 0},
+        launchSitePos_{0, 0, 0},
         registeredEvents_{},
         worldRef_{std::make_shared<const WorldReference>(LatLon{
                 ConfSingleton::instance().get("origin.lat", 0.0),
@@ -47,20 +48,6 @@ RootEntity::RootEntity(Qt3DExtras::Qt3DWindow *view, Qt3DCore::QNode *parent) :
 
     initRenderSettings(view);
     initCamera(view);
-
-    trackedFlyables_.insert(std::make_pair<FlyableType, Tracker *>(
-            FlyableType::ROCKET,
-            new Tracker(launchSitePos_, camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
-                        TextType::BOLD, this, OpenGLConstants::ABOVE_MARKER_OFFSET,
-                        OpenGLConstants::ABOVE_CENTER_LABEL)
-    ));
-
-    trackedFlyables_.insert(std::make_pair<FlyableType, Tracker *>(
-            FlyableType::PAYLOAD,
-            new Tracker(launchSitePos_, camera_, TextureConstants::CARET_DOWN, QStringLiteral("PAYLOAD"),
-                        TextType::LEGEND, this, OpenGLConstants::ABOVE_MARKER_OFFSET,
-                        OpenGLConstants::ABOVE_RIGHT_LABEL)
-    ));
 }
 
 void
@@ -96,6 +83,20 @@ RootEntity::init() {
 
     auto *gs = new GroundStation(worldRef_->worldPosAt(gsLatLon, elevationModel_), TextureConstants::DOUBLE_DOWN_ARROW,
                                  camera_, this);
+
+    trackedFlyables_.insert(std::make_pair<FlyableType, Tracker *>(
+            FlyableType::ROCKET,
+            new Tracker(worldRef_->worldPosAt(launchSiteLatLon, elevationModel_), camera_, TextureConstants::CARET_DOWN, QStringLiteral("ROCKET"),
+                        TextType::BOLD, this, OpenGLConstants::ABOVE_MARKER_OFFSET,
+                        OpenGLConstants::ABOVE_CENTER_LABEL)
+    ));
+
+    trackedFlyables_.insert(std::make_pair<FlyableType, Tracker *>(
+            FlyableType::PAYLOAD,
+            new Tracker(worldRef_->worldPosAt(launchSiteLatLon, elevationModel_), camera_, TextureConstants::CARET_DOWN, QStringLiteral("PAYLOAD"),
+                        TextType::LEGEND, this, OpenGLConstants::ABOVE_MARKER_OFFSET,
+                        OpenGLConstants::ABOVE_RIGHT_LABEL)
+    ));
 
     // Initialise simulated rocket trace
     /*
