@@ -14,7 +14,7 @@ PacketDispatcher::PacketDispatcher(Worker *const containerWorker) :
         sensorsLogger_{LogConstants::WORKER_TELEMETRY_LOG_PATH},
         gpsLogger_{LogConstants::WORKER_GPS_LOG_PATH},
         eventLogger_{LogConstants::WORKER_EVENT_LOG_PATH},
-        logEnabled_{false} {
+        logEnabled_{true} {
 
     // Build queues for each flyable type
     for (size_t i = 0; i < FlyableType::Count; i++) {
