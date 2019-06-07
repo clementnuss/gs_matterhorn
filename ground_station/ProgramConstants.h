@@ -4,14 +4,9 @@
 #include <map>
 #include <string>
 #include "CRC/CRC.h"
-#include <QVector3D>
-#include <Qt3DRender/QLayer>
-#include <3D/CoordinateUtils.h>
 
 #define DEBUG false
 #define USE_TRACKING false
-#define USE_3D_MODULE true
-#define TEST3D true
 
 
 namespace UnitsConstants {

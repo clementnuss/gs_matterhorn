@@ -8,8 +8,9 @@
 
 static double
 altitudeFromPressure(float pressure_hPa) {
+    float seaLevelPressure = ConfSingleton::instance().get("adjustedSeaLevelPressure", 1000.0f);
     return 44330 *
-           (1.0 - pow(pressure_hPa / ConfSingleton::instance().get("adjustedSeaLevelPressure", 1000.0f), 0.1903));
+           (1.0 - pow(pressure_hPa / seaLevelPressure, 0.1903));
 }
 
 static double

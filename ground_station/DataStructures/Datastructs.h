@@ -8,6 +8,8 @@
 #include <utility>
 #include <Flyable.h>
 #include "ProgramConstants.h"
+#include <vector>
+#include <list>
 
 using namespace PrintConstants;
 
@@ -126,8 +128,6 @@ struct GPSPacket : public DataPacket, IDeserializable {
     void dispatchWith(PacketDispatcher *) override;
 
     bool isValid() const override;
-
-    LatLon latLon() const;
 };
 
 struct Data3D : public ILoggable {

@@ -20,7 +20,7 @@ class RadioReceiver : public IReceiver {
 
 public:
 
-    explicit RadioReceiver(const string &, const string &logTitle);
+    explicit RadioReceiver(const string &hardwareID, const string &port, const string &logTitle);
 
     ~RadioReceiver() override;
 

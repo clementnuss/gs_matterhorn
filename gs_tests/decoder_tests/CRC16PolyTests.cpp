@@ -61,12 +61,12 @@ TEST(CRCTest, lightCRCImplementation) {
     for (const char byte : helloWorld) {
         uint16_t remainder = crc;
 
-        std::cout << std::hex << "current remainder\t0x" << remainder << endl;
+        std::cout << std::hex << "current remainder\t0x" << remainder << std::endl;
         remainder = (remainder << CHAR_BIT) ^
                     CRC_16_TABLE[static_cast<unsigned char>((remainder >> 8) ^ byte)];
         std::cout << "table value:\t" <<
-                  std::hex << CRC_16_TABLE[static_cast<unsigned char>((remainder >> 8) ^ byte)] << endl;
-        std::cout << "new remainder:\t" << std::hex << "0x" << remainder << endl;
+                  std::hex << CRC_16_TABLE[static_cast<unsigned char>((remainder >> 8) ^ byte)] << std::endl;
+        std::cout << "new remainder:\t" << std::hex << "0x" << remainder << std::endl;
 
         crc = CRC::CalculateRemainderFromTable<uint16_t, 16>(static_cast<uint8_t>(byte), CRC_16_TABLE,
                                                              CommunicationsConstants::CRC_16_GENERATOR_POLY,
@@ -74,6 +74,6 @@ TEST(CRCTest, lightCRCImplementation) {
     }
 
     uint16_t finalizedCRC = crc ^CommunicationsConstants::CRC_16_GENERATOR_POLY.finalXOR;
-    std::cout << endl;
+    std::cout << std::endl;
     ASSERT_EQ(refCrc, finalizedCRC);
 }

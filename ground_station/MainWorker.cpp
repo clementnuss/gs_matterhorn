@@ -1,18 +1,23 @@
-#include <QThread>
 #include <iostream>
+#include <unistd.h>
+
 #include <DataHandlers/Receiver/RadioReceiver.h>
 #include <DataHandlers/Replay/TelemetryReplay.h>
 #include <ConfigParser/ConfigParser.h>
 #include <DataHandlers/Receiver/CompositeReceiver.h>
+#include <Utilities/TimeUtils.h>
 #include "MainWorker.h"
 #include "PacketDispatcher.h"
 
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 
 /**
  *
  * @param telemetryHandler
  */
-Worker::Worker(GSMainwindow *gsMainwindow) :
+Worker::Worker() :
         packetDispatcher_{new PacketDispatcher(this)},
         loggingEnabled_{false},
         lastIteration_{chrono::system_clock::now()},
@@ -25,25 +30,34 @@ Worker::Worker(GSMainwindow *gsMainwindow) :
         telemetryHandler433MHz_{},
         compositeReceiver_{} {
 
-    gsMainwindow->setRealTimeMode();
     try {
-        // Xbee FTDIBUS\COMPORT&VID_0403&PID_6015
-        // Serial USB\VID_067B&PID_2303&REV_0300
-        telemetryHandler900MHz_ = std::make_unique<RadioReceiver>(ConfSingleton::instance().get("receiverID.900MHz", std::string{""}), "_900Mhz");
+        string port = ConfSingleton::instance().get("receiverID.900MHz.port", std::string{""});
+        if (!port.empty()) {
+            telemetryHandler900MHz_ = std::make_unique<RadioReceiver>("", port, "_900Mhz");
+        } else {
+            string hardwareID = ConfSingleton::instance().get("receiverID.900MHz.hardwareID", std::string{""});
+            telemetryHandler900MHz_ = std::make_unique<RadioReceiver>(hardwareID, "", "_900Mhz");
+        }
         telemetryHandler900MHz_->startup();
     } catch (const std::runtime_error &e) {
-        std::cerr << "Unable to start radio receiver handler:\n" << e.what();
+        std::cerr << "Unable to start 900MHz radio receiver handler:\n" << e.what();
     }
 
     try {
-        // Adafruit USB\VID_1A86&PID_7523&REV_0263
-        telemetryHandler433MHz_ = std::make_unique<RadioReceiver>(ConfSingleton::instance().get("receiverID.433MHz", std::string{""}), "_433MHz");
+        string port = ConfSingleton::instance().get("receiverID.433MHz.port", std::string{""});
+        if (!port.empty()) {
+            telemetryHandler433MHz_ = std::make_unique<RadioReceiver>("", port, "_433Mhz");
+        } else {
+            string hardwareID = ConfSingleton::instance().get("receiverID.433MHz.hardwareID", std::string{""});
+            telemetryHandler433MHz_ = std::make_unique<RadioReceiver>(hardwareID, "", "_433Mhz");
+        }
         telemetryHandler433MHz_->startup();
     } catch (const std::runtime_error &e) {
-        std::cerr << "Unable to start radio receiver handler:\n" << e.what();
+        std::cerr << "Unable to start 433MHz radio receiver handler:\n" << e.what();
     }
 
-    compositeReceiver_ = std::make_unique<CompositeReceiver>(std::move(telemetryHandler900MHz_), std::move(telemetryHandler433MHz_), 10);
+    compositeReceiver_ = std::make_unique<CompositeReceiver>(std::move(telemetryHandler900MHz_),
+                                                             std::move(telemetryHandler433MHz_), 10);
 
 #if USE_TRACKING
     vector<serial::PortInfo> devices_found = serial::list_ports();
@@ -80,14 +94,6 @@ Worker::~Worker() {
     delete packetDispatcher_;
 }
 
-/**
- * Emits all statuses boolean. This should be used once the UI has loaded to initialise
- * the different status color markers.
- */
-void
-Worker::emitAllStatuses() {
-    emit loggingStatusChanged(loggingEnabled_);
-}
 
 /**
  * Entry point of the executing thread
@@ -95,11 +101,9 @@ Worker::emitAllStatuses() {
 void
 Worker::run() {
 
-    while (!(QThread::currentThread()->isInterruptionRequested())) {
+    for (;;) {
         mainRoutine();
     }
-
-    std::cout << "The worker thread was interrupted" << std::endl;
 }
 
 /**
@@ -110,7 +114,7 @@ Worker::mainRoutine() {
     //TODO: adapt sleep time so as to have proper framerate
     auto elapsed = msecsBetween(lastIteration_, chrono::system_clock::now());
     if (elapsed < UIConstants::REFRESH_RATE) {
-        QThread::msleep(UIConstants::REFRESH_RATE - static_cast<unsigned long>(elapsed));
+        usleep(1000 * (UIConstants::REFRESH_RATE - static_cast<unsigned long>(elapsed)));
     }
     lastIteration_ = chrono::system_clock::now();
     checkLinkStatuses();
@@ -126,40 +130,11 @@ Worker::mainRoutine() {
     }
 
     packetDispatcher_->processDataFlows();
-
-    QCoreApplication::sendPostedEvents(this);
-    QCoreApplication::processEvents();
 }
 
-
-/**
- * Emits a boolean to the UI indicating the current status of the logger.
- */
-void
-Worker::updateLoggingStatus() {
-    emit loggingStatusChanged(packetDispatcher_->toggleLogging());
-}
-
-
-void
-Worker::toggleTracking() {
-    trackingEnabled_ = !trackingEnabled_;
-
-#if USE_TRACKING
-
-    double movAverage = 0;
-    for (double i: altitudeBuffer_) {
-        movAverage += i;
-    }
-    movAverage /= altitudeBuffer_.size();
-
-    SensorConstants::launchAltitude = static_cast<float>(movAverage);
-    SensorConstants::trackingAltitude = static_cast<float>(movAverage + 1);
-#endif
-}
-
-/**
+/*
  * Determine the status of the communication based on the quantity of data received during the past second.
+ * Sends a request to so that the receiver sends the RSSI of the last received packet
  */
 void
 Worker::checkLinkStatuses() {
@@ -169,34 +144,15 @@ Worker::checkLinkStatuses() {
     if (elapsedMillis > CommunicationsConstants::MSECS_BETWEEN_LINK_CHECKS) {
 
         timeOfLastLinkCheck_ = now;
-        emit ppsOnPrimaryRFChanged(compositeReceiver_->getPPS(true));
-        emit ppsOnSecondaryRFChanged(compositeReceiver_->getPPS(false));
-        compositeReceiver_->sendCommand(&ATCommandResponse::RSSI_COMMAND_RF1[0], ATCommandResponse::RSSI_COMMAND_RF1.size(), true);
-        compositeReceiver_->sendCommand(&ATCommandResponse::RSSI_COMMAND_RF2[0], ATCommandResponse::RSSI_COMMAND_RF2.size(), false);
+        //emit ppsOnPrimaryRFChanged(compositeReceiver_->getPPS(true));
+        //emit ppsOnSecondaryRFChanged(compositeReceiver_->getPPS(false));
+        compositeReceiver_->sendCommand(&ATCommandResponse::RSSI_COMMAND_RF1[0],
+                                        ATCommandResponse::RSSI_COMMAND_RF1.size(), true);
+        compositeReceiver_->sendCommand(&ATCommandResponse::RSSI_COMMAND_RF2[0],
+                                        ATCommandResponse::RSSI_COMMAND_RF2.size(), false);
     }
 }
 
-
-void
-Worker::updatePlaybackSpeed(double newSpeed) {
-    assert(replayMode_);
-    //auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler900MHz_.get());
-    //telemReplay->updatePlaybackSpeed(newSpeed);
-}
-
-void
-Worker::resetPlayback() {
-    assert(replayMode_);
-    //auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler900MHz_.get());
-    //telemReplay->resetPlayback();
-}
-
-void
-Worker::reversePlayback(bool reversed) {
-    assert(replayMode_);
-    //auto *telemReplay = dynamic_cast<ITelemetryReplayHandler *>(telemetryHandler900MHz_.get());
-    //telemReplay->setPlaybackReversed(reversed);
-}
 
 void
 Worker::transmitCommand(int command) {
@@ -214,74 +170,4 @@ Worker::transmitCommand(int command) {
 }
 
 
-void
-Worker::defineReplayMode(const QString &parameters) {
-    /* IReceiver *handler = nullptr;
-     try {
-         handler = new TelemetryReplay(parameters.toStdString());
-         handler->startup();
-     } catch (std::runtime_error &e) {
-         std::cerr << "Error when starting replay handler:\n" << e.what();
-     }
-     newHandler_ = unique_ptr<IReceiver>{handler};
-     updateHandler_.store(true);
-     */
-}
-
-
-void
-Worker::defineRealtimeMode(const QString &parameters) {
-    /*IReceiver *handler = nullptr;
-    try {
-        handler = new RadioReceiver(parameters.toStdString(), "");
-        handler->startup();
-    } catch (std::runtime_error &e) {
-        std::cerr << "Error when starting RadioReceiver handler:\n" << e.what();
-    }
-    newHandler_ = unique_ptr<IReceiver>{handler};
-    updateHandler_.store(true);
-     */
-}
-
-void
-Worker::moveTrackingSystem(double currentAltitude) {
-#if USE_TRACKING
-
-    altitudeBuffer_.push_back(currentAltitude);
-    double movAverage = 0;
-    for (double i: altitudeBuffer_) {
-        movAverage += i;
-    }
-    movAverage /= altitudeBuffer_.size();
-
-    /**
-     * We use the law of sines to get the correct angle. The tracking altitude corresponds to the ground station's
-     * relative elevation with regards to the launch site altitude.
-     * The distanceToLaunchSite variable is the horizontal distance between the launch site and the GS.
-     */
-
-    double beta = atan(SensorConstants::distanceToLaunchSite / abs(movAverage - SensorConstants::launchAltitude));
-    double hypothenuseToLaunchSite = sqrt(
-            pow(SensorConstants::distanceToLaunchSite, 2) +
-            pow(SensorConstants::trackingAltitude - movAverage, 2));
-    double gamma = asin(abs(movAverage - SensorConstants::launchAltitude) * sin(beta) / hypothenuseToLaunchSite);
-
-    gamma *= 180 / M_PI;
-    gamma = 123 - gamma;
-
-
-    if (msecsBetween(lastTrackingAngleUpdate_, chrono::system_clock::now()) > 100) {
-        lastTrackingAngleUpdate_ = chrono::system_clock::now();
-        std::string toSend = std::to_string(static_cast<int>(gamma)) + "\r\n";
-        cout << "angle for tracking: " << toSend;
-        if (trackingEnabled_) {
-            serialPort_.write(toSend);
-            uint8_t carriageReturn = 0x0d;
-            serialPort_.write(&carriageReturn, 1);
-        }
-    }
-
-#endif
-}
-
-
+#pragma clang diagnostic pop

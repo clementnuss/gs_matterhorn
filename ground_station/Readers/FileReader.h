@@ -1,7 +1,6 @@
 #ifndef GS_MATTERHORN_FILEREADER_H
 #define GS_MATTERHORN_FILEREADER_H
 
-#include <QVector>
 #include <boost/filesystem.hpp>
 #include <string>
 #include <iostream>

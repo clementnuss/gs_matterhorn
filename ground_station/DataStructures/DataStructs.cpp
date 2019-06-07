@@ -168,10 +168,6 @@ GPSPacket::isValid() const {
            (-180.0f <= longitude_ && longitude_ <= 180.0f);
 }
 
-LatLon
-GPSPacket::latLon() const {
-    return LatLon{latitude_, longitude_};
-}
 
 
 /**

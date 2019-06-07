@@ -1,26 +1,35 @@
 {
-  "origin": { 
-    "lat": 32.942380,
-    "lon": -106.914828
+  "origin": {
+    "lat": 47.057274,
+    "lon": 6.918895
+  },
+  "origin_test_range_encanto": {
+    "lat": 32.343203,
+    "lon": -106.615227
   },
   "gs": {
-    "lat": 32.940272,
-    "lon": -106.919195
+    "lat": 47.055119,
+    "lon": 6.912208
   },
   "launchsite": {
-    "lat": 32.942380,
-    "lon": -106.914828,
+    "lat": 47.051528,
+    "lon": 6.917500,
     "distance": 50.0,
-    "altitude": 1382.74,
-    "adjustedSeaLevelPressure": 1015.6
+    "altitude": 1382.74
   },
   "dems": [
-    "./DEM/N32W107.hgt" 
+    "./DEM/N32W107.hgt"
   ],
+  "adjustedSeaLevelPressure": 1018.54,
   "commonTexturePath": "qrc:/3D/textures/terrain/irec",
   "meteoFile": "./MeteoData/meteo_payerne_test.txt",
   "receiverID":{
-	"900MHz": "FTDIBUS\\COMPORT&VID_0403&PID_6015",
-	"433MHz": ""
+    "900MHz": {
+      "port": "/dev/ttyS1",
+      "hardwareID": ""
+    },
+    "433MHz": {
+      "hardwareID_YAGI": "USB\\VID_1A86&PID_7523&REV_0263"
+    }
   }
 }

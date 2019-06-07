@@ -1,6 +1,5 @@
 
-#include <UI/GraphFeature.h>
-#include <Utilities/GraphUtils.h>
+#include <iostream>
 #include "PacketDispatcher.h"
 #include "MainWorker.h"
 
@@ -64,63 +63,39 @@ PacketDispatcher::dispatch(RSSIResponse *r) {
 }
 
 
-/**
- *
- *
- * @param data A reference to a vector of telemetry structs.
- * @param extractionFct A helper function to convert the strucs to plottable objects (QCPGraphData).
- * @return A QVector of QCPGraphData.
- */
-QVector<QCPGraphData>
-extractGraphData(std::vector<SensorsPacket *> &data, QCPGraphData (*extractionFct)(SensorsPacket)) {
-    QVector<QCPGraphData> v;
-    long long int lastTimestampSeen = 0;
-
-    for (SensorsPacket *reading : data) {
-        if (abs(lastTimestampSeen - reading->timestamp_) > UIConstants::GRAPH_DATA_INTERVAL_USECS) {
-            v.append(extractionFct(*reading));
-            lastTimestampSeen = reading->timestamp_;
-        }
-    }
-
-    return v;
-}
 
 void
 PacketDispatcher::processDataFlows() {
 
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 
-    QVector<QCPGraphData> altitudeDataBuffer = extractGraphData(sensorsPacketQueues_[FlyableType::ROCKET], altitudeFromReading);
-    QVector<QCPGraphData> accelDataBuffer = extractGraphData(sensorsPacketQueues_[FlyableType::ROCKET], accelerationFromReading);
+    for (auto *reading : sensorsPacketQueues_[FlyableType::ROCKET]) {
+        stringstream ss{};
+        ss << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER);
+        ss << "SENSOR# ";
+        ss << reading->toString();
+        std::cout << ss.str() << std::endl;
+    }
 
-    emit worker_->graphDataChanged(altitudeDataBuffer, GraphFeature::FEATURE1);
-    emit worker_->graphDataChanged(accelDataBuffer, GraphFeature::FEATURE2);
+    for (auto *reading : gpsPacketQueues_[FlyableType::ROCKET]) {
+        stringstream ss{};
+        ss << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER);
+        ss << "GPS# ";
+        ss << reading->toString();
+        std::cout << ss.str() << std::endl;
+    }
 
-    displayFreshValues();
+    for (auto *reading : rssiResponsesQueue_) {
+        stringstream ss{};
+        ss << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER);
+        ss << "RSSI# ";
+        ss << static_cast<int>(reading->value_);
+        std::cout << ss.str() << std::endl;
+    }
+
     releaseMemory();
 }
 
-
-void
-PacketDispatcher::displayFreshValues() {
-
-    emitIfNonEmpty(rssiResponsesQueue_);
-
-    std::chrono::system_clock::time_point now{std::chrono::system_clock::now()};
-
-    for (size_t i = 0; i < FlyableType::Count; i++) {
-
-        auto t = static_cast<FlyableType>(i);
-
-        if (msecsBetween(lastUpdates_[t], now) > UIConstants::NUMERICAL_SENSORS_VALUES_REFRESH_RATE) {
-            lastUpdates_[t] = now;
-            emitIfNonEmpty(sensorsPacketQueues_[t]);
-            emitIfNonEmpty(gpsPacketQueues_[t]);
-            emitIfNonEmpty(eventPacketQueues_[t]);
-        }
-    }
-}
 
 template<class T>
 void
@@ -148,17 +123,6 @@ PacketDispatcher::releaseMemory() {
 
     for (auto &entry : eventPacketQueues_) {
         freeQueue<EventPacket *>(entry.second);
-    }
-}
-
-template<class T>
-void
-PacketDispatcher::emitIfNonEmpty(const std::vector<T *> &v) {
-    if (!v.empty()) {
-
-        // Copy the content of the object pointed at by the last element in the vector
-        T t = (*v.back());
-        emit worker_->dataChanged(t);
     }
 }
 

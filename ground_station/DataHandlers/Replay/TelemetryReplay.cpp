@@ -2,6 +2,7 @@
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 #include <Utilities/TimeUtils.h>
+#include <cstddef>
 
 using namespace boost::filesystem;
 
@@ -45,7 +46,7 @@ TelemetryReplay::startup() {
     if (gpsReadings_.empty()) {
         GPSPacket g{};
         gpsReadings_.push_back(g);
-        std::cout << "No GPS reading for this replay" << endl;
+        std::cout << "No GPS reading for this replay" << std::endl;
     }
 
     resetPlayback();
@@ -141,7 +142,7 @@ TelemetryReplay::pollSensorsData() {
 void
 TelemetryReplay::parseFile(boost::filesystem::path p) {
     boost::filesystem::ifstream ifs{p, std::ios::in};
-    std::cout << "Parsing telemetry file " << p.string() << endl;
+    std::cout << "Parsing telemetry file " << p.string() << std::endl;
 
     std::string reading;
     while (getline(ifs, reading)) {
@@ -195,8 +196,8 @@ TelemetryReplay::parseFile(boost::filesystem::path p) {
                 std::cout << "\tunable to decode this reading:\n\t" << reading;
             }
         } else {
-            std::cout << "\tInvalid reading, only " << values.size() << " values on the line:" << endl;
-            std::cout << "\t" << reading << endl;
+            std::cout << "\tInvalid reading, only " << values.size() << " values on the line:" << std::endl;
+            std::cout << "\t" << reading << std::endl;
             continue;
         }
     }

@@ -1,84 +1,29 @@
 #ifndef MAINWORKER_H
 #define MAINWORKER_H
 
-#include <QtWidgets/QWidget>
 #include <DataStructures/Datastructs.h>
 #include <DataHandlers/IReceiver.h>
-#include <qcustomplot.h>
 #include <chrono>
 #include <serial/serial.h>
 #include <boost/circular_buffer.hpp>
-#include <3D/CoordinateUtils.h>
-#include <UI/UIWidget.h>
 #include <DataHandlers/Receiver/CompositeReceiver.h>
-#include "UI/GraphFeature.h"
 #include "Loggers/FileLogger.h"
 #include "Flyable.h"
 
-class GSMainwindow;
 
-class Worker : public QObject {
-Q_OBJECT
+class Worker {
 
 public:
 
-    explicit Worker(GSMainwindow *);
+    Worker();
 
-    ~Worker() override;
+    ~Worker();
 
     void mainRoutine();
 
-    void defineReplayMode(const QString &);
-
-    void defineRealtimeMode(const QString &parameters);
-
-
-public slots:
-
     void run();
 
-    void emitAllStatuses();
-
-    void updateLoggingStatus();
-
-    void toggleTracking();
-
-    void updatePlaybackSpeed(double);
-
-    void resetPlayback();
-
-    void reversePlayback(bool);
-
     void transmitCommand(int);
-
-signals:
-
-    void loggingStatusChanged(bool);
-
-    void dataChanged(SensorsPacket) const;
-
-    void dataChanged(EventPacket) const;
-
-    void dataChanged(GPSPacket) const;
-
-    void dataChanged(RSSIResponse) const;
-
-    void flightPositionChanged(Position);
-
-    void payloadPositionChanged(Position);
-
-    void ppsOnPrimaryRFChanged(float);
-
-    void ppsOnSecondaryRFChanged(float);
-
-    void graphDataChanged(QVector<QCPGraphData> &, GraphFeature);
-
-    void linkStatusChanged(HandlerStatus);
-
-    void groundStatusChanged(float, float);
-
-    void resetUIState();
-
 
 private:
 
@@ -106,8 +51,6 @@ private:
     std::chrono::system_clock::time_point timeOfLastReceivedTelemetry_;
     long long int millisBetweenLastTwoPackets_;
 
-
-    void moveTrackingSystem(double currentAltitude);
 };
 
 

@@ -13,7 +13,7 @@
  * @param baudRate
  * @param io
  */
-RadioReceiver::RadioReceiver(const string &hardwareID, const string &logTitle)
+RadioReceiver::RadioReceiver(const string &hardwareID, const string &port, const string &logTitle)
         : byteDecoder_{logTitle}, devicePort_{}, serialPort_{}, thread_{},
           recvBuffer_{},
           lastPPSPoll_{std::chrono::system_clock::now()},
@@ -24,7 +24,7 @@ RadioReceiver::RadioReceiver(const string &hardwareID, const string &logTitle)
           bytesLogger_{LogConstants::BYTES_LOG_PATH + logTitle},
           packetLogger_{LogConstants::RECEIVER_LOG_PATH + logTitle} {
 
-    if (hardwareID.empty()) {
+    if (hardwareID.empty() && port.empty()) {
         std::cerr << "Empty serial port specified, telemetry acquisition will not work." << std::endl;
         return;
     }
@@ -37,8 +37,12 @@ RadioReceiver::RadioReceiver(const string &hardwareID, const string &logTitle)
             serial::PortInfo device = *iter++;
             printf("(%s, %s, %s)\n",
                    device.port.c_str(), device.description.c_str(), device.hardware_id.c_str());
-            if (device.hardware_id == hardwareID) {
+            if (device.port == port) {
                 devicePort_ = device.port;
+                break;
+            } else if (device.hardware_id == hardwareID) {
+                devicePort_ = device.port;
+                break;
             }
         }
 

@@ -3,9 +3,9 @@
 #define GS_MATTERHORN_PACKETDISPATCHER_H
 
 #include <DataStructures/Datastructs.h>
-#include <qcustomplot.h>
 #include <deque>
 #include <Loggers/FileLogger.h>
+#include <chrono>
 
 class Worker;
 
@@ -22,11 +22,6 @@ public:
     virtual void dispatch(EventPacket *);
 
     virtual void dispatch(RSSIResponse *);
-
-    template<class T>
-    void emitIfNonEmpty(const std::vector<T *> &v);
-
-    void displayFreshValues();
 
     void releaseMemory();
 
