@@ -1,5 +1,8 @@
 #include <iostream>
 #include <unistd.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #include <DataHandlers/Receiver/RadioReceiver.h>
 #include <DataHandlers/Replay/TelemetryReplay.h>
@@ -95,15 +98,29 @@ Worker::~Worker() {
 }
 
 
+static volatile sig_atomic_t keep_running = 1;
+
+static void sig_handler(int _)
+{
+    (void)_;
+    keep_running = 0;
+}
+
+
 /**
  * Entry point of the executing thread
  */
 void
 Worker::run() {
 
-    for (;;) {
+    signal(SIGINT, sig_handler);
+
+
+    while (keep_running) {
         mainRoutine();
     }
+
+    puts("exiting software and flush log files ... ");
 }
 
 /**
