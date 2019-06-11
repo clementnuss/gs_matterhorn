@@ -47,8 +47,8 @@ ATCommandResponse::toString() const {
     std::stringstream ss;
 
     ss << command_
-       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << frameID_
-       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << status_;
+       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << static_cast<int>(frameID_)
+       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << static_cast<int>(status_);
 
     return ss.str();
 }
@@ -71,7 +71,7 @@ RSSIResponse::toString() const {
     std::stringstream ss;
 
     ss << ATCommandResponse::toString()
-       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << value_;
+       << std::setw(FIELD_WIDTH) << std::setfill(DELIMITER) << static_cast<int>(value_);;
 
     return ss.str();
 }
